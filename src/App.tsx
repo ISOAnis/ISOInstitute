@@ -13,10 +13,7 @@ const About = lazy(() => import('./components/About').then(m => ({ default: m.Ab
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
-const FAQ = lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
-const BecomeACoach = lazy(() => import('./components/BecomeACoach').then(m => ({ default: m.BecomeACoach })));
-
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'faq' | 'become-a-coach';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -131,20 +128,6 @@ export default function App() {
             coachName={selectedCoachName}
             onBack={navigateBackToCoaches}
           />
-        </Suspense>
-      )}
-
-      {/* FAQ page */}
-      {currentPage === 'faq' && (
-        <Suspense fallback={<LoadingSpinner />}>
-          <FAQ />
-        </Suspense>
-      )}
-
-      {/* Become a Coach page */}
-      {currentPage === 'become-a-coach' && (
-        <Suspense fallback={<LoadingSpinner />}>
-          <BecomeACoach />
         </Suspense>
       )}
 

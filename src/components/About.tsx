@@ -1,135 +1,210 @@
 import * as React from 'react';
 
+const stats = [
+  { label: 'Young people mentored', value: '250+' },
+  { label: 'Faith-centered coaches', value: '45' },
+  { label: 'Cities represented', value: '18' },
+  { label: 'Mentee satisfaction', value: '97%' },
+];
+
+const milestones = [
+  {
+    year: '2018',
+    title: 'The ISO spark',
+    copy:
+      'Anis begins informal coaching circles to help Muslim students navigate faith, academics, and purpose.',
+  },
+  {
+    year: '2021',
+    title: 'Court culture',
+    copy:
+      'The basketball metaphor becomes our operating system: one court, trusted coaches, and a scoreboard that tracks character as much as outcomes.',
+  },
+  {
+    year: '2024',
+    title: 'ISO Institute',
+    copy:
+      'We formalize our playbook with curated mentors, immersive coaching nights, and a product experience focused on proximity to success.',
+  },
+];
+
+const values = [
+  {
+    label: 'Faith x Ambition',
+    copy: 'Spiritual practice is the anchor, ambition is the engine. We train both.',
+  },
+  {
+    label: 'Coaching > Content',
+    copy: 'Mentees don’t need another motivational thread—they need a disciplined coach in their corner.',
+  },
+  {
+    label: 'Proximity builds courage',
+    copy: 'We engineer rooms, not feeds. When you sit next to excellence, your next move becomes obvious.',
+  },
+];
+
 export function About() {
   return (
-    <div className="min-h-screen bg-slate-950 pt-32 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        {/* ISO Institute Title */}
-        <div className="text-center mb-16">
-          <h1 className="text-white mb-4" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(3rem, 8vw, 5rem)', letterSpacing: '0.1em' }}>
-            ISO Institute
-          </h1>
-          <p className="text-slate-300 text-xl md:text-2xl mb-8">"In Search Of"</p>
-        </div>
+    <div className="relative min-h-screen bg-slate-950 text-white overflow-hidden">
+      <div className="absolute -right-24 -top-24 h-96 w-96 bg-orange-500/20 blur-[140px]" />
+      <div className="absolute left-1/4 top-1/3 h-72 w-72 bg-cyan-500/10 blur-[160px]" />
 
-        {/* Main Content */}
-        <div className="space-y-12 mb-16">
-          {/* ISO Basketball Explanation */}
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              In basketball, an ISO (isolation) play is when it's one-on-one — you vs. your defender.
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-32 space-y-24">
+        <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center">
+          <div>
+            <p className="text-sm uppercase tracking-[0.4em] text-slate-400 mb-4">ISO INSTITUTE</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              In Search Of <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">clarity</span>, discipline, and spiritual edge.
+            </h1>
+            <p className="text-lg text-slate-300 leading-relaxed mb-8">
+              On the court, an ISO is one-on-one. In life, it’s you vs. distraction, self-doubt, and inertia.
+              We build coaching environments where Muslim youth can attack the lane with confidence—rooted
+              in deen, sharpened by ambition.
             </p>
-          </div>
-
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              But sometimes, the biggest defender isn't in front of you — it's you.
-            </p>
-          </div>
-
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              ISO stands for In Search Of — because we all find ourselves searching for something: guidance, clarity, purpose, or simply a next step.
-            </p>
-          </div>
-
-          {/* Mission Statement */}
-          <div className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30 p-8">
-            <p className="text-white text-xl md:text-2xl leading-relaxed italic text-center">
-                  "Our goal is to bring youth into the proximity of success by creating an intuitive space where coaching, faith, and purpose intersect."
-            </p>
-          </div>
-
-          {/* Founder Story */}
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed mb-6">
-              The ISO Mentorship Institute is built by <span className="text-white font-semibold">Anis Benyoucef</span>, a first-generation Algerian-American, who has been through the same crossroads — someone who know what it feels like to be confused, stuck, or uncertain about what's next.
-            </p>
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              This isn't just about career advice. It's about life coaching: spiritual growth, professional direction, and personal courage.
-            </p>
-          </div>
-
-          {/* Calling an ISO */}
-          <div className="bg-gradient-to-r from-slate-900 via-orange-900/20 to-slate-900 rounded-2xl border-2 border-orange-500/30 p-8">
-            <p className="text-white text-xl md:text-2xl leading-relaxed mb-6">
-              When you "call an ISO," you're not going 1-on-1 against yourself — you're stepping into a conversation with someone who's going to challenge you, guide you, and help you take smarter shots.
-            </p>
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
-              We won't hand you easy buckets; we'll help you build the confidence and mindset to create your own.
-            </p>
-          </div>
-
-          {/* Closing Message */}
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-8 text-center">
-            <p className="text-white text-xl md:text-2xl leading-relaxed">
-              Whether you're in search of coaching, opportunity, or simply perspective — this is where your growth starts.
-            </p>
-          </div>
-        </div>
-
-        {/* Additional Content Section from Hero */}
-        <div className="mt-20 pt-16 border-t border-slate-800">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-                ISO Institute: <span className="text-orange-500">"In Search Of"</span>
-              </h2>
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="px-8 py-3 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors font-semibold"
+              >
+                Call an ISO
+              </button>
+              <button
+                onClick={() => document.getElementById('about-mission')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-3 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white transition-colors"
+              >
+                See the mission
+              </button>
             </div>
+          </div>
 
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <p className="text-slate-300 text-lg">
-                  In basketball, an <span className="text-orange-400 font-semibold">ISO (isolation)</span> play is when it's one-on-one — you vs. your defender.
-                </p>
-                <p className="text-slate-300 text-lg">
-                  But sometimes, the biggest defender isn't in front of you — <span className="text-white italic">it's you.</span>
-                </p>
+          <div className="bg-slate-900/60 border border-white/10 rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-300 mb-4">Why we exist</p>
+            <p className="text-lg text-slate-100 leading-relaxed mb-6">
+              “We bring youth into the proximity of success by pairing them with coaches who protect their iman
+              and push their ambition. No vague inspiration—just disciplined reps for the mind, body, and heart.”
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-2xl">
+                ☪️
               </div>
-
-              <div className="py-6 px-6 bg-slate-900/50 rounded-2xl border border-slate-800">
-                <p className="text-slate-200">
-                  <span className="text-orange-400 font-semibold">ISO</span> stands for <span className="text-orange-400 font-semibold">In Search Of</span> — because we all find ourselves searching for something: guidance, clarity, purpose, or simply a next step.
-                </p>
-              </div>
-
-              <div className="py-6 px-6 bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30">
-                <p className="text-white italic text-lg">
-                  "Our goal is to bring youth into the proximity of success by creating an intuitive space where coaching, faith, and purpose intersect."
-                </p>
-              </div>
-
-              <div className="space-y-4 text-slate-300">
-                <p>
-                  The ISO Mentorship Institute is built by Anis Benyoucef, a first-generation Algerian-American, who has been through the same crossroads — someone who know what it feels like to be confused, stuck, or uncertain about what's next. This isn't just about career advice. It's about <span className="text-white font-semibold">life coaching</span>: spiritual growth, professional direction, and personal courage.
-                </p>
-
-                <p>
-                  When you <span className="text-orange-400 font-semibold">"call an ISO,"</span> you're not going 1-on-1 against yourself — you're stepping into a conversation with someone who's going to challenge you, guide you, and help you take smarter shots. We won't hand you easy buckets; we'll help you build the confidence and mindset to create your own.
-                </p>
-
-                <p className="text-slate-200">
-                  Whether you're in search of coaching, opportunity, or simply perspective — <span className="text-orange-400 font-semibold">this is where your growth starts.</span>
-                </p>
-              </div>
-
-              {/* CTA */}
-              <div className="pt-4">
-                <button
-                  onClick={() => {
-                    window.location.href = '/#basketball-court';
-                  }}
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors font-semibold"
-                >
-                  Explore the Court
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                </button>
+              <div>
+                <p className="font-semibold">Anis Benyoucef</p>
+                <p className="text-sm text-slate-400">Founder & Lead Coach</p>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent p-6 text-center"
+            >
+              <p className="text-3xl font-semibold text-white mb-2">{stat.value}</p>
+              <p className="text-sm uppercase tracking-wide text-slate-400">{stat.label}</p>
+            </div>
+          ))}
+        </section>
+
+        <section id="about-mission" className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-start">
+          <div className="bg-slate-900/60 border border-white/5 rounded-3xl p-8 space-y-8">
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Our identity</p>
+            <h2 className="text-3xl font-semibold leading-tight">
+              ISO is a Muslim-built coaching lab for young adults who crave tactical mentorship.
+            </h2>
+            <div className="space-y-5">
+              {values.map((value) => (
+                <div key={value.label} className="border border-white/5 rounded-2xl p-5 bg-white/5">
+                  <p className="text-orange-300 text-sm uppercase tracking-wide mb-1">{value.label}</p>
+                  <p className="text-slate-200">{value.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500/20 via-pink-500/10 to-slate-900 rounded-3xl border border-white/10 p-8">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-200 mb-6">Timeline</p>
+            <div className="space-y-8 relative">
+              <div className="absolute left-6 top-0 bottom-0 w-px bg-white/20" />
+              {milestones.map((milestone) => (
+                <div key={milestone.year} className="relative pl-12">
+                  <div className="absolute left-4 top-2 h-3 w-3 rounded-full bg-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.7)]" />
+                  <p className="text-sm uppercase tracking-widest text-slate-400">{milestone.year}</p>
+                  <h3 className="text-xl font-semibold mb-1">{milestone.title}</h3>
+                  <p className="text-slate-200">{milestone.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-8 lg:grid-cols-3">
+          <div className="col-span-2 bg-slate-900/70 border border-white/5 rounded-3xl p-8">
+            <p className="text-sm uppercase tracking-[0.4em] text-slate-400 mb-4">Programs</p>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40">
+                <h4 className="text-xl font-semibold mb-2">Court sessions</h4>
+                <p className="text-slate-300">
+                  Live coaching nights where mentees break down film (their goals) with pros who’ve walked the
+                  exact path.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40">
+                <h4 className="text-xl font-semibold mb-2">One-on-one residencies</h4>
+                <p className="text-slate-300">
+                  6-week coaching arcs pairing mentees with a mentor that tracks spiritual reps, craft, and
+                  execution.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40">
+                <h4 className="text-xl font-semibold mb-2">Pathway pods</h4>
+                <p className="text-slate-300">
+                  Micro communities (health, medicine, tech, entrepreneurship) moderated by mentors and alumni.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40">
+                <h4 className="text-xl font-semibold mb-2">Faith & focus labs</h4>
+                <p className="text-slate-300">
+                  Breathwork, dua journaling, and discipline drills that keep the heart right while the grind
+                  intensifies.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-white/10 to-transparent border border-white/10 rounded-3xl p-8">
+            <p className="text-sm uppercase tracking-[0.4em] text-slate-300 mb-4">Founder story</p>
+            <h4 className="text-2xl font-semibold mb-3">Built by someone in the trenches</h4>
+            <p className="text-slate-200 mb-6">
+              “I’m a first-gen Algerian-American who hacked my way through medicine, startups, and community
+              work. ISO is the platform I wished existed—a place where Muslim youth can ask the real questions
+              without code-switching.”
+            </p>
+            <div className="rounded-2xl bg-slate-950/60 border border-white/10 p-6">
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400 mb-2">North star</p>
+              <p className="text-lg text-slate-100">
+                Proximity to excellence + anchored iman = unstoppable confidence.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-900/70 border border-white/5 rounded-3xl p-10 text-center space-y-5">
+          <p className="text-sm uppercase tracking-[0.4em] text-slate-400">Final word</p>
+          <p className="text-2xl md:text-3xl leading-relaxed text-slate-100">
+            Whether you’re hunting for the right mentor, a clearer career lane, or spiritual accountability—ISO
+            is that timeout where you stop playing small and start running the right play.
+          </p>
+          <div className="flex justify-center">
+            <button
+              onClick={() => window.location.assign('#basketball-court')}
+              className="px-10 py-3 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors font-semibold"
+            >
+              Step onto the court
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );

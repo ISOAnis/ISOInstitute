@@ -1,4 +1,4 @@
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'faq' | 'become-a-coach';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
 
 interface FooterProps {
   onNavigate?: (page: Page) => void;
@@ -64,22 +64,7 @@ export function Footer({ onNavigate }: FooterProps) {
               <li><a href="#about" className="hover:text-white transition-colors">About ISO</a></li>
               <li><a href="#mentors" className="hover:text-white transition-colors">Our Coaches</a></li>
               <li><a href="#contact" className="hover:text-white transition-colors">Coaching Nights</a></li>
-              <li>
-                <button 
-                  onClick={() => onNavigate?.('faq')}
-                  className="hover:text-white transition-colors text-left"
-                >
-                  FAQ
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => onNavigate?.('become-a-coach')}
-                  className="hover:text-white transition-colors text-left"
-                >
-                  Become a Coach
-                </button>
-              </li>
+              <li><span className="text-slate-500 text-sm uppercase tracking-wide">Coming Soon</span></li>
             </ul>
           </div>
         </div>
