@@ -109,6 +109,7 @@ export default function ScrollPinnedImageSequence({
   const hasCompletedRef = useRef(false);
   const lastWheelTimeRef = useRef(0);
   const lastScrollYRef = useRef(0);
+  const touchStateRef = useRef({ isTouching: false, lastY: 0 });
   
   // ═══════════════════════════════════════════════════════════════════════════════
   // TEXT OVERLAY - Synced to frame ranges
@@ -363,6 +364,81 @@ export default function ScrollPinnedImageSequence({
     return progress;
   }, [drawFrame, easeOutCubic]);
   
+  const exitSequenceAtStart = useCallback(() => {
+    isSequenceActiveRef.current = false;
+    setIsSequenceActive(false);
+    hasCompletedRef.current = false;
+    setIsTransitioning(false);
+    scrollAccumulatorRef.current = 0;
+    setCurrentFrame(0);
+    
+    if (onSequenceComplete) {
+      onSequenceComplete(false);
+    }
+  }, [onSequenceComplete]);
+  
+  const completeSequenceTransition = useCallback(() => {
+    hasCompletedRef.current = true;
+    setIsTransitioning(true);
+    
+    isSequenceActiveRef.current = false;
+    setIsSequenceActive(false);
+    
+    if (onSequenceComplete) {
+      onSequenceComplete(true);
+    }
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+      const container = containerRef.current;
+      if (container) {
+        const containerEnd = container.offsetTop + container.offsetHeight;
+        window.scrollTo({
+          top: containerEnd,
+          behavior: 'smooth'
+        });
+      }
+    }, 700);
+  }, [onSequenceComplete]);
+  
+  const handleScrollDelta = useCallback((deltaY: number): boolean => {
+    if (deltaY === 0) return false;
+    
+    if (isTransitioning && deltaY > 0) {
+      return false;
+    }
+    
+    if (isTransitioning && deltaY < 0) {
+      setIsTransitioning(false);
+      hasCompletedRef.current = false;
+    }
+    
+    if (!isSequenceActiveRef.current) {
+      return false;
+    }
+    
+    const currentProgress = scrollProgress;
+    
+    if (currentProgress >= 0.98 && deltaY > 0) {
+      completeSequenceTransition();
+      return false;
+    }
+    
+    if (deltaY < 0 && hasCompletedRef.current) {
+      hasCompletedRef.current = false;
+      setIsTransitioning(false);
+    }
+    
+    if (currentProgress <= 0.01 && deltaY < 0 && currentFrame === 0) {
+      exitSequenceAtStart();
+      return false;
+    }
+    
+    advanceFrameByDelta(deltaY);
+    window.scrollTo(0, lockedScrollPositionRef.current);
+    return true;
+  }, [advanceFrameByDelta, completeSequenceTransition, currentFrame, exitSequenceAtStart, isTransitioning, scrollProgress]);
+  
   // ═══════════════════════════════════════════════════════════════════════════════
   // CHECK SEQUENCE ZONE - Determine if we should activate scroll hijacking
   // ═══════════════════════════════════════════════════════════════════════════════
@@ -551,199 +627,62 @@ export default function ScrollPinnedImageSequence({
     if (loading.isLoading) return;
     
     const handleWheel = (e: WheelEvent) => {
-      // Track wheel event time to distinguish from scrollbar dragging
       lastWheelTimeRef.current = Date.now();
-      
-      // Don't interfere if we're transitioning (unless scrolling backward to cancel transition)
-      if (isTransitioning && e.deltaY > 0) return;
-      
-      // If transitioning and scrolling backward, cancel transition
-      if (isTransitioning && e.deltaY < 0) {
-        setIsTransitioning(false);
-        hasCompletedRef.current = false;
+      if (handleScrollDelta(e.deltaY)) {
+        e.preventDefault();
       }
-      
-      if (!isSequenceActiveRef.current) return;
-      
-      // Get current progress before advancing
-      const currentProgress = scrollProgress;
-      
-      // Check if we're at the end and trying to scroll down
-      if (currentProgress >= 0.98 && e.deltaY > 0) {
-        // Start smooth transition to unlock with fade-out
-        hasCompletedRef.current = true;
-        setIsTransitioning(true);
-        
-        console.log('✅ Sequence COMPLETE - transitioning with fade-out...');
-        
-        // Unlock immediately and notify parent
-        isSequenceActiveRef.current = false;
-        setIsSequenceActive(false);
-        
-        // Notify parent that sequence is complete
-        if (onSequenceComplete) {
-          onSequenceComplete(true);
-        }
-        
-        // Wait for fade-out animation to complete before finishing transition
-        setTimeout(() => {
-          setIsTransitioning(false);
-          // Position scroll at container end for seamless transition
-          const container = containerRef.current;
-          if (container) {
-            const containerEnd = container.offsetTop + container.offsetHeight;
-            // Smooth scroll to container end after fade completes
-            window.scrollTo({
-              top: containerEnd,
-              behavior: 'smooth'
-            });
-          }
-        }, 700); // Match the fade-out duration (700ms)
-        
-        return; // Don't preventDefault, allow this scroll through
-      }
-      
-      // Reset completion and transition flags when scrolling backward (before checking exit)
-      if (e.deltaY < 0) {
-        if (hasCompletedRef.current) {
-          hasCompletedRef.current = false;
-          setIsTransitioning(false);
-        }
-      }
-      
-      // Check if we're at the start and trying to scroll up (exit sequence going backwards)
-      // CRITICAL: Stop scroll hijacking when at frame 0 to prevent glitches
-      if (currentProgress <= 0.01 && e.deltaY < 0 && currentFrame === 0) {
-        // UNLOCK - allow scroll up out of sequence
-        isSequenceActiveRef.current = false;
-        setIsSequenceActive(false);
-        hasCompletedRef.current = false;
-        setIsTransitioning(false);
-        scrollAccumulatorRef.current = 0; // Reset to frame 0
-        setCurrentFrame(0); // Ensure we're at frame 0
-        console.log('⬆️ Scrolling UP out of sequence at frame 0 - scroll released');
-        
-        // Notify parent that sequence is no longer complete
-        if (onSequenceComplete) {
-          onSequenceComplete(false);
-        }
-        
-        return; // Don't preventDefault, allow normal scroll
-      }
-      
-      // PREVENT NORMAL SCROLLING - we're in the middle of the sequence
-      e.preventDefault();
-      
-      // Advance frames based on scroll delta (works both directions)
-      advanceFrameByDelta(e.deltaY);
-      
-      // Keep page locked at sequence position (wheel events lock scroll)
-      window.scrollTo(0, lockedScrollPositionRef.current);
     };
     
-    // Handle arrow key scrolling
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle arrow keys when sequence is active
       if (!isSequenceActiveRef.current) return;
-      
-      // Check if arrow keys are pressed
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
-        
-        // Don't interfere if we're transitioning (unless scrolling backward to cancel transition)
-        if (isTransitioning && e.key === 'ArrowDown') return;
-        
-        // If transitioning and scrolling backward, cancel transition
-        if (isTransitioning && e.key === 'ArrowUp') {
-          setIsTransitioning(false);
-          hasCompletedRef.current = false;
-        }
-        
-        // Get current progress before advancing
-        const currentProgress = scrollProgress;
-        
-        // Convert arrow key to deltaY equivalent
-        const deltaY = e.key === 'ArrowDown' ? 120 : -120; // Simulate wheel scroll
-        
-        // Check if we're at the end and trying to scroll down
-        if (currentProgress >= 0.98 && e.key === 'ArrowDown') {
-          // Start smooth transition to unlock with fade-out
-          hasCompletedRef.current = true;
-          setIsTransitioning(true);
-          
-          // Unlock immediately and notify parent
-          isSequenceActiveRef.current = false;
-          setIsSequenceActive(false);
-          
-          // Notify parent that sequence is complete
-          if (onSequenceComplete) {
-            onSequenceComplete(true);
-          }
-          
-          // Wait for fade-out animation to complete before finishing transition
-          setTimeout(() => {
-            setIsTransitioning(false);
-            // Position scroll at container end for seamless transition
-            const container = containerRef.current;
-            if (container) {
-              const containerEnd = container.offsetTop + container.offsetHeight;
-              window.scrollTo({
-                top: containerEnd,
-                behavior: 'smooth'
-              });
-            }
-          }, 700);
-          
-          return;
-        }
-        
-        // Reset completion and transition flags when scrolling backward
-        if (e.key === 'ArrowUp') {
-          if (hasCompletedRef.current) {
-            hasCompletedRef.current = false;
-            setIsTransitioning(false);
-          }
-        }
-        
-        // Check if we're at the start and trying to scroll up
-        if (currentProgress <= 0.01 && e.key === 'ArrowUp' && currentFrame === 0) {
-          // UNLOCK - allow scroll up out of sequence
-          isSequenceActiveRef.current = false;
-          setIsSequenceActive(false);
-          hasCompletedRef.current = false;
-          setIsTransitioning(false);
-          scrollAccumulatorRef.current = 0;
-          setCurrentFrame(0);
-          
-          // Notify parent that sequence is no longer complete
-          if (onSequenceComplete) {
-            onSequenceComplete(false);
-          }
-          
-          return;
-        }
-        
-        // Advance frames based on arrow key
-        advanceFrameByDelta(deltaY);
-        
-        // Keep page locked at sequence position
-        window.scrollTo(0, lockedScrollPositionRef.current);
+        const deltaY = e.key === 'ArrowDown' ? 120 : -120;
+        handleScrollDelta(deltaY);
       }
     };
     
-    // Use passive: false to allow preventDefault
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!isSequenceActiveRef.current || e.touches.length !== 1) return;
+      touchStateRef.current.isTouching = true;
+      touchStateRef.current.lastY = e.touches[0].clientY;
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStateRef.current.isTouching || e.touches.length !== 1) return;
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStateRef.current.lastY - currentY;
+      if (deltaY === 0) return;
+      lastWheelTimeRef.current = Date.now();
+      if (handleScrollDelta(deltaY)) {
+        e.preventDefault();
+      }
+      touchStateRef.current.lastY = currentY;
+    };
+    
+    const handleTouchEnd = () => {
+      touchStateRef.current.isTouching = false;
+    };
+    
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
     
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
-      // Cleanup animation frame on unmount
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
       if (frameUpdateRef.current) {
         cancelAnimationFrame(frameUpdateRef.current);
       }
     };
-  }, [loading.isLoading, advanceFrameByDelta, scrollProgress, isTransitioning, currentFrame, onSequenceComplete]);
+  }, [loading.isLoading, handleScrollDelta]);
   
   // ═══════════════════════════════════════════════════════════════════════════════
   // INITIAL SCROLL TO TOP - Ensure sequence is visible when loaded
