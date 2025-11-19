@@ -74,7 +74,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     setTimeout(() => {
       const courtElement = document.getElementById('basketball-court');
       if (courtElement) {
-        courtElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        courtElement.scrollIntoView({ behavior: 'auto', block: 'start' });
       }
     }, 100);
   };

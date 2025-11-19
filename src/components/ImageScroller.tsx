@@ -547,7 +547,7 @@ export default function ScrollPinnedImageSequence({
                     // Smooth scroll to container end after fade completes
                     window.scrollTo({
                       top: containerEnd,
-                      behavior: 'smooth'
+                      behavior: 'auto'
                     });
                   }
                 }, 700); // Match the fade-out duration (700ms)
@@ -692,7 +692,7 @@ export default function ScrollPinnedImageSequence({
     if (!loading.isLoading && containerRef.current) {
       // Scroll to the top of the page to show the sequence
       setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'auto' });
         console.log('📍 Scrolled to top to show image sequence');
       }, 100);
     }

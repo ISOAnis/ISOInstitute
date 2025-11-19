@@ -3,7 +3,6 @@ import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 
 // Lazy load heavy components
-const ImageSequenceScroll = lazy(() => import('./components/ImageScroller'));
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
 const WhatIsISO = lazy(() => import('./components/WhatIsISO').then(m => ({ default: m.WhatIsISO })));
 const ProductShowcase = lazy(() => import('./components/ProductShowcase').then(m => ({ default: m.ProductShowcase })));
@@ -32,7 +31,7 @@ export default function App() {
     category?: string;
     daysRemaining?: number;
   } | null>(null);
-  const [sequenceComplete, setSequenceComplete] = useState(false);
+  const [shouldReopenMentorModal, setShouldReopenMentorModal] = useState(false);
 
   // Helper to navigate to Call ISO page
   const navigateToCallIso = (coachName: string, categoryId?: string) => {
@@ -42,11 +41,21 @@ export default function App() {
   };
 
   // Helper to navigate back to coaches (reopen MentorModal)
-  const navigateBackToCoaches = () => {
+  const navigateBackToCoaches = (categoryId?: string) => {
     setCurrentPage('home');
-    // The category will be restored by BasketballCourt if needed
     setSelectedCoachName(null);
-    setSelectedCategoryId(null);
+    if (categoryId) {
+      setSelectedCategoryId(categoryId);
+    }
+    setShouldReopenMentorModal(true);
+    
+    // Scroll to court section after navigation
+    setTimeout(() => {
+      const courtSection = document.getElementById('iso-court');
+      if (courtSection) {
+        courtSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }, 100);
   };
 
   return (
@@ -59,45 +68,30 @@ export default function App() {
       
       {currentPage === 'home' && (
         <>
+          {/* New Simple Hero Section */}
           <Suspense fallback={<LoadingSpinner />}>
-            <ImageSequenceScroll 
-              frameCount={94}
-              framePrefix="ezgif-frame-"
-              frameSuffix=".png"
-              scrollHeight={250}
-              showDebug={false}
-              onSequenceComplete={setSequenceComplete}
-            />
+            <Hero onNavigate={setCurrentPage} />
           </Suspense>
-          <div 
-            className="transition-all duration-700 ease-in-out"
-            style={{ 
-              opacity: sequenceComplete ? 1 : 0,
-              pointerEvents: sequenceComplete ? 'auto' : 'none',
-              visibility: sequenceComplete ? 'visible' : 'hidden',
-              transform: sequenceComplete ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'opacity 700ms ease-in-out, transform 700ms ease-in-out, visibility 0ms linear 0ms',
-            }}
-          >
-            {sequenceComplete && (
-              <Suspense fallback={<LoadingSpinner />}>
-                <BasketballCourt 
-                  commitmentStatus={menteeCommitmentStatus}
-                  onNavigateToCallIso={navigateToCallIso}
-                  selectedCategoryId={selectedCategoryId}
-                  onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
-                />
-              </Suspense>
-            )}
+          
+          {/* Basketball Court Section */}
+          <div id="iso-court">
+            <Suspense fallback={<LoadingSpinner />}>
+              <BasketballCourt 
+                commitmentStatus={menteeCommitmentStatus}
+                onNavigateToCallIso={navigateToCallIso}
+                selectedCategoryId={selectedCategoryId}
+                onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
+                forceOpenCategoryId={shouldReopenMentorModal ? selectedCategoryId : null}
+                onForceOpenHandled={() => setShouldReopenMentorModal(false)}
+              />
+            </Suspense>
           </div>
-          <Suspense fallback={<div className="h-96 bg-slate-950" />}>
+          
+          <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <ProductShowcase />
           </Suspense>
-          <Suspense fallback={<div className="h-96 bg-slate-950" />}>
+          <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <Pricing />
-          </Suspense>
-          <Suspense fallback={<div className="h-96 bg-slate-950" />}>
-            <Hero />
           </Suspense>
         </>
       )}

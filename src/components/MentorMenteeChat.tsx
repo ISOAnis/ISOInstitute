@@ -199,7 +199,7 @@ export function MentorMenteeChat({
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950"
-        style={{ scrollBehavior: 'smooth' }}
+        style={{ scrollBehavior: 'auto' }}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-12">

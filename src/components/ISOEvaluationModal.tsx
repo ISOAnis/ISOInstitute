@@ -27,7 +27,7 @@ interface ISOEvaluationModalProps {
 const scrollToCourt = () => {
   const courtElement = document.getElementById('iso-court') || document.getElementById('basketball-court');
   if (courtElement) {
-    courtElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    courtElement.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
 };
 

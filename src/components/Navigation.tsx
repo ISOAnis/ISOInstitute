@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { MentorPortal } from './MentorPortal';
 import { MenteePortal } from './MenteePortal';
@@ -27,6 +27,9 @@ interface NavigationProps {
   } | null) => void;
 }
 
+const STORAGE_KEY = 'iso_demo_user';
+const STORAGE_PORTAL_KEY = 'iso_demo_portal';
+
 export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onMenteeStatusChange }: NavigationProps) {
   const [user, setUser] = useState<User | null>(null);
   const [showCoachLogin, setShowCoachLogin] = useState(false);
@@ -37,21 +40,55 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
+  // Load saved user state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem(STORAGE_KEY);
+      const savedPortal = localStorage.getItem(STORAGE_PORTAL_KEY);
+      
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        
+        // Restore the portal view
+        if (savedPortal === 'coach') {
+          setShowCoachPortal(true);
+        } else if (savedPortal === 'player') {
+          setShowPlayerPortal(true);
+        } else if (savedPortal === 'community') {
+          setShowCommunityPortal(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load saved user state:', error);
+    }
+  }, []);
+
   const handleCoachLogin = (email: string, password: string) => {
     // Mock authentication - in production, this would call an API
     // For now: all coaches have access to Community Leader Portal
     const roles: UserRole[] = ['coach', 'community-leader'];
+    const userData = { email, roles };
     
-    setUser({ email, roles });
+    setUser(userData);
     setShowCoachLogin(false);
     setShowCoachPortal(true);
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+    localStorage.setItem(STORAGE_PORTAL_KEY, 'coach');
   };
 
   const handlePlayerLogin = (email: string, password: string) => {
     // Mock authentication
-    setUser({ email, roles: ['player'] });
+    const userData = { email, roles: ['player'] as UserRole[] };
+    setUser(userData);
     setShowPlayerLogin(false);
     setShowPlayerPortal(true);
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+    localStorage.setItem(STORAGE_PORTAL_KEY, 'player');
   };
 
   const handleLogout = () => {
@@ -59,16 +96,22 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
     setShowCoachPortal(false);
     setShowPlayerPortal(false);
     setShowCommunityPortal(false);
+    
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_PORTAL_KEY);
   };
 
   const switchToCommunityPortal = () => {
     setShowCoachPortal(false);
     setShowCommunityPortal(true);
+    localStorage.setItem(STORAGE_PORTAL_KEY, 'community');
   };
 
   const switchToCoachPortal = () => {
     setShowCommunityPortal(false);
     setShowCoachPortal(true);
+    localStorage.setItem(STORAGE_PORTAL_KEY, 'coach');
   };
 
   return (
@@ -291,7 +334,14 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
           onSignupComplete={(userData) => {
             console.log('Account created:', userData);
             setShowSignupModal(false);
-            // TODO: Handle successful signup (e.g., log user in, redirect, etc.)
+            // Auto-login as player after signup
+            const userDataForLogin = { email: userData.email, roles: ['player'] as UserRole[] };
+            setUser(userDataForLogin);
+            setShowPlayerPortal(true);
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(userDataForLogin));
+            localStorage.setItem(STORAGE_PORTAL_KEY, 'player');
           }}
         />
       )}

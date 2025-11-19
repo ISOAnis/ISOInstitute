@@ -194,12 +194,13 @@
     font-variation-settings: var(--default-font-variation-settings, normal);
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
-    scroll-behavior: smooth;
+    scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
   }
 
   body {
     line-height: inherit;
     overflow-x: hidden;
+    scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
   }
 
   /* Custom Scrollbar Styling - Clean and Smooth */
@@ -265,6 +266,38 @@ html {
   50% {
     background-position: 100% 50%;
   }
+}
+
+/* Product Showcase Scroll Animations - Premium with depth and stagger */
+.product-feature {
+  opacity: 0;
+  transform: translateX(-100px) scale(0.95);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.product-feature.product-right {
+  transform: translateX(100px) scale(0.95);
+}
+
+.product-feature.product-visible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.product-feature.product-hidden {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 1, 1), 
+              transform 0.7s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.product-feature.product-hidden.product-right {
+  transform: translateX(100px) scale(0.95);
+}
+
+.product-feature.product-hidden:not(.product-right) {
+  transform: translateX(-100px) scale(0.95);
 }
 
 /* ISO Scale utility class */

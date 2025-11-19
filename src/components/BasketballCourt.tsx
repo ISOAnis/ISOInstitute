@@ -17,6 +17,8 @@ interface BasketballCourtProps {
   onNavigateToCallIso?: (coachName: string, categoryId?: string) => void;
   selectedCategoryId?: string | null;
   onCategorySelect?: (categoryId: string) => void;
+  forceOpenCategoryId?: string | null;
+  onForceOpenHandled?: () => void;
 }
 
 const categories = [
@@ -82,22 +84,56 @@ const categories = [
   },
 ];
 
-export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect }: BasketballCourtProps) {
+export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect, forceOpenCategoryId, onForceOpenHandled }: BasketballCourtProps) {
   const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
 
   // Restore selected category when coming back from Call ISO page
   useEffect(() => {
     if (selectedCategoryId) {
       const category = categories.find(c => c.id === selectedCategoryId);
-      if (category && !selectedCategory) {
+      if (category && (!selectedCategory || selectedCategory.id !== category.id)) {
         setSelectedCategory(category);
       }
     }
   }, [selectedCategoryId, selectedCategory]);
   const [showCommitmentWarning, setShowCommitmentWarning] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // In production, this would come from auth context
+  // Check localStorage for saved login state
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('iso_demo_user');
+      return savedUser !== null;
+    } catch {
+      return false;
+    }
+  });
   const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(null);
+  
+  // Update login state when localStorage changes (e.g., user logs in/out in another component)
+  useEffect(() => {
+    const checkLoginState = () => {
+      try {
+        const savedUser = localStorage.getItem('iso_demo_user');
+        setIsLoggedIn(savedUser !== null);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    
+    // Check on mount and when component becomes visible
+    checkLoginState();
+    
+    // Listen for storage changes (in case user logs in/out in another tab or component)
+    window.addEventListener('storage', checkLoginState);
+    
+    // Also check periodically in case localStorage was updated in same window
+    const interval = setInterval(checkLoginState, 500);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginState);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Add staggered bounce animation for arrows
   useEffect(() => {
@@ -150,12 +186,33 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
 
   const handleSignupComplete = (userData: any) => {
     console.log('User signed up:', userData);
+    
+    // Save to localStorage to persist login state (same as Navigation component)
+    try {
+      const userDataForLogin = { email: userData.email, roles: ['player'] as any[] };
+      localStorage.setItem('iso_demo_user', JSON.stringify(userDataForLogin));
+      localStorage.setItem('iso_demo_portal', 'player');
+    } catch (error) {
+      console.error('Failed to save user to localStorage:', error);
+    }
+    
     setIsLoggedIn(true);
     setShowSignupModal(false);
-    // In production, this would store the userData in context/auth for use throughout the app
-    // The menteeProfile would be built from this data
     // selectedCategory is already set, so the MentorModal will open automatically
   };
+
+  useEffect(() => {
+    if (forceOpenCategoryId) {
+      const category = categories.find(c => c.id === forceOpenCategoryId);
+      if (category) {
+        setIsLoggedIn(true);
+        setSelectedCategory(category);
+        if (onForceOpenHandled) {
+          onForceOpenHandled();
+        }
+      }
+    }
+  }, [forceOpenCategoryId, onForceOpenHandled]);
 
   return (
     <>

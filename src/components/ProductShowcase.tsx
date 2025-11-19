@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 
 export function ProductShowcase() {
@@ -77,13 +78,16 @@ export function ProductShowcase() {
   }, []);
 
   return (
-    <section style={{ 
-      backgroundColor: '#0f172a', 
-      paddingTop: '80px',
-      paddingBottom: '80px',
-      paddingLeft: '32px',
-      paddingRight: '32px'
-    }}>
+    <section 
+      id="product-showcase"
+      style={{ 
+        backgroundColor: '#0f172a', 
+        paddingTop: '80px',
+        paddingBottom: '80px',
+        paddingLeft: '32px',
+        paddingRight: '32px'
+      }}
+    >
       <div style={{ 
         maxWidth: '1280px', 
         margin: '0 auto' 
@@ -143,14 +147,14 @@ export function ProductShowcase() {
               marginBottom: '16px',
               lineHeight: '1.75'
             }}>
-              Navigate your journey through six key pathways. From Deen & Purpose to Engineering & Technology, find the mentors who align with your goals.
+              Navigate your journey through six key pathways. From Deen & Purpose to Engineering & Technology, find the coaches who align with your goals.
             </p>
             <p style={{ 
               fontSize: '1.125rem', 
               color: '#64748b',
               lineHeight: '1.75'
             }}>
-              Browse coaches, read profiles, and connect with mentors who specialize in your chosen area of growth.
+              Browse coaches, read profiles, and connect with coaches who specialize in your chosen area of growth.
             </p>
           </div>
           
@@ -350,7 +354,7 @@ export function ProductShowcase() {
           style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '48px',
+            gap: '56px',
             alignItems: 'center',
             marginBottom: '64px',
             opacity: isVisible3 ? 1 : 0,
@@ -383,7 +387,7 @@ export function ProductShowcase() {
               marginBottom: '16px',
               lineHeight: '1.75'
             }}>
-              Connect directly with mentors who understand your journey. One-on-one conversations that challenge, guide, and help you take smarter shots in life.
+              Connect directly with a coach who understands your journey. One-on-one, personalized curriculum that challenges, guides, and helps you take smarter shots in life.
             </p>
             <p style={{ 
               fontSize: '1.125rem', 
@@ -396,29 +400,34 @@ export function ProductShowcase() {
           
           <div style={{ 
             position: 'relative',
-            paddingTop: '80px',
-            paddingBottom: '80px',
+            paddingTop: '120px',
+            paddingBottom: '120px',
+            paddingLeft: '80px',
+            paddingRight: '80px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '60px',
-            overflow: 'visible'
+            gap: '10px',
+            overflow: 'visible',
+            flexWrap: 'nowrap'
           }}>
-            {/* Card 1 - Left (slightly larger) */}
+            {/* Card 1 - Left */}
             <div 
               onMouseEnter={() => setHover3Card1(true)}
               onMouseLeave={() => setHover3Card1(false)}
               style={{ 
-                borderRadius: '16px',
-                width: '52%',
-                maxWidth: '720px',
+                borderRadius: '8px',
+                width: '56%',
+                maxWidth: '700px',
+                flexShrink: 0,
                 height: 'auto',
                 display: 'inline-block',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                 transform: hover3Card1 ? 'rotate(-0.5deg) scale(1.03) translateY(-8px)' : 'rotate(-1deg)',
                 transition: 'transform 0.3s ease-out',
                 cursor: 'pointer',
-                zIndex: 2
+                zIndex: 2,
+                overflow: 'hidden'
               }}
             >
               <img 
@@ -428,36 +437,39 @@ export function ProductShowcase() {
                   width: '100%', 
                   height: 'auto', 
                   display: 'block',
-                  borderRadius: '16px'
+                  borderRadius: '8px',
+                  objectFit: 'cover'
                 }} 
               />
             </div>
-            {/* Card 2 - Right (slightly smaller) */}
+            {/* Card 2 - Right (larger - phone mockups) */}
             <div 
               onMouseEnter={() => setHover3Card2(true)}
               onMouseLeave={() => setHover3Card2(false)}
               style={{ 
-                borderRadius: '16px',
-                width: '51%',
-                maxWidth: '700px',
+                borderRadius: '8px',
+                width: '100%',
+                maxWidth: '1000px',
+                flexShrink: 0,
                 height: 'auto',
                 display: 'inline-block',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                 transform: hover3Card2 ? 'rotate(2deg) scale(1.03) translateY(-8px)' : 'rotate(1.5deg)',
                 transition: 'transform 0.3s ease-out',
                 cursor: 'pointer',
-                zIndex: 1
+                zIndex: 1,
+                overflow: 'hidden'
               }}
             >
               <img 
-                className="iso-scale"
-                src="/call-an-iso-2.png" 
+                src="/call-an-iso-2.1.png" 
                 alt="Call an ISO" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
                   display: 'block',
-                  borderRadius: '16px'
+                  borderRadius: '8px',
+                  objectFit: 'cover'
                 }} 
               />
             </div>
