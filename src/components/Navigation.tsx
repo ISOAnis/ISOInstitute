@@ -140,10 +140,9 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 > 
                   <span className="text-white text-lg">☪️</span> 
                 </div> 
-                <div className="text-left"> 
-                  <span className="text-white block tracking-wider font-bold">ISO</span> 
-                  <span className="text-slate-400 text-xs tracking-wide">In Search Of</span> 
-                </div>
+                <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  ISO Institute
+                </span>
               </button>
             </div>
             

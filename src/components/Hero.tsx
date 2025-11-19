@@ -49,17 +49,19 @@ export function Hero({ onNavigate }: HeroProps = {}) {
           <div className="space-y-6">
             <h1 
               className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight tracking-tight"
-              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold' }}
+              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold', lineHeight: '1.2' }}
               
             >
-              At ISO, your defender becomes your coach.
+              <span style={{ display: 'block' }}>You're not lost.</span>
+              <span style={{ display: 'block', marginTop: '0.5rem' }}>You're just <span className="text-orange-500 font-semibold">In Search Of</span>.</span>
+             
             </h1>
             
             <h2 
               className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-relaxed"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
-              You're not lost — you're just <span className="text-orange-500 font-semibold">In Search Of</span>.
+               At ISO, your defender becomes your coach.
             </h2>
             
             <p 
