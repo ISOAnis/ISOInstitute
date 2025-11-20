@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
-import { X, Star, Calendar, Zap, BookOpen, Briefcase, DollarSign, GraduationCap, Award, Clock } from 'lucide-react';
+import { X, Star, Calendar, Zap, BookOpen, Briefcase, DollarSign, GraduationCap, Award, Clock, ChevronDown, Sparkles } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CoachCardProps {
@@ -35,6 +35,7 @@ interface CoachCardProps {
 export function CoachTradingCard({ mentor, category, onClose, onBookSession }: CoachCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -44,6 +45,60 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
       document.body.style.overflow = '';
     };
   }, []);
+
+  // Check if content is scrollable and handle scroll indicator
+  useEffect(() => {
+    if (!isFlipped) {
+      setShowScrollIndicator(false);
+      return;
+    }
+    
+    // Use a small delay to ensure DOM is fully rendered
+    const checkScrollability = () => {
+      const cardContent = document.getElementById('card-back-content');
+      if (!cardContent) return;
+
+      const scrollHeight = cardContent.scrollHeight;
+      const clientHeight = cardContent.clientHeight;
+      
+      // Only show indicator if content is scrollable
+      const isScrollable = scrollHeight > clientHeight;
+      setShowScrollIndicator(isScrollable);
+    };
+
+    // Check immediately and after a brief delay to account for any animations
+    checkScrollability();
+    const timeoutId = setTimeout(checkScrollability, 100);
+
+    const cardContent = document.getElementById('card-back-content');
+    if (!cardContent) {
+      clearTimeout(timeoutId);
+      return;
+    }
+
+    // Hide indicator as soon as user starts scrolling
+    const handleScroll = () => {
+      const scrollTop = cardContent.scrollTop;
+      if (scrollTop > 0) {
+        setShowScrollIndicator(false);
+      } else {
+        // Re-check if scrollable when scrolled back to top
+        const isScrollable = cardContent.scrollHeight > cardContent.clientHeight;
+        setShowScrollIndicator(isScrollable);
+      }
+    };
+
+    cardContent.addEventListener('scroll', handleScroll);
+    
+    // Also check on window resize in case card size changes
+    window.addEventListener('resize', checkScrollability);
+
+    return () => {
+      clearTimeout(timeoutId);
+      cardContent.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', checkScrollability);
+    };
+  }, [isFlipped]);
   
   // Default values for stats
   const overall = mentor.rating ? Math.round(60 + (mentor.rating / 5) * 40) : 85; // Convert 1-5 rating to 60-100 scale, default to 85
@@ -279,17 +334,32 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
 
                   {/* Name and Role */}
                   <div style={{ marginBottom: '16px' }}>
-                    <h3 style={{
-                      color: 'white',
-                      fontSize: '24px',
-                      fontWeight: 'bold',
-                      marginBottom: '4px',
-                      fontFamily: "'Poppins', sans-serif",
-                      textTransform: 'uppercase'
-                    }}>
-                      {mentor.name}
-                    </h3>
-                    <p style={{ color: '#f97316', fontSize: '14px', fontWeight: '500' }}>{mentor.role}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                      <h3 style={{
+                        color: 'white',
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        margin: 0,
+                        fontFamily: "'Poppins', sans-serif",
+                        textTransform: 'uppercase'
+                      }}>
+                        {mentor.name}
+                      </h3>
+                      {mentor.successRate && (
+                        <span style={{
+                          color: '#f97316',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          border: '1px solid rgba(249, 115, 22, 0.3)'
+                        }}>
+                          {mentor.successRate}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ color: '#f97316', fontSize: '14px', fontWeight: '500', margin: 0 }}>{mentor.role}</p>
                   </div>
 
                   {/* Quick Stats */}
@@ -411,17 +481,21 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   background: 'linear-gradient(135deg, #9333ea 0%, #f97316 100%)',
                 }}
               >
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundColor: '#0f172a',
-                  borderRadius: '14px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflowY: 'auto',
-                  boxSizing: 'border-box'
-                }}>
+                <div 
+                  id="card-back-content"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#0f172a',
+                    borderRadius: '14px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflowY: 'auto',
+                    boxSizing: 'border-box',
+                    position: 'relative'
+                  }}
+                >
                   {/* Close/Flip indicator */}
                   <div style={{
                     display: 'flex',
@@ -444,16 +518,31 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   </div>
 
                   {/* Name Header */}
-                  <h3 style={{
-                    color: 'white',
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
-                    textTransform: 'uppercase'
-                  }}>
-                    {mentor.name}
-                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                    <h3 style={{
+                      color: 'white',
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      margin: 0,
+                      fontFamily: "'Poppins', sans-serif",
+                      textTransform: 'uppercase'
+                    }}>
+                      {mentor.name}
+                    </h3>
+                    {mentor.successRate && (
+                      <span style={{
+                        color: '#f97316',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                        border: '1px solid rgba(249, 115, 22, 0.3)'
+                      }}>
+                        {mentor.successRate}
+                      </span>
+                    )}
+                  </div>
 
                   {/* Full Bio */}
                   <div style={{ marginBottom: '16px' }}>
@@ -591,53 +680,123 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       </ul>
                     </div>
                   )}
-                  
-                  {/* Success Rate */}
-                  {mentor.successRate && (
-                    <div style={{
-                      marginBottom: '16px',
-                      padding: '12px',
-                      backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                      borderRadius: '8px',
-                      border: '1px solid #334155'
-                    }}>
-                      <p style={{ color: '#94a3b8', fontSize: '12px', margin: 0 }}>{mentor.successRate}</p>
-                    </div>
+
+                  {/* Scroll Indicator - Animated Arrow */}
+                  {showScrollIndicator && (
+                    <motion.div
+                      id="scroll-indicator"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      style={{
+                        position: 'absolute',
+                        bottom: '16px',
+                        right: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: '4px',
+                        zIndex: 10,
+                        pointerEvents: 'none'
+                      }}
+                    >
+                      <motion.div
+                        animate={{
+                          y: [0, 8, 0],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <ChevronDown 
+                          style={{ 
+                            width: '24px', 
+                            height: '24px', 
+                            color: '#f97316',
+                            filter: 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.8))'
+                          }} 
+                        />
+                      </motion.div>
+                      <p style={{
+                        color: '#f97316',
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        margin: 0,
+                        textShadow: '0 0 8px rgba(249, 115, 22, 0.6)',
+                        fontFamily: "'Poppins', sans-serif",
+                        textAlign: 'right'
+                      }}>
+                        Scroll to Call an ISO
+                      </p>
+                    </motion.div>
                   )}
 
-                  {/* Call an ISO Button */}
-                  <button
+                  {/* Call an ISO Button - Enhanced */}
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation();
                       if (onBookSession) {
                         onBookSession();
                       }
                     }}
+                    initial={{ scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     style={{
                       width: '100%',
-                      backgroundColor: '#f97316',
+                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                       color: 'white',
                       fontWeight: 'bold',
-                      padding: '12px 24px',
-                      borderRadius: '8px',
-                      border: 'none',
+                      padding: '16px 24px',
+                      borderRadius: '12px',
+                      border: '2px solid rgba(249, 115, 22, 0.5)',
                       cursor: 'pointer',
                       transition: 'all 0.3s',
                       fontFamily: "'Poppins', sans-serif",
                       marginTop: 'auto',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                      boxShadow: '0 0 30px rgba(249, 115, 22, 0.6), 0 10px 25px -5px rgba(249, 115, 22, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      fontSize: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#ea580c';
-                      e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+                      e.currentTarget.style.boxShadow = '0 0 50px rgba(249, 115, 22, 0.9), 0 15px 35px -5px rgba(249, 115, 22, 0.6), 0 6px 10px -2px rgba(0, 0, 0, 0.4)';
+                      e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.8)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f97316';
-                      e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+                      e.currentTarget.style.boxShadow = '0 0 30px rgba(249, 115, 22, 0.6), 0 10px 25px -5px rgba(249, 115, 22, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)';
+                      e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.5)';
                     }}
                   >
-                    Call an ISO
-                  </button>
+                    {/* Shimmer effect */}
+                    <motion.div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '-100%',
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                      }}
+                      animate={{
+                        left: ['-100%', '100%'],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 1,
+                        ease: "linear"
+                      }}
+                    />
+                    <Sparkles style={{ width: '18px', height: '18px' }} />
+                    <span style={{ position: 'relative', zIndex: 1 }}>Call an ISO</span>
+                  </motion.button>
                 </div>
               </div>
             </div>

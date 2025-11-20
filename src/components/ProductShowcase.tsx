@@ -162,18 +162,21 @@ export function ProductShowcase() {
             position: 'relative',
             paddingTop: '80px',
             paddingBottom: '80px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '60px',
-            overflow: 'visible'
+            overflow: 'visible',
+            backgroundColor: '#0a0f1a',
+            borderRadius: '12px'
           }}>
             {/* Card 1 - Left (slightly larger) */}
             <div 
               onMouseEnter={() => setHover1Card1(true)}
               onMouseLeave={() => setHover1Card1(false)}
               style={{ 
-                borderRadius: '16px',
                 width: '52%',
                 maxWidth: '720px',
                 height: 'auto',
@@ -187,13 +190,12 @@ export function ProductShowcase() {
             >
               <img 
                 className="iso-scale"
-                src="/choose-your-pathway-1.png" 
+                src="/basketball court v3.png" 
                 alt="Choose Your Pathway" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
-                  display: 'block',
-                  borderRadius: '16px'
+                  display: 'block'
                 }} 
               />
             </div>
@@ -202,7 +204,6 @@ export function ProductShowcase() {
               onMouseEnter={() => setHover1Card2(true)}
               onMouseLeave={() => setHover1Card2(false)}
               style={{ 
-                borderRadius: '16px',
                 width: '51%',
                 maxWidth: '700px',
                 height: 'auto',
@@ -221,8 +222,7 @@ export function ProductShowcase() {
                 style={{
                   width: '100%', 
                   height: 'auto', 
-                  display: 'block',
-                  borderRadius: '16px'
+                  display: 'block'
                 }} 
               />
             </div>
@@ -247,17 +247,20 @@ export function ProductShowcase() {
             position: 'relative',
             paddingTop: '60px',
             paddingBottom: '60px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '24px'
+            gap: '24px',
+            backgroundColor: '#0a0f1a',
+            borderRadius: '12px'
           }}>
             {/* Card 1 - Left (slightly larger) */}
             <div 
               onMouseEnter={() => setHover2Card1(true)}
               onMouseLeave={() => setHover2Card1(false)}
               style={{ 
-                borderRadius: '16px',
                 width: '45%',
                 maxWidth: '500px',
                 height: 'auto',
@@ -270,13 +273,12 @@ export function ProductShowcase() {
               }}
             >
               <img 
-                src="/view-coach-cards-1.png" 
+                src="/coach-cards-v3.png" 
                 alt="View Coach Cards" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
-                  display: 'block',
-                  borderRadius: '16px'
+                  display: 'block'
                 }} 
               />
             </div>
@@ -285,7 +287,6 @@ export function ProductShowcase() {
               onMouseEnter={() => setHover2Card2(true)}
               onMouseLeave={() => setHover2Card2(false)}
               style={{ 
-                borderRadius: '16px',
                 width: '44%',
                 maxWidth: '490px',
                 height: 'auto',
@@ -299,13 +300,12 @@ export function ProductShowcase() {
               }}
             >
               <img 
-                src="/view-coach-cards-2.png" 
+                src="/coach-cards-v2a.png" 
                 alt="View Coach Cards" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
-                  display: 'block',
-                  borderRadius: '16px'
+                  display: 'block'
                 }} 
               />
             </div>
@@ -409,14 +409,15 @@ export function ProductShowcase() {
             justifyContent: 'center',
             gap: '10px',
             overflow: 'visible',
-            flexWrap: 'nowrap'
+            flexWrap: 'nowrap',
+            backgroundColor: '#0a0f1a',
+            borderRadius: '12px'
           }}>
             {/* Card 1 - Left */}
             <div 
               onMouseEnter={() => setHover3Card1(true)}
               onMouseLeave={() => setHover3Card1(false)}
               style={{ 
-                borderRadius: '8px',
                 width: '56%',
                 maxWidth: '700px',
                 flexShrink: 0,
@@ -426,18 +427,16 @@ export function ProductShowcase() {
                 transform: hover3Card1 ? 'rotate(-0.5deg) scale(1.03) translateY(-8px)' : 'rotate(-1deg)',
                 transition: 'transform 0.3s ease-out',
                 cursor: 'pointer',
-                zIndex: 2,
-                overflow: 'hidden'
+                zIndex: 2
               }}
             >
               <img 
-                src="/call-an-iso-1.png" 
+                src="/coach-cards-v2.png" 
                 alt="Call an ISO" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
                   display: 'block',
-                  borderRadius: '8px',
                   objectFit: 'cover'
                 }} 
               />
@@ -447,7 +446,6 @@ export function ProductShowcase() {
               onMouseEnter={() => setHover3Card2(true)}
               onMouseLeave={() => setHover3Card2(false)}
               style={{ 
-                borderRadius: '8px',
                 width: '100%',
                 maxWidth: '1000px',
                 flexShrink: 0,
@@ -457,18 +455,16 @@ export function ProductShowcase() {
                 transform: hover3Card2 ? 'rotate(2deg) scale(1.03) translateY(-8px)' : 'rotate(1.5deg)',
                 transition: 'transform 0.3s ease-out',
                 cursor: 'pointer',
-                zIndex: 1,
-                overflow: 'hidden'
+                zIndex: 1
               }}
             >
               <img 
-                src="/call-an-iso-2.1.png" 
+                src="/ISO Called.png" 
                 alt="Call an ISO" 
                 style={{
                   width: '100%', 
                   height: 'auto', 
                   display: 'block',
-                  borderRadius: '8px',
                   objectFit: 'cover'
                 }} 
               />

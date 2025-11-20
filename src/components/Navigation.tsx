@@ -40,24 +40,15 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  // Load saved user state from localStorage on mount
+  // Load saved user state from localStorage on mount (but don't auto-open portals)
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem(STORAGE_KEY);
-      const savedPortal = localStorage.getItem(STORAGE_PORTAL_KEY);
       
       if (savedUser) {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
-        
-        // Restore the portal view
-        if (savedPortal === 'coach') {
-          setShowCoachPortal(true);
-        } else if (savedPortal === 'player') {
-          setShowPlayerPortal(true);
-        } else if (savedPortal === 'community') {
-          setShowCommunityPortal(true);
-        }
+        // Don't auto-open portals on page load - user must manually click to open
       }
     } catch (error) {
       console.error('Failed to load saved user state:', error);

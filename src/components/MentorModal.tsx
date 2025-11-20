@@ -1,4 +1,4 @@
-import { X, Search, Star, Lightbulb, Sparkles } from 'lucide-react';
+import { X, Search, Star, Lightbulb, Sparkles, Clock } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { useState } from 'react';
@@ -417,255 +417,277 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
           style={{ display: viewingCard ? 'none' : 'flex' }}
         >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-800"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-slate-900 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-slate-700/50"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+        }}
       >
-        {/* Header */}
-        <div className={`bg-gradient-to-br ${category.color} p-8 text-white relative`}>
+        {/* Enhanced Header */}
+        <div 
+          className={`bg-gradient-to-br ${category.color} p-5 text-white relative overflow-hidden`}
+        >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/30 rounded-full flex items-center justify-center transition-colors"
+            className="absolute top-3 right-3 w-10 h-10 bg-black/20 hover:bg-black/30 rounded-full flex items-center justify-center transition-colors z-10"
           >
             <X className="w-6 h-6" />
           </button>
           
-          <div className="flex items-center gap-4 mb-4">
-            <span className="text-5xl">{category.emoji}</span>
+          <div className="flex items-center gap-3 mb-2 pr-16">
+            <span className="text-4xl">{category.emoji}</span>
             <div>
-              <h2 className="text-white mb-2">{category.title}</h2>
-              <p className="text-white/90">{category.description}</p>
+              <h2 className="text-white mb-1 text-xl">{category.title}</h2>
+              <p className="text-white/90 text-sm">{category.description}</p>
             </div>
           </div>
-          <p className="text-white/95 italic text-lg">{category.tagline}</p>
+          <p className="text-white/95 italic text-base">{category.tagline}</p>
         </div>
 
-        {/* Mentors */}
+        {/* Content Area */}
         <div className="p-8 overflow-y-auto max-h-[calc(90vh-280px)] bg-slate-900">
-          {/* Collapsible Info Section */}
-          <Accordion type="multiple" className="mb-8 space-y-2" defaultValue={[]}>
-          {/* Match Score Explanation */}
-            <AccordionItem value="match-scores" className="border border-slate-700 rounded-xl bg-slate-800/50 px-4 overflow-hidden">
-              <AccordionTrigger className="text-white hover:no-underline py-4 [&>svg]:text-slate-400">
-                <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-orange-400" />
-                  <span className="font-medium">Understanding Match Scores</span>
+          {/* Enhanced Collapsible Info Section */}
+          <div className="mb-8 space-y-3">
+            <Accordion type="multiple" className="space-y-3" defaultValue={[]}>
+              {/* Match Score Explanation */}
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-orange-500/20 rounded-xl border border-orange-500/30 flex-shrink-0 self-start">
+                  <Lightbulb className="w-6 h-6 text-orange-400" />
+                </div>
+                <AccordionItem value="match-scores" className="flex-1 border-2 border-blue-400/60 rounded-2xl bg-blue-800/80 border-solid overflow-hidden shadow-xl shadow-black/40">
+                  <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-slate-400">
+                    <span className="font-semibold text-base" style={{ fontFamily: "'Poppins', sans-serif" }}>Understanding Match Scores</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-300 text-sm pb-6 px-6 leading-relaxed">
+                    Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400 font-semibold">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400 font-semibold">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
+
+              {/* Try Outs - Quick Chat */}
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-500/20 rounded-xl border border-blue-500/30 flex-shrink-0 self-start">
+                  <Clock className="w-6 h-6 text-blue-400" />
+                </div>
+                <AccordionItem value="try-outs" className="flex-1 border-2 border-blue-400/60 rounded-2xl bg-blue-800/80 border-solid overflow-hidden shadow-xl shadow-black/40">
+                  <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-slate-400">
+                    <span className="font-semibold text-base" style={{ fontFamily: "'Poppins', sans-serif" }}>Try Outs</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
+                    Not ready to commit yet? Start with a quick, no-pressure conversation. Think of it as a first consultation — just you and a coach, exploring what's possible.
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
+
+              {/* Call an ISO - Full Commitment */}
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-orange-500/30 rounded-xl border-2 border-orange-500/40 flex-shrink-0 self-start shadow-lg shadow-orange-500/20">
+                  <Sparkles className="w-6 h-6 text-orange-400" />
+                </div>
+                <AccordionItem value="call-iso" className="flex-1 border-2 border-orange-500/50 rounded-2xl bg-slate-700/80 backdrop-blur-sm overflow-hidden shadow-lg shadow-orange-500/20">
+                  <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-orange-400">
+                    <span className="font-semibold text-base text-orange-400" style={{ fontFamily: "'Poppins', sans-serif" }}>Call an ISO</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
+                    When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
+            </Accordion>
           </div>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-400 text-sm pb-4">
-                Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
-              </AccordionContent>
-            </AccordionItem>
 
-            {/* Try Outs - Quick Chat */}
-            <AccordionItem value="try-outs" className="border border-slate-700 rounded-xl bg-slate-800/50 px-4 overflow-hidden">
-              <AccordionTrigger className="text-white hover:no-underline py-4 [&>svg]:text-slate-400">
-                <span className="font-medium">Try Outs</span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-400 pb-4">
-                Not ready to commit yet? Start with a quick, no-pressure conversation. Think of it as a first consultation — just you and a coach, exploring what's possible.
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Call an ISO - Full Commitment */}
-            <AccordionItem value="call-iso" className="border border-orange-500/20 rounded-xl bg-slate-800 px-4 overflow-hidden">
-              <AccordionTrigger className="text-white hover:no-underline py-4 [&>svg]:text-slate-400">
-                <span className="font-medium">Call an ISO</span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-400 pb-4">
-                When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          <h3 className="text-white text-2xl font-bold mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>Coaches</h3>
+          {/* Section Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <h3 
+              className="text-white text-3xl font-bold flex items-center gap-3"
+              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '800' }}
+            >
+              <span className="text-white">Coaches</span>
+              <span className="text-slate-500 text-lg font-normal">({filteredMentors.length})</span>
+            </h3>
+          </div>
           
-          {/* Search and Filters */}
-          <div className="mb-6 flex flex-col sm:flex-row gap-4">
-            {/* Search Bar */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          {/* Enhanced Search and Filters */}
+          <div className="mb-8 flex flex-col sm:flex-row gap-4">
+            {/* Search Bar with Box */}
+            <div className="relative flex-1 bg-slate-700/90 backdrop-blur-sm rounded-xl border-2 border-slate-500/80 shadow-lg hover:border-slate-400/80 focus-within:border-orange-500/60 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
               <input
                 type="text"
-                placeholder="Search by Coach Name"
+                placeholder="Search by Coach Name, Title, or Expertise..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-800 text-white pl-10 pr-4 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-transparent text-white pl-4 pr-4 py-4 rounded-xl border-0 focus:outline-none focus:ring-0 transition-all placeholder:text-slate-400"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
               />
-          </div>
+            </div>
 
             {/* Sort Dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-slate-800 text-white px-4 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              >
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-slate-800/80 backdrop-blur-sm text-white px-5 py-3 rounded-xl border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
               <option value="match">Sort by: Best Match</option>
               <option value="overall">Sort by: Overall</option>
               <option value="experience">Sort by: Experience</option>
               <option value="availability">Sort by: Availability</option>
-              </select>
+            </select>
           </div>
           
-          {/* Coach Roster Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-slate-800 border-b-2 border-slate-700">
-                  <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Photo</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Title</th>
-                  <th className="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Match Score</th>
-                  <th className="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Overall</th>
-                  <th className="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Availability</th>
-                  <th className="px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Poppins', sans-serif" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMentors.map((mentor, index) => (
-                  <tr 
-                key={index}
-                    className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"
-                  >
-                    <td className="px-4 py-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-700">
-                  <ImageWithFallback
+          {/* Modern Card-Based Coach Grid */}
+          <div className="grid grid-cols-1 gap-4">
+            {filteredMentors.map((mentor, index) => {
+              const matchResult = getMatchScore(mentor.name);
+              const overall = getOverall(mentor.name);
+              const availabilityStatus = getAvailabilityStatus(mentor.name);
+              
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  className="group bg-blue-800/80 rounded-2xl border-2 border-blue-400/60 hover:border-blue-300/70 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10 shadow-xl shadow-black/40"
+                >
+                  <div className="flex items-start gap-6">
+                    {/* Photo */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-700 border-2 border-slate-600 group-hover:border-orange-500/50 transition-colors shadow-lg">
+                        <ImageWithFallback
                           src={getImageSrc(mentor.name)}
-                    alt={mentor.name}
-                    className={`w-full h-full ${mentor.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
-                  />
-                </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <p className="text-white font-medium">{mentor.name}</p>
-                    </td>
-                    <td className="px-4 py-4">
-                      <p className="text-slate-400 text-sm">{mentor.role}</p>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                  {(() => {
-                    const matchResult = getMatchScore(mentor.name);
-                    if (matchResult) {
-                      return (
-                          <Badge className={`${getMatchColor(matchResult.score)} border text-sm px-3 py-1`}>
+                          alt={mentor.name}
+                          className={`w-full h-full ${mentor.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
+                        />
+                      </div>
+                      {mentor.tier && (
+                        <div className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-lg text-xs font-bold ${getTierBadgeStyle(mentor.tier)} border-2 shadow-lg`}>
+                          {getTierLabel(mentor.tier)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Coach Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="text-white text-xl font-bold mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            {mentor.name}
+                          </h4>
+                          <p className="text-slate-400 text-sm mb-3">{mentor.role}</p>
+                        </div>
+                        
+                        {/* Match Score Badge */}
+                        {matchResult && (
+                          <Badge className={`${getMatchColor(matchResult.score)} border text-sm px-4 py-1.5 font-semibold shadow-lg`}>
                             {matchResult.score}% Match
                           </Badge>
-                      );
-                    }
-                        return <span className="text-slate-400 text-sm">—</span>;
-                  })()}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span className="text-white font-semibold">{getOverall(mentor.name)}</span>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <button
+
+                      {/* Stats Row */}
+                      <div className="flex items-center gap-6 mb-4">
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                          <span className="text-white font-semibold text-sm">{overall}</span>
+                          <span className="text-slate-500 text-xs">Overall</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-400" />
+                          <span className="text-slate-300 text-sm font-medium capitalize">{availabilityStatus}</span>
+                          <span className="text-slate-500 text-xs">Availability</span>
+                        </div>
+                        {mentor.successRate && (
+                          <div className="text-slate-400 text-xs">
+                            {mentor.successRate}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Specialization Tags */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {mentor.specialization.slice(0, 3).map((spec, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 bg-slate-700/50 text-slate-300 text-xs rounded-lg border border-slate-600/50"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                        {mentor.specialization.length > 3 && (
+                          <span className="px-3 py-1 text-slate-400 text-xs">
+                            +{mentor.specialization.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-3 flex-shrink-0">
+                      <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowCalendarForMentor(mentor.name);
                           setSelectedDate(undefined);
                           setSelectedTimeSlot(null);
                         }}
-                        className="text-white px-4 py-2 rounded-lg transition-all text-sm font-medium relative overflow-hidden"
-                        style={{
-                          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                          boxShadow: '0 0 20px rgba(59, 130, 246, 0.5), 0 4px 14px 0 rgba(59, 130, 246, 0.3)',
-                          transition: 'all 0.3s ease',
-                          position: 'relative',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 0 30px rgba(59, 130, 246, 0.7), 0 6px 20px 0 rgba(59, 130, 246, 0.4)';
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5), 0 4px 14px 0 rgba(59, 130, 246, 0.3)';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
+                        className="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl transition-all text-sm font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 relative overflow-hidden"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <span style={{ position: 'relative', zIndex: 1 }}>Book a Try Out</span>
-                      </button>
-                    </td>
-                    <td className="px-4 py-4 text-center">
+                        <span className="relative z-10 flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          Book a Try Out
+                        </span>
+                      </motion.button>
+                      
                       <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
                           setAnimatingCardId(mentor.name);
-                          // Delay opening card to show animation
                           setTimeout(() => {
                             setViewingCard(mentor);
                             setAnimatingCardId(null);
                           }, 400);
                         }}
-                        className="text-white px-4 py-2 rounded-lg transition-all text-sm font-medium relative overflow-hidden"
-                        style={{
-                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                          boxShadow: '0 0 25px rgba(249, 115, 22, 0.7), 0 4px 14px 0 rgba(249, 115, 22, 0.5)',
-                          transition: 'all 0.3s ease',
-                          position: 'relative',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontWeight: '600',
-                          animation: animatingCardId === mentor.name ? 'none' : 'glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                        className="group/btn bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl transition-all text-sm font-bold shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 relative overflow-hidden border-2 border-orange-400/50 hover:border-orange-300/70"
+                        style={{ 
+                          fontFamily: "'Poppins', sans-serif",
+                          boxShadow: '0 0 25px rgba(249, 115, 22, 0.6), 0 0 50px rgba(249, 115, 22, 0.3), 0 8px 16px rgba(0, 0, 0, 0.3)',
+                          animation: 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                         }}
-                        animate={animatingCardId === mentor.name ? {
-                          scale: [1, 1.15, 0.95, 1.1],
-                          rotate: [0, 5, -5, 0],
-                          boxShadow: [
-                            '0 0 25px rgba(249, 115, 22, 0.7), 0 4px 14px 0 rgba(249, 115, 22, 0.5)',
-                            '0 0 50px rgba(249, 115, 22, 1), 0 8px 25px 0 rgba(249, 115, 22, 0.8)',
-                            '0 0 60px rgba(249, 115, 22, 1.2), 0 12px 30px 0 rgba(249, 115, 22, 1)',
-                            '0 0 40px rgba(249, 115, 22, 0.9), 0 6px 20px 0 rgba(249, 115, 22, 0.7)',
-                          ]
-                        } : {}}
-                        transition={{
-                          duration: 0.4,
-                          ease: [0.34, 1.56, 0.64, 1] // Custom easing for bounce effect
-                        }}
-                        onMouseEnter={(e) => {
-                          if (animatingCardId !== mentor.name) {
-                            e.currentTarget.style.boxShadow = '0 0 40px rgba(249, 115, 22, 1), 0 8px 25px 0 rgba(249, 115, 22, 0.7)';
-                            e.currentTarget.style.transform = 'scale(1.08)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (animatingCardId !== mentor.name) {
-                            e.currentTarget.style.boxShadow = '0 0 25px rgba(249, 115, 22, 0.7), 0 4px 14px 0 rgba(249, 115, 22, 0.5)';
-                            e.currentTarget.style.transform = 'scale(1)';
-                          }
-                        }}
-                        disabled={animatingCardId === mentor.name}
+                        whileHover={{ scale: 1.08, boxShadow: '0 0 40px rgba(249, 115, 22, 0.9), 0 0 80px rgba(249, 115, 22, 0.5), 0 12px 24px rgba(0, 0, 0, 0.4)' }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <span style={{ 
-                          position: 'relative', 
-                          zIndex: 1,
-                          display: 'inline-block',
-                          transform: animatingCardId === mentor.name ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                          transition: 'transform 0.2s ease'
-                        }}>
-                          {animatingCardId === mentor.name ? <Sparkles className="w-4 h-4 inline" /> : 'View Card'}
+                        {/* Animated glow effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 via-orange-300/30 to-orange-400/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                        
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                        
+                        <span className="relative z-10 flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 drop-shadow-lg" />
+                          <span className="drop-shadow-md">View Card</span>
                         </span>
                       </motion.button>
-                    </td>
-                  </tr>
-                ))}
-                {filteredMentors.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
-                      No coaches found matching your search.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+            
+            {filteredMentors.length === 0 && (
+              <div className="text-center py-16">
+                <Search className="w-16 h-16 text-slate-600 mx-auto mb-4 opacity-50" />
+                <p className="text-slate-400 text-lg font-medium mb-2">No coaches found</p>
+                <p className="text-slate-500 text-sm">Try adjusting your search or filters</p>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>

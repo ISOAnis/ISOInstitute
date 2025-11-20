@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
+import { ConsultationModal } from './components/ConsultationModal';
 
 // Lazy load heavy components
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
@@ -32,12 +33,41 @@ export default function App() {
     daysRemaining?: number;
   } | null>(null);
   const [shouldReopenMentorModal, setShouldReopenMentorModal] = useState(false);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
+  const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
 
-  // Helper to navigate to Call ISO page
+  // Handle navigation - clear states when navigating to home from logo/nav
+  const handleNavigate = (page: Page) => {
+    // If navigating to home, clear all Call ISO related states
+    if (page === 'home') {
+      setSelectedCoachName(null);
+      setSelectedCategoryId(null);
+      setShouldReopenMentorModal(false);
+      setShowConsultationModal(false);
+      setPendingCoachName(null);
+      setPendingCategoryId(null);
+    }
+    setCurrentPage(page);
+  };
+
+  // Helper to show consultation modal before Call ISO page
   const navigateToCallIso = (coachName: string, categoryId?: string) => {
-    setSelectedCoachName(coachName);
-    setSelectedCategoryId(categoryId || null);
-    setCurrentPage('call-iso');
+    setPendingCoachName(coachName);
+    setPendingCategoryId(categoryId || null);
+    setShowConsultationModal(true);
+  };
+
+  // After consultation is scheduled, navigate to Call ISO page
+  const handleConsultationComplete = () => {
+    if (pendingCoachName) {
+      setSelectedCoachName(pendingCoachName);
+      setSelectedCategoryId(pendingCategoryId || null);
+      setShowConsultationModal(false);
+      setPendingCoachName(null);
+      setPendingCategoryId(null);
+      setCurrentPage('call-iso');
+    }
   };
 
   // Helper to navigate back to coaches (reopen MentorModal)
@@ -62,7 +92,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-950">
       <Navigation 
         currentPage={currentPage}
-        onNavigate={setCurrentPage}
+        onNavigate={handleNavigate}
         onMenteeStatusChange={setMenteeCommitmentStatus}
       />
       
@@ -126,6 +156,20 @@ export default function App() {
       )}
 
       {currentPage !== 'call-iso' && <Footer onNavigate={setCurrentPage} />}
+
+      {/* Consultation Modal - shown before Call ISO page */}
+      {showConsultationModal && pendingCoachName && (
+        <ConsultationModal
+          coachName={pendingCoachName}
+          categoryId={pendingCategoryId || undefined}
+          onClose={() => {
+            setShowConsultationModal(false);
+            setPendingCoachName(null);
+            setPendingCategoryId(null);
+          }}
+          onScheduleComplete={handleConsultationComplete}
+        />
+      )}
     </div>
   );
 }
