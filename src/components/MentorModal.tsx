@@ -1,4 +1,4 @@
-import { X, Search, Star } from 'lucide-react';
+import { X, Search, Star, Lightbulb, Sparkles } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { useState } from 'react';
@@ -329,11 +329,11 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
   const getTierLabel = (tier: 'standard' | 'specialist' | 'premium') => {
     switch (tier) {
       case 'premium':
-        return '⭐ Premium Coach';
+        return 'Premium Coach';
       case 'specialist':
-        return '🎯 Specialist';
+        return 'Specialist';
       case 'standard':
-        return '✓ Standard';
+        return 'Standard';
     }
   };
 
@@ -446,13 +446,13 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
         <div className="p-8 overflow-y-auto max-h-[calc(90vh-280px)] bg-slate-900">
           {/* Collapsible Info Section */}
           <Accordion type="multiple" className="mb-8 space-y-2" defaultValue={[]}>
-            {/* Match Score Explanation */}
+          {/* Match Score Explanation */}
             <AccordionItem value="match-scores" className="border border-slate-700 rounded-xl bg-slate-800/50 px-4 overflow-hidden">
               <AccordionTrigger className="text-white hover:no-underline py-4 [&>svg]:text-slate-400">
                 <div className="flex items-center gap-2">
-                  <span>💡</span>
+              <Lightbulb className="w-4 h-4 text-orange-400" />
                   <span className="font-medium">Understanding Match Scores</span>
-                </div>
+          </div>
               </AccordionTrigger>
               <AccordionContent className="text-slate-400 text-sm pb-4">
                 Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
@@ -494,8 +494,8 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-800 text-white pl-10 pr-4 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
-            </div>
-            
+          </div>
+
             {/* Sort Dropdown */}
               <select
                 value={sortBy}
@@ -650,7 +650,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                           transform: animatingCardId === mentor.name ? 'rotateY(180deg)' : 'rotateY(0deg)',
                           transition: 'transform 0.2s ease'
                         }}>
-                          {animatingCardId === mentor.name ? '✨' : 'View Card'}
+                          {animatingCardId === mentor.name ? <Sparkles className="w-4 h-4 inline" /> : 'View Card'}
                         </span>
                       </motion.button>
                     </td>

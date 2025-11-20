@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X } from 'lucide-react';
+import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { MenteeProfileSection } from './MenteeProfileSection';
 import { LockerRoom } from './LockerRoom';
@@ -69,7 +69,7 @@ export function MenteePortal() {
   const currentMentor = {
     name: 'Imam Abdullah Rahman',
     category: 'Deen & Purpose',
-    categoryIcon: '☪️',
+    categoryIcon: Moon,
     startDate: '2024-10-15', // Date mentee started with this mentor
   };
 
@@ -124,11 +124,11 @@ export function MenteePortal() {
   const currentTier = getCurrentTier();
   
   const tiers = [
-    { id: 'freshman', name: 'Freshman', icon: '🌱', minGames: 0, color: 'bg-green-500', darkColor: 'bg-green-700' },
-    { id: 'jv', name: 'JV', icon: '📚', minGames: 3, color: 'bg-blue-500', darkColor: 'bg-blue-700' },
-    { id: 'varsity', name: 'Varsity', icon: '⭐', minGames: 6, color: 'bg-purple-500', darkColor: 'bg-purple-700' },
-    { id: 'd1', name: 'D1', icon: '🏆', minGames: 10, color: 'bg-orange-500', darkColor: 'bg-orange-700' },
-    { id: 'professional', name: 'Professional', icon: '💎', minGames: 15, color: 'bg-yellow-500', darkColor: 'bg-yellow-700' },
+    { id: 'freshman', name: 'Freshman', icon: Sprout, minGames: 0, color: 'bg-green-500', darkColor: 'bg-green-700' },
+    { id: 'jv', name: 'JV', icon: BookOpen, minGames: 3, color: 'bg-blue-500', darkColor: 'bg-blue-700' },
+    { id: 'varsity', name: 'Varsity', icon: StarIcon, minGames: 6, color: 'bg-purple-500', darkColor: 'bg-purple-700' },
+    { id: 'd1', name: 'D1', icon: Trophy, minGames: 10, color: 'bg-orange-500', darkColor: 'bg-orange-700' },
+    { id: 'professional', name: 'Professional', icon: Gem, minGames: 15, color: 'bg-yellow-500', darkColor: 'bg-yellow-700' },
   ];
   
   const toggleBucket = (gameId: string, bucketId: string) => {
@@ -158,7 +158,7 @@ export function MenteePortal() {
             <div>
               <h1 className="text-white mb-2">Your Season</h1>
               <div className="flex items-center gap-2 text-slate-400">
-                <span className="text-2xl">{currentMentor.categoryIcon}</span>
+                {React.createElement(currentMentor.categoryIcon, { className: 'w-6 h-6 text-white' })}
                 <div>
                   <span className="text-orange-400">{currentMentor.category}</span>
                   <span> with {currentMentor.name}</span>
@@ -322,10 +322,11 @@ export function MenteePortal() {
                     const nextTier = tiers[index + 1];
                     const gamesNeeded = nextTier ? nextTier.minGames - gamesWon : 0;
                     
+                    const TierIcon = tier.icon;
                     return (
                       <div key={tier.id} className="flex flex-col items-center flex-1">
-                        <div className={`text-2xl mb-1 ${isCurrent ? 'scale-125' : ''} transition-transform`}>
-                          {tier.icon}
+                        <div className={`mb-1 ${isCurrent ? 'scale-125' : ''} transition-transform`}>
+                          {TierIcon && <TierIcon className="w-6 h-6 text-white" />}
                         </div>
                         <div className={`text-xs font-semibold text-center ${
                           isCurrent ? 'text-orange-400' : isCompleted ? 'text-white' : 'text-slate-500'
@@ -338,8 +339,8 @@ export function MenteePortal() {
                           </div>
                         )}
                         {isCurrent && gamesNeeded === 0 && (
-                          <div className="text-yellow-400 text-xs mt-0.5">
-                            ✨ Max Level
+                          <div className="text-yellow-400 text-xs mt-0.5 flex items-center gap-1">
+                            <Sparkles className="w-3 h-3" /> Max Level
                           </div>
                         )}
                         {!isCurrent && !isCompleted && index === currentTier.level && (
@@ -356,7 +357,10 @@ export function MenteePortal() {
               {/* Current Tier Info */}
               <div className="text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-full">
-                  <span className="text-2xl">{tiers.find(t => t.id === currentTier.tier)?.icon}</span>
+                  {(() => {
+                    const CurrentTierIcon = tiers.find(t => t.id === currentTier.tier)?.icon;
+                    return CurrentTierIcon ? <CurrentTierIcon className="w-5 h-5 text-white" /> : null;
+                  })()}
                   <span className="text-white font-semibold">
                     Current Level: {tiers.find(t => t.id === currentTier.tier)?.name}
                   </span>
@@ -415,7 +419,9 @@ export function MenteePortal() {
             {/* Championship Banner */}
             {isChampion && (
               <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 border-2 border-yellow-500/50 rounded-2xl p-8 mb-8 text-center">
-                <div className="text-6xl mb-4">🏆</div>
+                <div className="mb-4 flex justify-center">
+                  <Trophy className="w-16 h-16 text-yellow-400" />
+                </div>
                 <h2 className="text-white mb-3">Championship Ring Earned!</h2>
                 <p className="text-slate-300 mb-4 max-w-2xl mx-auto">
                   You've demonstrated exceptional growth, consistency, and commitment over your coaching journey. 
@@ -467,7 +473,9 @@ export function MenteePortal() {
                         </div>
                         <div className="text-right">
                           {game.completed ? (
-                            <div className="text-green-400">Game Won! 🎯</div>
+                            <div className="text-green-400 flex items-center gap-1">
+                              Game Won! <Target className="w-4 h-4" />
+                            </div>
                           ) : (
                             <div className="text-orange-400">{progress}% Complete</div>
                           )}

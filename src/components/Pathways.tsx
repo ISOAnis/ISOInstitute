@@ -1,3 +1,5 @@
+import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Sprout, BookOpen, Star, Trophy, Gem, Target, Clock, ArrowUp, Circle, Sparkles } from 'lucide-react';
+
 type Page = 'home' | 'pathways' | 'about' | 'community';
 
 interface PathwaysProps {
@@ -8,7 +10,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
   const pathways = [
     {
       id: 'deen',
-      icon: '☪️',
+      icon: Moon,
       name: 'Deen & Purpose',
       description: 'Spiritual development, Islamic knowledge, reflection, and balance between dunya and akhirah. This is the core of all growth — everything flows from this center.',
       tagline: '"Center your faith before your function."',
@@ -18,7 +20,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     },
     {
       id: 'health',
-      icon: '💪🏽',
+      icon: Dumbbell,
       name: 'Health & Fitness',
       description: 'Discipline through the body — physical wellness, gym consistency, mental health, nutrition, and self-discipline.',
       tagline: '"Train your body. Strengthen your mind."',
@@ -28,7 +30,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     },
     {
       id: 'medicine',
-      icon: '⚕️',
+      icon: Activity,
       name: 'Medicine & Healthcare',
       description: 'Serving through healing — for those exploring pre-med, nursing, public health, or medical professions.',
       tagline: '"Serve through science and compassion."',
@@ -38,7 +40,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     },
     {
       id: 'engineering',
-      icon: '⚙️',
+      icon: Settings,
       name: 'Engineering & Technology',
       description: 'Building and solving — for innovators in STEM and design who want to leave a real-world impact.',
       tagline: '"Design, build, and solve for tomorrow."',
@@ -48,7 +50,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     },
     {
       id: 'entrepreneurship',
-      icon: '🚀',
+      icon: Rocket,
       name: 'Entrepreneurship & Innovation',
       description: 'For builders, dreamers, and leaders turning ideas into reality — from startups to social ventures.',
       tagline: '"Build something that outlasts you."',
@@ -58,13 +60,13 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     },
     {
       id: 'global',
-      icon: '🌍',
+      icon: Globe,
       name: 'Global Affairs & Business',
       description: 'For those navigating global impact — economics, diplomacy, international organizations, and ethical leadership.',
       tagline: '"Lead globally. Move with purpose."',
-      color: 'from-teal-500 to-green-600',
-      borderColor: 'border-teal-500/30',
-      bgColor: 'from-teal-500/10 to-green-600/10',
+      color: 'from-indigo-500 to-blue-600',
+      borderColor: 'border-indigo-500/30',
+      bgColor: 'from-indigo-500/10 to-blue-600/10',
     },
   ];
 
@@ -104,8 +106,8 @@ export function Pathways({ onNavigate }: PathwaysProps) {
             >
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${pathway.color} rounded-2xl flex items-center justify-center text-4xl shadow-lg`}>
-                    {pathway.icon}
+                  <div className={`w-20 h-20 bg-gradient-to-br ${pathway.color} rounded-2xl flex items-center justify-center shadow-lg`}>
+                    {pathway.icon && <pathway.icon className="w-10 h-10 text-white" />}
                   </div>
                 </div>
                 <div className="flex-1">
@@ -183,21 +185,26 @@ export function Pathways({ onNavigate }: PathwaysProps) {
             {/* Level Labels */}
             <div className="flex justify-between mt-3">
               {[
-                { level: 'Freshman', icon: '🌱', minTime: '3mo' },
-                { level: 'JV', icon: '📚', minTime: '3mo' },
-                { level: 'Varsity', icon: '⭐', minTime: '4mo' },
-                { level: 'D1', icon: '🏆', minTime: '6mo' },
-                { level: 'Professional', icon: '💎', minTime: 'Ongoing', special: true }
-              ].map((stage, index) => (
-                <div key={index} className="flex flex-col items-center flex-1">
-                  <div className="text-2xl mb-1">{stage.icon}</div>
-                  <div className="text-white text-xs font-semibold text-center">{stage.level}</div>
-                  <div className="text-orange-400 text-xs mt-0.5">{stage.minTime}</div>
-                  {stage.special && (
-                    <div className="text-yellow-400 text-xs mt-1">✨ Mentor</div>
-                  )}
-                </div>
-              ))}
+                { level: 'Freshman', icon: Sprout, minTime: '3mo' },
+                { level: 'JV', icon: BookOpen, minTime: '3mo' },
+                { level: 'Varsity', icon: Star, minTime: '4mo' },
+                { level: 'D1', icon: Trophy, minTime: '6mo' },
+                { level: 'Professional', icon: Gem, minTime: 'Ongoing', special: true }
+              ].map((stage, index) => {
+                const IconComponent = stage.icon;
+                return (
+                  <div key={index} className="flex flex-col items-center flex-1">
+                    {IconComponent && <IconComponent className="w-6 h-6 text-white mb-1" />}
+                    <div className="text-white text-xs font-semibold text-center">{stage.level}</div>
+                    <div className="text-orange-400 text-xs mt-0.5">{stage.minTime}</div>
+                    {stage.special && (
+                      <div className="text-yellow-400 text-xs mt-1 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Mentor
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
           
@@ -205,7 +212,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
           <div className="pt-4 border-t border-orange-500/20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
-                <span className="text-orange-400 text-lg">🎯</span>
+                <Target className="w-5 h-5 text-orange-400 mt-0.5" />
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-1">Start Where You're Ready</h4>
                   <p className="text-slate-400 text-xs">
@@ -214,7 +221,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-orange-400 text-lg">⏱️</span>
+                <Clock className="w-5 h-5 text-orange-400 mt-0.5" />
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-1">Minimum Timeframes</h4>
                   <p className="text-slate-400 text-xs">
@@ -233,7 +240,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-orange-400 text-2xl">🏀</span>
+                <Circle className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Get Buckets (Micro-Goals)</h4>
               <p className="text-slate-400">
@@ -243,7 +250,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
             
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-orange-400 text-2xl">🏆</span>
+                <Trophy className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Win Games (Major Milestones)</h4>
               <p className="text-slate-400">
@@ -253,7 +260,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
             
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-orange-400 text-2xl">⬆️</span>
+                <ArrowUp className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Level Up</h4>
               <p className="text-slate-400">

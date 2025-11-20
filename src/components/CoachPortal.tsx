@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle } from 'lucide-react';
+import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle, Moon } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
@@ -44,7 +44,7 @@ interface Player {
   name: string;
   email: string;
   category: string;
-  categoryIcon: string;
+  categoryIcon: string | typeof Moon;
   joinedDate: string;
   games: Game[];
   avatar?: string;
@@ -57,7 +57,7 @@ const mockPlayers: Player[] = [
     name: 'Ahmed Hassan',
     email: 'ahmed.hassan@email.com',
     category: 'Deen & Purpose',
-    categoryIcon: '☪️',
+    categoryIcon: Moon,
     joinedDate: '2024-09-01',
     games: [
       {
@@ -120,7 +120,7 @@ const mockPlayers: Player[] = [
     name: 'Fatima Ali',
     email: 'fatima.ali@email.com',
     category: 'Deen & Purpose',
-    categoryIcon: '☪️',
+    categoryIcon: Moon,
     joinedDate: '2024-10-01',
     games: [
       {
@@ -160,7 +160,7 @@ export function CoachPortal() {
   const currentCoach = {
     name: 'Imam Abdullah Rahman',
     category: 'Deen & Purpose',
-    categoryIcon: '☪️'
+    categoryIcon: Moon
   };
 
   const addComment = (playerId: string, gameId: string, bucketId: string) => {
@@ -290,7 +290,7 @@ export function CoachPortal() {
         <div className="mb-8">
           <h1 className="text-white mb-2">Coach Portal</h1>
           <div className="flex items-center gap-2 text-slate-400">
-            <span className="text-2xl">{currentCoach.categoryIcon}</span>
+            {React.createElement(currentCoach.categoryIcon, { className: 'w-6 h-6 text-white' })}
             <span className="text-orange-400">{currentCoach.category}</span>
             <span> • {currentCoach.name}</span>
           </div>
@@ -347,7 +347,9 @@ export function CoachPortal() {
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4">
                   <h3 className="text-white font-semibold mb-4">Your Players</h3>
                   <div className="space-y-2">
-                    {players.map((player) => (
+                            {players.map((player) => {
+                        const PlayerCategoryIcon = typeof player.categoryIcon === 'string' && player.categoryIcon === '☪️' ? Moon : (typeof player.categoryIcon !== 'string' ? player.categoryIcon : null);
+                        return (
                       <button
                         key={player.id}
                         onClick={() => setSelectedPlayerForChat(player)}
@@ -366,11 +368,14 @@ export function CoachPortal() {
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium truncate">{player.name}</p>
-                            <p className="text-slate-400 text-xs truncate">{player.category}</p>
+                            <p className="text-slate-400 text-xs truncate flex items-center gap-1">
+                              {PlayerCategoryIcon && React.createElement(PlayerCategoryIcon, { className: 'w-3 h-3' })}
+                              {player.category}
+                            </p>
                           </div>
                         </div>
                       </button>
-                    ))}
+                    )})}
                   </div>
                 </div>
               </div>
@@ -534,8 +539,8 @@ export function CoachPortal() {
                               <p className="text-slate-400 text-sm">Games</p>
                             </div>
                             <div className="text-center">
-                              <div className={stats.isChampion ? 'text-yellow-400 mb-1' : 'text-slate-500 mb-1'}>
-                                {stats.isChampion ? '🏆' : `${6 - stats.gamesWon} to go`}
+                              <div className={stats.isChampion ? 'text-yellow-400 mb-1 flex items-center justify-center' : 'text-slate-500 mb-1'}>
+                                {stats.isChampion ? <Trophy className="w-5 h-5" /> : `${6 - stats.gamesWon} to go`}
                               </div>
                               <p className="text-slate-400 text-sm">Champion</p>
                             </div>

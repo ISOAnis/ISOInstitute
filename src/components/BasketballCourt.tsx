@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CategoryBubble } from './CategoryBubble';
 import { MentorModal } from './MentorModal';
 import { SignupModal } from './SignupModal';
-import { Lock, Clock } from 'lucide-react';
+import { Lock, Clock, Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 
 interface CommitmentStatus {
   isCommitted: boolean;
@@ -25,7 +25,8 @@ const categories = [
   {
     id: 'deen',
     title: 'Deen & Purpose',
-    emoji: '☪️',
+    icon: Moon,
+    iconName: 'Moon',
     description: 'Spiritual development, Islamic knowledge, reflection, and balance between dunya and akhirah. This is the core of all growth — everything flows from this center.',
     tagline: '"Center your faith before your function."',
     color: 'from-emerald-500 to-teal-600',
@@ -35,7 +36,8 @@ const categories = [
   {
     id: 'health',
     title: 'Health & Fitness',
-    emoji: '💪🏽',
+    icon: Dumbbell,
+    iconName: 'Dumbbell',
     description: 'Discipline through the body — physical wellness, gym consistency, mental health, nutrition, and self-discipline.',
     tagline: '"Train your body. Strengthen your mind."',
     color: 'from-red-500 to-rose-600',
@@ -45,7 +47,8 @@ const categories = [
   {
     id: 'medicine',
     title: 'Medicine & Healthcare',
-    emoji: '⚕️',
+    icon: Activity,
+    iconName: 'Activity',
     description: 'Serving through healing — for those exploring pre-med, nursing, public health, or medical professions.',
     tagline: '"Serve through science and compassion."',
     color: 'from-blue-500 to-cyan-600',
@@ -55,7 +58,8 @@ const categories = [
   {
     id: 'engineering',
     title: 'Engineering & Technology',
-    emoji: '⚙️',
+    icon: Settings,
+    iconName: 'Settings',
     description: 'Building and solving — for innovators in STEM and design who want to leave a real-world impact.',
     tagline: '"Design, build, and solve for tomorrow."',
     color: 'from-purple-500 to-indigo-600',
@@ -65,7 +69,8 @@ const categories = [
   {
     id: 'entrepreneurship',
     title: 'Entrepreneurship & Business',
-    emoji: '🚀',
+    icon: Rocket,
+    iconName: 'Rocket',
     description: 'For builders, dreamers, and leaders turning ideas into reality — from startups to social ventures.',
     tagline: '"Build something that outlasts you."',
     color: 'from-orange-500 to-amber-600',
@@ -75,10 +80,11 @@ const categories = [
   {
     id: 'global',
     title: 'Global Affairs, Law, & Policy',
-    emoji: '🌍',
+    icon: Globe,
+    iconName: 'Globe',
     description: 'For those navigating global impact — economics, diplomacy, international organizations, and ethical leadership.',
     tagline: '"Lead globally. Move with purpose."',
-    color: 'from-teal-500 to-green-600',
+    color: 'from-indigo-500 to-blue-600',
     position: { bottom: '20%', left: '20%' },
     zIndex: 10,
   },
