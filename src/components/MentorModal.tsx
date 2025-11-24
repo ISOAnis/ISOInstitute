@@ -836,7 +836,12 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               { year: '2021', role: 'Senior Engineer', company: 'Zoox' },
               { year: '2023', role: 'Lead Engineer', company: 'Zoox' },
               { year: '2024', role: 'Mentor & Community Builder', company: 'ISO Institute' }
-            ]
+            ],
+            photo:
+              typeof window !== 'undefined' &&
+              viewingCard.name === 'Imam Abdullah Rahman'
+                ? localStorage.getItem('coach_profile_picture') || undefined
+                : undefined
           }}
           category={category}
           onClose={() => setViewingCard(null)}

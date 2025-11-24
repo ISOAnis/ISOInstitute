@@ -195,12 +195,23 @@
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
     scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
+    background-color: #05060a;
+    overscroll-behavior: none;
   }
 
   body {
     line-height: inherit;
     overflow-x: hidden;
     scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
+    background-color: #05060a;
+    overscroll-behavior: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #root {
+    background-color: #05060a;
+    min-height: 100vh;
   }
 
   /* Custom Scrollbar Styling - Clean and Smooth */

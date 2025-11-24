@@ -19,6 +19,8 @@ interface Message {
   }>;
 }
 
+type CategoryIconType = string | React.ComponentType<{ className?: string }>;
+
 interface MentorMenteeChatProps {
   currentUserId: string;
   currentUserName: string;
@@ -28,7 +30,7 @@ interface MentorMenteeChatProps {
   otherUserRole: 'mentor' | 'mentee';
   otherUserAvatar?: string;
   category?: string;
-  categoryIcon?: string;
+  categoryIcon?: CategoryIconType;
 }
 
 // Mock messages - in production this would come from backend
@@ -166,6 +168,20 @@ export function MentorMenteeChat({
 
   const isCurrentUser = (message: Message) => message.senderId === currentUserId;
 
+  const renderCategoryIcon = () => {
+    if (!categoryIcon) return null;
+    if (typeof categoryIcon === 'string') {
+      return <span>{categoryIcon}</span>;
+    }
+    try {
+      const IconComponent = categoryIcon;
+      return <IconComponent className="w-3 h-3 text-slate-400" />;
+    } catch (error) {
+      console.error('Failed to render category icon:', error);
+      return null;
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
       {/* Chat Header */}
@@ -180,7 +196,7 @@ export function MentorMenteeChat({
           <div>
             <h3 className="text-white font-semibold">{otherUserName}</h3>
             <div className="flex items-center gap-2 text-slate-400 text-xs">
-              {categoryIcon && <span>{categoryIcon}</span>}
+              {renderCategoryIcon()}
               {category && <span>{category}</span>}
               <span>•</span>
               <span className="flex items-center gap-1">

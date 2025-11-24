@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { MenteeProfileSection } from './MenteeProfileSection';
@@ -62,34 +62,32 @@ const mockGames: Game[] = [
   }
 ];
 
+const PLAYER_TUTORIAL_KEY = 'iso_tutorial_completed_player_page';
+type PlayerTab = 'progress' | 'messages' | 'profile';
+
 export function MenteePortal() {
   const [games, setGames] = useState<Game[]>(mockGames);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [showProfileCompletion, setShowProfileCompletion] = useState(true); // Show by default for new users
   const [showProfileCompletionModal, setShowProfileCompletionModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('progress');
+  const [playerProfileCompletion, setPlayerProfileCompletion] = useState(() => {
+    const saved = localStorage.getItem('player_profile_completion');
+    return saved ? Number(saved) : 0;
+  });
+  const [activeTab, setActiveTab] = useState<PlayerTab>('progress');
+  const profileSectionRef = useRef<HTMLDivElement | null>(null);
+  const showProfileCompletion = playerProfileCompletion < 100;
 
   // Check if tutorial should be shown
   useEffect(() => {
-    const tutorialCompleted = localStorage.getItem('iso_tutorial_completed_player');
-    console.log('[Player Portal] Tutorial completed check:', tutorialCompleted);
+    const tutorialCompleted = localStorage.getItem(PLAYER_TUTORIAL_KEY);
     if (tutorialCompleted === 'true') {
       setShowTutorial(false);
     } else {
-      console.log('[Player Portal] Setting tutorial to true');
       setTimeout(() => {
         setShowTutorial(true);
-      }, 100);
-    }
-  }, []);
-
-  // Check if profile is completed
-  useEffect(() => {
-    const profileCompleted = localStorage.getItem('player_profile_completed');
-    if (profileCompleted === 'true') {
-      setShowProfileCompletion(false);
+      }, 150);
     }
   }, []);
 
@@ -212,9 +210,25 @@ export function MenteePortal() {
   const handleProfileComplete = (profileData: any) => {
     // Save profile data to localStorage
     localStorage.setItem('player_profile_data', JSON.stringify(profileData));
-    localStorage.setItem('player_profile_completed', 'true');
     setShowProfileCompletionModal(false);
-    setShowProfileCompletion(false);
+    setPlayerProfileCompletion(100);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('player_profile_completion', String(playerProfileCompletion));
+  }, [playerProfileCompletion]);
+
+  const handleStartTutorial = () => {
+    localStorage.removeItem(PLAYER_TUTORIAL_KEY);
+    localStorage.removeItem('iso_tutorial_completed_player');
+    setShowTutorial(true);
+  };
+
+  const focusProfileSection = () => {
+    setActiveTab('profile');
+    setTimeout(() => {
+      profileSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
   };
 
   return (
@@ -225,7 +239,7 @@ export function MenteePortal() {
           steps={playerTutorialSteps}
           onComplete={() => {
             setShowTutorial(false);
-            localStorage.setItem('iso_tutorial_completed_player', 'true');
+            localStorage.setItem(PLAYER_TUTORIAL_KEY, 'true');
           }}
           role="player"
         />
@@ -255,7 +269,10 @@ export function MenteePortal() {
               </div>
             </div>
             <button
-              onClick={() => setShowProfileCompletionModal(true)}
+              onClick={() => {
+                focusProfileSection();
+                setShowProfileCompletionModal(true);
+              }}
               className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
             >
               Complete Profile
@@ -265,23 +282,27 @@ export function MenteePortal() {
         )}
 
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-white mb-2">Your Season</h1>
-              <div className="flex items-center gap-2 text-slate-400">
-                {React.createElement(currentMentor.categoryIcon, { className: 'w-6 h-6 text-white' })}
-                <div>
-                  <span className="text-orange-400">{currentMentor.category}</span>
-                  <span> with {currentMentor.name}</span>
-                </div>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-white mb-2">Your Season</h1>
+            <div className="flex items-center gap-2 text-slate-400">
+              {React.createElement(currentMentor.categoryIcon, { className: 'w-6 h-6 text-white' })}
+              <div>
+                <span className="text-orange-400">{currentMentor.category}</span>
+                <span> with {currentMentor.name}</span>
               </div>
             </div>
           </div>
+          <button
+            onClick={handleStartTutorial}
+            className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white hover:bg-white/10 transition-colors"
+          >
+            Start Tutorial
+          </button>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 relative z-10">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PlayerTab)} className="space-y-6 relative z-10">
           <div className="flex items-center justify-between">
             <TabsList className="bg-slate-900 border border-slate-800 p-1 relative z-10">
               <TabsTrigger value="progress" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
@@ -803,7 +824,9 @@ export function MenteePortal() {
 
           {/* My Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
-            <MenteeProfileSection />
+            <div ref={profileSectionRef} id="player-profile-section">
+              <MenteeProfileSection onProfileCompletionChange={setPlayerProfileCompletion} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

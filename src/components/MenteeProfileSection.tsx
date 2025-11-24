@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Edit3, Save, X, MapPin, User, Calendar, GraduationCap, Globe2, Heart, MessageCircle, Layout, Zap } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
@@ -27,22 +27,19 @@ interface MenteeProfile {
   topValues: string[];
 }
 
-const mockProfile: MenteeProfile = {
-  name: 'Ahmed Hassan',
-  email: 'ahmed.hassan@email.com',
-  age: '19',
-  schoolYear: 'college-sophomore',
-  locations: [
-    { lat: 40.7128, lng: -74.0060, label: 'New York, USA' },
-    { lat: 30.0444, lng: 31.2357, label: 'Cairo, Egypt' }
-  ],
-  prefersSameBackground: true,
-  goals: 'I want to strengthen my connection with my faith while building a successful career in technology. I hope to become someone who can inspire and coach others in the future.',
-  timeframe: '6-12 months',
-  communicationPreference: 'balanced',
-  structurePreference: 'adaptive',
-  motivationLevel: 'committed',
-  topValues: ['Faith & Spirituality', 'Discipline & Consistency', 'Knowledge & Learning']
+const defaultProfile: MenteeProfile = {
+  name: '',
+  email: '',
+  age: '',
+  schoolYear: '',
+  locations: [],
+  prefersSameBackground: false,
+  goals: '',
+  timeframe: '',
+  communicationPreference: '',
+  structurePreference: '',
+  motivationLevel: '',
+  topValues: []
 };
 
 const schoolYearLabels: Record<string, string> = {
@@ -79,12 +76,53 @@ const motivationLabels = {
   'all-in': 'All In - Ready to Transform'
 };
 
-export function MenteeProfileSection() {
-  const [profile, setProfile] = useState<MenteeProfile>(mockProfile);
+interface MenteeProfileSectionProps {
+  onProfileCompletionChange?: (percentage: number) => void;
+}
+
+export function MenteeProfileSection({ onProfileCompletionChange }: MenteeProfileSectionProps) {
+  const [profile, setProfile] = useState<MenteeProfile>(() => {
+    try {
+      const saved = localStorage.getItem('player_profile_data');
+      if (saved) {
+        return { ...defaultProfile, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.warn('Failed to load player profile data:', error);
+    }
+    return defaultProfile;
+  });
   const [isEditingBasics, setIsEditingBasics] = useState(false);
   const [isEditingDemographics, setIsEditingDemographics] = useState(false);
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
-  const [tempProfile, setTempProfile] = useState<MenteeProfile>(mockProfile);
+  const [tempProfile, setTempProfile] = useState<MenteeProfile>(() => profile);
+
+  useEffect(() => {
+    localStorage.setItem('player_profile_data', JSON.stringify(profile));
+  }, [profile]);
+
+  const completionPercentage = useMemo(() => {
+    const checks: Array<boolean> = [
+      Boolean(profile.name?.trim()),
+      Boolean(profile.email?.trim()),
+      Boolean(profile.age?.trim()),
+      Boolean(profile.schoolYear?.trim()),
+      profile.locations.length > 0,
+      profile.prefersSameBackground !== null,
+      Boolean(profile.goals?.trim()),
+      Boolean(profile.timeframe?.trim()),
+      profile.communicationPreference !== '',
+      profile.structurePreference !== '',
+      profile.motivationLevel !== '',
+      profile.topValues.length >= 2,
+    ];
+    const completed = checks.filter(Boolean).length;
+    return Math.round((completed / checks.length) * 100);
+  }, [profile]);
+
+  useEffect(() => {
+    onProfileCompletionChange?.(completionPercentage);
+  }, [completionPercentage, onProfileCompletionChange]);
 
   const startEditBasics = () => {
     setTempProfile({ ...profile });

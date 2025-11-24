@@ -21,6 +21,7 @@ interface CoachCardProps {
     responseTime?: string;
     education?: string[];
     careerTimeline?: Array<{ year: string; role: string; company: string }>;
+    photo?: string;
   };
   category: {
     id: string;
@@ -120,6 +121,9 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
   ];
 
   const getImageSrc = () => {
+    if (mentor.photo) {
+      return mentor.photo;
+    }
     return `https://images.unsplash.com/photo-1609503842755-77f4a81d69ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW50b3IlMjBwcm9mZXNzaW9uYWx8ZW58MXx8fHwxNzYyNjQ0MTgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral`;
   };
 

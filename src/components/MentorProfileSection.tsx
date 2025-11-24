@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Save, Edit3, User, Briefcase, Target, Heart, MessageSquare, Clock } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Save, Edit3, User, Briefcase, Target, Heart, MessageSquare, Clock, Camera, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Textarea } from './ui/textarea';
@@ -58,16 +58,63 @@ const defaultProfile: MentorProfile = {
   motivations: ''
 };
 
-export function MentorProfileSection() {
-  const [profile, setProfile] = useState<MentorProfile>(defaultProfile);
+interface MentorProfileSectionProps {
+  onProfileCompletionChange?: (percentage: number) => void;
+  onProfilePictureChange?: (image: string | null) => void;
+  initialProfilePicture?: string | null;
+}
+
+export function MentorProfileSection({
+  onProfileCompletionChange,
+  onProfilePictureChange,
+  initialProfilePicture = null,
+}: MentorProfileSectionProps) {
+  const [profile, setProfile] = useState<MentorProfile>(() => {
+    try {
+      const saved = localStorage.getItem('coach_profile_data');
+      if (saved) {
+        return { ...defaultProfile, ...JSON.parse(saved) };
+      }
+    } catch (error) {
+      console.warn('Failed to load coach profile data:', error);
+    }
+    return defaultProfile;
+  });
   const [isEditing, setIsEditing] = useState(true);
   const [activeSection, setActiveSection] = useState<'basic' | 'style' | 'availability' | 'preferences'>('basic');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [profilePicture, setProfilePicture] = useState<string | null>(() => {
+    const stored = localStorage.getItem('coach_profile_picture');
+    if (stored) return stored;
+    return initialProfilePicture;
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleSave = () => {
     // In production, this would save to backend
     console.log('Saving mentor profile:', profile);
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    localStorage.setItem('coach_profile_data', JSON.stringify(profile));
+  }, [profile]);
+
+  useEffect(() => {
+    if (profilePicture) {
+      localStorage.setItem('coach_profile_picture', profilePicture);
+    } else {
+      localStorage.removeItem('coach_profile_picture');
+    }
+    onProfilePictureChange?.(profilePicture);
+  }, [profilePicture, onProfilePictureChange]);
+
+  useEffect(() => {
+    if (initialProfilePicture && !profilePicture) {
+      setProfilePicture(initialProfilePicture);
+    }
+  }, [initialProfilePicture, profilePicture]);
 
   const expertiseOptions = [
     'Career Transition', 'Interview Prep', 'Resume Building', 'Networking',
@@ -93,35 +140,143 @@ export function MentorProfileSection() {
     }
   };
 
+  const completionPercentage = useMemo(() => {
+    const checks: Array<boolean> = [
+      Boolean(profile.bio?.trim()),
+      Boolean(profile.yearsOfExperience?.trim()),
+      Boolean(profile.currentRole?.trim()),
+      profile.expertiseAreas.length > 0,
+      profile.mentoringStyle !== '',
+      profile.communicationStyle !== '',
+      profile.structurePreference !== '',
+      Boolean(profile.weeklyHoursAvailable),
+      profile.preferredMeetingTimes.length > 0,
+      Boolean(profile.maxMentees),
+      profile.idealMenteeTraits.length > 0,
+      profile.coreValues.length > 0,
+      Boolean(profile.faithIntegration?.trim()),
+      Boolean(profile.motivations?.trim()),
+      Boolean(profilePicture),
+    ];
+    const completed = checks.filter(Boolean).length;
+    return Math.round((completed / checks.length) * 100);
+  }, [profile, profilePicture]);
+
+  useEffect(() => {
+    onProfileCompletionChange?.(completionPercentage);
+  }, [completionPercentage, onProfileCompletionChange]);
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select a valid image file.');
+      return;
+    }
+    setUploadError(null);
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProfilePicture(reader.result as string);
+      setIsUploading(false);
+    };
+    reader.onerror = () => {
+      setUploadError('Failed to load image. Please try again.');
+      setIsUploading(false);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
+
+  const triggerPhotoPicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const removePhoto = () => {
+    setProfilePicture(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-white mb-2">Coach Profile</h2>
-            <p className="text-slate-400">
-              Complete your profile to help us match you with the right players
-            </p>
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {profilePicture ? (
+                <img
+                  src={profilePicture}
+                  alt="Coach profile"
+                  className="w-20 h-20 rounded-2xl object-cover border border-slate-700"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-slate-500" />
+                </div>
+              )}
+              {profilePicture && (
+                <button
+                  onClick={removePhoto}
+                  className="absolute -top-2 -right-2 bg-slate-900 border border-slate-600 rounded-full w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                  aria-label="Remove photo"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <div>
+              <p className="text-white font-semibold text-lg">Coach Profile</p>
+              <p className="text-slate-400 text-sm">
+                Upload a photo to personalize your coach card
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Button
+                  type="button"
+                  onClick={triggerPhotoPicker}
+                  className="bg-slate-800 border border-slate-700 text-white hover:bg-slate-700"
+                  disabled={isUploading}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  {profilePicture ? 'Change Photo' : 'Upload Photo'}
+                </Button>
+                {!profilePicture && !isUploading && (
+                  <span className="text-xs text-slate-400">
+                    Recommended 400x400px
+                  </span>
+                )}
+              </div>
+              {uploadError && (
+                <p className="text-sm text-red-400 mt-2">{uploadError}</p>
+              )}
+            </div>
           </div>
-          {!isEditing ? (
-            <Button 
-              onClick={() => setIsEditing(true)}
-              className="bg-orange-500 text-white hover:bg-orange-600"
-            >
-              <Edit3 className="w-4 h-4 mr-2" />
-              Edit Profile
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleSave}
-              className="bg-green-600 text-white hover:bg-green-700"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
-          )}
+          <div className="flex items-center gap-3 ml-auto">
+            {!isEditing ? (
+              <Button 
+                onClick={() => setIsEditing(true)}
+                className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleSave}
+                className="bg-green-600 text-white hover:bg-green-700"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+            )}
+          </div>
         </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          className="hidden"
+          onChange={handlePhotoUpload}
+        />
       </div>
 
       {/* Section Navigation */}
@@ -509,31 +664,13 @@ export function MentorProfileSection() {
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-white">Profile Completeness</h4>
           <span className="text-orange-400">
-            {Math.round((
-              (profile.bio ? 1 : 0) +
-              (profile.yearsOfExperience ? 1 : 0) +
-              (profile.expertiseAreas.length > 0 ? 1 : 0) +
-              (profile.mentoringStyle ? 1 : 0) +
-              (profile.communicationStyle ? 1 : 0) +
-              (profile.weeklyHoursAvailable ? 1 : 0) +
-              (profile.idealMenteeTraits.length > 0 ? 1 : 0)
-            ) / 7 * 100)}%
+            {completionPercentage}%
           </span>
         </div>
         <div className="bg-slate-800 rounded-full h-2 overflow-hidden mb-3">
           <div
             className="bg-gradient-to-r from-orange-500 to-orange-400 h-full transition-all duration-500"
-            style={{
-              width: `${Math.round((
-                (profile.bio ? 1 : 0) +
-                (profile.yearsOfExperience ? 1 : 0) +
-                (profile.expertiseAreas.length > 0 ? 1 : 0) +
-                (profile.mentoringStyle ? 1 : 0) +
-                (profile.communicationStyle ? 1 : 0) +
-                (profile.weeklyHoursAvailable ? 1 : 0) +
-                (profile.idealMenteeTraits.length > 0 ? 1 : 0)
-              ) / 7 * 100)}%`
-            }}
+            style={{ width: `${completionPercentage}%` }}
           />
         </div>
         <p className="text-slate-400 text-sm">

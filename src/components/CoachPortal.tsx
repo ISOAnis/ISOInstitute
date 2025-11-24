@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle, Moon, ArrowRight } from 'lucide-react';
 import { PortalTutorial } from './PortalTutorial';
 import { Card } from './ui/card';
@@ -145,6 +145,10 @@ const mockPlayers: Player[] = [
   }
 ];
 
+const COACH_TUTORIAL_KEY = 'iso_tutorial_completed_coach_page';
+
+type CoachTab = 'players' | 'messages' | 'matching' | 'profile';
+
 export function CoachPortal() {
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(players[0]);
@@ -157,15 +161,49 @@ export function CoachPortal() {
   const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(players[0]);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [showProfileCompletion, setShowProfileCompletion] = useState(true); // Show by default for new users
+  const [profileCompletion, setProfileCompletion] = useState(() => {
+    const saved = localStorage.getItem('coach_profile_completion');
+    return saved ? Number(saved) : 0;
+  });
+  const [coachProfilePicture, setCoachProfilePicture] = useState<string | null>(() => {
+    return localStorage.getItem('coach_profile_picture');
+  });
+  const [activeTab, setActiveTab] = useState<CoachTab>('players');
+  const profileSectionRef = useRef<HTMLDivElement | null>(null);
+  const showProfileCompletion = profileCompletion < 100;
 
   // Check if tutorial should be shown
   useEffect(() => {
-    const tutorialCompleted = localStorage.getItem('iso_tutorial_completed_coach');
+    const tutorialCompleted = localStorage.getItem(COACH_TUTORIAL_KEY);
     if (!tutorialCompleted) {
-      setShowTutorial(true);
+      setTimeout(() => setShowTutorial(true), 150);
     }
   }, []);
+
+  const handleStartTutorial = () => {
+    localStorage.removeItem(COACH_TUTORIAL_KEY);
+    localStorage.removeItem('iso_tutorial_completed_coach');
+    setShowTutorial(true);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('coach_profile_completion', String(profileCompletion));
+  }, [profileCompletion]);
+
+  useEffect(() => {
+    if (coachProfilePicture) {
+      localStorage.setItem('coach_profile_picture', coachProfilePicture);
+    } else {
+      localStorage.removeItem('coach_profile_picture');
+    }
+  }, [coachProfilePicture]);
+
+  const focusProfileSection = () => {
+    setActiveTab('profile');
+    setTimeout(() => {
+      profileSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  };
 
   const coachTutorialSteps = [
     {
@@ -198,7 +236,8 @@ export function CoachPortal() {
   const currentCoach = {
     name: 'Imam Abdullah Rahman',
     category: 'Deen & Purpose',
-    categoryIcon: Moon
+    categoryIcon: Moon,
+    profilePicture: coachProfilePicture
   };
 
   const addComment = (playerId: string, gameId: string, bucketId: string) => {
@@ -327,7 +366,10 @@ export function CoachPortal() {
       {showTutorial && (
         <PortalTutorial
           steps={coachTutorialSteps}
-          onComplete={() => setShowTutorial(false)}
+          onComplete={() => {
+            localStorage.setItem(COACH_TUTORIAL_KEY, 'true');
+            setShowTutorial(false);
+          }}
           role="coach"
         />
       )}
@@ -348,11 +390,7 @@ export function CoachPortal() {
               </div>
             </div>
             <button
-              onClick={() => {
-                // Navigate to profile section or open profile completion modal
-                setShowProfileCompletion(false);
-                // TODO: Open profile completion form
-              }}
+              onClick={focusProfileSection}
               className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
             >
               Complete Profile
@@ -362,17 +400,36 @@ export function CoachPortal() {
         )}
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-white mb-2">Coach Portal</h1>
-          <div className="flex items-center gap-2 text-slate-400">
-            {React.createElement(currentCoach.categoryIcon, { className: 'w-6 h-6 text-white' })}
-            <span className="text-orange-400">{currentCoach.category}</span>
-            <span> • {currentCoach.name}</span>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="w-14 h-14 border border-slate-700">
+              {currentCoach.profilePicture ? (
+                <AvatarImage src={currentCoach.profilePicture} alt={currentCoach.name} />
+              ) : (
+                <AvatarFallback className="bg-orange-500 text-white text-lg">
+                  {currentCoach.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div>
+              <h1 className="text-white mb-1">Coach Portal</h1>
+              <div className="flex items-center gap-2 text-slate-400">
+                {React.createElement(currentCoach.categoryIcon, { className: 'w-5 h-5 text-white' })}
+                <span className="text-orange-400">{currentCoach.category}</span>
+                <span> • {currentCoach.name}</span>
+              </div>
+            </div>
           </div>
+          <button
+            onClick={handleStartTutorial}
+            className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white hover:bg-white/10 transition-colors"
+          >
+            Start Tutorial
+          </button>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="players" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as CoachTab)} className="space-y-6">
           <div className="flex items-center justify-between">
           <TabsList className="bg-slate-900 border border-slate-800 p-1">
             <TabsTrigger value="players" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
@@ -889,7 +946,13 @@ export function CoachPortal() {
 
           {/* My Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
-            <MentorProfileSection />
+            <div ref={profileSectionRef} id="coach-profile-section">
+              <MentorProfileSection
+                onProfileCompletionChange={setProfileCompletion}
+                onProfilePictureChange={setCoachProfilePicture}
+                initialProfilePicture={coachProfilePicture}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -2,6 +2,8 @@ import { useState, Suspense, lazy } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
+import { CoachPortalPage } from './components/CoachPortalPage';
+import { PlayerPortalPage } from './components/PlayerPortalPage';
 
 // Lazy load heavy components
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
@@ -13,7 +15,7 @@ const About = lazy(() => import('./components/About').then(m => ({ default: m.Ab
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -88,12 +90,19 @@ export default function App() {
     }, 100);
   };
 
+  if (currentPage === 'coach-portal') {
+    return <CoachPortalPage onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === 'player-portal') {
+    return <PlayerPortalPage onNavigate={handleNavigate} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950">
       <Navigation 
         currentPage={currentPage}
         onNavigate={handleNavigate}
-        onMenteeStatusChange={setMenteeCommitmentStatus}
       />
       
       {currentPage === 'home' && (
@@ -128,20 +137,20 @@ export default function App() {
 
       {currentPage === 'pathways' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <Pathways onNavigate={setCurrentPage} />
+          <Pathways onNavigate={setCurrentPage} />
         </Suspense>
       )}
 
       {currentPage === 'about' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <About />
+          <About />
         </Suspense>
       )}
 
       {/* Community page - temporarily hidden */}
       {false && currentPage === 'community' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <ISOCommunity />
+          <ISOCommunity />
         </Suspense>
       )}
 
