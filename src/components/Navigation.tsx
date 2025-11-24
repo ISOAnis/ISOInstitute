@@ -6,6 +6,7 @@ import { CoachPortal } from './CoachPortal';
 import { CommunityLeaderPortal } from './CommunityLeaderPortal';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
+import { RoleSelectionModal } from './RoleSelectionModal';
 
 type Page = 'home' | 'pathways' | 'about' | 'community';
 type UserRole = 'coach' | 'player' | 'community-leader';
@@ -13,6 +14,7 @@ type UserRole = 'coach' | 'player' | 'community-leader';
 interface User {
   email: string;
   roles: UserRole[];
+  name?: string;
 }
 
 interface NavigationProps {
@@ -39,6 +41,8 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [showCommunityPortal, setShowCommunityPortal] = useState(false);
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showRoleSelection, setShowRoleSelection] = useState(false);
+  const [pendingUserData, setPendingUserData] = useState<{ name: string; email: string; password: string } | null>(null);
 
   // Load saved user state from localStorage on mount (but don't auto-open portals)
   useEffect(() => {
@@ -129,8 +133,8 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                   className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow" 
                   style={{ display: 'none' }} 
                 > 
-                  <span className="text-white text-lg">☪️</span> 
-                </div> 
+                  <span className="text-white text-lg">☪️</span>
+                </div>
                 <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   ISO Institute
                 </span>
@@ -146,12 +150,12 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
               </button>
               {/* Community tab - temporarily hidden */}
               {false && (
-                <button 
-                  onClick={() => onNavigate('community')}
-                  className={`transition-colors ${currentPage === 'community' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
-                >
-                  Community
-                </button>
+              <button 
+                onClick={() => onNavigate('community')}
+                className={`transition-colors ${currentPage === 'community' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+              >
+                Community
+              </button>
               )}
               <button 
                 onClick={() => onNavigate('about')}
@@ -193,15 +197,15 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                     </button>
                     {/* Community Portal - temporarily hidden */}
                     {false && (
-                      <button
-                        onClick={() => {
-                          setShowCoachLogin(true);
-                          setShowPortalDropdown(false);
-                        }}
-                        className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                      >
-                        Community Portal
-                      </button>
+                    <button
+                      onClick={() => {
+                        setShowCoachLogin(true);
+                        setShowPortalDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                    >
+                      Community Portal
+                    </button>
                     )}
                   </div>
                 )}
@@ -324,15 +328,42 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
           onSignupComplete={(userData) => {
             console.log('Account created:', userData);
             setShowSignupModal(false);
-            // Auto-login as player after signup
-            const userDataForLogin = { email: userData.email, roles: ['player'] as UserRole[] };
+            setPendingUserData(userData);
+            setShowRoleSelection(true);
+          }}
+        />
+      )}
+
+      {/* Role Selection Modal */}
+      {showRoleSelection && pendingUserData && (
+        <RoleSelectionModal
+          onClose={() => {
+            setShowRoleSelection(false);
+            setPendingUserData(null);
+          }}
+          onSelectRole={(role) => {
+            setShowRoleSelection(false);
+            const userDataForLogin = { 
+              email: pendingUserData.email, 
+              roles: [role] as UserRole[],
+              name: pendingUserData.name
+            };
             setUser(userDataForLogin);
-            setShowPlayerPortal(true);
             
             // Save to localStorage
             localStorage.setItem(STORAGE_KEY, JSON.stringify(userDataForLogin));
-            localStorage.setItem(STORAGE_PORTAL_KEY, 'player');
+            localStorage.setItem(STORAGE_PORTAL_KEY, role);
+            
+            // Open appropriate portal
+            if (role === 'coach') {
+              setShowCoachPortal(true);
+            } else {
+              setShowPlayerPortal(true);
+            }
+            
+            setPendingUserData(null);
           }}
+          userName={pendingUserData.name}
         />
       )}
     </>

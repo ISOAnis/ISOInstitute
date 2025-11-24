@@ -81,11 +81,11 @@ export function ProductShowcase() {
     <section 
       id="product-showcase"
       style={{ 
-        backgroundColor: '#0f172a', 
-        paddingTop: '80px',
-        paddingBottom: '80px',
-        paddingLeft: '32px',
-        paddingRight: '32px'
+      backgroundColor: '#0f172a', 
+      paddingTop: '80px',
+      paddingBottom: '80px',
+      paddingLeft: '32px',
+      paddingRight: '32px'
       }}
     >
       <div style={{ 

@@ -128,20 +128,20 @@ export default function App() {
 
       {currentPage === 'pathways' && (
         <Suspense fallback={<LoadingSpinner />}>
-          <Pathways onNavigate={setCurrentPage} />
+        <Pathways onNavigate={setCurrentPage} />
         </Suspense>
       )}
 
       {currentPage === 'about' && (
         <Suspense fallback={<LoadingSpinner />}>
-          <About />
+        <About />
         </Suspense>
       )}
 
       {/* Community page - temporarily hidden */}
       {false && currentPage === 'community' && (
         <Suspense fallback={<LoadingSpinner />}>
-          <ISOCommunity />
+        <ISOCommunity />
         </Suspense>
       )}
 

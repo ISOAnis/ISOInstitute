@@ -335,16 +335,16 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   {/* Name and Role */}
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                      <h3 style={{
-                        color: 'white',
-                        fontSize: '24px',
-                        fontWeight: 'bold',
+                    <h3 style={{
+                      color: 'white',
+                      fontSize: '24px',
+                      fontWeight: 'bold',
                         margin: 0,
-                        fontFamily: "'Poppins', sans-serif",
-                        textTransform: 'uppercase'
-                      }}>
-                        {mentor.name}
-                      </h3>
+                      fontFamily: "'Poppins', sans-serif",
+                      textTransform: 'uppercase'
+                    }}>
+                      {mentor.name}
+                    </h3>
                       {mentor.successRate && (
                         <span style={{
                           color: '#f97316',
@@ -484,14 +484,14 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                 <div 
                   id="card-back-content"
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: '#0f172a',
-                    borderRadius: '14px',
-                    padding: '24px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflowY: 'auto',
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: '#0f172a',
+                  borderRadius: '14px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflowY: 'auto',
                     boxSizing: 'border-box',
                     position: 'relative'
                   }}
@@ -519,16 +519,16 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
 
                   {/* Name Header */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                    <h3 style={{
-                      color: 'white',
-                      fontSize: '20px',
-                      fontWeight: 'bold',
+                  <h3 style={{
+                    color: 'white',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
                       margin: 0,
-                      fontFamily: "'Poppins', sans-serif",
-                      textTransform: 'uppercase'
-                    }}>
-                      {mentor.name}
-                    </h3>
+                    fontFamily: "'Poppins', sans-serif",
+                    textTransform: 'uppercase'
+                  }}>
+                    {mentor.name}
+                  </h3>
                     {mentor.successRate && (
                       <span style={{
                         color: '#f97316',
@@ -680,7 +680,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       </ul>
                     </div>
                   )}
-
+                  
                   {/* Scroll Indicator - Animated Arrow */}
                   {showScrollIndicator && (
                     <motion.div

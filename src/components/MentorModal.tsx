@@ -453,7 +453,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
           {/* Enhanced Collapsible Info Section */}
           <div className="mb-8 space-y-3">
             <Accordion type="multiple" className="space-y-3" defaultValue={[]}>
-              {/* Match Score Explanation */}
+          {/* Match Score Explanation */}
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-orange-500/20 rounded-xl border border-orange-500/30 flex-shrink-0 self-start">
                   <Lightbulb className="w-6 h-6 text-orange-400" />
@@ -466,7 +466,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400 font-semibold">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400 font-semibold">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
                   </AccordionContent>
                 </AccordionItem>
-              </div>
+          </div>
 
               {/* Try Outs - Quick Chat */}
               <div className="flex items-center gap-4">
@@ -478,12 +478,12 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <span className="font-semibold text-base" style={{ fontFamily: "'Poppins', sans-serif" }}>Try Outs</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
-                    Not ready to commit yet? Start with a quick, no-pressure conversation. Think of it as a first consultation — just you and a coach, exploring what's possible.
+                Not ready to commit yet? Start with a quick, no-pressure conversation. Think of it as a first consultation — just you and a coach, exploring what's possible.
                   </AccordionContent>
                 </AccordionItem>
-              </div>
+            </div>
 
-              {/* Call an ISO - Full Commitment */}
+            {/* Call an ISO - Full Commitment */}
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-orange-500/30 rounded-xl border-2 border-orange-500/40 flex-shrink-0 self-start shadow-lg shadow-orange-500/20">
                   <Sparkles className="w-6 h-6 text-orange-400" />
@@ -493,10 +493,10 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <span className="font-semibold text-base text-orange-400" style={{ fontFamily: "'Poppins', sans-serif" }}>Call an ISO</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
-                    When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
+                When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
                   </AccordionContent>
                 </AccordionItem>
-              </div>
+            </div>
             </Accordion>
           </div>
 
@@ -509,8 +509,8 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               <span className="text-white">Coaches</span>
               <span className="text-slate-500 text-lg font-normal">({filteredMentors.length})</span>
             </h3>
-          </div>
-          
+            </div>
+            
           {/* Enhanced Search and Filters */}
           <div className="mb-8 flex flex-col sm:flex-row gap-4">
             {/* Search Bar with Box */}
@@ -548,7 +548,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               
               return (
                 <motion.div
-                  key={index}
+                key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
@@ -558,12 +558,12 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     {/* Photo */}
                     <div className="relative flex-shrink-0">
                       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-700 border-2 border-slate-600 group-hover:border-orange-500/50 transition-colors shadow-lg">
-                        <ImageWithFallback
+                  <ImageWithFallback
                           src={getImageSrc(mentor.name)}
-                          alt={mentor.name}
-                          className={`w-full h-full ${mentor.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
-                        />
-                      </div>
+                    alt={mentor.name}
+                    className={`w-full h-full ${mentor.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
+                  />
+                </div>
                       {mentor.tier && (
                         <div className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-lg text-xs font-bold ${getTierBadgeStyle(mentor.tier)} border-2 shadow-lg`}>
                           {getTierLabel(mentor.tier)}
@@ -607,23 +607,23 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                           </div>
                         )}
                       </div>
-
-                      {/* Specialization Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {mentor.specialization.slice(0, 3).map((spec, idx) => (
-                          <span
-                            key={idx}
+                  
+                  {/* Specialization Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {mentor.specialization.slice(0, 3).map((spec, idx) => (
+                      <span
+                        key={idx}
                             className="px-3 py-1 bg-slate-700/50 text-slate-300 text-xs rounded-lg border border-slate-600/50"
-                          >
-                            {spec}
-                          </span>
-                        ))}
+                      >
+                        {spec}
+                      </span>
+                    ))}
                         {mentor.specialization.length > 3 && (
                           <span className="px-3 py-1 text-slate-400 text-xs">
                             +{mentor.specialization.length - 3} more
                           </span>
                         )}
-                      </div>
+                  </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -727,8 +727,8 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               >
                 <X className="w-5 h-5" />
               </button>
-            </div>
-            
+                        </div>
+
             <div className="flex justify-center mb-6">
                         <Calendar
                           mode="single"

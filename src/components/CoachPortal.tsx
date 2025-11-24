@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle, Moon, ArrowRight } from 'lucide-react';
+import { PortalTutorial } from './PortalTutorial';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
@@ -155,6 +156,43 @@ export function CoachPortal() {
   const [showNewGameForm, setShowNewGameForm] = useState(false);
   const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(players[0]);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(true); // Show by default for new users
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('iso_tutorial_completed_coach');
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const coachTutorialSteps = [
+    {
+      title: 'Welcome to Your Coach Portal!',
+      description: 'This is your coaching dashboard where you\'ll manage players, track their progress, and build your coaching brand. Let\'s get you started!'
+    },
+    {
+      title: 'Player Management',
+      description: 'View all your players in the "Your Players" section. Click on a player to see their games, progress, and communicate directly with them.'
+    },
+    {
+      title: 'Games & Buckets',
+      description: 'Create games (goals) for your players and break them down into buckets (actionable steps). Track completion and provide feedback through comments.'
+    },
+    {
+      title: 'Communication',
+      description: 'Use the Messages tab to chat with your players. Provide guidance, answer questions, and build meaningful coaching relationships.'
+    },
+    {
+      title: 'AI Matching Dashboard',
+      description: 'The AI Matching Dashboard helps you find new players who match your expertise and coaching style. Review match scores and accept requests.'
+    },
+    {
+      title: 'Complete Your Profile',
+      description: 'Finish setting up your coach profile to get published on ISO! Add your bio, expertise, and availability to start attracting players.'
+    }
+  ];
 
   // Mock current coach data
   const currentCoach = {
@@ -285,7 +323,44 @@ export function CoachPortal() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-8">
+      {/* Tutorial */}
+      {showTutorial && (
+        <PortalTutorial
+          steps={coachTutorialSteps}
+          onComplete={() => setShowTutorial(false)}
+          role="coach"
+        />
+      )}
+
       <div className="max-w-7xl mx-auto">
+        {/* Profile Completion Banner */}
+        {showProfileCompletion && (
+          <div className="mb-6 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-2 border-orange-500/50 rounded-2xl p-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-500/20 rounded-xl">
+                <AlertCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-lg mb-1">Complete Your Coach Profile</h3>
+                <p className="text-slate-300 text-sm">
+                  Finish setting up your account to get published on ISO and start attracting players.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                // Navigate to profile section or open profile completion modal
+                setShowProfileCompletion(false);
+                // TODO: Open profile completion form
+              }}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
+            >
+              Complete Profile
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-white mb-2">Coach Portal</h1>
@@ -299,24 +374,24 @@ export function CoachPortal() {
         {/* Tabs */}
         <Tabs defaultValue="players" className="space-y-6">
           <div className="flex items-center justify-between">
-            <TabsList className="bg-slate-900 border border-slate-800 p-1">
-              <TabsTrigger value="players" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <Users className="w-4 h-4 mr-2" />
-                My Players
-              </TabsTrigger>
+          <TabsList className="bg-slate-900 border border-slate-800 p-1">
+            <TabsTrigger value="players" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <Users className="w-4 h-4 mr-2" />
+              My Players
+            </TabsTrigger>
               <TabsTrigger value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messages
               </TabsTrigger>
-              <TabsTrigger value="matching" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <Sparkles className="w-4 h-4 mr-2" />
-                AI Matching
-              </TabsTrigger>
-              <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <UserCircle className="w-4 h-4 mr-2" />
-                My Profile
-              </TabsTrigger>
-            </TabsList>
+            <TabsTrigger value="matching" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Matching
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <UserCircle className="w-4 h-4 mr-2" />
+              My Profile
+            </TabsTrigger>
+          </TabsList>
             <button
               onClick={() => setShowLockerRoom(true)}
               className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2"

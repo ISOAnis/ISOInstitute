@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { MenteeProfileSection } from './MenteeProfileSection';
 import { LockerRoom } from './LockerRoom';
 import { MentorMenteeChat } from './MentorMenteeChat';
+import { PortalTutorial } from './PortalTutorial';
+import { ProfileCompletionModal } from './ProfileCompletionModal';
 
 interface Bucket {
   id: string;
@@ -64,6 +66,64 @@ export function MenteePortal() {
   const [games, setGames] = useState<Game[]>(mockGames);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showProfileCompletion, setShowProfileCompletion] = useState(true); // Show by default for new users
+  const [showProfileCompletionModal, setShowProfileCompletionModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('progress');
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem('iso_tutorial_completed_player');
+    console.log('[Player Portal] Tutorial completed check:', tutorialCompleted);
+    if (tutorialCompleted === 'true') {
+      setShowTutorial(false);
+    } else {
+      console.log('[Player Portal] Setting tutorial to true');
+      setTimeout(() => {
+        setShowTutorial(true);
+      }, 100);
+    }
+  }, []);
+
+  // Check if profile is completed
+  useEffect(() => {
+    const profileCompleted = localStorage.getItem('player_profile_completed');
+    if (profileCompleted === 'true') {
+      setShowProfileCompletion(false);
+    }
+  }, []);
+
+  const playerTutorialSteps = [
+    {
+      title: 'Welcome to Your Player Portal!',
+      description: 'This is your personal dashboard where you\'ll track your progress, communicate with your coach, and work toward your goals. Let\'s get you started!'
+    },
+    {
+      title: 'Your Games & Progress',
+      description: 'View all your games (goals) and buckets (actionable steps) in the "My Progress" tab. Complete buckets to win games and level up!',
+      targetId: 'tutorial-games-section'
+    },
+    {
+      title: 'Progress Level Bar',
+      description: 'Track your advancement through tiers: Freshman → JV → Varsity → D1 → Professional. Complete games to level up!',
+      targetId: 'tutorial-progress-bar'
+    },
+    {
+      title: 'Messages with Your Coach',
+      description: 'Use the Messages tab to communicate with your coach. Ask questions, get feedback, and stay connected.',
+      targetId: 'tutorial-messages-tab'
+    },
+    {
+      title: 'Locker Room',
+      description: 'Access the Locker Room to connect with other players in your pathway and build your community.',
+      targetId: 'tutorial-locker-room-btn'
+    },
+    {
+      title: 'Complete Your Profile',
+      description: 'Finish setting up your player profile to get the most out of ISO! Add your goals, preferences, and information.',
+      targetId: 'tutorial-profile-completion'
+    }
+  ];
 
   // Mock current mentorship data - in production would come from backend
   const currentMentor = {
@@ -149,9 +209,61 @@ export function MenteePortal() {
     }));
   };
 
+  const handleProfileComplete = (profileData: any) => {
+    // Save profile data to localStorage
+    localStorage.setItem('player_profile_data', JSON.stringify(profileData));
+    localStorage.setItem('player_profile_completed', 'true');
+    setShowProfileCompletionModal(false);
+    setShowProfileCompletion(false);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Tutorial */}
+      {showTutorial && (
+        <PortalTutorial
+          steps={playerTutorialSteps}
+          onComplete={() => {
+            setShowTutorial(false);
+            localStorage.setItem('iso_tutorial_completed_player', 'true');
+          }}
+          role="player"
+        />
+      )}
+
+      {/* Profile Completion Modal */}
+      {showProfileCompletionModal && (
+        <ProfileCompletionModal
+          onClose={() => setShowProfileCompletionModal(false)}
+          onComplete={handleProfileComplete}
+        />
+      )}
+
+      <div className="max-w-7xl mx-auto pt-32 px-8 pb-24">
+        {/* Profile Completion Banner */}
+        {showProfileCompletion && (
+          <div id="tutorial-profile-completion" className="mb-6 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-2 border-orange-500/50 rounded-2xl p-6 flex items-center justify-between relative">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-500/20 rounded-xl">
+                <AlertCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-lg mb-1">Complete Your Player Profile</h3>
+                <p className="text-slate-300 text-sm">
+                  Finish setting up your account to get the most out of ISO and connect with the right coach.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowProfileCompletionModal(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
+            >
+              Complete Profile
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -169,14 +281,14 @@ export function MenteePortal() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="progress" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 relative z-10">
           <div className="flex items-center justify-between">
-            <TabsList className="bg-slate-900 border border-slate-800 p-1">
+            <TabsList className="bg-slate-900 border border-slate-800 p-1 relative z-10">
               <TabsTrigger value="progress" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
                 <Trophy className="w-4 h-4 mr-2" />
                 My Progress
               </TabsTrigger>
-              <TabsTrigger value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <TabsTrigger id="tutorial-messages-tab" value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messages
               </TabsTrigger>
@@ -186,6 +298,7 @@ export function MenteePortal() {
               </TabsTrigger>
             </TabsList>
             <button
+              id="tutorial-locker-room-btn"
               onClick={() => setShowLockerRoom(true)}
               className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2"
             >
@@ -211,7 +324,7 @@ export function MenteePortal() {
           {/* My Progress Tab */}
           <TabsContent value="progress" className="space-y-6">
             {/* Progress Tier System */}
-            <div className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30 p-6 mb-8">
+            <div id="tutorial-progress-bar" className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30 p-6 mb-8">
               <h2 className="text-white text-center mb-2">Your Progress Level</h2>
               <p className="text-slate-400 text-center mb-6 text-sm">
                 Level up by completing games and achieving your goals
@@ -260,14 +373,13 @@ export function MenteePortal() {
                           }}
                         ></div>
                         {/* Filled portion - lighter solid color with sharp vertical edge */}
-                        {currentTier.progress > 0 && filledWidthPercentOfBar > 0 && (
+                        {currentTier.progress > 0 && (
                           <div
                             className={`absolute top-0 h-full ${currentTierData.color}`}
                             style={{
                               left: `${tierIndex * tierWidthPercent}%`,
-                              width: `${filledWidthPercentOfBar}%`,
+                              width: `${Math.max(filledWidthPercentOfBar, 2)}%`,
                               zIndex: 35,
-                              minWidth: '3px', // Ensure minimum visibility
                             }}
                           ></div>
                         )}
@@ -434,7 +546,7 @@ export function MenteePortal() {
             )}
 
             {/* Games List */}
-            <div className="space-y-6">
+            <div id="tutorial-games-section" className="space-y-6">
               <h3 className="text-white">Your Games</h3>
               
               {games.map((game) => {
@@ -675,7 +787,7 @@ export function MenteePortal() {
 
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-6">
-            <div className="h-[calc(100vh-300px)] min-h-[600px]">
+            <div className="h-[calc(100vh-400px)] min-h-[500px] max-h-[800px]">
               <MentorMenteeChat
                 currentUserId="mentee-1"
                 currentUserName="You"

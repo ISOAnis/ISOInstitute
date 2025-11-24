@@ -27,7 +27,7 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
   
   // Determine if bubble is in lower part of screen (positioned from bottom)
   const isLowerPosition = 'bottom' in category.position;
-  
+
   // Dynamic positioning to keep card on screen
   const [cardPosition, setCardPosition] = useState<'top' | 'bottom'>(
     isLowerPosition ? 'bottom' : 'top'
@@ -213,7 +213,7 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
                 }}
               />
             ) : (
-              <span className={`text-3xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
+          <span className={`text-3xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
             )}
           </div>
           
@@ -285,7 +285,7 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
               {IconComponent ? (
                 <IconComponent className={`w-6 h-6 text-white`} />
               ) : (
-                <span className={`text-2xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
+              <span className={`text-2xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
               )}
               <h3 className="text-white font-semibold">{category.title}</h3>
             </div>

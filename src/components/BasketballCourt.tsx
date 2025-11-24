@@ -263,11 +263,11 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                 onMouseLeave={() => setHoveredCategoryId(null)}
               >
                 <CategoryBubble
-                  category={category}
-                  onClick={() => handleCategoryClick(category)}
-                  isSelected={selectedCategory?.id === category.id}
+                category={category}
+                onClick={() => handleCategoryClick(category)}
+                isSelected={selectedCategory?.id === category.id}
                   isOtherHovered={hoveredCategoryId !== null && hoveredCategoryId !== category.id}
-                />
+              />
               </div>
             ))}
 
