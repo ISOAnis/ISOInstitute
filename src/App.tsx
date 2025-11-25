@@ -4,6 +4,7 @@ import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
 import { CoachPortalPage } from './components/CoachPortalPage';
 import { PlayerPortalPage } from './components/PlayerPortalPage';
+import { About } from './components/About';
 
 // Lazy load heavy components
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
@@ -11,7 +12,6 @@ const WhatIsISO = lazy(() => import('./components/WhatIsISO').then(m => ({ defau
 const ProductShowcase = lazy(() => import('./components/ProductShowcase').then(m => ({ default: m.ProductShowcase })));
 const Pricing = lazy(() => import('./components/Pricing').then(m => ({ default: m.Pricing })));
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
-const About = lazy(() => import('./components/About').then(m => ({ default: m.About })));
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
