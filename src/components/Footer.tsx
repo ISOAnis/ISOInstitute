@@ -12,7 +12,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img 
-                src="/ISOV1Logo.jpg" 
+                src="/ISO-logo-v2.jpg" 
                 alt="ISO Logo" 
                 className="h-10 w-auto object-contain"
                 onError={(e) => {

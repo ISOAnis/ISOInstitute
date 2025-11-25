@@ -678,7 +678,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
           marginBottom: '32px',
         }}>
           <img 
-            src="/ISOV1Logo.jpg" 
+            src="/ISO-logo-v2.jpg" 
             alt="ISO Logo" 
             style={{
               height: '40px',

@@ -109,7 +109,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             <div className="flex items-center gap-3">
               <button onClick={() => onNavigate('home')} className="flex items-center gap-3 group hover:opacity-80 transition-opacity cursor-pointer">
                 <img 
-                  src="/ISOV1Logo.jpg" 
+                  src="/ISO-logo-v2.jpg" 
                   alt="ISO Logo" 
                   className="h-10 w-auto object-contain cursor-pointer" onClick={() => onNavigate('home')} 
                   onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
