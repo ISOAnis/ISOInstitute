@@ -283,16 +283,16 @@ export function MenteePortal() {
 
         {/* Header */}
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-white mb-2">Your Season</h1>
-            <div className="flex items-center gap-2 text-slate-400">
+            <div>
+              <h1 className="text-white mb-2">Your Season</h1>
+              <div className="flex items-center gap-2 text-slate-400">
               {React.createElement(currentMentor.categoryIcon, { className: 'w-6 h-6 text-white' })}
-              <div>
-                <span className="text-orange-400">{currentMentor.category}</span>
-                <span> with {currentMentor.name}</span>
+                <div>
+                  <span className="text-orange-400">{currentMentor.category}</span>
+                  <span> with {currentMentor.name}</span>
+                </div>
               </div>
             </div>
-          </div>
           <button
             onClick={handleStartTutorial}
             className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white hover:bg-white/10 transition-colors"
@@ -305,19 +305,19 @@ export function MenteePortal() {
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PlayerTab)} className="space-y-6 relative z-10">
           <div className="flex items-center justify-between">
             <TabsList className="bg-slate-900 border border-slate-800 p-1 relative z-10">
-              <TabsTrigger value="progress" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <Trophy className="w-4 h-4 mr-2" />
-                My Progress
-              </TabsTrigger>
+            <TabsTrigger value="progress" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <Trophy className="w-4 h-4 mr-2" />
+              My Progress
+            </TabsTrigger>
               <TabsTrigger id="tutorial-messages-tab" value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messages
               </TabsTrigger>
-              <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <UserCircle className="w-4 h-4 mr-2" />
-                My Profile
-              </TabsTrigger>
-            </TabsList>
+            <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
+              <UserCircle className="w-4 h-4 mr-2" />
+              My Profile
+            </TabsTrigger>
+          </TabsList>
             <button
               id="tutorial-locker-room-btn"
               onClick={() => setShowLockerRoom(true)}

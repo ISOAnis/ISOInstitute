@@ -587,8 +587,8 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                             {matchResult.score}% Match
                           </Badge>
                         )}
-                      </div>
-
+                </div>
+                
                       {/* Stats Row */}
                       <div className="flex items-center gap-6 mb-4">
                         <div className="flex items-center gap-2">
