@@ -27,7 +27,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
     { 
       id: 1, 
       label: 'Real Connections, Real Responses', 
-      subtext: 'Still getting ghosted? Stop wasting time on cold outreach. ISO guarantees aresponse from a coach in your field of interest.',
+      subtext: 'Still getting ghosted? Stop wasting time on cold outreach. ISO guarantees a response from a coach in your field of interest.',
       icon: MessageSquare,
     },
     { 
@@ -117,10 +117,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
 
   return (
     <section 
-      className="min-h-screen relative overflow-hidden pt-32 pb-16 px-4"
-      style={{
-        background: 'radial-gradient(ellipse at center, rgba(255, 107, 53, 0.05) 0%, #0a0a0a 70%)',
-      }}
+      className="min-h-screen relative overflow-hidden pt-32 pb-16 px-4 bg-slate-1050"
     >
       {/* Top Section - Text Content */}
       <div className="max-w-4xl mx-auto text-center mb-16 z-10 relative">
@@ -170,40 +167,12 @@ export function Hero({ onNavigate }: HeroProps = {}) {
         >
           The ISO Institute is a faith-driven coaching platform rooted in community uplift and empowerment. Inspired by basketball, ISO makes professional coaching relatable, human, and culturally grounded. ISO offers 6 pathways of growth and development in your field of interest.
         </motion.p>
-
-        {/* CTA Buttons */}
-        <motion.div 
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.button
-            onClick={scrollToCourt}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-lg shadow-orange-500/20"
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Explore Pathways
-          </motion.button>
-          
-          <motion.button
-            onClick={handleLearnHowItWorks}
-            className="border-2 border-slate-600 hover:border-slate-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200"
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Learn How ISO Works
-          </motion.button>
-        </motion.div>
         </div>
 
       {/* Why ISO Section */}
       <div className="relative w-full max-w-6xl mx-auto mb-8 z-10">
         <motion.h2 
-          className="text-4xl md:text-5xl font-bold text-white text-center mb-12"
+          className="text-4xl md:text-5xl font-bold text-white text-center mb-8"
           style={{ fontFamily: "'Poppins', sans-serif" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -211,7 +180,41 @@ export function Hero({ onNavigate }: HeroProps = {}) {
         >
           Why ISO?
         </motion.h2>
-          </div>
+      </div>
+
+      {/* Tab System - Above Cards */}
+      <div className="relative w-full max-w-6xl mx-auto mb-8 z-10 flex justify-center">
+        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+          <motion.button
+            onClick={() => setActiveTab('players')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+              activeTab === 'players'
+                ? 'bg-orange-500 text-white'
+                : 'text-slate-300 hover:text-white'
+            }`}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+            whileHover={{ scale: activeTab === 'players' ? 1 : 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Users size={18} />
+            For Players
+          </motion.button>
+          <motion.button
+            onClick={() => setActiveTab('coaches')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+              activeTab === 'coaches'
+                ? 'bg-orange-500 text-white'
+                : 'text-slate-300 hover:text-white'
+            }`}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+            whileHover={{ scale: activeTab === 'coaches' ? 1 : 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Briefcase size={18} />
+            For Coaches
+          </motion.button>
+        </div>
+      </div>
 
       {/* Bottom Section - Why ISO Benefit Cards */}
       <motion.div 
@@ -292,39 +295,33 @@ export function Hero({ onNavigate }: HeroProps = {}) {
         })}
       </motion.div>
 
-      {/* Tab System - Below Cards */}
-      <div className="relative w-full max-w-6xl mx-auto mt-16 z-10 flex justify-center">
-        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
-          <motion.button
-            onClick={() => setActiveTab('players')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
-              activeTab === 'players'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
-            }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: activeTab === 'players' ? 1 : 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Users size={18} />
-            For Players
-          </motion.button>
-          <motion.button
-            onClick={() => setActiveTab('coaches')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
-              activeTab === 'coaches'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
-            }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: activeTab === 'coaches' ? 1 : 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Briefcase size={18} />
-            For Coaches
-          </motion.button>
-        </div>
-      </div>
+      {/* CTA Buttons - Below Cards */}
+      <motion.div 
+        className="relative w-full max-w-6xl mx-auto mt-16 z-10 flex flex-col sm:flex-row gap-4 justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <motion.button
+          onClick={scrollToCourt}
+          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-lg shadow-orange-500/20"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Explore Pathways
+        </motion.button>
+        
+        <motion.button
+          onClick={handleLearnHowItWorks}
+          className="border-2 border-slate-600 hover:border-slate-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Learn How ISO Works
+        </motion.button>
+      </motion.div>
 
       {/* Background gradient effects */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">

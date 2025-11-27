@@ -116,10 +116,26 @@ export function MentorMenteeChat({
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const previousMessagesLengthRef = useRef(mockMessages.length);
+  const hasInitializedRef = useRef(false);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom only when new messages are added (not on mount or tab switch)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Skip auto-scroll on initial mount
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      previousMessagesLengthRef.current = messages.length;
+      return;
+    }
+
+    // Only scroll if message count increased (new message added)
+    if (messages.length > previousMessagesLengthRef.current) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+    
+    previousMessagesLengthRef.current = messages.length;
   }, [messages]);
 
   const formatTime = (date: Date): string => {

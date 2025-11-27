@@ -361,7 +361,7 @@ export function CoachPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8">
+    <div className="px-4 sm:px-8">
       {/* Tutorial */}
       {showTutorial && (
         <PortalTutorial
