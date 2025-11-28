@@ -1186,16 +1186,16 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               }}>
                 (varies by coach)
               </p>
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#94a3b8',
-                lineHeight: '1.5',
-                marginBottom: '12px',
-                fontStyle: 'italic',
-                fontFamily: "'Poppins', sans-serif",
-              }}>
-                Coaches set their own pricing based on expertise, experience, and availability.
-              </p>
+                <p style={{
+                  fontSize: '0.75rem',
+                  color: '#94a3b8',
+                  lineHeight: '1.5',
+                  marginBottom: '12px',
+                  fontStyle: 'italic',
+                  fontFamily: "'Poppins', sans-serif",
+                }}>
+                  Coaches set their own pricing based on expertise, experience, and availability.
+                </p>
               <p style={{
                 fontSize: '0.8125rem',
                 color: '#94a3b8',

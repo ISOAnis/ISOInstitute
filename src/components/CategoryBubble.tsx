@@ -18,9 +18,12 @@ interface CategoryBubbleProps {
   onClick: () => void;
   isSelected: boolean;
   isOtherHovered?: boolean;
+  disableHoverCard?: boolean;
+  hideTitle?: boolean;
+  isLockedOn?: boolean;
 }
 
-export function CategoryBubble({ category, onClick, isSelected, isOtherHovered = false }: CategoryBubbleProps) {
+export function CategoryBubble({ category, onClick, isSelected, isOtherHovered = false, disableHoverCard = false, hideTitle = false, isLockedOn = false }: CategoryBubbleProps) {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const IconComponent = category.icon;
@@ -149,16 +152,15 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
       className="absolute z-10"
       style={{ 
         ...category.position, 
-        zIndex: isHovered ? 20 : 10,
-        opacity: isOtherHovered && !isHovered ? 0.5 : 1,
-        transition: 'opacity 0.3s ease-out'
+        zIndex: isLockedOn ? 20 : 10,
+        opacity: isOtherHovered && !isLockedOn ? 0.5 : 1,
+        transition: 'opacity 0.3s ease-out',
+        pointerEvents: 'auto', // Allow clicks
+        cursor: 'none', // Keep cursor hidden
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         className="relative cursor-pointer"
-        whileHover={{ scale: 1.15, y: -5 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         onClick={() => {
@@ -166,90 +168,110 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
           onClick();
         }}
       >
-        {/* Main bubble with glassmorphic effect, glow, and shadow */}
+        {/* Basketball Hoop/Rim */}
         <div 
-          className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+          className={`relative flex items-center justify-center transition-all duration-300 ${
             isSelected ? 'opacity-80 ring-4 ring-orange-400/50 ring-offset-2 ring-offset-slate-950' : 'opacity-100'
           }`}
           style={{
-            background: `linear-gradient(135deg, ${fromColor}, ${toColor})`,
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: `3px solid rgba(255, 255, 255, 0.3)`,
-            boxShadow: isHovered 
-              ? `0 20px 60px ${getGlowColor()}, 0 10px 30px ${getGlowColor()}, 0 0 0 1px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)`
-              : `0 10px 40px ${getGlowColor()}, 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
             position: 'relative',
-            overflow: 'hidden',
+            width: '80px',
+            height: '80px',
           }}
         >
-          {/* Outer glow ring */}
-          <div 
-            className="absolute inset-0 rounded-full"
+          {/* Outer rim ring */}
+          <motion.div
+            className="absolute rounded-full border-4"
             style={{
-              background: `radial-gradient(circle at 50% 50%, ${getGlowColor()}, transparent 70%)`,
-              opacity: isHovered ? 0.8 : 0.5,
-              transition: 'opacity 0.3s ease',
+              borderColor: fromColor,
+              width: '80px',
+              height: '80px',
+              filter: `drop-shadow(0 0 ${isLockedOn ? '25px' : '10px'} ${fromColor})`,
+              boxShadow: isLockedOn 
+                ? `0 0 30px ${getGlowColor()}, inset 0 0 20px ${getGlowColor()}`
+                : `0 0 15px ${getGlowColor()}`,
+            }}
+            animate={isLockedOn ? {
+              scale: 1.15, // Reduced from 1.2 to prevent glitch
+              opacity: 1,
+            } : {
+              scale: 1,
+              opacity: 0.6,
+            }}
+            transition={{
+              duration: 0.2,
+              ease: 'easeOut',
             }}
           />
           
-          {/* Inner highlight */}
-          <div 
-            className="absolute inset-2 rounded-full"
+          {/* Inner rim */}
+          <div
+            className="absolute rounded-full border-2"
             style={{
-              background: `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 60%)`,
-              opacity: isHovered ? 0.6 : 0.4,
-              transition: 'opacity 0.3s ease',
+              borderColor: 'rgba(255, 255, 255, 0.4)',
+              width: '60px',
+              height: '60px',
+              background: 'radial-gradient(circle, rgba(0, 0, 0, 0.3) 0%, transparent 70%)',
             }}
           />
           
-          {/* Icon */}
+          {/* Center icon */}
           <div className="relative z-10">
             {IconComponent ? (
               <IconComponent 
-                className={`w-10 h-10 ${category.id === 'medicine' ? 'text-white' : 'text-white'}`}
+                className={`w-5 h-5 text-white`}
                 style={{
-                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))',
                 }}
               />
             ) : (
-          <span className={`text-3xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
+              <span className={`text-lg text-white`}>{category.emoji}</span>
             )}
           </div>
           
-          {/* Shimmer effect on hover */}
-          {isHovered && (
-            <div 
-              className="absolute inset-0 rounded-full opacity-50"
+          {/* Lock-on glow effect */}
+          {isLockedOn && (
+            <motion.div
+              className="absolute inset-0 rounded-full"
               style={{
-                background: `linear-gradient(135deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%)`,
-                animation: 'shimmer 2s ease-in-out infinite',
+                background: `radial-gradient(circle, ${getGlowColor()}, transparent 70%)`,
+              }}
+              animate={{
+                opacity: [0.3, 0.7, 0.3],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                ease: 'easeInOut',
               }}
             />
           )}
         </div>
 
-        {/* Minimal title label underneath bubble */}
-        <motion.div
-          className="absolute top-full mt-3 left-1/2 -translate-x-1/2 whitespace-nowrap"
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <span 
-            className="text-xs font-medium text-white/90"
-            style={{
-              fontFamily: "'Poppins', sans-serif",
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3)',
-              letterSpacing: '0.5px',
-            }}
+        {/* Minimal title label underneath bubble - hidden if hideTitle is true */}
+        {!hideTitle && (
+          <motion.div
+            className="absolute top-full mt-2 left-1/2 -translate-x-1/2 whitespace-nowrap"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {category.title}
-          </span>
-        </motion.div>
+            <span 
+              className="text-[0.65rem] font-medium text-white/90"
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3)',
+                letterSpacing: '0.3px',
+              }}
+            >
+              {category.title}
+            </span>
+          </motion.div>
+        )}
 
         {/* Hover card - dynamically positioned */}
-        {isHovered && !isSelected && (
+        {isHovered && !isSelected && !disableHoverCard && (
           <motion.div
             ref={cardRef}
             initial={{ opacity: 0, y: cardPosition === 'bottom' ? -10 : 10, scale: 0.95 }}

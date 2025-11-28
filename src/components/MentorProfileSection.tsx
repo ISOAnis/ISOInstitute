@@ -224,7 +224,7 @@ export function MentorProfileSection({
                 </button>
               )}
             </div>
-            <div>
+          <div>
               <p className="text-white font-semibold text-lg">Coach Profile</p>
               <p className="text-slate-400 text-sm">
                 Upload a photo to personalize your coach card
@@ -251,24 +251,24 @@ export function MentorProfileSection({
             </div>
           </div>
           <div className="flex items-center gap-3 ml-auto">
-            {!isEditing ? (
-              <Button 
-                onClick={() => setIsEditing(true)}
-                className="bg-orange-500 text-white hover:bg-orange-600"
-              >
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleSave}
-                className="bg-green-600 text-white hover:bg-green-700"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            )}
-          </div>
+          {!isEditing ? (
+            <Button 
+              onClick={() => setIsEditing(true)}
+              className="bg-orange-500 text-white hover:bg-orange-600"
+            >
+              <Edit3 className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleSave}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+          )}
+        </div>
         </div>
         <input
           type="file"

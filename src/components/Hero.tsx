@@ -165,7 +165,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          The ISO Institute is a faith-driven coaching platform rooted in community uplift and empowerment. Inspired by basketball, ISO makes professional coaching relatable, human, and culturally grounded. ISO offers 6 pathways of growth and development in your field of interest.
+          The ISO Institute is a faith-driven coaching platform rooted in community uplift and empowerment.
         </motion.p>
         </div>
 
@@ -180,7 +180,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
         >
           Why ISO?
         </motion.h2>
-      </div>
+          </div>
 
       {/* Tab System - Above Cards */}
       <div className="relative w-full max-w-6xl mx-auto mb-8 z-10 flex justify-center">
