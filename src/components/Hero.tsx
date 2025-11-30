@@ -7,20 +7,6 @@ interface HeroProps {
 }
 
 export function Hero({ onNavigate }: HeroProps = {}) {
-  const scrollToCourt = () => {
-    const courtSection = document.getElementById('iso-court');
-    if (courtSection) {
-      courtSection.scrollIntoView({ behavior: 'auto' });
-    }
-  };
-
-  const handleLearnHowItWorks = () => {
-    const productShowcaseSection = document.getElementById('product-showcase');
-    if (productShowcaseSection) {
-      productShowcaseSection.scrollIntoView({ behavior: 'auto' });
-    }
-  };
-
   const [activeTab, setActiveTab] = React.useState<'players' | 'coaches'>('players');
 
   const playerNodes = [
@@ -295,33 +281,6 @@ export function Hero({ onNavigate }: HeroProps = {}) {
         })}
       </motion.div>
 
-      {/* CTA Buttons - Below Cards */}
-      <motion.div 
-        className="relative w-full max-w-6xl mx-auto mt-16 z-10 flex flex-col sm:flex-row gap-4 justify-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <motion.button
-          onClick={scrollToCourt}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 shadow-lg shadow-orange-500/20"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          Explore Pathways
-        </motion.button>
-        
-        <motion.button
-          onClick={handleLearnHowItWorks}
-          className="border-2 border-slate-600 hover:border-slate-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          Learn How ISO Works
-        </motion.button>
-      </motion.div>
 
       {/* Background gradient effects */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">

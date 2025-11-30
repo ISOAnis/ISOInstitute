@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'motion/react';
 import { CategoryBubble } from './CategoryBubble';
 import { MentorModal } from './MentorModal';
 import { SignupModal } from './SignupModal';
-import { Lock, Clock, Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
+import { FeatureShowcase } from './FeatureShowcase';
+import { Lock, Clock, Moon, Dumbbell, Activity, Settings, Rocket, Globe, Compass, BookOpen, Users, Briefcase } from 'lucide-react';
 
 interface CommitmentStatus {
   isCommitted: boolean;
@@ -93,6 +94,15 @@ const categories = [
 
 export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect, forceOpenCategoryId, onForceOpenHandled }: BasketballCourtProps) {
   const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
+  const [mode, setMode] = useState<'explore' | 'learn'>('explore');
+  const [role, setRole] = useState<'players' | 'coaches'>('players');
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isPinned, setIsPinned] = useState(false);
+  const isPinnedRef = useRef(false);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stepsContainerRef = useRef<HTMLDivElement | null>(null);
+  const learnSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Restore selected category when coming back from Call ISO page
   useEffect(() => {
@@ -118,6 +128,62 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [lockedBubblePosition, setLockedBubblePosition] = useState<{ x: number; y: number } | null>(null);
   const courtContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const playerSteps = [
+    {
+      number: '01',
+      question: 'CHOOSE YOUR PATHWAY',
+      heading: 'Navigate the Court',
+      description: 'Explore six pathways of growth and select the area that aligns with your goals. From Deen & Purpose to Engineering & Technology, find your starting point.',
+    },
+    {
+      number: '02',
+      question: 'CALL AN ISO',
+      heading: 'Connect with Your Coach',
+      description: 'Browse coach profiles, read their stories, and connect with a mentor who understands your journey. Schedule your first session and begin your mentorship.',
+    },
+    {
+      number: '03',
+      question: 'GET BUCKETS & WIN GAMES',
+      heading: 'Score Your Goals',
+      description: 'Complete tasks, achieve milestones, and track your progress. Your coach sets personalized goals and helps you execute with accountability.',
+    },
+    {
+      number: '04',
+      question: 'LEVEL UP',
+      heading: 'Grow Continuously',
+      description: 'Unlock new opportunities, build your network, and keep moving up—your growth journey never stops.',
+    },
+  ];
+
+  const coachSteps = [
+    {
+      number: '01',
+      question: 'ACCEPT ISOs',
+      heading: 'Review Mentorship Requests',
+      description: 'Players in your pathway reach out. Understand their goals and accept mentorship requests that align with your expertise.',
+    },
+    {
+      number: '02',
+      question: 'SET BUCKETS & GOALS',
+      heading: 'Create Structured Plans',
+      description: 'Design personalized development plans for your players. Set milestones, assignments, and track progress in one place.',
+    },
+    {
+      number: '03',
+      question: 'BUILD YOUR REP',
+      heading: 'Grow Your Brand',
+      description: 'Share wins, join events, and post inside the community. Build a reputation through genuine service and consistent value.',
+    },
+    {
+      number: '04',
+      question: 'GRADUATE YOUR STUDENT',
+      heading: 'Celebrate Milestones',
+      description: 'Watch your players grow, celebrate their wins, and prep them for the next level before taking on new ISOs.',
+    },
+  ];
+
+  const currentSteps = role === 'players' ? playerSteps : coachSteps;
   
   // Ensure cursor is always hidden on court container
   useEffect(() => {
@@ -198,6 +264,10 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
       .court-arrow-3 {
         animation: staggered-bounce 1.5s ease-in-out 0.4s infinite;
       }
+      
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
     `;
     document.head.appendChild(style);
     
@@ -250,6 +320,162 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
     }
   }, [forceOpenCategoryId, onForceOpenHandled]);
 
+  // Reset learn mode step when toggles change
+  useEffect(() => {
+    setActiveStep(0);
+    stepRefs.current = [];
+  }, [mode, role]);
+
+  // Scroll pinning and step tracking for learn mode
+  useEffect(() => {
+    if (mode !== 'learn') {
+      setScrollProgress(0);
+      setActiveStep(0);
+      setIsPinned(false);
+      isPinnedRef.current = false;
+      return;
+    }
+
+    const section = learnSectionRef.current;
+    const container = stepsContainerRef.current;
+    if (!section || !container) return;
+
+    let pinnedScrollY = 0;
+    let isHandlingWheel = false;
+    let scrollLockRaf: number | null = null;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (!isPinnedRef.current) return;
+
+      const currentScroll = container.scrollTop || 0;
+      const maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+      
+      // If container is at bottom and scrolling down, allow page to scroll normally
+      if (currentScroll >= maxScroll - 10 && e.deltaY > 0) {
+        // Unpin and allow normal scroll
+        isPinnedRef.current = false;
+        setIsPinned(false);
+        pinnedScrollY = 0;
+        return; // Let the scroll event pass through
+      }
+      
+      // If container is at top and scrolling up, allow page to scroll back
+      if (currentScroll <= 10 && e.deltaY < 0) {
+        // Don't unpin immediately - let user scroll up to exit the section
+        // Just allow the scroll to pass through
+        return; // Let the scroll event pass through to window
+      }
+
+      // When pinned and container has room to scroll, convert scroll to container
+      e.preventDefault();
+      e.stopPropagation();
+      
+      isHandlingWheel = true;
+      
+      const scrollDelta = e.deltaY;
+      const newScroll = Math.max(0, Math.min(maxScroll, currentScroll + scrollDelta));
+      
+      // Apply scroll to container
+      container.scrollTop = newScroll;
+      
+      // Lock window scroll position
+      if (scrollLockRaf !== null) {
+        cancelAnimationFrame(scrollLockRaf);
+      }
+      
+      scrollLockRaf = requestAnimationFrame(() => {
+        if (pinnedScrollY > 0 && Math.abs(window.scrollY - pinnedScrollY) > 2) {
+          window.scrollTo(0, pinnedScrollY);
+        }
+        isHandlingWheel = false;
+      });
+    };
+
+    const handleContainerScroll = () => {
+      if (!container || isHandlingWheel) return;
+
+      const scrollTop = container.scrollTop;
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, scrollTop / maxScroll)) : 0;
+      setScrollProgress(progress);
+
+      // Determine active step
+      const containerRect = container.getBoundingClientRect();
+      const viewportCenter = containerRect.top + container.clientHeight * 0.3;
+      
+      let newActive = 0;
+      stepRefs.current.forEach((ref, index) => {
+        if (ref) {
+          const rect = ref.getBoundingClientRect();
+          const stepCenter = rect.top + rect.height / 2;
+          if (Math.abs(stepCenter - viewportCenter) < Math.abs((stepRefs.current[newActive]?.getBoundingClientRect().top || 0) + (stepRefs.current[newActive]?.getBoundingClientRect().height || 0) / 2 - viewportCenter)) {
+            newActive = index;
+          }
+        }
+      });
+      
+      setActiveStep(newActive);
+
+      // Unpin if we've scrolled past all steps (progress is 1 or very close)
+      if (progress >= 0.95 && isPinnedRef.current) {
+        isPinnedRef.current = false;
+        setIsPinned(false);
+        // Reset pinned scroll position to allow normal scrolling
+        pinnedScrollY = 0;
+      }
+    };
+
+    // Check pinning status on scroll
+    const handleWindowScroll = () => {
+      if (isHandlingWheel) return;
+      
+      const rect = section.getBoundingClientRect();
+      const sectionTop = rect.top;
+      const sectionBottom = rect.bottom;
+      const windowHeight = window.innerHeight;
+
+      // Pin when section top reaches top of viewport
+      const shouldBePinned = sectionTop <= 0 && sectionBottom > windowHeight;
+      
+      if (shouldBePinned && !isPinnedRef.current) {
+        isPinnedRef.current = true;
+        setIsPinned(true);
+        pinnedScrollY = window.scrollY;
+        // Immediately lock position
+        window.scrollTo(0, pinnedScrollY);
+      } else if (!shouldBePinned && isPinnedRef.current) {
+        // Unpin if we've scrolled past
+        isPinnedRef.current = false;
+        setIsPinned(false);
+        pinnedScrollY = 0;
+      } else if (isPinnedRef.current && pinnedScrollY > 0 && Math.abs(window.scrollY - pinnedScrollY) > 2) {
+        // Maintain locked position only if we have a valid pinned position
+        window.scrollTo(0, pinnedScrollY);
+      }
+    };
+
+    // Initial check
+    setTimeout(() => {
+      handleWindowScroll();
+      handleContainerScroll();
+    }, 100);
+
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    window.addEventListener('resize', handleWindowScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('scroll', handleContainerScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+      window.removeEventListener('resize', handleWindowScroll);
+      window.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('scroll', handleContainerScroll);
+      if (scrollLockRaf !== null) {
+        cancelAnimationFrame(scrollLockRaf);
+      }
+    };
+  }, [mode, role]);
+
   return (
     <>
       <section id="iso-court" className="pt-4 pb-20 px-4 sm:px-6 lg:px-8 bg-slate-1050">
@@ -268,30 +494,102 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
           >
             The court is not the end, it's the <span style={{color: '#f97316'}}>beginning</span>.
           </h2>
-          
-          {/* Two-column layout: Court on left, Description on right */}
-          <div className="pathways-showcase" style={{
-            display: 'grid',
-            gridTemplateColumns: '45% 55%',
-            gap: '40px',
-            alignItems: 'start',
-            width: '100%',
-            maxWidth: '1400px',
-            margin: '0 auto'
-          }}>
+
+          {/* Mode Toggle */}
+          <div className="flex flex-col items-center gap-4 mb-16">
+            <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+              <motion.button
+                onClick={() => setMode('explore')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  mode === 'explore'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+                whileHover={{ scale: mode === 'explore' ? 1 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Compass size={18} />
+                Explore Pathways
+              </motion.button>
+              <motion.button
+                onClick={() => setMode('learn')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  mode === 'learn'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+                whileHover={{ scale: mode === 'learn' ? 1 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <BookOpen size={18} />
+                Learn How ISO Works
+              </motion.button>
+            </div>
+
+            {mode === 'learn' && (
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+                <motion.button
+                  onClick={() => setRole('players')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                    role === 'players'
+                      ? 'bg-orange-500 text-white'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  whileHover={{ scale: role === 'players' ? 1 : 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Users size={18} />
+                  For Players
+                </motion.button>
+                <motion.button
+                  onClick={() => setRole('coaches')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                    role === 'coaches'
+                      ? 'bg-orange-500 text-white'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  whileHover={{ scale: role === 'coaches' ? 1 : 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Briefcase size={18} />
+                  For Coaches
+                </motion.button>
+              </div>
+            )}
+          </div>
+
+          {mode === 'explore' ? (
+            <div className="pathways-showcase" style={{
+              display: 'grid',
+              gridTemplateColumns: '45% 55%',
+              gap: '40px',
+              alignItems: 'start',
+              width: '100%',
+              maxWidth: '1400px',
+              margin: '0 auto'
+            }}>
             
             {/* LEFT: Basketball Court - Smaller */}
-            <div 
-              ref={courtContainerRef}
-              className="basketball-court-container" 
-              style={{
-                width: '100%',
-                height: '500px',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'none', // Hide default cursor
-              }}
-              onMouseMove={(e) => {
+             <div 
+               ref={courtContainerRef}
+               className="basketball-court-container" 
+               style={{
+                 width: '100%',
+                 height: '500px',
+                 position: 'relative',
+                 overflow: 'hidden',
+                 cursor: 'none', // Hide default cursor
+                 pointerEvents: 'auto', // Ensure clicks work
+               }}
+               onClick={(e) => {
+                 // Allow clicks to pass through if not on a bubble
+                 // Don't prevent default - let bubbles handle their own clicks
+               }}
+               onMouseMove={(e) => {
                 if (!courtContainerRef.current) return;
                 const rect = courtContainerRef.current.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
@@ -393,37 +691,39 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                   ballY = currentMousePos.y + (lockedBubblePosition.y - currentMousePos.y) * attractionStrength;
                 }
                 
-                return (
-                  <motion.div
-                    className="pointer-events-none absolute z-50"
-                    style={{
-                      left: `${ballX}px`,
-                      top: `${ballY}px`,
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                    animate={{
-                      left: `${ballX}px`,
-                      top: `${ballY}px`,
-                    }}
-                    transition={{
-                      duration: 0.15,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <motion.div
-                      animate={{
-                        scale: hoveredCategoryId ? [1, 1.3, 1] : 1, // Grow/shrink to simulate dribbling into screen
-                      }}
-                      transition={{
-                        duration: hoveredCategoryId ? 0.6 : 0,
-                        repeat: hoveredCategoryId ? Infinity : 0,
-                        ease: 'easeInOut',
-                      }}
-                    >
-                      <div className="text-2xl">🏀</div>
-                    </motion.div>
-                  </motion.div>
-                );
+                 return (
+                   <motion.div
+                     className="pointer-events-none absolute z-50"
+                     style={{
+                       left: `${ballX}px`,
+                       top: `${ballY}px`,
+                       transform: 'translate(-50%, -50%)',
+                       pointerEvents: 'none', // Explicitly disable pointer events
+                     }}
+                     animate={{
+                       left: `${ballX}px`,
+                       top: `${ballY}px`,
+                     }}
+                     transition={{
+                       duration: 0.15,
+                       ease: 'easeOut',
+                     }}
+                   >
+                     <motion.div
+                       style={{ pointerEvents: 'none' }} // Ensure inner div also has no pointer events
+                       animate={{
+                         scale: hoveredCategoryId ? [1, 1.3, 1] : 1, // Grow/shrink to simulate dribbling into screen
+                       }}
+                       transition={{
+                         duration: hoveredCategoryId ? 0.6 : 0,
+                         repeat: hoveredCategoryId ? Infinity : 0,
+                         ease: 'easeInOut',
+                       }}
+                     >
+                       <div className="text-2xl" style={{ pointerEvents: 'none' }}>🏀</div>
+                     </motion.div>
+                   </motion.div>
+                 );
               })()}
             {/* Basketball Court SVG - Half Court */}
             <svg 
@@ -606,6 +906,24 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               )}
             </div>
           </div>
+          ) : (
+            <div 
+              className="w-full"
+              style={{
+                maxWidth: '1400px',
+                margin: '0 auto',
+                borderRadius: '24px',
+                overflow: 'hidden',
+                background: 'rgba(10, 14, 39, 0.95)',
+                border: '2px solid rgba(255, 107, 53, 0.2)',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%' }}>
+                <FeatureShowcase />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

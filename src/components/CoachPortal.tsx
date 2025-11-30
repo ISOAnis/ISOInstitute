@@ -413,10 +413,10 @@ export function CoachPortal() {
             </Avatar>
             <div>
               <h1 className="text-white mb-1">Coach Portal</h1>
-              <div className="flex items-center gap-2 text-slate-400">
+          <div className="flex items-center gap-2 text-slate-400">
                 {React.createElement(currentCoach.categoryIcon, { className: 'w-5 h-5 text-white' })}
-                <span className="text-orange-400">{currentCoach.category}</span>
-                <span> • {currentCoach.name}</span>
+            <span className="text-orange-400">{currentCoach.category}</span>
+            <span> • {currentCoach.name}</span>
               </div>
             </div>
           </div>
@@ -439,7 +439,7 @@ export function CoachPortal() {
               <TabsTrigger value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messages
-              </TabsTrigger>
+            </TabsTrigger>
             <TabsTrigger value="matching" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
               <Sparkles className="w-4 h-4 mr-2" />
               AI Matching
