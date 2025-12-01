@@ -160,7 +160,8 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
       }}
     >
       <motion.div
-        className="relative cursor-pointer"
+        className="relative"
+        style={{ cursor: 'none' }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         onClick={() => {

@@ -181,12 +181,15 @@ export function MenteePortal() {
 
   const currentTier = getCurrentTier();
   
+  // Calculate overall progress as percentage of full bar (0-100%)
+  const overallProgress = Math.min(100, (gamesWon / 15) * 100); // 15 games = 100%
+  
   const tiers = [
-    { id: 'freshman', name: 'Freshman', icon: Sprout, minGames: 0, color: 'bg-green-500', darkColor: 'bg-green-700' },
-    { id: 'jv', name: 'JV', icon: BookOpen, minGames: 3, color: 'bg-blue-500', darkColor: 'bg-blue-700' },
-    { id: 'varsity', name: 'Varsity', icon: StarIcon, minGames: 6, color: 'bg-purple-500', darkColor: 'bg-purple-700' },
-    { id: 'd1', name: 'D1', icon: Trophy, minGames: 10, color: 'bg-orange-500', darkColor: 'bg-orange-700' },
-    { id: 'professional', name: 'Professional', icon: Gem, minGames: 15, color: 'bg-yellow-500', darkColor: 'bg-yellow-700' },
+    { id: 'freshman', name: 'Freshman', icon: Sprout, minGames: 0, color: 'bg-gradient-to-r from-green-500 to-emerald-600', darkColor: 'bg-green-700' },
+    { id: 'jv', name: 'JV', icon: BookOpen, minGames: 3, color: 'bg-gradient-to-r from-blue-500 to-cyan-600', darkColor: 'bg-blue-700' },
+    { id: 'varsity', name: 'Varsity', icon: StarIcon, minGames: 6, color: 'bg-gradient-to-r from-purple-500 to-indigo-600', darkColor: 'bg-purple-700' },
+    { id: 'd1', name: 'D1', icon: Trophy, minGames: 10, color: 'bg-gradient-to-r from-orange-500 to-amber-600', darkColor: 'bg-orange-700' },
+    { id: 'professional', name: 'Professional', icon: Gem, minGames: 15, color: 'bg-gradient-to-r from-orange-500 to-orange-600', darkColor: 'bg-orange-700' },
   ];
   
   const toggleBucket = (gameId: string, bucketId: string) => {
@@ -352,9 +355,30 @@ export function MenteePortal() {
               </p>
               
               {/* Progress Bar */}
-              <div className="relative mb-6">
+              <div className="relative mb-6" style={{ width: '100%' }}>
                 {/* Background Bar - dark background for entire bar */}
-                <div className="h-6 bg-slate-800 rounded-full overflow-hidden relative">
+                <div className="h-6 bg-slate-800 rounded-full overflow-hidden" style={{ position: 'relative', width: '100%' }}>
+                  {/* Progress Fill - gradient bar matching tier colors */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      height: '100%',
+                      width: `${overallProgress}%`,
+                      background: overallProgress <= 20 
+                        ? 'linear-gradient(to right, #10b981, #059669)' // Freshman - green
+                        : overallProgress <= 40
+                        ? 'linear-gradient(to right, #3b82f6, #0891b2)' // JV - blue
+                        : overallProgress <= 60
+                        ? 'linear-gradient(to right, #a855f7, #6366f1)' // Varsity - purple
+                        : overallProgress <= 80
+                        ? 'linear-gradient(to right, #f97316, #f59e0b)' // D1 - orange
+                        : 'linear-gradient(to right, #f97316, #ea580c)', // Professional - reddish-orange
+                      transition: 'width 0.3s ease',
+                      zIndex: 5
+                    }}
+                  ></div>
                   {/* Completed tiers - show in full solid color (render first) */}
                   {tiers.map((tier, index) => {
                     const isCompleted = gamesWon >= tier.minGames && currentTier.level > index + 1;

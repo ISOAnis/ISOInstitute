@@ -496,7 +496,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
           </h2>
 
           {/* Mode Toggle */}
-          <div className="flex flex-col items-center gap-4 mb-16">
+          <div className="flex flex-col items-center gap-4 mb-8">
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
               <motion.button
                 onClick={() => setMode('explore')}
@@ -907,22 +907,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
             </div>
           </div>
           ) : (
-            <div 
-              className="w-full"
-              style={{
-                maxWidth: '1400px',
-                margin: '0 auto',
-                borderRadius: '24px',
-                overflow: 'hidden',
-                background: 'rgba(10, 14, 39, 0.95)',
-                border: '2px solid rgba(255, 107, 53, 0.2)',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
-              }}
-            >
-              <div style={{ position: 'relative', width: '100%' }}>
-                <FeatureShowcase />
-              </div>
-            </div>
+            <FeatureShowcase role={role} />
           )}
         </div>
       </section>
