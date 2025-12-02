@@ -103,10 +103,11 @@ export function Hero({ onNavigate }: HeroProps = {}) {
 
   return (
     <section 
-      className="min-h-screen relative overflow-hidden pt-32 pb-16 px-4 bg-slate-1050"
+      className="relative overflow-hidden bg-slate-1050"
     >
-      {/* Top Section - Text Content */}
-      <div className="max-w-4xl mx-auto text-center mb-16 z-10 relative">
+      {/* Top Section - Text Content - Full Viewport Height */}
+      <div className="min-h-screen flex flex-col justify-center items-center px-4 pt-32 pb-16 z-10 relative">
+        <div className="max-w-4xl mx-auto text-center">
         {/* Logo */}
         <motion.div
           className="flex justify-center mb-6"
@@ -154,12 +155,13 @@ export function Hero({ onNavigate }: HeroProps = {}) {
           The ISO Institute is a faith-driven coaching platform rooted in community uplift and empowerment.
         </motion.p>
         </div>
+      </div>
 
-      {/* Why ISO Section */}
-      <div className="relative w-full max-w-6xl mx-auto mb-8 z-10">
+      {/* Why ISO Section - Below viewport */}
+      <div className="relative w-full max-w-6xl mx-auto py-16 px-4 z-10">
         <motion.h2 
-          className="text-4xl md:text-5xl font-bold text-white text-center mb-8"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
+          className="text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center mb-1"
+          style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }}
@@ -169,7 +171,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
           </div>
 
       {/* Tab System - Above Cards */}
-      <div className="relative w-full max-w-6xl mx-auto mb-8 z-10 flex justify-center">
+      <div className="relative w-full max-w-6xl mx-auto mb-4 z-10 flex justify-center">
         <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
           <motion.button
             onClick={() => setActiveTab('players')}

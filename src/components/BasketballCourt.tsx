@@ -478,7 +478,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
 
   return (
     <>
-      <section id="iso-court" className="pt-4 pb-20 px-4 sm:px-6 lg:px-8 bg-slate-1050">
+      <section id="iso-court" className="pt-8 pb-20 px-4 sm:px-6 lg:px-8 bg-slate-1050">
         <div className="max-w-7xl mx-auto">
           {/* Title above court */}
           <h2 
@@ -489,10 +489,47 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               fontFamily: 'Poppins, sans-serif',
               textAlign: 'center',
               maxWidth: '1280px',
-              margin: '0 auto 40px auto'
+              margin: '0 auto 40px auto',
+              padding: '40px 60px',
+              borderRadius: '24px',
+              background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(168, 85, 247, 0.15) 100%)',
+              border: '1px solid rgba(249, 115, 22, 0.2)',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(249, 115, 22, 0.1)'
             }}
           >
+            {/* Animated gradient overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'radial-gradient(circle at 30% 50%, rgba(249, 115, 22, 0.2) 0%, transparent 50%), radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%)',
+                pointerEvents: 'none',
+                zIndex: 0,
+                animation: 'pulse 4s ease-in-out infinite'
+              }}
+            />
+            <span style={{ position: 'relative', zIndex: 1 }}>
             The court is not the end, it's the <span style={{color: '#f97316'}}>beginning</span>.
+            </span>
+            <style>
+              {`
+                @keyframes pulse {
+                  0%, 100% {
+                    opacity: 1;
+                    transform: scale(1);
+                  }
+                  50% {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                  }
+                }
+              `}
+            </style>
           </h2>
 
           {/* Mode Toggle */}

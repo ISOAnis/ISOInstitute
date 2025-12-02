@@ -32,7 +32,7 @@ const values = [
   },
   {
     label: "Coaching > Content",
-    copy: "Mentees don’t need another motivational thread—they need a disciplined coach in their corner.",
+    copy: "Mentees don't need another motivational thread—they need a disciplined coach in their corner.",
   },
   {
     label: "Proximity builds courage",
@@ -42,280 +42,195 @@ const values = [
 
 export function About() {
   return (
-    <div className="relative min-h-screen bg-slate-950 text-white overflow-hidden">
-      <div className="absolute -right-24 -top-24 h-96 w-96 bg-orange-500/20 blur-[140px]" />
-      <div className="absolute left-1/4 top-1/3 h-72 w-72 bg-cyan-500/10 blur-[160px]" />
+    <div className="relative min-h-screen bg-[#0a0e27] text-white overflow-hidden">
+      {/* Subtle background gradients */}
+      <div className="absolute right-0 top-0 h-[600px] w-[600px] bg-orange-500/10 blur-[180px]" />
+      <div className="absolute left-0 bottom-0 h-[400px] w-[400px] bg-blue-500/5 blur-[160px]" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-32 space-y-24">
-        <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center">
-          <div>
-            <p className="text-sm uppercase tracking-[0.4em] text-slate-400 mb-4">
-              ISO INSTITUTE
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              In Search Of{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500">
-                clarity
-              </span>
-              , discipline, and spiritual edge.
-            </h1>
-            <p className="text-lg text-slate-300 leading-relaxed mb-8">
-              On the court, an ISO is one-on-one. In life, it’s you vs.
-              distraction, self-doubt, and inertia. We build coaching
-              environments where Muslim youth can attack the lane with
-              confidence—rooted in deen, sharpened by ambition.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="px-8 py-3 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors font-semibold"
-              >
-                Call an ISO
-              </button>
-              <button
-                onClick={() =>
-                  document
-                    .getElementById("about-mission")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-                className="px-8 py-3 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white transition-colors"
-              >
-                See the mission
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-slate-900/60 border border-white/10 rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-300 mb-4">
-              Why we exist
-            </p>
-            <p className="text-lg text-slate-100 leading-relaxed mb-6">
-              “We bring youth into the proximity of success by pairing them with
-              coaches who protect their iman and push their ambition. No vague
-              inspiration—just disciplined reps for the mind, body, and heart.”
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-2xl">
-                ☪️
-              </div>
-              <div>
-                <p className="font-semibold">Anis Benyoucef</p>
-                <p className="text-sm text-slate-400">Founder & Lead Coach</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent p-6 text-center"
-            >
-              <p className="text-3xl font-semibold text-white mb-2">
-                {stat.value}
-              </p>
-              <p className="text-sm uppercase tracking-wide text-slate-400">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </section>
-
-        <section
-          id="about-mission"
-          className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] items-start"
-        >
-          <div className="bg-slate-900/60 border border-white/5 rounded-3xl p-8 space-y-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">
-              Our identity
-            </p>
-            <h2 className="text-3xl font-semibold leading-tight">
-              ISO is a Muslim-built coaching lab for young adults who crave
-              tactical mentorship.
-            </h2>
-            <div className="space-y-5">
-              {values.map((value) => (
-                <div
-                  key={value.label}
-                  className="border border-white/5 rounded-2xl p-5 bg-white/5"
-                >
-                  <p className="text-orange-300 text-sm uppercase tracking-wide mb-1">
-                    {value.label}
-                  </p>
-                  <p className="text-slate-200">{value.copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500/20 via-pink-500/10 to-slate-900 rounded-3xl border border-white/10 p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-200 mb-6">
-              Timeline
-            </p>
-            <div className="space-y-8 relative">
-              <div className="absolute left-6 top-0 bottom-0 w-px bg-white/20" />
-              {milestones.map((milestone) => (
-                <div key={milestone.year} className="relative pl-12">
-                  <div className="absolute left-4 top-2 h-3 w-3 rounded-full bg-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.7)]" />
-                  <p className="text-sm uppercase tracking-widest text-slate-400">
-                    {milestone.year}
-                  </p>
-                  <h3 className="text-xl font-semibold mb-1">
-                    {milestone.title}
-                  </h3>
-                  <p className="text-slate-200">{milestone.copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-8 lg:grid-cols-3 items-start">
-          <div className="lg:col-span-2 bg-slate-900/70 border border-white/5 rounded-3xl p-8 h-full">
-            <p className="text-sm uppercase tracking-[0.4em] text-slate-400 mb-4">
-              Programs
-            </p>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40 h-full flex flex-col">
-                <h4 className="text-xl font-semibold mb-2">Court sessions</h4>
-                <p className="text-slate-300">
-                  Live coaching nights where mentees break down film (their
-                  goals) with pros who’ve walked the exact path.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40 h-full flex flex-col">
-                <h4 className="text-xl font-semibold mb-2">
-                  One-on-one residencies
-                </h4>
-                <p className="text-slate-300">
-                  6-week coaching arcs pairing mentees with a mentor that tracks
-                  spiritual reps, craft, and execution.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40 h-full flex flex-col">
-                <h4 className="text-xl font-semibold mb-2">Pathway pods</h4>
-                <p className="text-slate-300">
-                  Micro communities (health, medicine, tech, entrepreneurship)
-                  moderated by mentors and alumni.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-white/5 p-6 bg-gradient-to-br from-slate-900 to-slate-900/40 h-full flex flex-col">
-                <h4 className="text-xl font-semibold mb-2">
-                  Faith & focus labs
-                </h4>
-                <p className="text-slate-300">
-                  Breathwork, dua journaling, and discipline drills that keep
-                  the heart right while the grind intensifies.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-b from-white/10 to-transparent border border-white/10 rounded-3xl p-8 flex flex-col justify-between h-full">
-            <p className="text-sm uppercase tracking-[0.4em] text-slate-300 mb-4">
-              Founder story
-            </p>
-            <h4 className="text-2xl font-semibold mb-3">
-              Built by someone in the trenches
-            </h4>
-            <p className="text-slate-200 mb-6">
-              “I’m a first-gen Algerian-American who hacked my way through
-              medicine, startups, and community work. ISO is the platform I
-              wished existed—a place where Muslim youth can ask the real
-              questions without code-switching.”
-            </p>
-            {/* North star moved to its own spotlight section at page bottom */}
-          </div>
-        </section>
-
-        {/* North Star spotlight — moved above Final word and intensified */}
-        <section className="mt-12 flex justify-center">
-          <div className="relative w-full max-w-3xl px-4">
-            <div className="mx-auto rounded-3xl bg-gradient-to-br from-slate-900/70 to-transparent border border-white/10 p-8 text-center">
-              <div className="flex items-center justify-center mb-4">
-                <div className="relative">
-                  <div className="north-star inline-flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-yellow-300 to-amber-200 text-slate-900 text-3xl">
-                    ✦
-                  </div>
-                  <div
-                    className="absolute inset-0 rounded-full star-glow-pointer"
-                    aria-hidden="true"
-                  />
-                </div>
-              </div>
-              <p className="text-sm uppercase tracking-[0.3em] text-slate-400 mb-2">
-                North star
-              </p>
-              <p className="text-lg text-slate-100">
-                Proximity to excellence + anchored iman = unstoppable
-                confidence.
-              </p>
-            </div>
-
-            <style>{`
-              .north-star {
-                box-shadow: 0 0 48px rgba(255, 220, 120, 0.35), 0 18px 80px rgba(255, 180, 60, 0.22);
-                transform-origin: center;
-                animation: northPulse 2000ms infinite ease-in-out;
-                filter: saturate(1.15) brightness(1.12);
-              }
-
-              .star-glow-pointer {
-                pointer-events: none;
-              }
-
-              .star-glow-pointer::before {
-                content: '';
-                position: absolute;
-                inset: -18px;
-                border-radius: 9999px;
-                background: radial-gradient(circle at 30% 30%, rgba(255,250,220,0.95), rgba(255,230,140,0.45) 18%, rgba(255,200,70,0.18) 36%, transparent 60%);
-                filter: blur(28px) contrast(1.05);
-                opacity: 1;
-                animation: starTwinkle 2800ms infinite ease-in-out;
-              }
-
-              @keyframes northPulse {
-                0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 200, 80, 0)); }
-                45% { transform: scale(1.12) rotate(-3deg); filter: drop-shadow(0 20px 80px rgba(255, 200, 80, 0.28)); }
-                100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 200, 80, 0)); }
-              }
-
-              @keyframes starTwinkle {
-                0% { opacity: 0.9; transform: scale(1); }
-                25% { opacity: 1; transform: scale(1.06); }
-                55% { opacity: 0.75; transform: scale(0.98); }
-                100% { opacity: 0.9; transform: scale(1); }
-              }
-
-              @media (prefers-reduced-motion: reduce) {
-                .north-star, .star-glow-pointer::before {
-                  animation: none !important;
-                }
-              }
-            `}</style>
-          </div>
-        </section>
-
-        <section className="bg-slate-900/70 border border-white/5 rounded-3xl p-10 pb-16 text-center space-y-5">
-          <p className="text-sm uppercase tracking-[0.4em] text-slate-400">
-            Final word
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-24 pb-32">
+        
+        {/* HERO SECTION - Clear focal point */}
+        <section className="mb-32 text-center max-w-4xl mx-auto">
+          <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-6 font-semibold">
+            ISO INSTITUTE
           </p>
-          <p className="text-2xl md:text-3xl leading-relaxed text-slate-100">
-            Whether you're hunting for the right mentor, a clearer career lane,
-            or spiritual accountability—ISO is that timeout where you stop
-            playing small and start running the right play.
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8">
+            In Search Of{" "}
+            <span className="text-orange-500">clarity</span>,{" "}
+            <span className="text-orange-500">discipline</span>, and{" "}
+            <span className="text-orange-500">spiritual edge</span>
+          </h1>
+          <p className="text-xl text-slate-300 leading-relaxed mb-12 max-w-3xl mx-auto">
+            On the court, an ISO is one-on-one. In life, it's you vs. distraction, self-doubt, and inertia. We build coaching environments where Muslim youth can attack the lane with confidence—rooted in deen, sharpened by ambition.
           </p>
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => window.location.assign("#basketball-court")}
-              className="px-10 py-3 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors font-semibold"
-            >
-              Step onto the court
+          <div className="flex flex-wrap justify-center gap-4">
+            <button className="px-10 py-4 rounded-full bg-orange-500 hover:bg-orange-600 transition-all font-semibold text-lg shadow-lg shadow-orange-500/20">
+              Call an ISO
+            </button>
+            <button className="px-10 py-4 rounded-full border-2 border-slate-700 hover:border-orange-500 transition-all font-semibold text-lg">
+              Learn More
             </button>
           </div>
         </section>
+
+        {/* STATS BAR - Clean, scannable */}
+        <section className="mb-32">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="text-center p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/30 transition-all"
+              >
+                <p className="text-5xl font-bold text-orange-500 mb-3">
+                  {stat.value}
+                </p>
+                <p className="text-sm uppercase tracking-wider text-slate-400">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* MISSION STATEMENT - Featured prominently */}
+        <section className="mb-32">
+          <div className="max-w-4xl mx-auto bg-gradient-to-br from-slate-900 to-slate-900/50 border border-slate-800 rounded-3xl p-12 shadow-2xl">
+            <div className="flex items-start gap-6">
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-3xl flex-shrink-0">
+                ☪️
+              </div>
+              <div>
+                <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
+                  Why we exist
+                </p>
+                <p className="text-2xl text-slate-100 leading-relaxed mb-6">
+                  "We bring youth into the proximity of success by pairing them with coaches who protect their iman and push their ambition. No vague inspiration—just disciplined reps for the mind, body, and heart."
+                </p>
+                <div className="pt-4 border-t border-slate-800">
+                  <p className="font-semibold text-lg">Anis Benyoucef</p>
+                  <p className="text-slate-400">Founder & Lead Coach</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* VALUES - Clear grid layout */}
+        <section className="mb-32">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
+              Our Values
+            </p>
+            <h2 className="text-4xl lg:text-5xl font-bold">What Drives Us</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {values.map((value) => (
+              <div
+                key={value.label}
+                className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all"
+              >
+                <h3 className="text-xl font-bold text-orange-500 mb-4">
+                  {value.label}
+                </h3>
+                <p className="text-slate-300 leading-relaxed">{value.copy}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* TIMELINE - Visual story */}
+        <section className="mb-32">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
+              Our Journey
+            </p>
+            <h2 className="text-4xl lg:text-5xl font-bold">The ISO Timeline</h2>
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-12 relative">
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500 via-orange-500/50 to-transparent" />
+              {milestones.map((milestone, index) => (
+                <div key={milestone.year} className="relative pl-20">
+                  <div className="absolute left-5 top-2 h-6 w-6 rounded-full bg-orange-500 border-4 border-[#0a0e27] shadow-lg shadow-orange-500/50" />
+                  <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800">
+                    <p className="text-sm uppercase tracking-widest text-orange-500 font-semibold mb-2">
+                      {milestone.year}
+                    </p>
+                    <h3 className="text-2xl font-bold mb-3">{milestone.title}</h3>
+                    <p className="text-slate-300 leading-relaxed">{milestone.copy}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PROGRAMS - Simplified grid */}
+        <section className="mb-32">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
+              What We Offer
+            </p>
+            <h2 className="text-4xl lg:text-5xl font-bold">Our Programs</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
+              <h4 className="text-2xl font-bold mb-4">Court Sessions</h4>
+              <p className="text-slate-300 leading-relaxed">
+                Live coaching nights where mentees break down film (their goals) with pros who've walked the exact path.
+              </p>
+            </div>
+            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
+              <h4 className="text-2xl font-bold mb-4">One-on-One Residencies</h4>
+              <p className="text-slate-300 leading-relaxed">
+                6-week coaching arcs pairing mentees with a mentor that tracks spiritual reps, craft, and execution.
+              </p>
+            </div>
+            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
+              <h4 className="text-2xl font-bold mb-4">Pathway Pods</h4>
+              <p className="text-slate-300 leading-relaxed">
+                Micro communities (health, medicine, tech, entrepreneurship) moderated by mentors and alumni.
+              </p>
+            </div>
+            <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
+              <h4 className="text-2xl font-bold mb-4">Faith & Focus Labs</h4>
+              <p className="text-slate-300 leading-relaxed">
+                Breathwork, dua journaling, and discipline drills that keep the heart right while the grind intensifies.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* NORTH STAR - Clear emphasis */}
+        <section className="mb-32">
+          <div className="max-w-3xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-orange-500/10 to-transparent border-2 border-orange-500/30">
+            <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 text-5xl mb-6 shadow-2xl shadow-orange-500/50">
+              ✦
+            </div>
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
+              North Star
+            </p>
+            <p className="text-3xl font-bold leading-relaxed">
+              Proximity to excellence + anchored iman = unstoppable confidence
+            </p>
+          </div>
+        </section>
+
+        {/* CTA - Strong close */}
+        <section className="text-center">
+          <div className="max-w-4xl mx-auto p-12 rounded-3xl bg-slate-900/60 border border-slate-800">
+            <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-6 font-semibold">
+              Ready to start?
+            </p>
+            <p className="text-3xl lg:text-4xl font-bold leading-relaxed mb-10">
+              Whether you're hunting for the right mentor, a clearer career lane, or spiritual accountability—ISO is that timeout where you stop playing small and start running the right play.
+            </p>
+            <button className="px-12 py-5 rounded-full bg-orange-500 hover:bg-orange-600 transition-all font-semibold text-lg shadow-xl shadow-orange-500/30">
+              Step Onto the Court
+            </button>
+          </div>
+        </section>
+
       </div>
     </div>
   );
