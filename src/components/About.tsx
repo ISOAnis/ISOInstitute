@@ -42,7 +42,12 @@ const values = [
 
 export function About() {
   return (
-    <div className="relative min-h-screen bg-[#0a0e27] text-white overflow-hidden">
+    <div 
+      className="relative min-h-screen text-white overflow-hidden"
+      style={{
+        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+      }}
+    >
       {/* Subtle background gradients */}
       <div className="absolute right-0 top-0 h-[600px] w-[600px] bg-orange-500/10 blur-[180px]" />
       <div className="absolute left-0 bottom-0 h-[400px] w-[400px] bg-blue-500/5 blur-[160px]" />
@@ -52,21 +57,21 @@ export function About() {
         {/* HERO SECTION - Clear focal point */}
         <section className="mb-32 text-center max-w-4xl mx-auto">
           <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-6 font-semibold">
-            ISO INSTITUTE
-          </p>
+              ISO INSTITUTE
+            </p>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8">
-            In Search Of{" "}
+              In Search Of{" "}
             <span className="text-orange-500">clarity</span>,{" "}
             <span className="text-orange-500">discipline</span>, and{" "}
             <span className="text-orange-500">spiritual edge</span>
-          </h1>
+            </h1>
           <p className="text-xl text-slate-300 leading-relaxed mb-12 max-w-3xl mx-auto">
             On the court, an ISO is one-on-one. In life, it's you vs. distraction, self-doubt, and inertia. We build coaching environments where Muslim youth can attack the lane with confidence—rooted in deen, sharpened by ambition.
-          </p>
+            </p>
           <div className="flex flex-wrap justify-center gap-4">
             <button className="px-10 py-4 rounded-full bg-orange-500 hover:bg-orange-600 transition-all font-semibold text-lg shadow-lg shadow-orange-500/20">
-              Call an ISO
-            </button>
+                Call an ISO
+              </button>
             <button className="px-10 py-4 rounded-full border-2 border-slate-700 hover:border-orange-500 transition-all font-semibold text-lg">
               Learn More
             </button>
@@ -87,7 +92,7 @@ export function About() {
                 <p className="text-sm uppercase tracking-wider text-slate-400">
                   {stat.label}
                 </p>
-              </div>
+            </div>
             ))}
           </div>
         </section>
@@ -124,17 +129,17 @@ export function About() {
             <h2 className="text-4xl lg:text-5xl font-bold">What Drives Us</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {values.map((value) => (
-              <div
-                key={value.label}
+              {values.map((value) => (
+                <div
+                  key={value.label}
                 className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all"
-              >
+                >
                 <h3 className="text-xl font-bold text-orange-500 mb-4">
-                  {value.label}
+                    {value.label}
                 </h3>
                 <p className="text-slate-300 leading-relaxed">{value.copy}</p>
-              </div>
-            ))}
+                </div>
+              ))}
           </div>
         </section>
 
@@ -154,8 +159,8 @@ export function About() {
                   <div className="absolute left-5 top-2 h-6 w-6 rounded-full bg-orange-500 border-4 border-[#0a0e27] shadow-lg shadow-orange-500/50" />
                   <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800">
                     <p className="text-sm uppercase tracking-widest text-orange-500 font-semibold mb-2">
-                      {milestone.year}
-                    </p>
+                    {milestone.year}
+                  </p>
                     <h3 className="text-2xl font-bold mb-3">{milestone.title}</h3>
                     <p className="text-slate-300 leading-relaxed">{milestone.copy}</p>
                   </div>
@@ -178,25 +183,25 @@ export function About() {
               <h4 className="text-2xl font-bold mb-4">Court Sessions</h4>
               <p className="text-slate-300 leading-relaxed">
                 Live coaching nights where mentees break down film (their goals) with pros who've walked the exact path.
-              </p>
-            </div>
+                </p>
+              </div>
             <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
               <h4 className="text-2xl font-bold mb-4">One-on-One Residencies</h4>
               <p className="text-slate-300 leading-relaxed">
                 6-week coaching arcs pairing mentees with a mentor that tracks spiritual reps, craft, and execution.
-              </p>
-            </div>
+                </p>
+              </div>
             <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
               <h4 className="text-2xl font-bold mb-4">Pathway Pods</h4>
               <p className="text-slate-300 leading-relaxed">
                 Micro communities (health, medicine, tech, entrepreneurship) moderated by mentors and alumni.
-              </p>
-            </div>
+                </p>
+              </div>
             <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-orange-500/50 transition-all">
               <h4 className="text-2xl font-bold mb-4">Faith & Focus Labs</h4>
               <p className="text-slate-300 leading-relaxed">
                 Breathwork, dua journaling, and discipline drills that keep the heart right while the grind intensifies.
-              </p>
+                </p>
             </div>
           </div>
         </section>
@@ -205,11 +210,11 @@ export function About() {
         <section className="mb-32">
           <div className="max-w-3xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-orange-500/10 to-transparent border-2 border-orange-500/30">
             <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 text-5xl mb-6 shadow-2xl shadow-orange-500/50">
-              ✦
-            </div>
+                    ✦
+                  </div>
             <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-4 font-semibold">
               North Star
-            </p>
+              </p>
             <p className="text-3xl font-bold leading-relaxed">
               Proximity to excellence + anchored iman = unstoppable confidence
             </p>
@@ -221,10 +226,10 @@ export function About() {
           <div className="max-w-4xl mx-auto p-12 rounded-3xl bg-slate-900/60 border border-slate-800">
             <p className="text-sm uppercase tracking-[0.3em] text-orange-500 mb-6 font-semibold">
               Ready to start?
-            </p>
+          </p>
             <p className="text-3xl lg:text-4xl font-bold leading-relaxed mb-10">
               Whether you're hunting for the right mentor, a clearer career lane, or spiritual accountability—ISO is that timeout where you stop playing small and start running the right play.
-            </p>
+          </p>
             <button className="px-12 py-5 rounded-full bg-orange-500 hover:bg-orange-600 transition-all font-semibold text-lg shadow-xl shadow-orange-500/30">
               Step Onto the Court
             </button>

@@ -1,294 +1,353 @@
 import * as React from 'react';
 import { motion } from 'motion/react';
-import { MessageSquare, Heart, Handshake, ArrowUpRight, Users, Briefcase, MapPin, Shield, Settings, DollarSign } from 'lucide-react';
+import { ArrowRight, Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 
 interface HeroProps {
   onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community') => void;
 }
 
 export function Hero({ onNavigate }: HeroProps = {}) {
-  const [activeTab, setActiveTab] = React.useState<'players' | 'coaches'>('players');
-
-  const playerNodes = [
-    { 
-      id: 1, 
-      label: 'Real Connections, Real Responses', 
-      subtext: 'Still getting ghosted? Stop wasting time on cold outreach. ISO guarantees a response from a coach in your field of interest.',
-      icon: MessageSquare,
-    },
-    { 
-      id: 2, 
-      label: 'Faith-Driven Guidance', 
-      subtext: 'At ISO, you will work with coaches who are committed to the game and who are here to serve, not sell.',
-      icon: Heart,
-    },
-    { 
-      id: 3, 
-      label: 'Community Support', 
-      subtext: "Join a network of peers on the same journey. Grow together, not alone.",
-      icon: Handshake,
-    },
-    { 
-      id: 8, 
-      label: 'Accessible Coaching', 
-      subtext: 'Access expert guidance without breaking the bank. Built for students and young professionals.',
-      icon: DollarSign,
-    },
-  ];
-
-  const coachNodes = [
-    { 
-      id: 4, 
-      label: 'Build Through Service', 
-      subtext: 'ISO helps you build a meaningful brand and attract opportunities through genuine service, not performative self-promotion.',
-      icon: ArrowUpRight,
-    },
-    { 
-      id: 5, 
-      label: 'Local Impact', 
-      subtext: 'Make real change in your community. Instead of broadcasting to millions, focus on deep, authentic, and local community impact.',
-      icon: MapPin,
-    },
-    { 
-      id: 6, 
-      label: 'Faith-Aligned Platform', 
-      subtext: 'Connect with mentees who share your values. Be compensated fairly for genuine, purpose-driven coaching.',
-      icon: Shield,
-    },
-    { 
-      id: 7, 
-      label: 'Streamlined Tools', 
-      subtext: 'Manage sessions, track progress, and focus on what matters - transforming lives, not admin work.',
-      icon: Settings,
+  const scrollToCourt = () => {
+    const courtSection = document.getElementById('iso-court');
+    if (courtSection) {
+      courtSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  ];
-
-  const nodes = activeTab === 'players' ? playerNodes : coachNodes;
-  const [hoveredCard, setHoveredCard] = React.useState<number | null>(null);
-  const defaultIconState = { scale: 1, y: 0, rotate: 0 };
-  const iconAnimationMap: Record<number, { animate: any; transition: any }> = {
-    1: {
-      animate: { y: [0, -4, 0], scale: [1, 1.05, 1] },
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    2: {
-      animate: { scale: [1, 1.15, 1] },
-      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
-    },
-    3: {
-      animate: { rotate: [0, -5, 5, 0] },
-      transition: { duration: 1.4, repeat: Infinity, ease: 'easeInOut' },
-    },
-    4: {
-      animate: { x: [0, 6, 0], y: [0, -6, 0], scale: [1, 1.08, 1] },
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    5: {
-      animate: { scale: [1, 1.1, 1], y: [0, -3, 0] },
-      transition: { duration: 1.3, repeat: Infinity, ease: 'easeInOut' },
-    },
-    6: {
-      animate: { rotate: [0, 5, -5, 0], scale: [1, 1.05, 1] },
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    7: {
-      animate: { rotate: [0, 360] },
-      transition: { duration: 3, repeat: Infinity, ease: 'linear' },
-    },
-    8: {
-      animate: { scale: [1, 1.12, 1], y: [0, -2, 0] },
-      transition: { duration: 1.1, repeat: Infinity, ease: 'easeInOut' },
-    },
   };
+
+  // Pathway icons that will orbit - matching basketball court icons
+  const pathwayIcons = [
+    { Icon: Moon, color: '#10b981', name: 'Deen & Purpose' }, // emerald/teal
+    { Icon: Dumbbell, color: '#ef4444', name: 'Health & Fitness' }, // red/rose
+    { Icon: Activity, color: '#3b82f6', name: 'Medicine & Healthcare' }, // blue/cyan
+    { Icon: Settings, color: '#a855f7', name: 'Engineering & Technology' }, // purple/indigo
+    { Icon: Rocket, color: '#f97316', name: 'Entrepreneurship & Business' }, // orange/amber
+    { Icon: Globe, color: '#6366f1', name: 'Global Affairs & Business' }, // indigo/blue
+  ];
 
   return (
     <section 
-      className="relative overflow-hidden bg-slate-1050"
+      className="relative overflow-hidden min-h-screen flex items-center px-4 py-20"
+      style={{
+        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+      }}
     >
-      {/* Top Section - Text Content - Full Viewport Height */}
-      <div className="min-h-screen flex flex-col justify-center items-center px-4 pt-32 pb-16 z-10 relative">
-        <div className="max-w-4xl mx-auto text-center">
-        {/* Logo */}
+      <div className="max-w-7xl mx-auto w-full relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          
+          {/* LEFT SIDE - Text Content */}
+          <div className="text-left space-y-8">
+            {/* Welcome Button */}
         <motion.div
-          className="flex justify-center mb-6"
-          initial={{ opacity: 0, y: -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <img 
-            src="/ISO-logo-v2.jpg" 
-            alt="ISO Institute Logo" 
-            className="h-24 md:h-28 lg:h-32 w-auto object-contain"
-          />
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <button
+                className="flex items-center gap-2 px-6 py-3 rounded-full border border-orange-500/30 bg-slate-950/60 backdrop-blur-md text-white text-base font-medium hover:border-orange-500/50 hover:bg-slate-950/80 transition-all"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                Welcome to ISO Institute
+                <ArrowRight size={16} className="opacity-70" />
+              </button>
         </motion.div>
 
-        {/* Large Heading */}
+            {/* Main Heading */}
         <motion.h1 
-          className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white leading-tight tracking-tight mb-6"
-          style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold', lineHeight: '1.2' }}
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          ISO Institute
+              className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight"
+              style={{ 
+                fontFamily: "'Poppins', sans-serif", 
+                fontWeight: 'bold',
+                lineHeight: '1.1',
+                letterSpacing: '-0.02em'
+              }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span className="text-white">You're Not Lost,</span>
+              <br />
+              <span className="text-white">You're Just </span>
+              <span 
+                className="inline-block"
+                style={{
+                  background: 'linear-gradient(90deg, #f97316, #fb923c, #3b82f6, #60a5fa)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                In Search Of
+              </span>
         </motion.h1>
-
-        {/* Subheading */}
-        <motion.h2 
-          className="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-relaxed mb-6"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        >
-          You're not lost — you're just <span className="text-orange-500 font-semibold">In Search Of</span>.
-        </motion.h2>
 
         {/* Description */}
         <motion.p 
-          className="text-lg md:text-xl lg:text-xl text-slate-300 leading-relaxed max-w-3xl mx-auto mb-8"
+              className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-xl"
           style={{ fontFamily: "'Poppins', sans-serif" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          The ISO Institute is a faith-driven coaching platform rooted in community uplift and empowerment.
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              The ISO Institute is a faith-rooted cultural movement designed to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
         </motion.p>
-        </div>
-      </div>
 
-      {/* Why ISO Section - Below viewport */}
-      <div className="relative w-full max-w-6xl mx-auto py-16 px-4 z-10">
-        <motion.h2 
-          className="text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center mb-1"
-          style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold' }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-        >
-          Why ISO?
-        </motion.h2>
-          </div>
-
-      {/* Tab System - Above Cards */}
-      <div className="relative w-full max-w-6xl mx-auto mb-4 z-10 flex justify-center">
-        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
-          <motion.button
-            onClick={() => setActiveTab('players')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
-              activeTab === 'players'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
-            }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: activeTab === 'players' ? 1 : 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Users size={18} />
-            For Players
-          </motion.button>
-          <motion.button
-            onClick={() => setActiveTab('coaches')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
-              activeTab === 'coaches'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
-            }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-            whileHover={{ scale: activeTab === 'coaches' ? 1 : 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Briefcase size={18} />
-            For Coaches
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Bottom Section - Why ISO Benefit Cards */}
-      <motion.div 
-        className="relative w-full max-w-6xl mx-auto flex flex-wrap justify-center items-stretch gap-6 z-10"
-        key={activeTab}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        {nodes.map((node, index) => {
-          const Icon = node.icon;
-          return (
+            {/* CTA Button with Flowing Border */}
             <motion.div
-              key={node.id}
-              className="benefit-card bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-2xl text-center"
+              className="relative inline-flex rounded-full"
+              style={{ padding: '1px' }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Animated flowing border */}
+              <motion.div
+                className="absolute inset-0 rounded-full"
               style={{
-                padding: '30px 26px',
-                width: 'calc(25% - 18px)',
-                minWidth: '240px',
-                minHeight: '280px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 107, 53, 0.1)',
-              }}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  background: 'linear-gradient(90deg, #f97316, #fb923c, #3b82f6, #60a5fa, #f97316)',
+                  backgroundSize: '200% 100%',
+                }}
               animate={{ 
-                opacity: 1, 
-                y: 0,
-                scale: 1,
+                  backgroundPosition: ['0% 50%', '200% 50%'],
               }}
               transition={{
-                duration: 0.6,
-                delay: index * 0.1,
-                ease: [0.16, 1, 0.3, 1]
-              }}
-              whileHover={{ 
-                scale: 1.04,
-                y: -6,
-                boxShadow: '0 18px 40px rgba(0, 0, 0, 0.4), 0 0 70px rgba(255, 107, 53, 0.3)',
-                borderColor: 'rgba(255, 107, 53, 0.7)',
-                background: 'rgba(255, 255, 255, 0.06)',
-              }}
-              onMouseEnter={() => setHoveredCard(node.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-            >
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+              />
+              
+              {/* Glow effect */}
               <motion.div
-                style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', flexShrink: 0 }}
-                animate={hoveredCard === node.id ? iconAnimationMap[node.id].animate : defaultIconState}
-                transition={hoveredCard === node.id ? iconAnimationMap[node.id].transition : { duration: 0.2 }}
-              >
-                <Icon size={36} color="#FF6B35" strokeWidth={2} />
-              </motion.div>
-              <h3 
-                className="text-white font-semibold"
+                className="absolute -inset-2 rounded-full blur-xl -z-10"
+                style={{ 
+                  background: 'linear-gradient(90deg, #f97316, #3b82f6)',
+                }}
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.7, 0.4],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+
+              <button
+                onClick={scrollToCourt}
+                className="relative px-6 py-3 rounded-full text-white text-base font-semibold transition-all z-10"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
-                  fontSize: '1.25rem',
-                  margin: '12px 0 10px 0',
-                  lineHeight: 1.3,
+                  background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, rgba(249, 115, 22, 0.3), rgba(59, 130, 246, 0.25))';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))';
                 }}
               >
-                {node.label}
-              </h3>
-              <p 
+                Get Started
+              </button>
+            </motion.div>
+          </div>
+
+          {/* RIGHT SIDE - Static 3D Basketball with Orbiting Icons */}
+          <motion.div 
+            className="relative flex items-center justify-center h-[500px] lg:h-[600px]"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            <div className="relative" style={{ width: '256px', height: '256px', perspective: '1000px' }}>
+              {/* Static 3D Basketball Wireframe */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  background: 'transparent',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  transform: 'translateZ(0)',
+                  boxShadow: `
+                    inset 0 0 80px rgba(255, 255, 255, 0.1),
+                    inset -30px -30px 60px rgba(0, 0, 0, 0.3),
+                    inset 30px 30px 60px rgba(255, 255, 255, 0.08)
+                  `,
+                }}
+              >
+                {/* Basketball wireframe lines - Clean standard pattern */}
+                <svg className="w-full h-full absolute inset-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  {/* Vertical center line */}
+                  <line 
+                    x1="50" y1="0" x2="50" y2="100" 
+                    stroke="#ffffff" 
+                    strokeWidth="1.5" 
+                    opacity="0.8"
+                    strokeLinecap="round"
+                  />
+                  {/* Horizontal center line */}
+                  <line 
+                    x1="0" y1="50" x2="100" y2="50" 
+                    stroke="#ffffff" 
+                    strokeWidth="1.5" 
+                    opacity="0.8"
+                    strokeLinecap="round"
+                  />
+                  {/* Curved lines for basketball pattern */}
+                  <path 
+                    d="M 20 10 Q 50 50 20 90" 
+                    fill="none" 
+                    stroke="#ffffff" 
+                    strokeWidth="1.5" 
+                    opacity="0.8"
+                    strokeLinecap="round"
+                  />
+                  <path 
+                    d="M 80 10 Q 50 50 80 90" 
+                    fill="none" 
+                    stroke="#ffffff" 
+                    strokeWidth="1.5" 
+                    opacity="0.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              
+              {/* Subtle 3D depth effect */}
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 70%)',
+                  mixBlendMode: 'overlay',
+                }}
+              />
+
+              {/* 3D Orbit Container */}
+              <motion.div
+                className="absolute inset-0"
                 style={{ 
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: '0.92rem',
-                  color: '#b8b8b8',
-                  lineHeight: 1.6,
-                  margin: 0,
+                  transformStyle: 'preserve-3d',
+                }}
+                animate={{
+                  rotateY: [0, 360],
+                  rotateX: [15, 15],
+                }}
+                transition={{
+                  rotateY: {
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear",
+                  },
                 }}
               >
-                {node.subtext}
-              </p>
+                {/* Orbiting Pathway Icons - positioned in 3D space with fade behind ball */}
+                {pathwayIcons.map((pathway, index) => {
+                  const angle = (index * 60) * (Math.PI / 180); // 60 degrees apart (6 icons = 360/6)
+                  const orbitRadius = 200;
+                  const orbitTilt = 15 * (Math.PI / 180); // Convert to radians
+                  
+                  // Calculate initial 3D position
+                  const initialX = Math.cos(angle) * orbitRadius;
+                  const initialY = Math.sin(angle) * Math.cos(orbitTilt) * orbitRadius;
+                  const initialZ = Math.sin(angle) * Math.sin(orbitTilt) * orbitRadius;
+                  
+                  // Create keyframes for 3D orbit with smooth fade when behind ball
+                  const ballRadius = 128; // Half of 256px ball size
+                  const iconRadius = 32; // Half of 64px icon size
+                  
+                  const orbitKeyframes = Array.from({ length: 60 }, (_, i) => {
+                    const currentAngle = angle + (i / 60) * Math.PI * 2;
+                    const x = Math.cos(currentAngle) * orbitRadius;
+                    const y = Math.sin(currentAngle) * Math.cos(orbitTilt) * orbitRadius;
+                    const z = Math.sin(currentAngle) * Math.sin(orbitTilt) * orbitRadius;
+                    
+                    // Calculate 3D distance from icon center to ball center
+                    const distanceFromBallCenter = Math.sqrt(x * x + y * y + z * z);
+                    
+                    // Calculate opacity: fade when icon is behind the ball (negative z or intersecting)
+                    let opacity = 1;
+                    const minOpacity = 0.05; // Minimum opacity when behind ball - almost invisible
+                    
+                    // Check if icon is behind the ball (negative z means it's in the back)
+                    // Also check if it's intersecting with the ball
+                    const isBehind = z < 0 || distanceFromBallCenter < (ballRadius + iconRadius);
+                    
+                    if (isBehind) {
+                      // Calculate how far behind/inside the ball the icon is
+                      if (distanceFromBallCenter < ballRadius + iconRadius) {
+                        // Icon is intersecting with ball - fade based on intersection depth
+                        const intersectionDepth = (ballRadius + iconRadius) - distanceFromBallCenter;
+                        const maxIntersection = iconRadius * 2;
+                        const fadeProgress = Math.min(1, intersectionDepth / maxIntersection);
+                        // Keep minimum opacity for depth effect
+                        opacity = Math.max(minOpacity, 1 - (fadeProgress * (1 - minOpacity)));
+                      } else if (z < 0) {
+                        // Icon is behind the ball - fade based on z distance
+                        // More negative z = more behind = more transparent
+                        const behindDistance = Math.abs(z);
+                        const fadeStart = 50; // Start fading 50px behind
+                        const fadeRange = 100; // Fade over 100px
+                        const fadeProgress = Math.min(1, (behindDistance - fadeStart) / fadeRange);
+                        // Keep minimum opacity for depth effect
+                        opacity = Math.max(minOpacity, 1 - (fadeProgress * (1 - minOpacity)));
+                      }
+                    }
+                    
+                    return { x, y, z, opacity };
+                  });
+                  
+                  return (
+                    <motion.div
+                      key={index}
+                      className="absolute"
+                      style={{
+                        left: '50%',
+                        top: '50%',
+                        marginLeft: '-32px',
+                        marginTop: '-32px',
+                        transformStyle: 'preserve-3d',
+                      }}
+                      animate={{
+                        x: orbitKeyframes.map(k => k.x),
+                        y: orbitKeyframes.map(k => k.y),
+                        z: orbitKeyframes.map(k => k.z),
+                        opacity: orbitKeyframes.map(k => k.opacity),
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    >
+                      <motion.div
+                        className="w-16 h-16 rounded-full flex items-center justify-center backdrop-blur-md border-2 relative"
+                        style={{
+                          background: `${pathway.color}30`,
+                          borderColor: `${pathway.color}80`,
+                          boxShadow: `
+                            0 0 20px ${pathway.color}40,
+                            0 8px 24px rgba(0, 0, 0, 0.4)
+                          `,
+                          transformStyle: 'preserve-3d',
+                        }}
+                        whileHover={{ scale: 1.3 }}
+                      >
+                        <pathway.Icon size={28} color={pathway.color} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
+                      </motion.div>
             </motion.div>
           );
         })}
+              </motion.div>
+            </div>
       </motion.div>
-
+        </div>
+      </div>
 
       {/* Background gradient effects */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-        <div className="absolute -right-24 -top-24 h-96 w-96 bg-orange-500/10 blur-[140px]" />
-        <div className="absolute left-1/4 top-1/3 h-72 w-72 bg-cyan-500/5 blur-[160px]" />
-    </div>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
+      </div>
     </section>
   );
 }

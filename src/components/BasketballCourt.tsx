@@ -478,7 +478,13 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
 
   return (
     <>
-      <section id="iso-court" className="pt-8 pb-20 px-4 sm:px-6 lg:px-8 bg-slate-1050">
+      <section 
+        id="iso-court" 
+        className="pt-8 pb-20 px-4 sm:px-6 lg:px-8"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Title above court */}
           <h2 

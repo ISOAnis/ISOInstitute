@@ -101,8 +101,8 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
         left: cardWidth * index,
         behavior: 'smooth'
       });
-    }
-  };
+      }
+    };
 
   const handleNext = () => {
     if (activeIndex < features.length - 1) {
@@ -150,7 +150,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
         {features.map((feature, index) => (
           <div
             key={index}
-            style={{
+          style={{
               minWidth: 'min(1200px, 95vw)',
               scrollSnapAlign: 'center',
               display: 'grid',
@@ -175,12 +175,12 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
             }}>
               <div style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
                 background: 'radial-gradient(circle at 20% 40%, rgba(249, 115, 22, 0.25) 0%, transparent 60%), radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.25) 0%, transparent 60%)',
-                pointerEvents: 'none',
+            pointerEvents: 'none',
                 zIndex: 1
               }}></div>
               <img
@@ -215,7 +215,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               <h2 style={{
                 fontSize: '56px',
                 color: 'white',
-                fontWeight: 'bold',
+                      fontWeight: 'bold',
                 marginBottom: '24px',
                 lineHeight: '1.1'
               }}>
@@ -230,16 +230,16 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
                 {feature.desc}
               </p>
             </div>
-          </div>
-        ))}
-      </div>
+                  </div>
+                ))}
+              </div>
 
       {/* Navigation Arrows */}
       <button
         onClick={handlePrev}
         disabled={activeIndex === 0}
-        style={{
-          position: 'absolute',
+                  style={{
+                    position: 'absolute',
           left: '20px',
           top: '50%',
           transform: 'translateY(-50%)',
@@ -253,21 +253,21 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
           cursor: activeIndex === 0 ? 'not-allowed' : 'pointer',
           opacity: activeIndex === 0 ? 0.3 : 1,
           transition: 'all 0.3s ease',
-          display: 'flex',
+                        display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+                        justifyContent: 'center',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           zIndex: 10
-        }}
-      >
+                        }}
+                      >
         ←
       </button>
 
       <button
         onClick={handleNext}
         disabled={activeIndex === features.length - 1}
-        style={{
-          position: 'absolute',
+                style={{
+                  position: 'absolute',
           right: '20px',
           top: '50%',
           transform: 'translateY(-50%)',
@@ -281,13 +281,13 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
           cursor: activeIndex === features.length - 1 ? 'not-allowed' : 'pointer',
           opacity: activeIndex === features.length - 1 ? 0.3 : 1,
           transition: 'all 0.3s ease',
-          display: 'flex',
-          alignItems: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
           zIndex: 10
-        }}
-      >
+                }}
+              >
         →
       </button>
 
@@ -303,7 +303,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
             key={index}
             onClick={() => scrollToCard(index)}
             aria-label={`Go to feature ${index + 1}`}
-            style={{
+                    style={{
               width: index === activeIndex ? '40px' : '12px',
               height: '12px',
               borderRadius: '6px',
@@ -312,10 +312,10 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               padding: 0
-            }}
-          />
-        ))}
-      </div>
+                    }}
+                  />
+                ))}
+              </div>
 
       <style>
         {`

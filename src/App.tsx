@@ -12,6 +12,7 @@ const WhatIsISO = lazy(() => import('./components/WhatIsISO').then(m => ({ defau
 const ProductShowcase = lazy(() => import('./components/ProductShowcase').then(m => ({ default: m.ProductShowcase })));
 const Pricing = lazy(() => import('./components/Pricing').then(m => ({ default: m.Pricing })));
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
+const WhyISO = lazy(() => import('./components/WhyISO').then(m => ({ default: m.WhyISO })));
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
@@ -99,7 +100,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div 
+      className="min-h-screen"
+      style={{
+        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+      }}
+    >
       <Navigation 
         currentPage={currentPage}
         onNavigate={handleNavigate}
@@ -110,6 +116,11 @@ export default function App() {
           {/* New Simple Hero Section */}
           <Suspense fallback={<LoadingSpinner />}>
             <Hero onNavigate={setCurrentPage} />
+          </Suspense>
+          
+          {/* Why ISO Section */}
+          <Suspense fallback={<LoadingSpinner />}>
+            <WhyISO />
           </Suspense>
           
           {/* Basketball Court Section */}

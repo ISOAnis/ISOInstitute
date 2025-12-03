@@ -81,7 +81,7 @@ export function ProductShowcase() {
     <section 
       id="product-showcase"
       style={{ 
-      backgroundColor: '#0f172a', 
+      background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)', 
       paddingTop: '80px',
       paddingBottom: '80px',
       paddingLeft: '32px',
