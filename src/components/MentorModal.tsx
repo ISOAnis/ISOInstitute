@@ -460,7 +460,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 </div>
                 <AccordionItem value="match-scores" className="flex-1 border-2 border-blue-400/60 rounded-2xl bg-blue-800/80 border-solid overflow-hidden shadow-xl shadow-black/40">
                   <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-slate-400">
-                    <span className="font-semibold text-base" style={{ fontFamily: "'Poppins', sans-serif" }}>Understanding Match Scores</span>
+                    <span className="font-semibold text-base" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Understanding Match Scores</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 text-sm pb-6 px-6 leading-relaxed">
                     Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400 font-semibold">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400 font-semibold">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
@@ -475,7 +475,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 </div>
                 <AccordionItem value="try-outs" className="flex-1 border-2 border-blue-400/60 rounded-2xl bg-blue-800/80 border-solid overflow-hidden shadow-xl shadow-black/40">
                   <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-slate-400">
-                    <span className="font-semibold text-base" style={{ fontFamily: "'Poppins', sans-serif" }}>Try Outs</span>
+                    <span className="font-semibold text-base" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Try Outs</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
                 Not ready to commit yet? Start with a quick, no-pressure conversation. Think of it as a first consultation — just you and a coach, exploring what's possible.
@@ -490,7 +490,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 </div>
                 <AccordionItem value="call-iso" className="flex-1 border-2 border-orange-500/50 rounded-2xl bg-slate-700/80 backdrop-blur-sm overflow-hidden shadow-lg shadow-orange-500/20">
                   <AccordionTrigger className="text-white hover:no-underline py-4 px-6 [&>svg]:text-orange-400">
-                    <span className="font-semibold text-base text-orange-400" style={{ fontFamily: "'Poppins', sans-serif" }}>Call an ISO</span>
+                    <span className="font-semibold text-base text-orange-400" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Call an ISO</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
                 When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
@@ -504,7 +504,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
           <div className="mb-6 flex items-center justify-between">
             <h3 
               className="text-white text-3xl font-bold flex items-center gap-3"
-              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '800' }}
+              style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '800' }}
             >
               <span className="text-white">Coaches</span>
               <span className="text-slate-500 text-lg font-normal">({filteredMentors.length})</span>
@@ -521,7 +521,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-transparent text-white pl-4 pr-4 py-4 rounded-xl border-0 focus:outline-none focus:ring-0 transition-all placeholder:text-slate-400"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               />
             </div>
 
@@ -530,7 +530,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-slate-800/80 backdrop-blur-sm text-white px-5 py-3 rounded-xl border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             >
               <option value="match">Sort by: Best Match</option>
               <option value="overall">Sort by: Overall</option>
@@ -575,7 +575,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h4 className="text-white text-xl font-bold mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          <h4 className="text-white text-xl font-bold mb-1" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                             {mentor.name}
                           </h4>
                           <p className="text-slate-400 text-sm mb-3">{mentor.role}</p>
@@ -636,7 +636,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                           setSelectedTimeSlot(null);
                         }}
                         className="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl transition-all text-sm font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 relative overflow-hidden"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -657,7 +657,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                         }}
                         className="group/btn bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl transition-all text-sm font-bold shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 relative overflow-hidden border-2 border-orange-400/50 hover:border-orange-300/70"
                         style={{ 
-                          fontFamily: "'Poppins', sans-serif",
+                          fontFamily: "'Bebas Neue', sans-serif",
                           boxShadow: '0 0 25px rgba(249, 115, 22, 0.6), 0 0 50px rgba(249, 115, 22, 0.3), 0 8px 16px rgba(0, 0, 0, 0.3)',
                           animation: 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                         }}

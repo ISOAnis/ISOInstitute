@@ -825,7 +825,7 @@ export default function ScrollPinnedImageSequence({
                       style={{
                         fontFamily: currentTextKey === '1-8' || currentTextKey === '9-24' 
                           ? "'Bebas Neue', sans-serif"
-                          : "'Poppins', 'Inter', sans-serif",
+                          : "'Bebas Neue', sans-serif",
                         fontSize: currentTextKey === '1-8' || currentTextKey === '9-24' 
                           ? 'clamp(2.5rem, 7vw, 6rem)' 
                           : currentTextKey === '25-48' || currentTextKey === '49-72'
@@ -863,7 +863,7 @@ export default function ScrollPinnedImageSequence({
                       key={`subtext-${currentTextKey}-${currentFrame}`}
                       className="font-medium mt-3 sm:mt-4"
                       style={{
-                        fontFamily: "'Poppins', 'Inter', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                         fontSize: currentTextKey === '9-24' 
                           ? 'clamp(1rem, 3vw, 2rem)'
                           : 'clamp(1rem, 3vw, 2.25rem)',

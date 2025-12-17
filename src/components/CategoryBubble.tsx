@@ -261,7 +261,7 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
             <span 
               className="text-[0.65rem] font-medium text-white/90"
               style={{
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3)',
                 letterSpacing: '0.3px',
               }}

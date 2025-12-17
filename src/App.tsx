@@ -5,6 +5,7 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { CoachPortalPage } from './components/CoachPortalPage';
 import { PlayerPortalPage } from './components/PlayerPortalPage';
 import { About } from './components/About';
+import './styles/about.css';
 
 // Lazy load heavy components
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
@@ -16,7 +17,9 @@ const WhyISO = lazy(() => import('./components/WhyISO').then(m => ({ default: m.
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal';
+const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
+
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -99,11 +102,19 @@ export default function App() {
     return <PlayerPortalPage onNavigate={handleNavigate} />;
   }
 
+  if (currentPage === 'store') {
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <StoreDashboard onBack={() => handleNavigate('home')} />
+      </Suspense>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen"
       style={{
-        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+        background: '#030305',
       }}
     >
       <Navigation 
@@ -137,9 +148,11 @@ export default function App() {
             </Suspense>
           </div>
           
+          {/* ProductShowcase - temporarily hidden
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <ProductShowcase />
           </Suspense>
+          */}
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <Pricing />
           </Suspense>

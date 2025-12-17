@@ -6,13 +6,13 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="bg-slate-900 text-white py-16 px-4 sm:px-6 lg:px-8">
+    <footer className="text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5" style={{ background: '#030305' }}>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img 
-                src="/ISO-logo-v2.jpg" 
+                src="/ISOMetallic.png" 
                 alt="ISO Logo" 
                 className="h-10 w-auto object-contain"
                 onError={(e) => {
@@ -35,14 +35,14 @@ export function Footer({ onNavigate }: FooterProps) {
                 <span className="text-white block font-bold">ISO</span>
               </div>
             </div>
-            <p className="text-slate-400">
+            <p className="text-white/70">
               Muslim-founded coaching institute helping you strengthen faith, discipline, and purpose.
             </p>
           </div>
 
           <div>
             <h4 className="text-white mb-4">Pathways</h4>
-            <ul className="space-y-2 text-slate-400">
+            <ul className="space-y-2 text-white/70">
               <li><a href="#deen" className="hover:text-white transition-colors">Deen & Purpose</a></li>
               <li><a href="#health" className="hover:text-white transition-colors">Health & Fitness</a></li>
               <li><a href="#medicine" className="hover:text-white transition-colors">Medicine & Healthcare</a></li>
@@ -51,7 +51,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
           <div>
             <h4 className="text-white mb-4">More Paths</h4>
-            <ul className="space-y-2 text-slate-400">
+            <ul className="space-y-2 text-white/70">
               <li><a href="#engineering" className="hover:text-white transition-colors">Engineering & Technology</a></li>
               <li><a href="#entrepreneurship" className="hover:text-white transition-colors">Entrepreneurship</a></li>
               <li><a href="#global" className="hover:text-white transition-colors">Global Affairs & Business</a></li>
@@ -60,7 +60,7 @@ export function Footer({ onNavigate }: FooterProps) {
 
           <div>
             <h4 className="text-white mb-4">Connect</h4>
-            <ul className="space-y-2 text-slate-400">
+            <ul className="space-y-2 text-white/70">
               <li><a href="#about" className="hover:text-white transition-colors">About ISO</a></li>
               <li><a href="#mentors" className="hover:text-white transition-colors">Our Coaches</a></li>
               <li><a href="#contact" className="hover:text-white transition-colors">Coaching Nights</a></li>
@@ -69,7 +69,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8 text-center text-slate-400">
+        <div className="border-t border-slate-800 pt-8 text-center text-white/70">
           <p>&copy; 2025 ISO. In Search Of your next move.</p>
         </div>
       </div>

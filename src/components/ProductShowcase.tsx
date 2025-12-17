@@ -81,7 +81,7 @@ export function ProductShowcase() {
     <section 
       id="product-showcase"
       style={{ 
-      background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)', 
+      background: '#030305', 
       paddingTop: '80px',
       paddingBottom: '80px',
       paddingLeft: '32px',
@@ -102,9 +102,24 @@ export function ProductShowcase() {
             fontSize: '3.75rem', 
             fontWeight: 'bold', 
             color: 'white',
-            fontFamily: 'Poppins, sans-serif'
+            fontFamily: 'Bebas Neue, sans-serif'
           }}>
-            A <span style={{color: '#f97316'}}>new</span>, <span style={{color: '#f97316'}}>intuitive</span>, and <span style={{color: '#f97316'}}>exciting</span> coaching experience
+            A <span style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>new</span>, <span style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>intuitive</span>, and <span style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>exciting</span> coaching experience
           </h2>
         </div>
 
@@ -124,7 +139,7 @@ export function ProductShowcase() {
         >
           <div>
             <p style={{ 
-              color: '#f97316', 
+              color: '#94a3b8', 
               fontSize: '0.875rem', 
               textTransform: 'uppercase',
               marginBottom: '16px',
@@ -137,7 +152,7 @@ export function ProductShowcase() {
               fontWeight: 'bold', 
               color: 'white',
               marginBottom: '24px',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Bebas Neue, sans-serif'
             }}>
               Choose Your Pathway
             </h3>
@@ -313,7 +328,7 @@ export function ProductShowcase() {
           
           <div style={{ order: window.innerWidth < 768 ? 1 : 2 }}>
             <p style={{ 
-              color: '#f97316', 
+              color: '#94a3b8', 
               fontSize: '0.875rem', 
               textTransform: 'uppercase',
               marginBottom: '16px',
@@ -326,7 +341,7 @@ export function ProductShowcase() {
               fontWeight: 'bold', 
               color: 'white',
               marginBottom: '24px',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Bebas Neue, sans-serif'
             }}>
               View Coach Cards
             </h3>
@@ -364,7 +379,7 @@ export function ProductShowcase() {
         >
           <div>
             <p style={{ 
-              color: '#f97316', 
+              color: '#94a3b8', 
               fontSize: '0.875rem', 
               textTransform: 'uppercase',
               marginBottom: '16px',
@@ -377,7 +392,7 @@ export function ProductShowcase() {
               fontWeight: 'bold', 
               color: 'white',
               marginBottom: '24px',
-              fontFamily: 'Poppins, sans-serif'
+              fontFamily: 'Bebas Neue, sans-serif'
             }}>
               Call an ISO
             </h3>

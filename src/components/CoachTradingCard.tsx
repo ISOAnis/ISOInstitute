@@ -344,7 +344,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       fontSize: '24px',
                       fontWeight: 'bold',
                         margin: 0,
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                       textTransform: 'uppercase'
                     }}>
                       {mentor.name}
@@ -528,7 +528,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                     fontSize: '20px',
                     fontWeight: 'bold',
                       margin: 0,
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     textTransform: 'uppercase'
                   }}>
                     {mentor.name}
@@ -729,7 +729,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                         fontWeight: '600',
                         margin: 0,
                         textShadow: '0 0 8px rgba(249, 115, 22, 0.6)',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                         textAlign: 'right'
                       }}>
                         Scroll to Call an ISO
@@ -758,7 +758,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       border: '2px solid rgba(249, 115, 22, 0.5)',
                       cursor: 'pointer',
                       transition: 'all 0.3s',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                       marginTop: 'auto',
                       boxShadow: '0 0 30px rgba(249, 115, 22, 0.6), 0 10px 25px -5px rgba(249, 115, 22, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
                       position: 'relative',

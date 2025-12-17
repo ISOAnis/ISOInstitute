@@ -101,14 +101,14 @@ export function WhyISO() {
     <section 
       className="relative w-full py-16"
       style={{
-        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+        background: '#030305',
       }}
     >
       {/* Why ISO Section */}
       <div className="relative w-full max-w-6xl mx-auto py-16 px-4 z-10">
         <motion.h2 
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center mb-1"
-          style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 'bold' }}
+          style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: 'bold' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -119,15 +119,15 @@ export function WhyISO() {
 
       {/* Tab System - Above Cards */}
       <div className="relative w-full max-w-6xl mx-auto mb-4 z-10 flex justify-center">
-        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+        <div className="flex items-center gap-2 backdrop-blur-[10px] rounded-xl p-1" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
           <motion.button
             onClick={() => setActiveTab('players')}
             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
               activeTab === 'players'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-white text-black'
+                : 'text-white hover:text-white'
             }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             whileHover={{ scale: activeTab === 'players' ? 1 : 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -138,10 +138,10 @@ export function WhyISO() {
             onClick={() => setActiveTab('coaches')}
             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
               activeTab === 'coaches'
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-white text-black'
+                : 'text-white hover:text-white'
             }`}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             whileHover={{ scale: activeTab === 'coaches' ? 1 : 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -164,7 +164,7 @@ export function WhyISO() {
           return (
             <motion.div
               key={node.id}
-              className="benefit-card bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-2xl text-center"
+              className="benefit-card backdrop-blur-[10px] rounded-2xl text-center"
               style={{
                 padding: '30px 26px',
                 width: 'calc(25% - 18px)',
@@ -173,7 +173,9 @@ export function WhyISO() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 107, 53, 0.1)',
+                background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
               }}
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ 
@@ -189,9 +191,9 @@ export function WhyISO() {
               whileHover={{ 
                 scale: 1.04,
                 y: -6,
-                boxShadow: '0 18px 40px rgba(0, 0, 0, 0.4), 0 0 70px rgba(255, 107, 53, 0.3)',
-                borderColor: 'rgba(255, 107, 53, 0.7)',
-                background: 'rgba(255, 255, 255, 0.06)',
+                boxShadow: '0 18px 40px rgba(0, 0, 0, 0.4)',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                background: 'linear-gradient(145deg, #121212 0%, #1c1c1c 50%, #121212 100%)',
               }}
               onMouseEnter={() => setHoveredCard(node.id)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -206,7 +208,7 @@ export function WhyISO() {
               <h3 
                 className="text-white font-semibold"
                 style={{ 
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                   fontSize: '1.25rem',
                   margin: '12px 0 10px 0',
                   lineHeight: 1.3,
@@ -216,9 +218,9 @@ export function WhyISO() {
               </h3>
               <p 
                 style={{ 
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                   fontSize: '0.92rem',
-                  color: '#b8b8b8',
+                  color: 'rgba(255, 255, 255, 0.7)',
                   lineHeight: 1.6,
                   margin: 0,
                 }}

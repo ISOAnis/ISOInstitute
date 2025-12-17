@@ -328,14 +328,14 @@ html {
 
   /* Create Account Button Invert Animation */
   .create-account-btn {
-    background: rgb(249, 115, 22);
-    color: white;
+    background: white;
+    color: black;
     position: relative;
     transition: all 0.5s ease-in-out;
   }
 
   .create-account-btn span {
-    color: white;
+    color: black;
     transition: color 0.5s ease-in-out;
   }
 
@@ -343,7 +343,7 @@ html {
     content: '';
     position: absolute;
     inset: 0;
-    background: white;
+    background: black;
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.5s ease-in-out;
@@ -357,7 +357,7 @@ html {
   }
 
   .create-account-btn:hover span {
-    color: rgb(249, 115, 22) !important;
+    color: white !important;
   }
 
   hr {
@@ -3990,3 +3990,217 @@ html {
   syntax: "*";
   inherits: false
 }
+/* About Page Styles */
+.about-page {
+  font-family: 'Bebas Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #030305;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.about-page .hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0e1a 0%, #151b2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-page .hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 123, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+  animation: aboutPulse 8s ease-in-out infinite;
+}
+
+@keyframes aboutPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.about-page .hero-content {
+  text-align: center;
+  z-index: 1;
+  padding: 2rem;
+  max-width: 1200px;
+}
+
+.about-page .logo {
+  font-size: 8rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: aboutFadeInUp 1s ease-out;
+}
+
+.about-page .tagline {
+  font-size: 2rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: aboutFadeInUp 1s ease-out 0.3s forwards;
+}
+
+.about-page .manifesto-intro {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: aboutFadeInUp 1s ease-out 0.6s forwards;
+}
+
+@keyframes aboutFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-page section {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-page .section-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-page .manifesto {
+  background: #0a0a0f;
+  border-left: 4px solid #64748b;
+  padding: 3rem;
+  margin: 2rem 0;
+  line-height: 1.8;
+  font-size: 1.2rem;
+}
+
+.about-page .manifesto p {
+  margin-bottom: 1.5rem;
+}
+
+.about-page .manifesto strong {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.about-page .value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.about-page .value-card {
+  background: linear-gradient(135deg, #0a0a0f 0%, #030305 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-page .value-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #64748b, #94a3b8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.about-page .value-card:hover {
+  transform: translateY(-5px);
+  border-color: #64748b;
+}
+
+.about-page .value-card:hover::before {
+  transform: scaleX(1);
+}
+
+.about-page .value-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #e2e8f0;
+}
+
+.about-page .value-card p {
+  line-height: 1.6;
+  color: #ccc;
+}
+
+.about-page .pillars {
+  background: #0a0a0f;
+  padding: 4rem 2rem;
+  margin: 4rem 0;
+  border-top: 2px solid #64748b;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.about-page .pillar-list {
+  list-style: none;
+  margin: 2rem 0;
+}
+
+.about-page .pillar-list li {
+  font-size: 1.3rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: #1e293b;
+  border-left: 4px solid #ff7b00;
+  transition: all 0.3s ease;
+}
+
+.about-page .pillar-list li:hover {
+  background: #2d3748;
+  transform: translateX(10px);
+}
+
+.about-page .cta-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, #ff7b00 0%, #3b82f6 100%);
+  color: #fff;
+}
+
+.about-page .cta-section h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+}
+
+.about-page .cta-section p {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.about-page .definitions {
+  background: #151b2e;
+  padding: 3r

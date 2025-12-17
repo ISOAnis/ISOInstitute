@@ -213,7 +213,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#05060A',
+        backgroundColor: '#030305',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -225,7 +225,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             fontWeight: 'bold',
             color: 'white',
             marginBottom: '16px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Coach not found
           </h1>
@@ -240,7 +240,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               fontWeight: '600',
               border: 'none',
               cursor: 'pointer',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}
           >
             ← Back to Coaches
@@ -331,7 +331,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#05060A',
+        backgroundColor: '#030305',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -364,7 +364,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             fontWeight: 'bold',
             color: 'white',
             marginBottom: '16px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             ISO Request Submitted!
           </h3>
@@ -379,7 +379,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               color: '#cbd5e1',
               lineHeight: '1.6',
               marginBottom: '16px',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               Your request has been sent to <span style={{ color: '#f97316', fontWeight: '600' }}>{coach.name}</span> for review.
             </p>
@@ -387,7 +387,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               fontSize: '0.9375rem',
               color: '#94a3b8',
               lineHeight: '1.6',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               Once they accept your ISO request, you'll have a consultation meeting to ensure both of you are aligned and ready for this coaching journey.
             </p>
@@ -405,7 +405,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.3s ease-out',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#ea580c';
@@ -425,7 +425,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#05060A',
+        backgroundColor: '#030305',
         padding: '80px 32px',
       }}>
         <div style={{
@@ -448,7 +448,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               borderRadius: '8px',
               cursor: 'pointer',
               transition: 'all 0.2s',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'white';
@@ -468,7 +468,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             fontWeight: 'bold',
             color: 'white',
             marginBottom: '24px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Payment Information
           </h3>
@@ -477,7 +477,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             color: '#94a3b8',
             lineHeight: '1.6',
             marginBottom: '32px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Enter your payment details below. Your card will not be charged until {coach.name} accepts your ISO request.
           </p>
@@ -490,7 +490,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: '600',
                 color: '#cbd5e1',
                 marginBottom: '8px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Card Number
               </label>
@@ -506,7 +506,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   color: 'white',
                   fontSize: '1rem',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}
               />
             </div>
@@ -519,7 +519,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   fontWeight: '600',
                   color: '#cbd5e1',
                   marginBottom: '8px',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   Expiry Date
                 </label>
@@ -535,7 +535,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     color: 'white',
                     fontSize: '1rem',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}
                 />
               </div>
@@ -546,7 +546,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   fontWeight: '600',
                   color: '#cbd5e1',
                   marginBottom: '8px',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   CVV
                 </label>
@@ -562,7 +562,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     color: 'white',
                     fontSize: '1rem',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}
                 />
               </div>
@@ -575,7 +575,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: '600',
                 color: '#cbd5e1',
                 marginBottom: '8px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Name on Card
               </label>
@@ -591,7 +591,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   color: 'white',
                   fontSize: '1rem',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}
               />
             </div>
@@ -606,7 +606,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               backgroundColor: 'rgba(251, 191, 36, 0.1)',
               borderRadius: '8px',
               border: '1px solid rgba(251, 191, 36, 0.2)',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               You won't be charged until your coach accepts your ISO. If they don't respond within 48 hours, we'll match you with another coach or cancel your request.
             </p>
@@ -626,7 +626,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease-out',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}
               >
                 Back
@@ -645,7 +645,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   border: 'none',
                   cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   transition: 'all 0.3s ease-out',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}
               >
                 {isSubmitting ? 'Processing...' : 'Submit ISO Request'}
@@ -660,7 +660,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#05060A',
+      backgroundColor: '#030305',
       paddingTop: '40px',
       paddingBottom: '40px',
       paddingLeft: '32px',
@@ -678,7 +678,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
           marginBottom: '32px',
         }}>
           <img 
-            src="/ISO-logo-v2.jpg" 
+            src="/ISOMetallic.png" 
             alt="ISO Logo" 
             style={{
               height: '40px',
@@ -694,7 +694,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             fontSize: '1.5rem',
             fontWeight: 'bold',
             color: 'white',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             ISO
           </span>
@@ -715,7 +715,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               fontWeight: 'bold',
               color: 'white',
               margin: 0,
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               Call an ISO
             </h1>
@@ -734,7 +734,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 borderRadius: '8px',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = 'white';
@@ -753,7 +753,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             fontSize: '1.25rem',
             color: '#94a3b8',
             marginBottom: '20px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Request coaching from {coach.name}
           </p>
@@ -792,7 +792,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '2px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 {coach.name}
               </h3>
@@ -800,7 +800,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontSize: '0.875rem',
                 color: '#f97316',
                 marginBottom: '8px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 {coach.role}
               </p>
@@ -818,7 +818,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 <span style={{
                   fontSize: '0.875rem',
                   color: '#cbd5e1',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   {coach.categoryTitle}
                 </span>
@@ -832,7 +832,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                       padding: '4px 12px',
                       borderRadius: '9999px',
                       border: '1px solid #334155',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}
                   >
                     {spec}
@@ -890,7 +890,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '6px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Walk-On Program
               </h3>
@@ -899,7 +899,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '2px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Free
               </div>
@@ -916,7 +916,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 color: '#94a3b8',
                 lineHeight: '1.5',
                 marginBottom: '16px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Stay connected at your own pace.
               </p>
@@ -952,7 +952,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     fontSize: '1rem',
                     flexShrink: 0,
                   }}>•</span>
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                 </li>
               ))}
             </ul>
@@ -970,7 +970,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease-out',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 boxShadow: hoveredCard === 'walk-on' 
                   ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
                   : '0 2px 8px rgba(0, 0, 0, 0.2)',
@@ -1029,7 +1029,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '6px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Locker Room Pass
               </h3>
@@ -1038,7 +1038,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '8px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 $5/mo
               </div>
@@ -1047,7 +1047,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 color: '#94a3b8',
                 lineHeight: '1.5',
                 marginBottom: '16px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Coach will reach out to you within 24-48 hrs for monthly meetings. Your portal will include all the benefits of the Locker Room Pass.
               </p>
@@ -1084,7 +1084,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     fontSize: '1rem',
                     flexShrink: 0,
                   }}>•</span>
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                 </li>
               ))}
             </ul>
@@ -1103,7 +1103,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 border: 'none',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease-out',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 boxShadow: hoveredCard === 'locker-room'
                   ? '0 4px 12px rgba(249, 115, 22, 0.4)'
                   : '0 2px 8px rgba(249, 115, 22, 0.3)',
@@ -1165,7 +1165,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '6px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Varsity Program
               </h3>
@@ -1174,7 +1174,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '2px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 {coach.varsityPrice ? `${varsityPriceDisplay} – $100/mo` : '$10/mo – $100/mo'}
               </div>
@@ -1192,7 +1192,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   lineHeight: '1.5',
                   marginBottom: '12px',
                   fontStyle: 'italic',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   Coaches set their own pricing based on expertise, experience, and availability.
                 </p>
@@ -1202,7 +1202,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 lineHeight: '1.5',
                 marginBottom: '16px',
                 fontStyle: 'italic',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Weekly sessions & full support with {coach.name}.
               </p>
@@ -1233,7 +1233,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     fontSize: '1rem',
                     flexShrink: 0,
                   }}>•</span>
-                  <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                 </li>
               ))}
               
@@ -1256,7 +1256,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                     fontSize: '1rem',
                     flexShrink: 0,
                   }}>★</span>
-                  <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '500' }}>{perk}</span>
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '500' }}>{perk}</span>
                 </li>
               ))}
             </ul>
@@ -1274,7 +1274,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease-out',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 boxShadow: hoveredCard === 'varsity'
                   ? '0 6px 16px rgba(251, 191, 36, 0.4)'
                   : '0 4px 12px rgba(251, 191, 36, 0.3)',
@@ -1300,7 +1300,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               textAlign: 'center',
               marginTop: '8px',
               marginBottom: 0,
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               You won't be charged until your coach accepts your ISO. If they don't respond within 48 hours, we'll match you with another coach or cancel your request.
             </p>
@@ -1319,7 +1319,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             color: '#94a3b8',
             lineHeight: '1.5',
             marginBottom: '32px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             You won't be charged until your coach accepts your ISO. If they don't respond within 48 hours, we'll match you with another coach or cancel your request.
           </p>
@@ -1332,7 +1332,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
             gap: '12px',
           }}>
             <img 
-              src="/ISOV1Logo.jpg" 
+              src="/ISOMetallic.png" 
               alt="ISO Logo" 
               style={{
                 height: '40px',
@@ -1348,7 +1348,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
               fontSize: '1.5rem',
               fontWeight: 'bold',
               color: 'white',
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
             }}>
               ISO
             </span>

@@ -158,13 +158,13 @@ export function ISOEvaluationModal({
           <div className="pr-12">
             <h2 
               className="text-white text-3xl font-bold mb-2"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             >
               Call an ISO
             </h2>
             <p 
               className="text-white/90 text-lg"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             >
             {mentorName ? `Request mentorship from ${mentorName}` : `Request mentorship in ${categoryTitle}`}
           </p>
@@ -207,7 +207,7 @@ export function ISOEvaluationModal({
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '16px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 ISO Request Submitted!
               </h3>
@@ -222,7 +222,7 @@ export function ISOEvaluationModal({
                   color: '#cbd5e1',
                   lineHeight: '1.6',
                   marginBottom: '16px',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   {mentorName ? (
                     <>
@@ -236,7 +236,7 @@ export function ISOEvaluationModal({
                   fontSize: '0.9375rem',
                   color: '#94a3b8',
                   lineHeight: '1.6',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   Once they accept your ISO request, you'll have a consultation meeting to ensure both of you are aligned and ready for this coaching journey.
                 </p>
@@ -256,7 +256,7 @@ export function ISOEvaluationModal({
                   fontWeight: 'bold',
                   color: 'white',
                   marginBottom: '20px',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   What Happens Next?
                 </h4>
@@ -281,14 +281,14 @@ export function ISOEvaluationModal({
                         fontWeight: '600',
                         color: 'white',
                         marginBottom: '4px',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         Mentor reviews your profile
                       </p>
                       <p style={{
                         fontSize: '0.875rem',
                         color: '#94a3b8',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         They'll assess if they can help you achieve your goals
                       </p>
@@ -315,14 +315,14 @@ export function ISOEvaluationModal({
                         fontWeight: '600',
                         color: 'white',
                         marginBottom: '4px',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         Consultation meeting is scheduled
                       </p>
                       <p style={{
                         fontSize: '0.875rem',
                         color: '#94a3b8',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         You'll discuss your goals in detail to ensure alignment
                       </p>
@@ -349,14 +349,14 @@ export function ISOEvaluationModal({
                         fontWeight: '600',
                         color: 'white',
                         marginBottom: '4px',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         Decision time
                       </p>
                       <p style={{
                         fontSize: '0.875rem',
                         color: '#94a3b8',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}>
                         Both of you decide if it's the right fit to move forward
                       </p>
@@ -369,7 +369,7 @@ export function ISOEvaluationModal({
                 fontSize: '0.9375rem',
                 color: '#94a3b8',
                 marginBottom: '24px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 We'll send you email updates or check your player portal for updates.
               </p>
@@ -386,7 +386,7 @@ export function ISOEvaluationModal({
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease-out',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#ea580c';
@@ -446,7 +446,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Walk-On Program
                   </h3>
@@ -455,7 +455,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '4px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Free
                       </div>
@@ -507,7 +507,7 @@ export function ISOEvaluationModal({
                         fontSize: '1.125rem',
                         flexShrink: 0,
                       }}>•</span>
-                      <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -525,7 +525,7 @@ export function ISOEvaluationModal({
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease-out',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     boxShadow: hoveredCard === 'walk-on' 
                       ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
                       : '0 2px 8px rgba(0, 0, 0, 0.2)',
@@ -584,7 +584,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Locker Room Pass
                   </h3>
@@ -593,7 +593,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '12px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     $5/mo
                   </div>
@@ -602,7 +602,7 @@ export function ISOEvaluationModal({
                     color: '#94a3b8',
                     lineHeight: '1.6',
                     marginBottom: '24px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Coach will reach out to you within 24-48 hrs for monthly meetings. Your portal will include all the benefits of the Locker Room Pass.
                   </p>
@@ -638,7 +638,7 @@ export function ISOEvaluationModal({
                         fontSize: '1.125rem',
                         flexShrink: 0,
                       }}>•</span>
-                      <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -656,7 +656,7 @@ export function ISOEvaluationModal({
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease-out',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     boxShadow: hoveredCard === 'locker-room'
                       ? '0 4px 12px rgba(249, 115, 22, 0.4)'
                       : '0 2px 8px rgba(249, 115, 22, 0.3)',
@@ -714,7 +714,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Varsity Program
                   </h3>
@@ -723,7 +723,7 @@ export function ISOEvaluationModal({
                     fontWeight: 'bold',
                     color: 'white',
                     marginBottom: '4px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     {varsityPriceDisplay}
               </div>
@@ -771,7 +771,7 @@ export function ISOEvaluationModal({
                         fontSize: '1.125rem',
                         flexShrink: 0,
                       }}>•</span>
-                      <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                     </li>
                   ))}
                   
@@ -794,7 +794,7 @@ export function ISOEvaluationModal({
                         fontSize: '1.125rem',
                         flexShrink: 0,
                       }}>★</span>
-                      <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '500' }}>{perk}</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '500' }}>{perk}</span>
                     </li>
                   ))}
                 </ul>
@@ -812,7 +812,7 @@ export function ISOEvaluationModal({
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease-out',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     boxShadow: hoveredCard === 'varsity'
                       ? '0 6px 16px rgba(251, 191, 36, 0.4)'
                       : '0 4px 12px rgba(251, 191, 36, 0.3)',
@@ -838,7 +838,7 @@ export function ISOEvaluationModal({
                   textAlign: 'center',
                   marginTop: '8px',
                   marginBottom: 0,
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   You won't be charged until your coach accepts your ISO. If they don't respond within 48 hours, we'll match you with another coach or cancel your request.
                 </p>
@@ -853,7 +853,7 @@ export function ISOEvaluationModal({
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '24px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Payment Information
               </h3>
@@ -862,7 +862,7 @@ export function ISOEvaluationModal({
                 color: '#94a3b8',
                 lineHeight: '1.6',
                 marginBottom: '24px',
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
               }}>
                 Enter your payment details below. Your card will not be charged until {coachName} accepts your ISO request.
               </p>
@@ -875,7 +875,7 @@ export function ISOEvaluationModal({
                     fontWeight: '600',
                     color: '#cbd5e1',
                     marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Card Number
                   </label>
@@ -891,7 +891,7 @@ export function ISOEvaluationModal({
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       color: 'white',
                       fontSize: '1rem',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}
                   />
                       </div>
@@ -904,7 +904,7 @@ export function ISOEvaluationModal({
                       fontWeight: '600',
                       color: '#cbd5e1',
                       marginBottom: '8px',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}>
                       Expiry Date
                     </label>
@@ -920,7 +920,7 @@ export function ISOEvaluationModal({
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         color: 'white',
                         fontSize: '1rem',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}
                     />
                       </div>
@@ -931,7 +931,7 @@ export function ISOEvaluationModal({
                       fontWeight: '600',
                       color: '#cbd5e1',
                       marginBottom: '8px',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}>
                       CVV
                     </label>
@@ -947,7 +947,7 @@ export function ISOEvaluationModal({
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         color: 'white',
                         fontSize: '1rem',
-                        fontFamily: "'Poppins', sans-serif",
+                        fontFamily: "'Bebas Neue', sans-serif",
                       }}
                     />
                   </div>
@@ -960,7 +960,7 @@ export function ISOEvaluationModal({
                     fontWeight: '600',
                     color: '#cbd5e1',
                     marginBottom: '8px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     Name on Card
                   </label>
@@ -976,7 +976,7 @@ export function ISOEvaluationModal({
                       border: '1px solid rgba(255, 255, 255, 0.1)',
                       color: 'white',
                       fontSize: '1rem',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}
                   />
                 </div>
@@ -993,7 +993,7 @@ export function ISOEvaluationModal({
                   backgroundColor: 'rgba(251, 191, 36, 0.1)',
                   borderRadius: '8px',
                   border: '1px solid rgba(251, 191, 36, 0.2)',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   You won't be charged until your coach accepts your ISO. If they don't respond within 48 hours, we'll match you with another coach or cancel your request.
                 </p>
@@ -1013,7 +1013,7 @@ export function ISOEvaluationModal({
                       border: 'none',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease-out',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}
                   >
                     Back
@@ -1032,7 +1032,7 @@ export function ISOEvaluationModal({
                       border: 'none',
                       cursor: isSubmitting ? 'not-allowed' : 'pointer',
                       transition: 'all 0.3s ease-out',
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "'Bebas Neue', sans-serif",
                     }}
                   >
                     {isSubmitting ? 'Processing...' : 'Submit ISO Request'}

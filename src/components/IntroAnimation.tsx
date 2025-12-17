@@ -128,7 +128,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
 
   if (!shouldShow) return null;
 
-  const fontFamily = "'Poppins', 'Inter', sans-serif";
+  const fontFamily = "'Bebas Neue', sans-serif";
 
   return (
     <div

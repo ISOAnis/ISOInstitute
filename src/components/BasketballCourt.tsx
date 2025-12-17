@@ -482,7 +482,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
         id="iso-court" 
         className="pt-8 pb-20 px-4 sm:px-6 lg:px-8"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+          background: '#030305',
         }}
       >
         <div className="max-w-7xl mx-auto">
@@ -492,17 +492,17 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               fontSize: '3.75rem', 
               fontWeight: 'bold', 
               color: 'white',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'Bebas Neue, sans-serif',
               textAlign: 'center',
               maxWidth: '1280px',
               margin: '0 auto 40px auto',
               padding: '40px 60px',
               borderRadius: '24px',
-              background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(168, 85, 247, 0.15) 100%)',
-              border: '1px solid rgba(249, 115, 22, 0.2)',
+              background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               position: 'relative',
               overflow: 'hidden',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(249, 115, 22, 0.1)'
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 255, 255, 0.02)'
             }}
           >
             {/* Animated gradient overlay */}
@@ -513,14 +513,19 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                 left: 0,
                 right: 0,
                 bottom: 0,
-                background: 'radial-gradient(circle at 30% 50%, rgba(249, 115, 22, 0.2) 0%, transparent 50%), radial-gradient(circle at 70% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%)',
+                background: 'radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 50%), radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%)',
                 pointerEvents: 'none',
                 zIndex: 0,
                 animation: 'pulse 4s ease-in-out infinite'
               }}
             />
             <span style={{ position: 'relative', zIndex: 1 }}>
-            The court is not the end, it's the <span style={{color: '#f97316'}}>beginning</span>.
+            The court is not the end, it's the <span style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>beginning</span>.
             </span>
             <style>
               {`
@@ -540,15 +545,15 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
 
           {/* Mode Toggle */}
           <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+            <div className="flex items-center gap-2 backdrop-blur-[10px] rounded-xl p-1" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
               <motion.button
                 onClick={() => setMode('explore')}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   mode === 'explore'
-                    ? 'bg-orange-500 text-white'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-white text-black'
+                    : 'text-white hover:text-white'
                 }`}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 whileHover={{ scale: mode === 'explore' ? 1 : 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -559,10 +564,10 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                 onClick={() => setMode('learn')}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   mode === 'learn'
-                    ? 'bg-orange-500 text-white'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-white text-black'
+                    : 'text-white hover:text-white'
                 }`}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 whileHover={{ scale: mode === 'learn' ? 1 : 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -572,15 +577,15 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
             </div>
 
             {mode === 'learn' && (
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-[10px] border border-orange-500/30 rounded-xl p-1">
+              <div className="flex items-center gap-2 backdrop-blur-[10px] rounded-xl p-1" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
                 <motion.button
                   onClick={() => setRole('players')}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                     role === 'players'
-                      ? 'bg-orange-500 text-white'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'bg-white text-black'
+                      : 'text-white hover:text-white'
                   }`}
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   whileHover={{ scale: role === 'players' ? 1 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -591,10 +596,10 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                   onClick={() => setRole('coaches')}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                     role === 'coaches'
-                      ? 'bg-orange-500 text-white'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'bg-white text-black'
+                      : 'text-white hover:text-white'
                   }`}
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   whileHover={{ scale: role === 'coaches' ? 1 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -791,10 +796,10 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               </defs>
               
               {/* Court background - fills entire container */}
-              <rect x="0" y="0" width="800" height="500" fill="#1e293b" rx="8" />
+              <rect x="0" y="0" width="800" height="500" fill="#0a0a0f" rx="8" />
               
               {/* Court lines - no glow */}
-              <g stroke="#475569" strokeWidth="3" fill="none">
+              <g stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" fill="none">
                 {/* Outer boundary - sides and top only (no bottom line) - top line ends at 3-point line intersection */}
                 <path d="M 140 10 L 660 10 M 790 10 L 790 490 M 10 490 L 10 10" strokeLinecap="round" />
                 
@@ -838,10 +843,10 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                     <Lock className="w-8 h-8 text-orange-400" />
                   </div>
                   <h3 className="text-white mb-3">Commitment Period Active</h3>
-                  <p className="text-slate-400 mb-4">
+                  <p className="text-white/70 mb-4">
                     You're currently committed to <span className="text-orange-400">{commitmentStatus.category}</span> with {commitmentStatus.mentorName}.
                   </p>
-                  <div className="flex items-center justify-center gap-2 text-slate-400 mb-6">
+                  <div className="flex items-center justify-center gap-2 text-white/70 mb-6">
                     <Clock className="w-5 h-5" />
                     <span>{commitmentStatus.daysRemaining} days remaining until you can explore other pathways</span>
                   </div>
@@ -859,8 +864,8 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
             <div className="pathway-description-panel" style={{
               width: '100%',
               minHeight: '500px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 107, 53, 0.2)',
+              background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '20px',
               padding: '40px',
               display: 'flex',
@@ -888,25 +893,25 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                       </div>
                       <h3
                         className="text-3xl lg:text-4xl font-bold mb-4 text-white"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                       >
                         {hoveredCategory.title}
                       </h3>
                       <p
                         className="text-lg lg:text-xl text-white leading-relaxed max-w-[500px] mx-auto mb-4"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                       >
                         {hoveredCategory.description}
                       </p>
                       <p
                         className="text-base lg:text-lg text-orange-500 italic mb-6"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                       >
                         {hoveredCategory.tagline}
                       </p>
                       <p
                         className="text-lg lg:text-xl text-white font-bold border-t border-orange-500/30 pt-4"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                       >
                         Press the pathway to view coaches
                       </p>
@@ -922,13 +927,13 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                 >
                   <p
                     className="text-lg lg:text-xl text-white leading-relaxed max-w-[500px] mx-auto mb-6"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   >
                     Inspired by basketball, ISO makes professional coaching relatable, human, and culturally grounded. ISO offers 6 pathways of growth and development in your field of interest.
                   </p>
                   <p
                     className="text-base lg:text-lg"
-                    style={{ fontFamily: "'Poppins', sans-serif", color: '#f97316' }}
+                    style={{ fontFamily: "'Bebas Neue', sans-serif", color: 'rgba(255, 255, 255, 0.7)' }}
                   >
                     Hover over a pathway to learn more
                   </p>
@@ -982,7 +987,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               <Lock className="w-8 h-8 text-orange-400" />
             </div>
             <h3 className="text-white text-center mb-4">Already Committed</h3>
-            <p className="text-slate-400 text-center mb-6">
+            <p className="text-white/70 text-center mb-6">
               You're currently working with {commitmentStatus?.mentorName} in <span className="text-orange-400">{commitmentStatus?.category}</span>. 
               Complete your 30-day commitment period before exploring other pathways.
             </p>
@@ -1021,8 +1026,8 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
           width: 100%;
           height: 500px;
           position: relative;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 107, 53, 0.2);
+          background: linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 20px;
         }
 
@@ -1060,8 +1065,8 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
         .pathway-description-panel {
           width: 100%;
           min-height: 500px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 107, 53, 0.2);
+          background: linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 20px;
           padding: 40px;
           display: flex;

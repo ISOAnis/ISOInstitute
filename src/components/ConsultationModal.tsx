@@ -153,13 +153,13 @@ export function ConsultationModal({
                 </div>
                 <h2 
                   className="text-white text-3xl font-bold mb-2"
-                  style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '700' }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '700' }}
                 >
                   Schedule with {coachName}
                 </h2>
                 <p 
                   className="text-white/80 text-base"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 >
                   Choose your preferred date and time slot
                 </p>
@@ -182,7 +182,7 @@ export function ConsultationModal({
                     </div>
                     <h3 
                       className="text-white text-lg font-semibold"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                     >
                       Select Date
                     </h3>
@@ -211,7 +211,7 @@ export function ConsultationModal({
                     </div>
                     <h3 
                       className="text-white text-lg font-semibold"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                     >
                       Select Time
                     </h3>
@@ -259,7 +259,7 @@ export function ConsultationModal({
                   onClick={handleSchedule}
                   disabled={isSubmitting || !selectedDate || !selectedTimeSlot}
                   className="group relative w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 rounded-xl font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 disabled:hover:shadow-orange-500/20 overflow-hidden"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     {isSubmitting ? (
@@ -321,7 +321,7 @@ export function ConsultationModal({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
                 className="text-white text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent"
-                style={{ fontFamily: "'Poppins', sans-serif", fontWeight: '800' }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '800' }}
               >
                 ISO Request Submitted!
               </motion.h2>
@@ -334,7 +334,7 @@ export function ConsultationModal({
               >
                 <p 
                   className="text-slate-200 text-lg mb-3"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                 >
                   Your consultation with <span className="text-orange-400 font-semibold">{coachName}</span> has been scheduled for
                 </p>
@@ -353,7 +353,7 @@ export function ConsultationModal({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="text-slate-300 text-base mb-8 max-w-md mx-auto leading-relaxed"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
                 Once the coach accepts your request, check your portal or email for confirmation and video link.
               </motion.p>
@@ -364,7 +364,7 @@ export function ConsultationModal({
                 transition={{ delay: 0.7 }}
                 onClick={handleSuccessButtonClick}
                 className="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 flex items-center gap-2 mx-auto"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
                 See ISO Membership Options
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

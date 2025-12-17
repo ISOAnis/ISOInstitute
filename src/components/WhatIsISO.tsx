@@ -7,7 +7,7 @@ export function WhatIsISO() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Large Text */}
             <div>
-              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                 <span className="text-slate-400">Where faith and</span>
                 <br />
                 <span className="text-white">coaching meet the</span>
@@ -18,7 +18,7 @@ export function WhatIsISO() {
             
             {/* Right: Description */}
             <div>
-              <p className="text-lg sm:text-xl text-slate-300 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              <p className="text-lg sm:text-xl text-slate-300 leading-relaxed" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                 ISO Institute bridges the gap between spiritual guidance and professional development, 
                 using basketball as the universal language that connects coaches and players.
               </p>
@@ -30,7 +30,7 @@ export function WhatIsISO() {
         <div className="border-t border-slate-800 pt-16 lg:pt-20">
           {/* Section Header */}
           <div className="mb-12">
-            <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
               What Calling an ISO means
             </p>
           </div>
@@ -38,7 +38,7 @@ export function WhatIsISO() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: "Call an ISO" Large Text */}
             <div>
-              <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                 <span className="text-slate-400">Call</span>
                 <br />
                 <span className="text-white">an ISO</span>
@@ -47,7 +47,7 @@ export function WhatIsISO() {
             
             {/* Right: Description */}
             <div>
-              <div className="space-y-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              <div className="space-y-4" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                 <p className="text-lg sm:text-xl text-slate-300 leading-relaxed">
                   In basketball, calling an ISO means isolating a player one-on-one against their defender. 
                   It's about trusting your skills, relying on your preparation, and taking control of the moment.

@@ -255,8 +255,8 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
 
   if (showLockedMessage) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-slate-900 rounded-2xl border border-slate-800 p-8 text-center">
+      <div className="min-h-screen text-white flex items-center justify-center p-8" style={{ background: '#030305' }}>
+        <div className="max-w-md w-full rounded-2xl border border-white/10 p-8 text-center" style={{ background: '#0a0a0f' }}>
           <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-orange-400" />
           </div>
@@ -278,7 +278,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex rounded-2xl overflow-hidden">
+    <div className="min-h-screen text-white flex rounded-2xl overflow-hidden" style={{ background: '#030305' }}>
       {/* Locked Pathway Overlay */}
       {showLockedOverlay && (
         <div 
@@ -286,7 +286,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
           onClick={() => setShowLockedOverlay(false)}
         >
           <div 
-            className="bg-slate-900 rounded-2xl border border-slate-800 p-8 max-w-md w-full text-center"
+            className="rounded-2xl border border-white/10 p-8 max-w-md w-full text-center" style={{ background: '#0a0a0f' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -310,7 +310,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
       )}
 
       {/* Sidebar - Pathway Channels */}
-      <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col rounded-l-2xl overflow-hidden">
+      <div className="w-64 border-r border-white/10 flex flex-col rounded-l-2xl overflow-hidden" style={{ background: '#0a0a0f' }}>
         <div className="p-4 border-b border-slate-800">
           <h2 className="text-white font-bold text-lg mb-1">🏀 Locker Room</h2>
           <p className="text-slate-400 text-xs">
@@ -354,7 +354,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
         </div>
 
         {/* Exit Button - Always visible at bottom left */}
-        <div className="p-4 border-t border-slate-800 bg-slate-900/50">
+        <div className="p-4 border-t border-white/10" style={{ background: 'rgba(10, 10, 15, 0.5)' }}>
           {onClose ? (
             <button
               onClick={onClose}

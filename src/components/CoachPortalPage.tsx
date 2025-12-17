@@ -15,7 +15,7 @@ export function CoachPortalPage({ onNavigate }: CoachPortalPageProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen text-white" style={{ background: '#030305' }}>
       <Navigation currentPage="coach-portal" onNavigate={onNavigate} />
       <div className="pt-32 pb-16">
         <CoachPortal />

@@ -54,7 +54,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
       num: "04",
       tag: "LEVEL UP YOUR GAME",
       title: "Unlock Your Potential",
-      desc: "Measure your growth, celebrate wins, and continue evolving. Access advanced features and take your development to the next level."
+      desc: "Measure your growth, celebrate wins, and continue evolving. Flex your achievements and development through ISO apparel, which is unlocked exclusively through your hard work and dedication to the movement."
     }
   ];
 
@@ -68,7 +68,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
     {
       num: "02",
       tag: "CONNECT & COMMIT",
-      title: "Accept ISO",
+      title: "Accept ISO Requests",
       desc: "Review and accept ISO requests from players. Schedule your first coaching session and begin building a transformative coach-player relationship."
     },
     {
@@ -80,8 +80,8 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
     {
       num: "04",
       tag: "LEVEL UP",
-      title: "Become a Platinum Coach",
-      desc: "Increase your overall rating through exceptional coaching, gain premium visibility to attract more players, and unlock advanced tools to scale your impact."
+      title: "Become a Hall of Fame Coach",
+      desc: "Increase your overall rating through exceptional coaching, gain premium visibility to attract more players, and unlock exclusive coach apparel. Be celebrated like a superstar."
     }
   ];
 
@@ -165,24 +165,15 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               width: '100%',
               borderRadius: '16px',
               overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 25%, rgba(51, 65, 85, 0.85) 50%, rgba(30, 41, 59, 0.9) 75%, rgba(15, 23, 42, 0.95) 100%)',
+              background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               padding: index === 1 && role === 'coaches' ? '40px' : '24px',
-              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(249, 115, 22, 0.25)',
+              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.6)',
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <div style={{
-                position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-                background: 'radial-gradient(circle at 20% 40%, rgba(249, 115, 22, 0.25) 0%, transparent 60%), radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.25) 0%, transparent 60%)',
-            pointerEvents: 'none',
-                zIndex: 1
-              }}></div>
               <img
                 src={demoImages[index]}
                 alt={`Feature ${index + 1}`}
@@ -223,7 +214,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               </h2>
               <p style={{
                 fontSize: '18px',
-                color: '#94a3b8',
+                color: 'rgba(255, 255, 255, 0.7)',
                 lineHeight: '1.8',
                 marginBottom: '32px'
               }}>

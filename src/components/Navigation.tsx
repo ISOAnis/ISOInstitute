@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store';
 type UserRole = 'coach' | 'player' | 'community-leader';
 
 interface User {
@@ -100,16 +100,17 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
       <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
         <div className="w-full max-w-5xl">
           <div
-            className={`flex items-center justify-between rounded-full border px-5 py-2 shadow-lg transition-all duration-300 ${
+            className={`flex items-center justify-between rounded-full px-5 py-2 shadow-lg transition-all duration-300 ${
               isScrolled
-                ? 'border-slate-800 bg-black/90 shadow-black/60 backdrop-blur-[40px]'
-                : 'border-slate-800 bg-black/65 shadow-black/30 backdrop-blur-[16px]'
+                ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
+                : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
             }`}
+            style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
           >
             <div className="flex items-center gap-3">
               <button onClick={() => onNavigate('home')} className="flex items-center gap-3 group hover:opacity-80 transition-opacity cursor-pointer">
                 <img 
-                  src="/ISO-logo-v2.jpg" 
+                  src="/ISOMetallic.png" 
                   alt="ISO Logo" 
                   className="h-10 w-auto object-contain cursor-pointer" onClick={() => onNavigate('home')} 
                   onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
@@ -127,7 +128,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 > 
                   <span className="text-white text-lg">☪️</span> 
                 </div> 
-                <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                   ISO Institute
                 </span>
               </button>
@@ -136,7 +137,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             <div className="flex items-center gap-6 text-sm">
               <button 
                 onClick={() => onNavigate('pathways')}
-                className={`transition-colors ${currentPage === 'pathways' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
               >
                 Pathways
               </button>
@@ -151,9 +152,16 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
               )}
               <button 
                 onClick={() => onNavigate('about')}
-                className={`transition-colors ${currentPage === 'about' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
               >
                 About
+              </button>
+
+              <button 
+                onClick={() => onNavigate('store')}
+                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                Store
               </button>
               
               {/* Portal Dropdown */}
@@ -161,20 +169,21 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 <button 
                   onClick={() => setShowPortalDropdown(!showPortalDropdown)}
                   onBlur={() => setTimeout(() => setShowPortalDropdown(false), 200)}
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                  className="flex items-center gap-1"
+                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
                 >
                   Portals
                   <ChevronDown className={`w-4 h-4 transition-transform ${showPortalDropdown ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {showPortalDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden">
+                  <div className="absolute top-full right-0 mt-2 w-48 border border-white/10 rounded-xl shadow-xl overflow-hidden" style={{ background: '#0a0a0f' }}>
                     <button
                       onClick={() => {
                         setShowCoachLogin(true);
                         setShowPortalDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
                       Coach Portal
                     </button>
@@ -183,7 +192,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                         setShowPlayerLogin(true);
                         setShowPortalDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     >
                       Player Portal
                     </button>
@@ -194,7 +203,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                           setShowCoachLogin(true);
                           setShowPortalDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                        className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                       >
                         Community Portal
                       </button>
@@ -204,10 +213,10 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
               </div>
               
               <button 
-                onClick={() => setShowSignupModal(true)}
-                className="create-account-btn relative bg-orange-500 text-white px-6 py-2 rounded-full overflow-hidden"
+                onClick={() => setShowPlayerLogin(true)}
+                className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
               >
-                <span className="relative z-10 transition-colors duration-500 inline-block">Create an Account</span>
+                <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Log In</span>
               </button>
             </div>
           </div>
@@ -220,15 +229,23 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
           title="Coach Portal Sign In"
           onClose={() => setShowCoachLogin(false)}
           onLogin={handleCoachLogin}
+          onSignupClick={() => {
+            setShowCoachLogin(false);
+            setShowSignupModal(true);
+          }}
         />
       )}
 
       {/* Player Login Modal */}
       {showPlayerLogin && (
         <LoginModal
-          title="Player Portal Sign In"
+          title="Log In"
           onClose={() => setShowPlayerLogin(false)}
           onLogin={handlePlayerLogin}
+          onSignupClick={() => {
+            setShowPlayerLogin(false);
+            setShowSignupModal(true);
+          }}
         />
       )}
 

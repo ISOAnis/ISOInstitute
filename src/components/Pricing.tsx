@@ -134,11 +134,12 @@ export function Pricing() {
       title: 'Locker Room Pass',
       badge: 'Best Value',
       badgeColor: 'bg-orange-500',
-      price: '$5/month',
-      description: 'Perfect for those who want extra inspiration, content, and community without committing to the full varsity program.',
+      price: '$10/month',
+      description: 'Perfect for those who want extra inspiration, content, community, and ISO apparel without committing to the full varsity program.',
       features: [
         'Everything in Walk-On',
         'Full access to The Locker Room video library',
+        'Access to Locker Room Store',
         'Community discussions',
         'Motivational content drops',
         'Early event announcements',
@@ -162,6 +163,7 @@ export function Pricing() {
         'Resume review & interview prep',
         'Professional network & referrals',
         'Locker Room included',
+        'Access to Locker Room Store + The Journey Store',
         'Priority event access',
       ],
       buttonText: 'Meet the Coaches',
@@ -174,7 +176,7 @@ export function Pricing() {
   return (
     <>
     <section style={{
-      background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+      background: '#030305',
         paddingTop: '50px',
         paddingBottom: '50px',
         paddingLeft: '20px',
@@ -194,17 +196,17 @@ export function Pricing() {
             fontWeight: 'bold',
             color: 'white',
             marginBottom: '12px',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Membership Options
           </h2>
           <p style={{
             fontSize: '1.25rem',
-            color: '#94a3b8',
+            color: 'rgba(255, 255, 255, 0.7)',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.75',
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "'Bebas Neue', sans-serif",
           }}>
             Choose what fits your journey. ISO is designed to meet you where you are.
           </p>
@@ -236,7 +238,7 @@ export function Pricing() {
               onMouseLeave={() => setHoveredCard(null)}
               style={{
                 position: 'relative',
-                  background: '#0f172a',
+                  background: '#0a0a0f',
                 borderRadius: '20px',
                   padding: '18px 16px',
                 transition: 'transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out',
@@ -269,7 +271,7 @@ export function Pricing() {
                   fontWeight: 'bold',
                   color: 'white',
                   marginBottom: '16px',
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   {card.title}
                 </h3>
@@ -282,14 +284,14 @@ export function Pricing() {
                     fontSize: '1.1rem',
                     fontWeight: 'bold',
                     color: 'white',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     {card.price}
                   </div>
                   {card.priceSubtext && (
                     <div style={{
                       fontSize: '0.875rem',
-                      color: '#94a3b8',
+                      color: 'rgba(255, 255, 255, 0.7)',
                       marginTop: '4px',
                       fontStyle: 'italic',
                     }}>
@@ -302,10 +304,10 @@ export function Pricing() {
                 {card.description && (
                   <p style={{
                     fontSize: '1rem',
-                    color: '#94a3b8',
+                    color: 'rgba(255, 255, 255, 0.7)',
                     lineHeight: '1.6',
                     marginBottom: '24px',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                   }}>
                     {card.description}
                   </p>
@@ -324,7 +326,7 @@ export function Pricing() {
                       key={index}
                       style={{
                         display: 'flex',
-                        alignItems: 'flex-start',
+                        alignItems: 'center',
                         marginBottom: '8px',
                         fontSize: '0.9rem',
                         color: '#cbd5e1',
@@ -334,10 +336,10 @@ export function Pricing() {
                       <span style={{
                         color: '#f97316',
                         marginRight: '12px',
-                        fontSize: '1.25rem',
+                        fontSize: '0.5rem',
                         flexShrink: 0,
-                      }}>•</span>
-                      <span style={{ fontFamily: "'Poppins', sans-serif" }}>{feature}</span>
+                      }}>●</span>
+                      <span style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -357,7 +359,7 @@ export function Pricing() {
                     border: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease-out',
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     boxShadow: hoveredCard === card.id
                       ? '0 4px 14px rgba(0, 0, 0, 0.35)'
                       : '0 2px 8px rgba(0, 0, 0, 0.2)',
@@ -383,23 +385,23 @@ export function Pricing() {
         </div>
       </div>
     </section>
-      {/* Competitive Landscape */}
-      <section 
+      {/* Competitive Landscape - temporarily hidden */}
+      {false && <section 
         className="border-t border-white/5"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+          background: '#030305',
         }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
           <div className="text-center max-w-4xl mx-auto mb-12 lg:mb-16">
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400 mb-4">How We Compare</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">How We Compare</p>
             <h2 className="text-4xl sm:text-5xl font-bold">Competitive Landscape — ISO vs. Existing Solutions</h2>
-            <p className="text-slate-300 mt-4">The mentorship market is fragmented. ISO delivers what others can’t: guaranteed, affordable, culturally-aligned guidance.</p>
+            <p className="text-white/70 mt-4">The mentorship market is fragmented. ISO delivers what others can’t: guaranteed, affordable, culturally-aligned guidance.</p>
           </div>
 
           <div className="rounded-3xl border border-white/5 bg-slate-900/70 p-4 lg:p-6 overflow-x-auto">
             <table className="w-full border-collapse text-sm">
-              <thead className="text-left text-slate-300 uppercase text-xs tracking-[0.3em]">
+              <thead className="text-left text-white/70 uppercase text-xs tracking-[0.3em]">
                 <tr>
                   <th className="py-3 pl-2 font-semibold border-b border-white/5">
                     Key Features &amp; Focus
@@ -416,7 +418,7 @@ export function Pricing() {
                     >
                       {company.highlight ? (
                         <img
-                          src="/ISO-logo-v2.jpg"
+                          src="/ISOMetallic.png"
                           alt="ISO Institute"
                           style={{ height: '42px', width: 'auto', margin: '0 auto' }}
                         />
@@ -460,13 +462,13 @@ export function Pricing() {
                 </div>
                 <div>
                   <p className="font-semibold text-lg mb-2">{benefit.title}</p>
-                  <p className="text-sm text-slate-400 leading-relaxed">{benefit.description}</p>
+                  <p className="text-sm text-white/70 leading-relaxed">{benefit.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </section>}
     </>
   );
 }

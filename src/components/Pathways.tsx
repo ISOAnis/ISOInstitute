@@ -85,19 +85,19 @@ export function Pathways({ onNavigate }: PathwaysProps) {
     <div 
       className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8"
       style={{
-        background: 'radial-gradient(ellipse at center, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 1) 100%)',
+        background: '#030305',
       }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-block mb-6">
-            <span className="px-4 py-2 bg-slate-900 text-orange-400 rounded-full border border-slate-800">
+            <span className="px-4 py-2 bg-slate-900 text-white/70 rounded-full border border-white/10">
               Six Pathways to Growth
             </span>
           </div>
           <h1 className="text-white mb-4">Explore Your Path</h1>
-          <p className="text-slate-400 text-xl max-w-3xl mx-auto">
+          <p className="text-white/70 text-xl max-w-3xl mx-auto">
             ISO offers mentorship across six key pathways. Each pathway is designed to help you grow with discipline, faith, and purpose — guided by coaches who've walked the path before you.
           </p>
         </div>
@@ -117,10 +117,10 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-white mb-2">{pathway.name}</h3>
-                  <p className="text-slate-300 mb-3">
+                  <p className="text-white/70 mb-3">
                     {pathway.description}
                   </p>
-                  <p className="text-slate-400 italic">
+                  <p className="text-white/70 italic">
                     {pathway.tagline}
                   </p>
                 </div>
@@ -139,7 +139,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <span className="text-orange-400 text-2xl">1</span>
               </div>
               <h4 className="text-white mb-2">Choose Your Pathway</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 Select the area where you want to grow. Each pathway has experienced coaches ready to guide you.
               </p>
             </div>
@@ -149,7 +149,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <span className="text-orange-400 text-2xl">2</span>
               </div>
               <h4 className="text-white mb-2">Connect with a Coach</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 Book a session with a mentor who aligns with your goals and schedule.
               </p>
             </div>
@@ -159,7 +159,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <span className="text-orange-400 text-2xl">3</span>
               </div>
               <h4 className="text-white mb-2">Start Getting Buckets</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 Set micro-goals, win games, and work toward your championship ring — all while building discipline and faith.
               </p>
             </div>
@@ -169,7 +169,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
         {/* Progress System Overview */}
         <div className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30 p-6 mb-8">
           <h2 className="text-white text-center mb-2">The ISO Progress System</h2>
-          <p className="text-slate-400 text-center mb-6 text-sm">
+          <p className="text-white/70 text-center mb-6 text-sm">
             Progress through levels based on your commitment and growth. Start where you're ready.
           </p>
           
@@ -220,7 +220,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <Target className="w-5 h-5 text-orange-400 mt-0.5" />
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-1">Start Where You're Ready</h4>
-                  <p className="text-slate-400 text-xs">
+                  <p className="text-white/70 text-xs">
                     Your initial level is determined by your knowledge base and experience. No need to start from the beginning if you're already advanced.
                   </p>
                 </div>
@@ -229,7 +229,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <Clock className="w-5 h-5 text-orange-400 mt-0.5" />
                 <div>
                   <h4 className="text-white text-sm font-semibold mb-1">Minimum Timeframes</h4>
-                  <p className="text-slate-400 text-xs">
+                  <p className="text-white/70 text-xs">
                     Each level has a minimum commitment period to ensure proper growth and mastery before advancing.
                   </p>
                 </div>
@@ -248,7 +248,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <Circle className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Get Buckets (Micro-Goals)</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 Small, actionable steps you take each week. Every bucket counts toward winning the game.
               </p>
             </div>
@@ -258,7 +258,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <Trophy className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Win Games (Major Milestones)</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 Complete a series of buckets to win a game. Each game represents a significant achievement in your pathway.
               </p>
             </div>
@@ -268,7 +268,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
                 <ArrowUp className="w-8 h-8 text-orange-400" />
               </div>
               <h4 className="text-white mb-2">Level Up</h4>
-              <p className="text-slate-400">
+              <p className="text-white/70">
                 After meeting minimum timeframes and completing required games, you advance to the next level.
               </p>
             </div>
@@ -277,7 +277,7 @@ export function Pathways({ onNavigate }: PathwaysProps) {
 
         {/* Call to Action */}
         <div className="mt-16 text-center">
-          <p className="text-slate-400 mb-6">
+          <p className="text-white/70 mb-6">
             Ready to start your journey?
           </p>
           <button className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors" onClick={handleExploreCourt}>
