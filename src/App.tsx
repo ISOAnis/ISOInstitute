@@ -1,3 +1,36 @@
+/**
+ * =============================================================================
+ * TEMPORARY SPLASH PAGE BRANCH
+ * =============================================================================
+ * 
+ * This branch (SplashPage) renders ONLY the EventSplashPage component.
+ * The full site is being developed on the main branch.
+ * 
+ * TO RESTORE THE FULL SITE:
+ * 1. Switch to the main branch, OR
+ * 2. Uncomment the FullApp component below and comment out the EventSplashPage import/render
+ * 
+ * REMOVE THIS MODIFICATION AND DELETE src/pages/EventSplashPage.tsx
+ * WHEN THE FULL SITE IS READY TO LAUNCH.
+ * =============================================================================
+ */
+
+import * as React from 'react';
+import EventSplashPage from './pages/EventSplashPage';
+
+// =============================================================================
+// SPLASH PAGE ONLY - This branch shows only the event splash page
+// =============================================================================
+export default function App() {
+  return <EventSplashPage />;
+}
+
+// =============================================================================
+// FULL SITE CODE (PRESERVED BELOW - DO NOT DELETE)
+// Uncomment this section and comment out the above when restoring full site
+// =============================================================================
+
+/*
 import { useState, Suspense, lazy } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
@@ -28,7 +61,7 @@ const LoadingSpinner = () => (
   </div>
 );
 
-export default function App() {
+export default function FullApp() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedCoachName, setSelectedCoachName] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -124,17 +157,17 @@ export default function App() {
       
       {currentPage === 'home' && (
         <>
-          {/* New Simple Hero Section */}
+          {/* New Simple Hero Section *}
           <Suspense fallback={<LoadingSpinner />}>
             <Hero onNavigate={setCurrentPage} />
           </Suspense>
           
-          {/* Why ISO Section */}
+          {/* Why ISO Section *}
           <Suspense fallback={<LoadingSpinner />}>
             <WhyISO />
           </Suspense>
           
-          {/* Basketball Court Section */}
+          {/* Basketball Court Section *}
           <div id="iso-court">
             <Suspense fallback={<LoadingSpinner />}>
               <BasketballCourt 
@@ -152,7 +185,7 @@ export default function App() {
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <ProductShowcase />
           </Suspense>
-          */}
+          *}
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
             <Pricing />
           </Suspense>
@@ -171,14 +204,14 @@ export default function App() {
         </Suspense>
       )}
 
-      {/* Community page - temporarily hidden */}
+      {/* Community page - temporarily hidden *}
       {false && currentPage === 'community' && (
         <Suspense fallback={<LoadingSpinner />}>
         <ISOCommunity />
         </Suspense>
       )}
 
-      {/* Call ISO page */}
+      {/* Call ISO page *}
       {currentPage === 'call-iso' && selectedCoachName && (
         <Suspense fallback={<LoadingSpinner />}>
           <CallIsoPage 
@@ -190,7 +223,7 @@ export default function App() {
 
       {currentPage !== 'call-iso' && <Footer onNavigate={setCurrentPage} />}
 
-      {/* Consultation Modal - shown before Call ISO page */}
+      {/* Consultation Modal - shown before Call ISO page *}
       {showConsultationModal && pendingCoachName && (
         <ConsultationModal
           coachName={pendingCoachName}
@@ -206,3 +239,4 @@ export default function App() {
     </div>
   );
 }
+*/
