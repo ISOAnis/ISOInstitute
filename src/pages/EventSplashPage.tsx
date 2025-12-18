@@ -35,13 +35,13 @@ interface WaitlistFormData {
 
 // Social media links - replace with actual URLs
 const SOCIAL_LINKS = {
-  instagram: 'https://instagram.com/iso_institute',
+  instagram: 'https://www.instagram.com/isoinstitute/',
   tiktok: 'https://tiktok.com/@iso_institute',
-  linkedin: 'https://linkedin.com/company/iso-institute',
+  linkedin: 'https://www.linkedin.com/company/isoinstitute/',
 };
 
-// Pilot program application URL - replace with actual form URL
-const PILOT_APPLICATION_URL = 'https://example.com/pilot-application';
+// Pilot program application URL - Typeform application
+const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 
 // =============================================================================
 // COMPONENTS
@@ -354,71 +354,65 @@ function PilotInfoModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Backdrop */}
+        <>
+          <style>{`
+            .pilot-list li::marker {
+              color: white;
+            }
+          `}</style>
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={onClose}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-          />
-
-          {/* Modal Content */}
-          <motion.div
-            className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0c] p-8 shadow-2xl"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
-            {/* Close button */}
-            <button
+            {/* Backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
               onClick={onClose}
-              className="absolute right-4 top-4 text-white/50 transition-colors hover:text-white"
-              aria-label="Close modal"
-            >
-              <X size={24} />
-            </button>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
 
-            <h2
-              className="mb-2 text-3xl font-bold text-white"
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+            {/* Modal Content */}
+            <motion.div
+              className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0c] p-8 shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
-              Pilot Program
-            </h2>
-            <p className="mb-6 text-white">
-              Join an exclusive group of early adopters shaping the future of ISO.
-            </p>
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="absolute right-4 top-4 text-white/50 transition-colors hover:text-white"
+                aria-label="Close modal"
+              >
+                <X size={24} />
+              </button>
 
-            <div className="mb-6 space-y-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
-                Application includes:
-              </h3>
-              <ul className="space-y-2 text-white">
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white" />
-                  Full name & date of birth
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white" />
-                  Email address
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white" />
-                  Acceptance of terms & conditions
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white" />
-                  Additional qualifying questions
-                </li>
-              </ul>
-            </div>
+              <h2
+                className="mb-2 text-3xl font-bold text-white"
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+              >
+                Pilot Program
+              </h2>
+              <p className="mb-6 text-white">
+                Join an exclusive group of early adopters shaping the future of ISO.
+              </p>
+
+              <div className="mb-6 space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
+                  Application includes:
+                </h3>
+                <ul className="pilot-list space-y-2 text-white list-disc ml-6">
+                  <li>Full name & date of birth</li>
+                  <li>Email address</li>
+                  <li>Acceptance of terms & conditions</li>
+                  <li>Additional qualifying questions</li>
+                </ul>
+              </div>
 
             <p className="mb-6 text-sm text-white">
               Limited spots available. All applications are reviewed.
@@ -433,6 +427,7 @@ function PilotInfoModal({
             </button>
           </motion.div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
@@ -702,7 +697,7 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A FAITH-ROOTED MOVEMENT INSPIRING AMBITION, ELEVATING TALENT, AND REBUILDING PATHWAYS TO SUCCESS.
+            A FAITH-DRIVEN MOVEMENT INSPIRING AMBITION, ELEVATING TALENT, AND REBUILDING PATHWAYS TO SUCCESS.
           </motion.p>
 
           {/* CTA Section */}
