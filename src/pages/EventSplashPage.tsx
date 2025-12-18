@@ -17,6 +17,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Linkedin, X } from 'lucide-react';
+import { saveWaitlistEntry } from '../utils/supabase';
 
 // =============================================================================
 // TYPES
@@ -65,7 +66,7 @@ function SplashNavigation() {
     <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
       <div className="w-full max-w-5xl">
         <div
-          className={`flex items-center justify-between rounded-full pl-5 pr-2 py-1.5 shadow-lg transition-all duration-300 ${
+          className={`flex items-center justify-between rounded-full pl-4 pr-3 h-12 shadow-lg transition-all duration-300 ${
             isScrolled
               ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
               : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
@@ -88,14 +89,12 @@ function SplashNavigation() {
           </div>
           
           {/* Coming Soon Button */}
-          <div className="flex items-center">
-            <button 
-              className="px-6 py-2 rounded-full bg-white text-black font-medium transition-all hover:bg-white/90"
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            >
-              Coming Soon
-            </button>
-          </div>
+          <button 
+            className="flex items-center justify-center rounded-full bg-white px-6 h-8 text-black font-medium transition-all hover:bg-white/90 leading-none mr-2"
+            style={{ fontFamily: "'Bebas Neue', sans-serif", height: '36px' }}
+          >
+            Coming Soon
+          </button>
         </div>
       </div>
     </nav>
@@ -136,26 +135,42 @@ function WaitlistModal({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // TODO: Replace with actual API call when backend is ready
-    // For now, just log the data and simulate a delay
-    console.log('Waitlist submission:', formData);
-    
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      // Save to database
+      const result = await saveWaitlistEntry({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone || undefined,
+      });
 
-    // Reset form after showing success
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ fullName: '', email: '', phone: '' });
-      onClose();
-    }, 2000);
+      if (!result.success) {
+        setError(result.error || 'Failed to save. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Success - show success message
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+
+      // Reset form after showing success
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({ fullName: '', email: '', phone: '' });
+        onClose();
+      }, 2000);
+    } catch (err) {
+      console.error('Error submitting waitlist:', err);
+      setError('An unexpected error occurred. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,6 +311,12 @@ function WaitlistModal({
                   <p className="text-xs text-white">
                     We'll only use this to keep you updated about ISO.
                   </p>
+
+                  {error && (
+                    <div className="rounded-xl bg-red-500/20 border border-red-500/50 px-4 py-3 text-sm text-red-200">
+                      {error}
+                    </div>
+                  )}
 
                   <button
                     type="submit"
@@ -631,16 +652,17 @@ export function EventSplashPage() {
           >
             You're Not Lost.
             <br />
+            <span>You're </span>
             <span
               style={{
                 background:
-                  'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+                  'linear-gradient(135deg, #ffffff 0%, #959595 40%, #b5b5b5 60%, #ffffff 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              You're In Search Of.
+              In Search Of.
             </span>
           </motion.h1>
 
@@ -657,7 +679,8 @@ export function EventSplashPage() {
 
           {/* Event Reference */}
           <motion.p
-            className="mb-12 text-sm uppercase tracking-[0.3em] text-white"
+            className="mb-12 text-lg uppercase tracking-[0.3em] text-white font-bold"
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
