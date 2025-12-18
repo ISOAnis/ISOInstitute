@@ -73,13 +73,8 @@ function SplashNavigation() {
           }`}
           style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
         >
-          {/* Logo and Brand */}
-          <div className="flex items-center gap-3">
-            <img 
-              src="/ISO OFFICIAL.png" 
-              alt="ISO Logo" 
-              className="h-10 w-auto object-contain" 
-            /> 
+          {/* Brand */}
+          <div className="flex items-center">
             <span 
               className="text-white text-lg font-semibold tracking-wide" 
               style={{ fontFamily: "'Bebas Neue', sans-serif" }}
