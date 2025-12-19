@@ -520,32 +520,30 @@ function SocialIconsRow() {
 }
 
 /**
- * CTA Button Component
+ * CTA Button Component with fluid color invert on hover
  */
 function CTAButton({
-  variant = 'primary',
   children,
   onClick,
 }: {
-  variant?: 'primary' | 'secondary';
   children: React.ReactNode;
   onClick?: () => void;
 }) {
-  const baseStyles =
-    'w-[260px] rounded-2xl px-8 py-4 text-lg font-semibold transition-all text-center';
-
-  const variants = {
-    primary:
-      'bg-white text-black hover:bg-white/90 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]',
-    secondary:
-      'border border-white/20 bg-white/5 text-white hover:border-white/40 hover:bg-white/10',
-  };
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.button
-      className={`${baseStyles} ${variants[variant]}`}
-      style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+      className="w-[260px] rounded-2xl px-8 py-4 text-base font-extrabold text-center border-2 border-white"
+      style={{ 
+        fontFamily: "'Bebas Neue', sans-serif",
+        backgroundColor: isHovered ? '#000000' : '#ffffff',
+        color: isHovered ? '#ffffff' : '#000000',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+        boxShadow: isHovered ? '0 0 30px rgba(255,255,255,0.15)' : 'none',
+      }}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
