@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { LoginModal } from './LoginModal';
@@ -100,34 +101,15 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
       <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
         <div className="w-full max-w-5xl">
           <div
-            className={`flex items-center justify-between rounded-full px-5 py-2 shadow-lg transition-all duration-300 ${
+            className={`flex items-center justify-between rounded-full pl-5 pr-5 py-2 shadow-lg transition-all duration-300 ${
               isScrolled
                 ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
                 : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
             }`}
             style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
           >
-            <div className="flex items-center gap-3">
-              <button onClick={() => onNavigate('home')} className="flex items-center gap-3 group hover:opacity-80 transition-opacity cursor-pointer">
-                <img 
-                  src="/ISOMetallic.png" 
-                  alt="ISO Logo" 
-                  className="h-10 w-auto object-contain cursor-pointer" onClick={() => onNavigate('home')} 
-                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
-                    const target = e.currentTarget; 
-                    target.style.display = 'none'; 
-                    const fallback = target.nextElementSibling as HTMLElement; 
-                    if (fallback) { 
-                      fallback.style.display = 'flex'; 
-                    } 
-                  }} 
-                /> 
-                <div 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow" 
-                  style={{ display: 'none' }} 
-                > 
-                  <span className="text-white text-lg">☪️</span> 
-                </div> 
+            <div className="flex items-center pl-2">
+              <button onClick={() => onNavigate('home')} className="hover:opacity-80 transition-opacity cursor-pointer">
                 <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                   ISO Institute
                 </span>

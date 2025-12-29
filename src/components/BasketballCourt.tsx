@@ -2,10 +2,9 @@ import * as React from 'react';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'motion/react';
 import { CategoryBubble } from './CategoryBubble';
-import { MentorModal } from './MentorModal';
-import { SignupModal } from './SignupModal';
 import { FeatureShowcase } from './FeatureShowcase';
-import { Lock, Clock, Moon, Dumbbell, Activity, Settings, Rocket, Globe, Compass, BookOpen, Users, Briefcase } from 'lucide-react';
+import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Compass, BookOpen, Users, Briefcase } from 'lucide-react';
+import { getAccentColor } from './Pathways';
 
 interface CommitmentStatus {
   isCommitted: boolean;
@@ -21,6 +20,7 @@ interface BasketballCourtProps {
   onCategorySelect?: (categoryId: string) => void;
   forceOpenCategoryId?: string | null;
   onForceOpenHandled?: () => void;
+  onNavigateToPathways?: () => void;
 }
 
 const categories = [
@@ -92,8 +92,7 @@ const categories = [
   },
 ];
 
-export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect, forceOpenCategoryId, onForceOpenHandled }: BasketballCourtProps) {
-  const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
+export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect, forceOpenCategoryId, onForceOpenHandled, onNavigateToPathways }: BasketballCourtProps) {
   const [mode, setMode] = useState<'explore' | 'learn'>('explore');
   const [role, setRole] = useState<'players' | 'coaches'>('players');
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -103,27 +102,6 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stepsContainerRef = useRef<HTMLDivElement | null>(null);
   const learnSectionRef = useRef<HTMLDivElement | null>(null);
-
-  // Restore selected category when coming back from Call ISO page
-  useEffect(() => {
-    if (selectedCategoryId) {
-      const category = categories.find(c => c.id === selectedCategoryId);
-      if (category && (!selectedCategory || selectedCategory.id !== category.id)) {
-        setSelectedCategory(category);
-      }
-    }
-  }, [selectedCategoryId, selectedCategory]);
-  const [showCommitmentWarning, setShowCommitmentWarning] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
-  // Check localStorage for saved login state
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    try {
-      const savedUser = localStorage.getItem('iso_demo_user');
-      return savedUser !== null;
-    } catch {
-      return false;
-    }
-  });
   const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [lockedBubblePosition, setLockedBubblePosition] = useState<{ x: number; y: number } | null>(null);
@@ -211,31 +189,6 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
     }
   }, []);
   
-  // Update login state when localStorage changes (e.g., user logs in/out in another component)
-  useEffect(() => {
-    const checkLoginState = () => {
-      try {
-        const savedUser = localStorage.getItem('iso_demo_user');
-        setIsLoggedIn(savedUser !== null);
-      } catch {
-        setIsLoggedIn(false);
-      }
-    };
-    
-    // Check on mount and when component becomes visible
-    checkLoginState();
-    
-    // Listen for storage changes (in case user logs in/out in another tab or component)
-    window.addEventListener('storage', checkLoginState);
-    
-    // Also check periodically in case localStorage was updated in same window
-    const interval = setInterval(checkLoginState, 500);
-    
-    return () => {
-      window.removeEventListener('storage', checkLoginState);
-      clearInterval(interval);
-    };
-  }, []);
 
   // Add staggered bounce animation for arrows and tracing line animation
   useEffect(() => {
@@ -278,47 +231,12 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
     };
   }, []);
 
+  // Clickability removed - court is now visual only
+  // Coach selection moved to Pathways page
   const handleCategoryClick = (category: typeof categories[0]) => {
-    if (commitmentStatus?.isCommitted) {
-      setShowCommitmentWarning(true);
-    } else if (!isLoggedIn) {
-      setShowSignupModal(true);
-      // Store the category they wanted to see for after signup
-      setSelectedCategory(category);
-    } else {
-      setSelectedCategory(category);
-    }
+    // No-op: Bubbles are no longer clickable
+    // All coach selection now happens on Pathways page
   };
-
-  const handleSignupComplete = (userData: any) => {
-    console.log('User signed up:', userData);
-    
-    // Save to localStorage to persist login state (same as Navigation component)
-    try {
-      const userDataForLogin = { email: userData.email, roles: ['player'] as any[] };
-      localStorage.setItem('iso_demo_user', JSON.stringify(userDataForLogin));
-      localStorage.setItem('iso_demo_portal', 'player');
-    } catch (error) {
-      console.error('Failed to save user to localStorage:', error);
-    }
-    
-    setIsLoggedIn(true);
-    setShowSignupModal(false);
-    // selectedCategory is already set, so the MentorModal will open automatically
-  };
-
-  useEffect(() => {
-    if (forceOpenCategoryId) {
-      const category = categories.find(c => c.id === forceOpenCategoryId);
-      if (category) {
-        setIsLoggedIn(true);
-        setSelectedCategory(category);
-        if (onForceOpenHandled) {
-          onForceOpenHandled();
-        }
-      }
-    }
-  }, [forceOpenCategoryId, onForceOpenHandled]);
 
   // Reset learn mode step when toggles change
   useEffect(() => {
@@ -815,7 +733,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               
             </svg>
 
-            {/* Category Bubbles - Now Hoops */}
+            {/* Category Bubbles - Visual only, not clickable */}
             <div style={{ cursor: 'none', pointerEvents: 'auto' }}>
               {categories.map((category) => {
                 const isHovered = hoveredCategoryId === category.id;
@@ -823,8 +741,8 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
               <CategoryBubble
                 key={category.id}
                 category={category}
-                onClick={() => handleCategoryClick(category)}
-                isSelected={selectedCategory?.id === category.id}
+                onClick={() => {}} // No-op: bubbles are visual only
+                isSelected={false} // Never selected since not clickable
                     isOtherHovered={hoveredCategoryId !== null && hoveredCategoryId !== category.id}
                     disableHoverCard={true}
                     hideTitle={true}
@@ -878,6 +796,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                   const hoveredCategory = categories.find(c => c.id === hoveredCategoryId);
                   if (!hoveredCategory) return null;
                   const Icon = hoveredCategory.icon;
+                  const categoryAccentColor = getAccentColor(hoveredCategory.color);
                   
                   return (
                     <motion.div
@@ -889,7 +808,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                       transition={{ duration: 0.4 }}
                     >
                       <div className="flex justify-center mb-6">
-                        <Icon size={64} strokeWidth={2} className="text-orange-500" />
+                        <Icon size={64} strokeWidth={2} style={{ color: categoryAccentColor }} />
                       </div>
                       <h3
                         className="text-3xl lg:text-4xl font-bold mb-4 text-white"
@@ -904,16 +823,16 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                         {hoveredCategory.description}
                       </p>
                       <p
-                        className="text-base lg:text-lg text-orange-500 italic mb-6"
-                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                        className="text-base lg:text-lg italic mb-6"
+                        style={{ fontFamily: "'Bebas Neue', sans-serif", color: categoryAccentColor }}
                       >
                         {hoveredCategory.tagline}
                       </p>
                       <p
-                        className="text-lg lg:text-xl text-white font-bold border-t border-orange-500/30 pt-4"
-                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                        className="text-lg lg:text-xl text-white font-bold border-t pt-4"
+                        style={{ fontFamily: "'Bebas Neue', sans-serif", borderTopColor: `${categoryAccentColor}4D` }}
                       >
-                        Press the pathway to view coaches
+                        Discover coaches through Pathways
                       </p>
                     </motion.div>
                   );
@@ -932,11 +851,24 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                     Inspired by basketball, ISO makes professional coaching relatable, human, and culturally grounded. ISO offers 6 pathways of growth and development in your field of interest.
                   </p>
                   <p
-                    className="text-base lg:text-lg"
+                    className="text-base lg:text-lg mb-6"
                     style={{ fontFamily: "'Bebas Neue', sans-serif", color: 'rgba(255, 255, 255, 0.7)' }}
                   >
                     Hover over a pathway to learn more
                   </p>
+                  <motion.button
+                    onClick={() => {
+                      if (onNavigateToPathways) {
+                        onNavigateToPathways();
+                      }
+                    }}
+                    className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-white/90 transition-all"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Explore Pathways
+                  </motion.button>
                   <motion.div
                     className="text-5xl mt-4"
                     animate={{
@@ -960,54 +892,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
         </div>
       </section>
 
-      {selectedCategory && !commitmentStatus?.isCommitted && isLoggedIn && (
-        <MentorModal
-          category={selectedCategory}
-          onClose={() => {
-            setSelectedCategory(null);
-            if (onCategorySelect) {
-              onCategorySelect('');
-            }
-          }}
-          onNavigateToCallIso={onNavigateToCallIso}
-        />
-      )}
-
-      {/* Commitment Warning Modal */}
-      {showCommitmentWarning && (
-        <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
-          onClick={() => setShowCommitmentWarning(false)}
-        >
-          <div 
-            className="bg-slate-900 rounded-3xl max-w-md w-full p-8 border-2 border-orange-500/50"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-8 h-8 text-orange-400" />
-            </div>
-            <h3 className="text-white text-center mb-4">Already Committed</h3>
-            <p className="text-white/70 text-center mb-6">
-              You're currently working with {commitmentStatus?.mentorName} in <span className="text-orange-400">{commitmentStatus?.category}</span>. 
-              Complete your 30-day commitment period before exploring other pathways.
-            </p>
-            <button
-              onClick={() => setShowCommitmentWarning(false)}
-              className="w-full bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition-colors"
-            >
-              Got It
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Signup Modal */}
-      {showSignupModal && (
-        <SignupModal
-          onClose={() => setShowSignupModal(false)}
-          onSignupComplete={handleSignupComplete}
-        />
-      )}
+      {/* Modals removed - coach selection now happens on Pathways page */}
 
       <style>{`
         /* Container for SIDE-BY-SIDE layout */

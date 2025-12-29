@@ -1,4 +1,5 @@
-import { useState, Suspense, lazy } from 'react';
+import * as React from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { ConsultationModal } from './components/ConsultationModal';
@@ -43,6 +44,47 @@ export default function App() {
   const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
 
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('iso-app-state');
+      if (!savedState) return;
+
+      const parsed = JSON.parse(savedState) as Partial<{
+        currentPage: Page;
+        selectedCoachName: string | null;
+        selectedCategoryId: string | null;
+      }>;
+
+      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store'];
+      if (parsed.currentPage && validPages.includes(parsed.currentPage)) {
+        // Only restore Call ISO page if we also have a coach to show
+        const targetPage = parsed.currentPage === 'call-iso' && !parsed.selectedCoachName ? 'home' : parsed.currentPage;
+        setCurrentPage(targetPage);
+      }
+
+      if (parsed.selectedCoachName) {
+        setSelectedCoachName(parsed.selectedCoachName);
+      }
+
+      if (parsed.selectedCategoryId) {
+        setSelectedCategoryId(parsed.selectedCategoryId);
+      }
+    } catch (error) {
+      console.error('Failed to restore navigation state:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'iso-app-state',
+      JSON.stringify({
+        currentPage,
+        selectedCoachName,
+        selectedCategoryId,
+      }),
+    );
+  }, [currentPage, selectedCoachName, selectedCategoryId]);
+
   // Handle navigation - clear states when navigating to home from logo/nav
   const handleNavigate = (page: Page) => {
     // If navigating to home, clear all Call ISO related states
@@ -55,6 +97,11 @@ export default function App() {
       setPendingCategoryId(null);
     }
     setCurrentPage(page);
+    
+    // Scroll to top when navigating to pathways page
+    if (page === 'pathways') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   // Helper to show consultation modal before Call ISO page
@@ -144,6 +191,7 @@ export default function App() {
                 onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
                 forceOpenCategoryId={shouldReopenMentorModal ? selectedCategoryId : null}
                 onForceOpenHandled={() => setShouldReopenMentorModal(false)}
+                onNavigateToPathways={() => handleNavigate('pathways')}
               />
             </Suspense>
           </div>
@@ -161,7 +209,11 @@ export default function App() {
 
       {currentPage === 'pathways' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <Pathways onNavigate={setCurrentPage} />
+        <Pathways 
+          onNavigate={setCurrentPage} 
+          onNavigateToCallIso={navigateToCallIso}
+          commitmentStatus={menteeCommitmentStatus}
+        />
         </Suspense>
       )}
 

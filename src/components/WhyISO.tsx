@@ -105,9 +105,9 @@ export function WhyISO() {
       }}
     >
       {/* Why ISO Section */}
-      <div className="relative w-full max-w-6xl mx-auto py-16 px-4 z-10">
+      <div className="relative w-full max-w-6xl mx-auto pt-16 pb-4 px-4 z-10">
         <motion.h2 
-          className="text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center mb-1"
+          className="text-5xl md:text-6xl lg:text-7xl font-bold text-white text-center mb-4"
           style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: 'bold' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
