@@ -667,7 +667,7 @@ export function EventSplashPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            ISO is launching soon. A movement, a system, a community.
+            A movement, a system, a community.
           </motion.p>
 
           {/* Event Reference */}
@@ -678,7 +678,7 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            ISO Launch Event • 2026
+            ISO • 2026
           </motion.p>
 
           {/* Mission Statement */}
@@ -695,7 +695,9 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A FAITH-DRIVEN MOVEMENT INSPIRING AMBITION, ELEVATING TALENT, AND REBUILDING PATHWAYS TO SUCCESS.
+            A FAITH-DRIVEN DEVELOPMENTAL MOVEMENT AND PROGRESS-FOCUSED LIFESTYLE BRAND BUILT TO
+            <br />
+            INSPIRE AMBITION, ELEVATE TALENT, AND REBUILD COMMUNITY PATHWAYS TO SUCCESS.
           </motion.p>
 
           {/* CTA Section */}
