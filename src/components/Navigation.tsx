@@ -108,7 +108,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             }`}
             style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
           >
-            <div className="flex items-center pl-2">
+            <div className="flex items-center pl-4">
               <button onClick={() => onNavigate('home')} className="hover:opacity-80 transition-opacity cursor-pointer">
                 <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                   ISO Institute

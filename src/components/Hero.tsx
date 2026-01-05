@@ -1,110 +1,8 @@
-import * as React from 'react';
-import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community') => void;
-}
-
-// Animated Blobs Component
-function AnimatedBlobs() {
-  const blobStyle: React.CSSProperties = {
-    aspectRatio: '1',
-    display: 'block',
-    gridArea: 'stack',
-    backgroundSize: 'calc(100% + 2vmin * 2)',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-    border: '2vmin solid transparent',
-    borderRadius: '115% 140% 145% 110% / 125% 140% 110% 125%',
-    maskImage: 'linear-gradient(transparent, transparent), linear-gradient(black, white)',
-    maskClip: 'padding-box, border-box',
-    WebkitMaskComposite: 'source-in',
-    maskComposite: 'intersect',
-    mixBlendMode: 'normal',
-    opacity: 0.5,
-    height: '70vmin',
-    maxHeight: '500px',
-    filter: 'blur(1vmin)',
-  };
-
-  // Pathway colors: emerald, red, blue, purple + white ring
-  const blobs = [
-    {
-      backgroundColor: '#10b981', // Emerald - Deen & Purpose
-      backgroundImage: 'linear-gradient(#10b981, #14b8a6, #10b981)',
-      transform: 'rotate(30deg) scale(1.03)',
-    },
-    {
-      backgroundColor: '#ef4444', // Red - Health & Fitness
-      backgroundImage: 'linear-gradient(#ef4444, #f97316, #ef4444)',
-      transform: 'rotate(60deg) scale(0.95)',
-    },
-    {
-      backgroundColor: '#3b82f6', // Blue - Medicine & Healthcare
-      backgroundImage: 'linear-gradient(#3b82f6, #06b6d4, #3b82f6)',
-      transform: 'rotate(90deg) scale(0.97)',
-    },
-    {
-      backgroundColor: '#a855f7', // Purple - Engineering & Technology
-      backgroundImage: 'linear-gradient(#a855f7, #6366f1, #a855f7)',
-      transform: 'rotate(120deg) scale(1.02)',
-    },
-    {
-      backgroundColor: '#ffffff', // White ring
-      backgroundImage: 'linear-gradient(#e5e7eb, #ffffff, #e5e7eb)',
-      transform: 'rotate(150deg) scale(1.0)',
-    },
-  ];
-
-  return (
-    <div className="relative flex items-center justify-center">
-      {/* ISO Logo and Text in center */}
-      <div className="absolute pointer-events-none z-10 flex flex-col items-center">
-        <img 
-          src="/ISOMetallic.png" 
-          alt="ISO" 
-          className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain"
-          style={{ filter: 'drop-shadow(0 0 40px rgba(255, 255, 255, 0.4))' }}
-        />
-        <span 
-          className="text-6xl md:text-7xl lg:text-8xl font-black tracking-wider mt-2"
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
-          }}
-        >
-          ISO
-        </span>
-      </div>
-      
-      {/* Blobs container */}
-      <div className="grid" style={{ gridTemplateAreas: "'stack'" }}>
-        <div
-          className="grid relative animate-spin-slow"
-          style={{
-            gridTemplateAreas: "'stack'",
-            gridArea: 'stack',
-          }}
-        >
-          {blobs.map((blob, index) => (
-            <span
-              key={index}
-              style={{
-                ...blobStyle,
-                ...blob,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function Hero({ onNavigate }: HeroProps = {}) {
@@ -114,31 +12,6 @@ export function Hero({ onNavigate }: HeroProps = {}) {
       courtSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-
-  // Add keyframes for spin animation
-  useEffect(() => {
-    const styleId = 'hero-blob-styles';
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.textContent = `
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-    return () => {
-      const existingStyle = document.getElementById(styleId);
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-    };
-  }, []);
 
   return (
     <section 
@@ -269,14 +142,18 @@ export function Hero({ onNavigate }: HeroProps = {}) {
             </motion.div>
           </div>
 
-          {/* RIGHT SIDE - Animated Blobs with ISO Logo */}
+          {/* RIGHT SIDE - ISO Logo */}
           <motion.div 
-            className="relative flex items-center justify-center h-[500px] lg:h-[600px]"
+            className="relative flex items-center justify-center w-full h-full"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
           >
-            <AnimatedBlobs />
+            <img 
+              src="/ISO OFFICIAL.png" 
+              alt="ISO" 
+              className="w-full h-auto max-w-[600px] lg:max-w-[700px] xl:max-w-[800px] object-contain"
+            />
       </motion.div>
         </div>
       </div>

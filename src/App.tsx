@@ -219,7 +219,7 @@ export default function App() {
 
       {currentPage === 'about' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <About />
+        <About onNavigate={setCurrentPage} />
         </Suspense>
       )}
 

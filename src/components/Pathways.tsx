@@ -35,6 +35,7 @@ interface PathwayCardProps {
   pathway: PathwayData;
   isSelected: boolean;
   onClick: () => void;
+  key?: string;
 }
 
 // Base card surface - same structure for ALL cards
@@ -127,10 +128,41 @@ const FlowConnector = () => (
   </div>
 );
 
+// Level descriptions and gear unlocks
+const levelDetails: Record<string, { title: string; description: string; gear: string }> = {
+  freshman: {
+    title: 'Freshman Level',
+    description: 'Your journey begins here. Build foundational habits, complete your first goals, and prove your commitment to growth.',
+    gear: 'Unlock: Basic ISO t-shirts, practice shorts, and an official ISO lanyard. Entry-level gear to show you\'re part of the team.'
+  },
+  jv: {
+    title: 'JV Level',
+    description: 'You\'ve shown consistency. Now it\'s time to level up your skills and take on bigger challenges with more accountability.',
+    gear: 'Unlock: ISO hoodies, joggers, wristbands, and a gym bag. More comfortable gear for dedicated practice sessions.'
+  },
+  varsity: {
+    title: 'Varsity Level',
+    description: 'You\'re becoming a leader. Tackle advanced goals, and represent ISO with excellence.',
+    gear: 'Unlock: Tracksuits, windbreakers, premium apparel, and exclusive colorways. You\'ve earned the right to look the part.'
+  },
+  d1: {
+    title: 'D1 Level',
+    description: 'Elite status. You\'re in the top tier, leading by example, and making significant impact in your pathway community.',
+    gear: 'Unlock: Limited edition drops, signature accessories, D1 varsity jacket, and exclusive member-only gear releases.'
+  },
+  professional: {
+    title: 'Professional Level',
+    description: 'You\'ve reached the pinnacle. As a mentor, you guide others on their journey while continuing your own mastery.',
+    gear: 'Unlock: Custom signature gear with your name, mentor status badge, the legendary ISO tracksuit, and your own colorway collection.'
+  }
+};
+
 export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: PathwaysProps) {
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showCommitmentWarning, setShowCommitmentWarning] = useState(false);
+  const [hoveredLevel, setHoveredLevel] = useState<string | null>(null);
+  const [isHoveringProgressBox, setIsHoveringProgressBox] = useState(false);
   
   // Scroll to top when component mounts
   useEffect(() => {
@@ -417,7 +449,11 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
           </div>
 
           {/* Progress System Overview */}
-          <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6 mb-16">
+          <div 
+            className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6 mb-16"
+            onMouseEnter={() => setIsHoveringProgressBox(true)}
+            onMouseLeave={() => setIsHoveringProgressBox(false)}
+          >
             <h2 
               className="text-white text-center mb-4 text-5xl md:text-6xl"
               style={{ fontFamily: "'Bebas Neue', sans-serif" }}
@@ -425,35 +461,95 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
               The ISO Progress System
             </h2>
             <p className="text-white/70 text-center mb-6 text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-              Progress through levels based on your commitment and growth. Start where you're ready.
+              Progress through levels based on your commitment and flex your growth with premium & exclusive ISO apparel. Start where you're ready.
+              <br />
+              <span 
+                style={{ 
+                  color: '#f97316',
+                  animation: isHoveringProgressBox ? 'blink 1.5s ease-in-out infinite' : 'none'
+                }}
+              >
+                Hover over each level to see the details.
+              </span>
             </p>
+            <style>{`
+              @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.3; }
+              }
+            `}</style>
             
             {/* Progress Bar */}
             <div className="relative mb-6">
               <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
                 <div className="h-full flex">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-emerald-600" style={{ width: '20%' }}></div>
-                  <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-600" style={{ width: '20%' }}></div>
-                  <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-600" style={{ width: '20%' }}></div>
-                  <div className="h-full bg-gradient-to-r from-orange-500 to-amber-600" style={{ width: '20%' }}></div>
-                  <div className="h-full bg-gradient-to-r from-yellow-500 to-orange-600" style={{ width: '20%' }}></div>
+                  {[
+                    { id: 'freshman', color: 'from-green-500 to-emerald-600', solidColor: '#22c55e' },
+                    { id: 'jv', color: 'from-blue-500 to-cyan-600', solidColor: '#3b82f6' },
+                    { id: 'varsity', color: 'from-purple-500 to-indigo-600', solidColor: '#a855f7' },
+                    { id: 'd1', color: 'from-orange-500 to-amber-600', solidColor: '#f97316' },
+                    { id: 'professional', color: 'from-yellow-500 to-orange-600', solidColor: '#eab308' }
+                  ].map((segment) => (
+                    <div
+                      key={segment.id}
+                      className={`h-full transition-all duration-300 cursor-pointer ${
+                        hoveredLevel === null 
+                          ? `bg-gradient-to-r ${segment.color}` 
+                          : hoveredLevel === segment.id 
+                            ? `bg-gradient-to-r ${segment.color}` 
+                            : 'bg-slate-700'
+                      }`}
+                      style={{ 
+                        width: '20%',
+                        filter: hoveredLevel === segment.id ? 'brightness(1.3)' : 'none',
+                        boxShadow: hoveredLevel === segment.id ? `0 0 20px ${segment.solidColor}80` : 'none'
+                      }}
+                      onMouseEnter={() => setHoveredLevel(segment.id)}
+                      onMouseLeave={() => setHoveredLevel(null)}
+                    />
+                  ))}
                 </div>
               </div>
               
               <div className="flex justify-between mt-3">
                 {[
-                  { level: 'Freshman', icon: Sprout, minTime: '3mo' },
-                  { level: 'JV', icon: BookOpen, minTime: '3mo' },
-                  { level: 'Varsity', icon: Star, minTime: '4mo' },
-                  { level: 'D1', icon: Trophy, minTime: '6mo' },
-                  { level: 'Professional', icon: Gem, minTime: 'Ongoing', special: true }
-                ].map((stage, index) => {
+                  { level: 'Freshman', id: 'freshman', icon: Sprout, minTime: '3mo' },
+                  { level: 'JV', id: 'jv', icon: BookOpen, minTime: '3mo' },
+                  { level: 'Varsity', id: 'varsity', icon: Star, minTime: '4mo' },
+                  { level: 'D1', id: 'd1', icon: Trophy, minTime: '6mo' },
+                  { level: 'Professional', id: 'professional', icon: Gem, minTime: 'Ongoing', special: true }
+                ].map((stage) => {
                   const IconComponent = stage.icon;
+                  const isHovered = hoveredLevel === stage.id;
                   return (
-                    <div key={index} className="flex flex-col items-center flex-1">
-                      {IconComponent && <IconComponent className="w-6 h-6 text-white mb-1" />}
-                    <div className="text-white text-xs font-semibold text-center" style={{ color: 'white' }}>{stage.level}</div>
-                    <div className="text-orange-400 text-xs mt-0.5" style={{ color: '#fb923c' }}>{stage.minTime}</div>
+                    <div 
+                      key={stage.id} 
+                      className={`flex flex-col items-center flex-1 cursor-pointer transition-all duration-300 ${
+                        hoveredLevel !== null && !isHovered ? 'opacity-40' : 'opacity-100'
+                      }`}
+                      onMouseEnter={() => setHoveredLevel(stage.id)}
+                      onMouseLeave={() => setHoveredLevel(null)}
+                    >
+                      {IconComponent && (
+                        <IconComponent 
+                          className={`w-6 h-6 mb-1 transition-all duration-300 ${
+                            isHovered ? 'text-white scale-125' : 'text-white'
+                          }`} 
+                        />
+                      )}
+                      <div 
+                        className={`text-xs font-semibold text-center transition-all duration-300 ${
+                          isHovered ? 'text-white scale-105' : 'text-white'
+                        }`}
+                      >
+                        {stage.level}
+                      </div>
+                      <div 
+                        className="text-orange-400 text-xs mt-0.5" 
+                        style={{ color: '#fb923c' }}
+                      >
+                        {stage.minTime}
+                      </div>
                       {stage.special && (
                         <div className="text-yellow-400 text-xs mt-1 flex items-center gap-1">
                           <Sparkles className="w-3 h-3" /> Mentor
@@ -466,6 +562,36 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             </div>
             
             <div className="pt-4 border-t border-slate-700/50">
+              {hoveredLevel ? (
+                <motion.div
+                  key={hoveredLevel}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <ArrowUp className="w-5 h-5 text-orange-400 mt-0.5" />
+                    <div>
+                      <h4 className="text-white text-sm font-semibold mb-1" style={{ color: 'white' }}>
+                        {levelDetails[hoveredLevel].title}
+                      </h4>
+                      <p className="text-white/70 text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {levelDetails[hoveredLevel].description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="w-5 h-5 text-orange-400 mt-0.5" />
+                    <div>
+                      <h4 className="text-white text-sm font-semibold mb-1" style={{ color: 'white' }}>Gear Rewards</h4>
+                      <p className="text-white/70 text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {levelDetails[hoveredLevel].gear}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
                   <Target className="w-5 h-5 text-orange-400 mt-0.5" />
@@ -486,6 +612,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                   </div>
                 </div>
               </div>
+              )}
             </div>
           </div>
 
@@ -509,14 +636,14 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
 
           {/* Pathways Grid - Now Clickable */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {pathways.map((pathway) => {
-              const cardProps: PathwayCardProps = {
-                pathway: pathway as PathwayData,
-                isSelected: selectedPathway === pathway.id,
-                onClick: () => handlePathwayClick(pathway.id),
-              };
-              return <PathwayCard key={pathway.id} {...cardProps} />;
-            })}
+            {pathways.map((pathway) => (
+              <PathwayCard 
+                key={pathway.id}
+                pathway={pathway as PathwayData}
+                isSelected={selectedPathway === pathway.id}
+                onClick={() => handlePathwayClick(pathway.id)}
+              />
+            ))}
           </div>
         </div>
       </div>
