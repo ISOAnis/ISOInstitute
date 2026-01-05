@@ -142,7 +142,7 @@ function WaitlistModal({
       const result = await saveWaitlistEntry({
         fullName: formData.fullName,
         email: formData.email,
-        phone: formData.phone || undefined,
+        phone: formData.phone,
       });
 
       if (!result.success) {
@@ -289,13 +289,13 @@ function WaitlistModal({
                       htmlFor="phone"
                       className="mb-1 block text-sm font-medium text-white"
                     >
-                      Phone Number{' '}
-                      <span className="text-white/60">(optional)</span>
+                      Phone Number <span className="text-white/60">*</span>
                     </label>
                     <input
                       type="tel"
                       id="phone"
                       name="phone"
+                      required
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white/40 focus:outline-none focus:ring-1 focus:ring-white/30"
