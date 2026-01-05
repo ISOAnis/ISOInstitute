@@ -6,6 +6,8 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { CoachPortalPage } from './components/CoachPortalPage';
 import { PlayerPortalPage } from './components/PlayerPortalPage';
 import { About } from './components/About';
+import { LoginModal } from './components/LoginModal';
+import { SignupModal } from './components/SignupModal';
 import './styles/about.css';
 
 // Lazy load heavy components
@@ -43,6 +45,8 @@ export default function App() {
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
+  const [showPlayerLogin, setShowPlayerLogin] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   useEffect(() => {
     try {
@@ -141,6 +145,13 @@ export default function App() {
     }, 100);
   };
 
+  // Handle player login
+  const handlePlayerLogin = (email: string, password: string) => {
+    // Mock authentication - in production, this would call an API
+    setShowPlayerLogin(false);
+    handleNavigate('player-portal');
+  };
+
   if (currentPage === 'coach-portal') {
     return <CoachPortalPage onNavigate={handleNavigate} />;
   }
@@ -202,7 +213,7 @@ export default function App() {
           </Suspense>
           */}
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
-            <Pricing />
+            <Pricing onLoginClick={() => setShowPlayerLogin(true)} />
           </Suspense>
         </>
       )}
@@ -253,6 +264,31 @@ export default function App() {
             setPendingCategoryId(null);
           }}
           onScheduleComplete={handleConsultationComplete}
+        />
+      )}
+
+      {/* Player Login Modal */}
+      {showPlayerLogin && (
+        <LoginModal
+          title="Log In"
+          onClose={() => setShowPlayerLogin(false)}
+          onLogin={handlePlayerLogin}
+          onSignupClick={() => {
+            setShowPlayerLogin(false);
+            setShowSignupModal(true);
+          }}
+        />
+      )}
+
+      {/* Signup Modal */}
+      {showSignupModal && (
+        <SignupModal
+          onClose={() => setShowSignupModal(false)}
+          onSignupComplete={(userData) => {
+            console.log('Account created:', userData);
+            setShowSignupModal(false);
+            handleNavigate('player-portal');
+          }}
         />
       )}
     </div>

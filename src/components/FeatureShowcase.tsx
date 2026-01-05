@@ -226,61 +226,61 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               </div>
 
       {/* Navigation Arrows */}
-      <button
-        onClick={handlePrev}
-        disabled={activeIndex === 0}
-                  style={{
-                    position: 'absolute',
-          left: '20px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          background: activeIndex === 0 ? '#1e293b' : '#f97316',
-          border: 'none',
-          color: 'white',
-          fontSize: '24px',
-          cursor: activeIndex === 0 ? 'not-allowed' : 'pointer',
-          opacity: activeIndex === 0 ? 0.3 : 1,
-          transition: 'all 0.3s ease',
-                        display: 'flex',
-          alignItems: 'center',
-                        justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          zIndex: 10
-                        }}
-                      >
-        ←
-      </button>
+      {activeIndex > 0 && (
+        <button
+          onClick={handlePrev}
+          style={{
+            position: 'absolute',
+            left: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            background: '#f97316',
+            border: 'none',
+            color: 'white',
+            fontSize: '24px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            zIndex: 10
+          }}
+        >
+          ←
+        </button>
+      )}
 
-      <button
-        onClick={handleNext}
-        disabled={activeIndex === features.length - 1}
-                style={{
-                  position: 'absolute',
-          right: '20px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          background: activeIndex === features.length - 1 ? '#1e293b' : '#f97316',
-          border: 'none',
-          color: 'white',
-          fontSize: '24px',
-          cursor: activeIndex === features.length - 1 ? 'not-allowed' : 'pointer',
-          opacity: activeIndex === features.length - 1 ? 0.3 : 1,
-          transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          zIndex: 10
-                }}
-              >
-        →
-      </button>
+      {activeIndex < features.length - 1 && (
+        <button
+          onClick={handleNext}
+          style={{
+            position: 'absolute',
+            right: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            background: '#f97316',
+            border: 'none',
+            color: 'white',
+            fontSize: '24px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            zIndex: 10
+          }}
+        >
+          →
+        </button>
+      )}
 
       {/* Dots Navigation */}
       <div style={{
@@ -298,11 +298,12 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
               width: index === activeIndex ? '40px' : '12px',
               height: '12px',
               borderRadius: '6px',
-              background: index === activeIndex ? '#f97316' : '#334155',
+              background: index === activeIndex ? 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)' : '#181818',
               border: 'none',
               cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              padding: 0
+              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              padding: 0,
+              willChange: 'width, background'
                     }}
                   />
                 ))}

@@ -1,7 +1,11 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-export function Pricing() {
+interface PricingProps {
+  onLoginClick?: () => void;
+}
+
+export function Pricing({ onLoginClick }: PricingProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const borderPalette: Record<string, { base: string; hover: string }> = {
@@ -346,6 +350,11 @@ export function Pricing() {
 
                 {/* Button */}
                 <button
+                  onClick={() => {
+                    if (card.id === 'walk-on' && card.buttonText === 'Join Free' && onLoginClick) {
+                      onLoginClick();
+                    }
+                  }}
                   style={{
                     width: '100%',
                     padding: '8px 15px',

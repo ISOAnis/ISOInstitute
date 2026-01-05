@@ -34,6 +34,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -109,8 +110,20 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
           >
             <div className="flex items-center pl-4">
-              <button onClick={() => onNavigate('home')} className="hover:opacity-80 transition-opacity cursor-pointer">
-                <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+              <button 
+                onClick={() => onNavigate('home')} 
+                className="transition-opacity cursor-pointer"
+                onMouseEnter={() => setHoveredItem('logo')}
+                onMouseLeave={() => setHoveredItem(null)}
+              >
+                <span 
+                  className="text-white text-lg font-semibold tracking-wide transition-all" 
+                  style={{ 
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    textShadow: hoveredItem === 'logo' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                    color: hoveredItem === 'logo' ? '#ffffff' : 'rgba(255, 255, 255, 0.9)'
+                  }}
+                >
                   ISO Institute
                 </span>
               </button>
@@ -119,7 +132,13 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             <div className="flex items-center gap-6 text-sm">
               <button 
                 onClick={() => onNavigate('pathways')}
-                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                onMouseEnter={() => setHoveredItem('pathways')}
+                onMouseLeave={() => setHoveredItem(null)}
+                style={{ 
+                  color: hoveredItem === 'pathways' || currentPage === 'pathways' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  textShadow: hoveredItem === 'pathways' || currentPage === 'pathways' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 Pathways
               </button>
@@ -134,14 +153,26 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
               )}
               <button 
                 onClick={() => onNavigate('about')}
-                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                onMouseEnter={() => setHoveredItem('about')}
+                onMouseLeave={() => setHoveredItem(null)}
+                style={{ 
+                  color: hoveredItem === 'about' || currentPage === 'about' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  textShadow: hoveredItem === 'about' || currentPage === 'about' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 About
               </button>
 
               <button 
                 onClick={() => onNavigate('store')}
-                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                onMouseEnter={() => setHoveredItem('store')}
+                onMouseLeave={() => setHoveredItem(null)}
+                style={{ 
+                  color: hoveredItem === 'store' || currentPage === 'store' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  textShadow: hoveredItem === 'store' || currentPage === 'store' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 Store
               </button>
@@ -151,8 +182,14 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 <button 
                   onClick={() => setShowPortalDropdown(!showPortalDropdown)}
                   onBlur={() => setTimeout(() => setShowPortalDropdown(false), 200)}
+                  onMouseEnter={() => setHoveredItem('portals')}
+                  onMouseLeave={() => setHoveredItem(null)}
                   className="flex items-center gap-1"
-                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                  style={{ 
+                    color: hoveredItem === 'portals' || showPortalDropdown || currentPage === 'coach-portal' || currentPage === 'player-portal' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                    textShadow: hoveredItem === 'portals' || showPortalDropdown || currentPage === 'coach-portal' || currentPage === 'player-portal' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   Portals
                   <ChevronDown className={`w-4 h-4 transition-transform ${showPortalDropdown ? 'rotate-180' : ''}`} />

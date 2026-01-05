@@ -1,3 +1,5 @@
+import { Instagram, Linkedin, Mail, Youtube } from 'lucide-react';
+
 type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
 
 interface FooterProps {
@@ -9,68 +11,124 @@ export function Footer({ onNavigate }: FooterProps) {
     <footer className="text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5" style={{ background: '#030305' }}>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
+          {/* Left Column - Logo and Tagline */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-6">
               <img 
-                src="/ISOMetallic.png" 
+                src="/ISO OFFICIAL.png" 
                 alt="ISO Logo" 
-                className="h-10 w-auto object-contain"
+                className="h-12 w-auto object-contain mb-4"
                 onError={(e) => {
-                  // Fallback to emoji icon if logo doesn't exist yet
                   const target = e.currentTarget as HTMLImageElement;
                   target.style.display = 'none';
-                  const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) {
-                    fallback.style.display = 'flex';
-                  }
                 }}
               />
-              <div 
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center"
-                style={{ display: 'none' }}
-              >
-                <span className="text-white">☪️</span>
-              </div>
-              <div>
-                <span className="text-white block font-bold">ISO</span>
+              <div className="space-y-1">
+                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  Your Purpose.
+                </p>
+                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  Your Coach.
+                </p>
+                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  Your Next Move.
+                </p>
               </div>
             </div>
-            <p className="text-white/70">
-              Muslim-founded coaching institute helping you strengthen faith, discipline, and purpose.
-            </p>
           </div>
 
+          {/* Resources Column */}
           <div>
-            <h4 className="text-white mb-4">Pathways</h4>
-            <ul className="space-y-2 text-white/70">
-              <li><a href="#deen" className="hover:text-white transition-colors">Deen & Purpose</a></li>
-              <li><a href="#health" className="hover:text-white transition-colors">Health & Fitness</a></li>
-              <li><a href="#medicine" className="hover:text-white transition-colors">Medicine & Healthcare</a></li>
+            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+              Resources
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                  Terms and Conditions
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
             </ul>
           </div>
 
+          {/* Company Column */}
           <div>
-            <h4 className="text-white mb-4">More Paths</h4>
-            <ul className="space-y-2 text-white/70">
-              <li><a href="#engineering" className="hover:text-white transition-colors">Engineering & Technology</a></li>
-              <li><a href="#entrepreneurship" className="hover:text-white transition-colors">Entrepreneurship</a></li>
-              <li><a href="#global" className="hover:text-white transition-colors">Global Affairs & Business</a></li>
+            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+              Company
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => onNavigate?.('about')}
+                  className="text-white hover:text-orange-500 transition-colors text-left"
+                >
+                  Our Story
+                </button>
+              </li>
+              <li>
+                <a href="#contact" className="text-white hover:text-orange-500 transition-colors">
+                  Contact Us
+                </a>
+              </li>
             </ul>
           </div>
 
+          {/* Follow Us Column */}
           <div>
-            <h4 className="text-white mb-4">Connect</h4>
-            <ul className="space-y-2 text-white/70">
-              <li><a href="#about" className="hover:text-white transition-colors">About ISO</a></li>
-              <li><a href="#mentors" className="hover:text-white transition-colors">Our Coaches</a></li>
-              <li><a href="#contact" className="hover:text-white transition-colors">Coaching Nights</a></li>
-              <li><span className="text-slate-500 text-sm uppercase tracking-wide">Coming Soon</span></li>
-            </ul>
+            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+              Follow Us
+            </h4>
+            <div className="grid grid-cols-2 gap-3 w-fit">
+              <a
+                href="https://www.instagram.com/isoinstitute/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full bg-black flex items-center justify-center hover:bg-gray-900 transition-colors"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram className="w-6 h-6 text-white" />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/isoinstitute/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full bg-black flex items-center justify-center hover:bg-gray-900 transition-colors"
+                aria-label="Follow us on LinkedIn"
+              >
+                <Linkedin className="w-6 h-6 text-white" />
+              </a>
+              <a
+                href="https://www.youtube.com/@isoinstitute"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full bg-black flex items-center justify-center hover:bg-gray-900 transition-colors"
+                aria-label="Follow us on YouTube"
+              >
+                <Youtube className="w-6 h-6 text-white" />
+              </a>
+              <a
+                href="mailto:info@isoinstitute.com"
+                className="w-12 h-12 rounded-full bg-black flex items-center justify-center hover:bg-gray-900 transition-colors"
+                aria-label="Send us an email"
+              >
+                <Mail className="w-6 h-6 text-white" />
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8 text-center text-white/70">
-          <p>&copy; 2025 ISO. In Search Of your next move.</p>
+        <div className="border-t border-white/10 pt-8 text-center text-white/70">
+          <p>&copy; {new Date().getFullYear()} ISO Institute. All rights reserved.</p>
         </div>
       </div>
     </footer>
