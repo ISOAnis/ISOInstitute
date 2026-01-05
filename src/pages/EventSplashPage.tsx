@@ -562,14 +562,19 @@ function CTAButtonsRow({
   onWaitlistClick: () => void;
   onPilotClick: () => void;
 }) {
+  // Temporarily suppress the application button - can be re-enabled by setting to true
+  const SHOW_PILOT_BUTTON = false;
+  
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
       <CTAButton variant="primary" onClick={onWaitlistClick}>
         Join the Waitlist
       </CTAButton>
-      <CTAButton variant="primary" onClick={onPilotClick}>
-        Apply for Pilot Program
-      </CTAButton>
+      {SHOW_PILOT_BUTTON && (
+        <CTAButton variant="primary" onClick={onPilotClick}>
+          Apply for Pilot Program
+        </CTAButton>
+      )}
     </div>
   );
 }
