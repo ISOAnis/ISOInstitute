@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle, ArrowRight, Dumbbell, Activity, Settings, Rocket, Globe, LucideIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { MenteeProfileSection } from './MenteeProfileSection';
 import { LockerRoom } from './LockerRoom';
 import { MentorMenteeChat } from './MentorMenteeChat';
 import { PortalTutorial } from './PortalTutorial';
 import { ProfileCompletionModal } from './ProfileCompletionModal';
+import { PathwaySelectionModal } from './PathwaySelectionModal';
 
 interface Bucket {
   id: string;
@@ -63,14 +64,20 @@ const mockGames: Game[] = [
 ];
 
 const PLAYER_TUTORIAL_KEY = 'iso_tutorial_completed_player_page';
+const PATHWAY_SELECTION_KEY = 'iso_pathway_selection_completed';
 type PlayerTab = 'progress' | 'messages' | 'profile';
 
-export function MenteePortal() {
+interface MenteePortalProps {
+  onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store') => void;
+}
+
+export function MenteePortal({ onNavigate }: MenteePortalProps) {
   const [games, setGames] = useState<Game[]>(mockGames);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showProfileCompletionModal, setShowProfileCompletionModal] = useState(false);
+  const [showPathwaySelectionModal, setShowPathwaySelectionModal] = useState(false);
   const [playerProfileCompletion, setPlayerProfileCompletion] = useState(() => {
     const saved = localStorage.getItem('player_profile_completion');
     return saved ? Number(saved) : 0;
@@ -123,33 +130,63 @@ export function MenteePortal() {
     }
   ];
 
-  // Mock current mentorship data - in production would come from backend
-  const currentMentor = {
-    name: 'Imam Abdullah Rahman',
-    category: 'Deen & Purpose',
-    categoryIcon: Moon,
-    startDate: '2024-10-15', // Date mentee started with this mentor
+  // Pathway mapping - maps pathway ID to category name and icon
+  const pathwayMap: Record<string, { name: string; icon: LucideIcon }> = {
+    'deen': { name: 'Deen & Purpose', icon: Moon },
+    'health': { name: 'Health & Fitness', icon: Dumbbell },
+    'medicine': { name: 'Medicine & Healthcare', icon: Activity },
+    'engineering': { name: 'Engineering & Technology', icon: Settings },
+    'entrepreneurship': { name: 'Entrepreneurship & Business', icon: Rocket },
+    'global': { name: 'Global Affairs, Law, & Policy', icon: Globe },
   };
 
-  // Map category to pathway ID for Locker Room access
-  const getPathwayIdFromCategory = (category: string): 'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global' | null => {
-    const categoryMap: Record<string, 'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global'> = {
-      'Deen & Purpose': 'deen',
-      'Health & Fitness': 'health',
-      'Medicine & Healthcare': 'medicine',
-      'Engineering & Technology': 'engineering',
-      'Entrepreneurship & Innovation': 'entrepreneurship',
-      'Entrepreneurship & Business': 'entrepreneurship',
-      'Global Affairs & Business': 'global',
-      'Global Affairs, Law, & Policy': 'global',
+  // Get selected pathway from localStorage (with state to track changes)
+  const [selectedPathwayId, setSelectedPathwayId] = useState(() => {
+    try {
+      return localStorage.getItem('iso_selected_pathway') || 'deen'; // Default to deen if not set
+    } catch {
+      return 'deen';
+    }
+  });
+
+  // Sync selected pathway with localStorage changes
+  useEffect(() => {
+    const checkPathway = () => {
+      try {
+        const saved = localStorage.getItem('iso_selected_pathway');
+        if (saved) {
+          setSelectedPathwayId(saved);
+        }
+      } catch (error) {
+        console.error('Failed to read selected pathway:', error);
+      }
     };
-    return categoryMap[category] || null;
-  };
+    
+    checkPathway();
+    window.addEventListener('storage', checkPathway);
+    const interval = setInterval(checkPathway, 500);
+    
+    return () => {
+      window.removeEventListener('storage', checkPathway);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Get pathway info based on selected pathway
+  const selectedPathway = pathwayMap[selectedPathwayId] || pathwayMap['deen'];
+
+  // Mock current mentorship data - in production would come from backend
+  // Uses selected pathway to determine category
+  const currentMentor = useMemo(() => ({
+    name: 'Imam Abdullah Rahman',
+    category: selectedPathway.name,
+    categoryIcon: selectedPathway.icon,
+    startDate: '2024-10-15', // Date mentee started with this mentor
+  }), [selectedPathway]);
 
   // Get active pathways (pathways where user has a coach)
-  const activePathwayId = getPathwayIdFromCategory(currentMentor.category);
   const activePathways: Array<'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global'> = 
-    activePathwayId ? [activePathwayId] : [];
+    [selectedPathwayId as 'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global'];
 
   // Calculate commitment progress (30 days = 1 month)
   const startDate = new Date(currentMentor.startDate);
@@ -243,8 +280,25 @@ export function MenteePortal() {
           onComplete={() => {
             setShowTutorial(false);
             localStorage.setItem(PLAYER_TUTORIAL_KEY, 'true');
+            // Show pathway selection modal after tutorial
+            const pathwaySelectionCompleted = localStorage.getItem(PATHWAY_SELECTION_KEY);
+            if (!pathwaySelectionCompleted) {
+              setTimeout(() => setShowPathwaySelectionModal(true), 300);
+            }
           }}
           role="player"
+        />
+      )}
+
+      {/* Pathway Selection Modal */}
+      {showPathwaySelectionModal && (
+        <PathwaySelectionModal
+          onClose={() => setShowPathwaySelectionModal(false)}
+          onPathwaySelect={(pathwayId) => {
+            setShowPathwaySelectionModal(false);
+            // Show profile completion modal after pathway selection
+            setTimeout(() => setShowProfileCompletionModal(true), 300);
+          }}
         />
       )}
 

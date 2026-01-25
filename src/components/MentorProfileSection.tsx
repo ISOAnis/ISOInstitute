@@ -4,12 +4,20 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
+import { InteractiveGlobe } from './InteractiveGlobe';
+
+interface Location {
+  lat: number;
+  lng: number;
+  label: string;
+}
 
 interface MentorProfile {
   // Basic Info
   bio: string;
   yearsOfExperience: string;
   currentRole: string;
+  locations: Location[];
   
   // Expertise Areas
   expertiseAreas: string[];
@@ -41,6 +49,7 @@ const defaultProfile: MentorProfile = {
   bio: '',
   yearsOfExperience: '',
   currentRole: '',
+  locations: [],
   expertiseAreas: [],
   specificSkills: [],
   industryExperience: [],
@@ -429,6 +438,33 @@ export function MentorProfileSection({
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <label className="block text-white mb-3">Where are you from? (Click on the globe or search to add up to 3 locations)</label>
+              <p className="text-slate-400 text-sm mb-3">
+                Share your cultural background and where you're located to help players find coaches in their area or with similar backgrounds.
+              </p>
+              {isEditing ? (
+                <InteractiveGlobe
+                  locations={profile.locations}
+                  onAddLocation={(loc) => setProfile({ ...profile, locations: [...profile.locations, loc] })}
+                  onRemoveLocation={(index) => setProfile({ ...profile, locations: profile.locations.filter((_, i) => i !== index) })}
+                  maxLocations={3}
+                />
+              ) : (
+                <div className="space-y-2">
+                  {profile.locations.length > 0 ? (
+                    profile.locations.map((loc, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-slate-800 p-3 rounded-xl border border-slate-700">
+                        <span className="text-white">{loc.label}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-slate-400 text-sm">No locations added</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -627,10 +627,21 @@ export default function ScrollPinnedImageSequence({
     if (loading.isLoading) return;
     
     const handleWheel = (e: WheelEvent) => {
-      lastWheelTimeRef.current = Date.now();
-      if (handleScrollDelta(e.deltaY)) {
-        e.preventDefault();
+      // Check sequence zone in real-time to ensure accurate state
+      // This allows normal trackpad scrolling everywhere when sequence is not active
+      checkSequenceZone();
+      
+      // Only intercept scroll when sequence is actually active
+      // This allows normal trackpad scrolling everywhere else on the page
+      if (!isSequenceActiveRef.current) {
+        return; // Let trackpad scroll events pass through normally everywhere
       }
+      
+      // Prevent default scroll and handle the scroll delta only when sequence is active
+      e.preventDefault();
+      e.stopPropagation();
+      lastWheelTimeRef.current = Date.now();
+      handleScrollDelta(e.deltaY);
     };
     
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -682,7 +693,7 @@ export default function ScrollPinnedImageSequence({
         cancelAnimationFrame(frameUpdateRef.current);
       }
     };
-  }, [loading.isLoading, handleScrollDelta]);
+  }, [loading.isLoading, handleScrollDelta, checkSequenceZone]);
   
   // ═══════════════════════════════════════════════════════════════════════════════
   // INITIAL SCROLL TO TOP - Ensure sequence is visible when loaded

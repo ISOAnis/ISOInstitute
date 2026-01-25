@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
 
@@ -33,6 +33,8 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [showPlayerLogin, setShowPlayerLogin] = useState(false);
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   useEffect(() => {
@@ -44,19 +46,37 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Load saved user state from localStorage on mount (but don't auto-open portals)
+  // Load saved user state from localStorage on mount and sync with changes
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem(STORAGE_KEY);
-      
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-        // Don't auto-open portals on page load - user must manually click to open
+    const checkUserState = () => {
+      try {
+        const savedUser = localStorage.getItem(STORAGE_KEY);
+        
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Failed to load saved user state:', error);
+        setUser(null);
       }
-    } catch (error) {
-      console.error('Failed to load saved user state:', error);
-    }
+    };
+    
+    // Check on mount
+    checkUserState();
+    
+    // Listen for storage events (from other tabs/windows)
+    window.addEventListener('storage', checkUserState);
+    
+    // Poll localStorage periodically to catch changes in the same tab
+    const interval = setInterval(checkUserState, 500);
+    
+    return () => {
+      window.removeEventListener('storage', checkUserState);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleCoachLogin = (email: string, password: string) => {
@@ -95,6 +115,24 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_PORTAL_KEY);
     onNavigate('home');
+  };
+
+  // Handle sign out confirmation
+  const handleConfirmSignOut = () => {
+    handleLogout();
+    setShowSignOutModal(false);
+    if (pendingPortalType === 'player') {
+      setShowPlayerLogin(true);
+    } else if (pendingPortalType === 'coach') {
+      setShowCoachLogin(true);
+    }
+    setPendingPortalType(null);
+  };
+
+  // Handle cancel sign out
+  const handleCancelSignOut = () => {
+    setShowSignOutModal(false);
+    setPendingPortalType(null);
   };
 
   return (
@@ -199,19 +237,55 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                   <div className="absolute top-full right-0 mt-2 w-48 border border-white/10 rounded-xl shadow-xl overflow-hidden" style={{ background: '#0a0a0f' }}>
                     <button
                       onClick={() => {
-                        setShowCoachLogin(true);
-                        setShowPortalDropdown(false);
+                        const savedPortal = localStorage.getItem(STORAGE_PORTAL_KEY);
+                        if (user && savedPortal === 'coach') {
+                          onNavigate('coach-portal');
+                          setShowPortalDropdown(false);
+                        } else if (user && savedPortal === 'player') {
+                          // User is logged in as player, show sign out modal
+                          setPendingPortalType('coach');
+                          setShowSignOutModal(true);
+                          setShowPortalDropdown(false);
+                        } else {
+                          setShowCoachLogin(true);
+                          setShowPortalDropdown(false);
+                        }
                       }}
-                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                      onMouseEnter={() => setHoveredItem('coach-portal')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className="w-full text-left px-4 py-3 transition-all"
+                      style={{
+                        color: hoveredItem === 'coach-portal' || currentPage === 'coach-portal' ? '#ffffff' : 'rgba(203, 213, 225, 0.8)',
+                        textShadow: hoveredItem === 'coach-portal' || currentPage === 'coach-portal' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                        backgroundColor: hoveredItem === 'coach-portal' || currentPage === 'coach-portal' ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
+                      }}
                     >
                       Coach Portal
                     </button>
                     <button
                       onClick={() => {
-                        setShowPlayerLogin(true);
-                        setShowPortalDropdown(false);
+                        const savedPortal = localStorage.getItem(STORAGE_PORTAL_KEY);
+                        if (user && savedPortal === 'player') {
+                          onNavigate('player-portal');
+                          setShowPortalDropdown(false);
+                        } else if (user && savedPortal === 'coach') {
+                          // User is logged in as coach, show sign out modal
+                          setPendingPortalType('player');
+                          setShowSignOutModal(true);
+                          setShowPortalDropdown(false);
+                        } else {
+                          setShowPlayerLogin(true);
+                          setShowPortalDropdown(false);
+                        }
                       }}
-                      className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                      onMouseEnter={() => setHoveredItem('player-portal')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className="w-full text-left px-4 py-3 transition-all"
+                      style={{
+                        color: hoveredItem === 'player-portal' || currentPage === 'player-portal' ? '#ffffff' : 'rgba(203, 213, 225, 0.8)',
+                        textShadow: hoveredItem === 'player-portal' || currentPage === 'player-portal' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                        backgroundColor: hoveredItem === 'player-portal' || currentPage === 'player-portal' ? 'rgba(255, 255, 255, 0.1)' : 'transparent'
+                      }}
                     >
                       Player Portal
                     </button>
@@ -231,12 +305,21 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 )}
               </div>
               
-              <button 
-                onClick={() => setShowPlayerLogin(true)}
-                className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
-              >
-                <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Log In</span>
-              </button>
+              {user ? (
+                <button 
+                  onClick={handleLogout}
+                  className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
+                >
+                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Sign Out</span>
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setShowPlayerLogin(true)}
+                  className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
+                >
+                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Log In</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -282,6 +365,43 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             onNavigate('player-portal');
           }}
         />
+      )}
+
+      {/* Sign Out Confirmation Modal */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={handleCancelSignOut}>
+          <div className="bg-slate-900 rounded-3xl max-w-md w-full p-8 border border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-white text-xl font-semibold">Sign Out Required</h2>
+              <button
+                onClick={handleCancelSignOut}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-slate-300 mb-8">
+              You are currently signed in as a {pendingPortalType === 'player' ? 'coach' : 'player'}. 
+              Please sign out to access the {pendingPortalType === 'player' ? 'player' : 'coach'} portal.
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={handleCancelSignOut}
+                className="flex-1 bg-slate-800 text-white py-3 rounded-full hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSignOut}
+                className="flex-1 bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

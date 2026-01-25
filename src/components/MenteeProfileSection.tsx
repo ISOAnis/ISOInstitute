@@ -102,6 +102,25 @@ export function MenteeProfileSection({ onProfileCompletionChange }: MenteeProfil
   }, [profile]);
 
   const completionPercentage = useMemo(() => {
+    // Check if profile was completed via the modal (has all modal fields but may not have name/email)
+    const hasAllModalFields = 
+      Boolean(profile.age?.trim()) &&
+      Boolean(profile.schoolYear?.trim()) &&
+      profile.locations.length > 0 &&
+      profile.prefersSameBackground !== null &&
+      Boolean(profile.goals?.trim()) &&
+      Boolean(profile.timeframe?.trim()) &&
+      profile.communicationPreference !== '' &&
+      profile.structurePreference !== '' &&
+      profile.motivationLevel !== '' &&
+      profile.topValues.length >= 2;
+    
+    // If all modal fields are complete, consider it 100% (name/email are optional for profile completion)
+    if (hasAllModalFields) {
+      return 100;
+    }
+    
+    // Otherwise, calculate based on all fields
     const checks: Array<boolean> = [
       Boolean(profile.name?.trim()),
       Boolean(profile.email?.trim()),

@@ -8,6 +8,7 @@ import { PlayerPortalPage } from './components/PlayerPortalPage';
 import { About } from './components/About';
 import { LoginModal } from './components/LoginModal';
 import { SignupModal } from './components/SignupModal';
+import { X } from 'lucide-react';
 import './styles/about.css';
 
 // Lazy load heavy components
@@ -46,7 +47,10 @@ export default function App() {
   const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
   const [showPlayerLogin, setShowPlayerLogin] = useState(false);
+  const [showCoachLogin, setShowCoachLogin] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
 
   useEffect(() => {
     try {
@@ -148,8 +152,99 @@ export default function App() {
   // Handle player login
   const handlePlayerLogin = (email: string, password: string) => {
     // Mock authentication - in production, this would call an API
+    const userData = { email, roles: ['player'] };
+    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
+    localStorage.setItem('iso_demo_portal', 'player');
     setShowPlayerLogin(false);
     handleNavigate('player-portal');
+  };
+
+  // Handle coach login
+  const handleCoachLogin = (email: string, password: string) => {
+    // Mock authentication - in production, this would call an API
+    const userData = { email, roles: ['coach', 'community-leader'] };
+    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
+    localStorage.setItem('iso_demo_portal', 'coach');
+    setShowCoachLogin(false);
+    handleNavigate('coach-portal');
+  };
+
+  // Helper function to sign out user
+  const signOutUser = () => {
+    localStorage.removeItem('iso_demo_user');
+    localStorage.removeItem('iso_demo_portal');
+  };
+
+  // Handle "for players" button click - check if user is logged in
+  const handlePlayerButtonClick = () => {
+    try {
+      const savedUser = localStorage.getItem('iso_demo_user');
+      const savedPortal = localStorage.getItem('iso_demo_portal');
+      
+      if (savedUser) {
+        // User is logged in, check if they're logged in as a coach
+        if (savedPortal === 'coach') {
+          // User is logged in as coach, show sign out modal
+          setPendingPortalType('player');
+          setShowSignOutModal(true);
+        } else {
+          // User is logged in as player, navigate to player portal
+          handleNavigate('player-portal');
+        }
+      } else {
+        // User is not logged in, show login modal
+        setShowPlayerLogin(true);
+      }
+    } catch (error) {
+      console.error('Failed to check login state:', error);
+      // If there's an error, show login modal as fallback
+      setShowPlayerLogin(true);
+    }
+  };
+
+  // Handle "for coaches" button click - check if user is logged in
+  const handleCoachButtonClick = () => {
+    try {
+      const savedUser = localStorage.getItem('iso_demo_user');
+      const savedPortal = localStorage.getItem('iso_demo_portal');
+      
+      if (savedUser) {
+        // User is logged in, check if they're logged in as a player
+        if (savedPortal === 'player') {
+          // User is logged in as player, show sign out modal
+          setPendingPortalType('coach');
+          setShowSignOutModal(true);
+        } else {
+          // User is logged in as coach, navigate to coach portal
+          handleNavigate('coach-portal');
+        }
+      } else {
+        // User is not logged in, show login modal
+        setShowCoachLogin(true);
+      }
+    } catch (error) {
+      console.error('Failed to check login state:', error);
+      // If there's an error, show login modal as fallback
+      setShowCoachLogin(true);
+    }
+  };
+
+  // Handle sign out confirmation
+  const handleConfirmSignOut = () => {
+    signOutUser();
+    setShowSignOutModal(false);
+    if (pendingPortalType === 'player') {
+      setShowPlayerLogin(true);
+    } else if (pendingPortalType === 'coach') {
+      setShowCoachLogin(true);
+    }
+    setPendingPortalType(null);
+  };
+
+  // Handle cancel sign out
+  const handleCancelSignOut = () => {
+    setShowSignOutModal(false);
+    setPendingPortalType(null);
   };
 
   if (currentPage === 'coach-portal') {
@@ -184,7 +279,7 @@ export default function App() {
         <>
           {/* New Simple Hero Section */}
           <Suspense fallback={<LoadingSpinner />}>
-            <Hero onNavigate={setCurrentPage} />
+            <Hero onNavigate={setCurrentPage} onPlayerClick={handlePlayerButtonClick} onCoachClick={handleCoachButtonClick} />
           </Suspense>
           
           {/* Why ISO Section */}
@@ -280,6 +375,19 @@ export default function App() {
         />
       )}
 
+      {/* Coach Login Modal */}
+      {showCoachLogin && (
+        <LoginModal
+          title="Coach Portal Sign In"
+          onClose={() => setShowCoachLogin(false)}
+          onLogin={handleCoachLogin}
+          onSignupClick={() => {
+            setShowCoachLogin(false);
+            setShowSignupModal(true);
+          }}
+        />
+      )}
+
       {/* Signup Modal */}
       {showSignupModal && (
         <SignupModal
@@ -290,6 +398,43 @@ export default function App() {
             handleNavigate('player-portal');
           }}
         />
+      )}
+
+      {/* Sign Out Confirmation Modal */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={handleCancelSignOut}>
+          <div className="bg-slate-900 rounded-3xl max-w-md w-full p-8 border border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-white text-xl font-semibold">Sign Out Required</h2>
+              <button
+                onClick={handleCancelSignOut}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-slate-300 mb-8">
+              You are currently signed in as a {pendingPortalType === 'player' ? 'coach' : 'player'}. 
+              Please sign out to access the {pendingPortalType === 'player' ? 'player' : 'coach'} portal.
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={handleCancelSignOut}
+                className="flex-1 bg-slate-800 text-white py-3 rounded-full hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSignOut}
+                className="flex-1 bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PricingProps {
   onLoginClick?: () => void;
@@ -7,6 +7,48 @@ interface PricingProps {
 
 export function Pricing({ onLoginClick }: PricingProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('iso_demo_user');
+      return savedUser !== null;
+    } catch {
+      return false;
+    }
+  });
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+
+  // Update login state when localStorage changes
+  useEffect(() => {
+    const checkLoginState = () => {
+      try {
+        const savedUser = localStorage.getItem('iso_demo_user');
+        const isUserLoggedIn = savedUser !== null;
+        setIsLoggedIn(isUserLoggedIn);
+        
+        // Determine user's plan (default to 'walk-on' for logged-in users)
+        // In the future, this could be stored in localStorage or fetched from an API
+        if (isUserLoggedIn) {
+          // Check if user has a plan stored in localStorage
+          const savedPlan = localStorage.getItem('iso_demo_plan');
+          setUserPlan(savedPlan || 'walk-on'); // Default to walk-on if no plan stored
+        } else {
+          setUserPlan(null);
+        }
+      } catch {
+        setIsLoggedIn(false);
+        setUserPlan(null);
+      }
+    };
+    
+    checkLoginState();
+    window.addEventListener('storage', checkLoginState);
+    const interval = setInterval(checkLoginState, 500);
+    
+    return () => {
+      window.removeEventListener('storage', checkLoginState);
+      clearInterval(interval);
+    };
+  }, []);
 
   const borderPalette: Record<string, { base: string; hover: string }> = {
     'walk-on': { base: 'rgba(148, 163, 184, 0.35)', hover: 'rgba(226, 232, 240, 0.8)' },
@@ -225,12 +267,25 @@ export function Pricing({ onLoginClick }: PricingProps) {
         }}>
           {pricingCards.map((card) => {
             const isHovered = hoveredCard === card.id;
+            const isUserCurrentPlan = userPlan === card.id;
+            
+            // Glow effect for user's plan
+            const userPlanGlow = isUserCurrentPlan
+              ? card.id === 'walk-on'
+                ? '0 0 30px rgba(148, 163, 184, 0.6), 0 0 50px rgba(148, 163, 184, 0.4)'
+                : card.id === 'locker-room'
+                ? '0 0 30px rgba(251, 191, 36, 0.6), 0 0 50px rgba(251, 191, 36, 0.4)'
+                : '0 0 30px rgba(249, 115, 22, 0.6), 0 0 50px rgba(59, 130, 246, 0.4)'
+              : '';
+            
             const boxShadow = isHovered
               ? card.id === 'varsity'
-                ? '0 24px 50px rgba(249, 115, 22, 0.35), 0 0 35px rgba(59, 130, 246, 0.25)'
+                ? `0 24px 50px rgba(249, 115, 22, 0.35), 0 0 35px rgba(59, 130, 246, 0.25)${userPlanGlow ? ', ' + userPlanGlow : ''}`
                 : card.emphasis
-                ? '0 20px 40px rgba(249, 115, 22, 0.25), 0 0 24px rgba(249, 115, 22, 0.15)'
-                : '0 16px 32px rgba(0, 0, 0, 0.32)'
+                ? `0 20px 40px rgba(249, 115, 22, 0.25), 0 0 24px rgba(249, 115, 22, 0.15)${userPlanGlow ? ', ' + userPlanGlow : ''}`
+                : `0 16px 32px rgba(0, 0, 0, 0.32)${userPlanGlow ? ', ' + userPlanGlow : ''}`
+              : isUserCurrentPlan
+              ? userPlanGlow
               : card.emphasis
               ? '0 12px 26px rgba(249, 115, 22, 0.2)'
               : '0 6px 18px rgba(0, 0, 0, 0.25)';
@@ -249,7 +304,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
                   transform: isHovered ? 'scale(1.02)' : 'scale(1)',
                   boxShadow,
                 overflow: 'hidden',
-                  border: `1px solid ${isHovered ? borderPalette[card.id].hover : borderPalette[card.id].base}`
+                  border: `1px solid ${isUserCurrentPlan ? borderPalette[card.id].hover : isHovered ? borderPalette[card.id].hover : borderPalette[card.id].base}`
                 }}
               >
               <div style={{ position: 'relative', zIndex: 1 }}>
@@ -351,10 +406,11 @@ export function Pricing({ onLoginClick }: PricingProps) {
                 {/* Button */}
                 <button
                   onClick={() => {
-                    if (card.id === 'walk-on' && card.buttonText === 'Join Free' && onLoginClick) {
+                    if (card.id === 'walk-on' && onLoginClick && !isLoggedIn) {
                       onLoginClick();
                     }
                   }}
+                  disabled={isUserCurrentPlan}
                   style={{
                     width: '100%',
                     padding: '8px 15px',
@@ -366,16 +422,17 @@ export function Pricing({ onLoginClick }: PricingProps) {
                     fontSize: '1rem',
                     fontWeight: '600',
                     border: 'none',
-                    cursor: 'pointer',
+                    cursor: isUserCurrentPlan ? 'default' : 'pointer',
                     transition: 'all 0.3s ease-out',
                     fontFamily: "'Bebas Neue', sans-serif",
                     boxShadow: hoveredCard === card.id
                       ? '0 4px 14px rgba(0, 0, 0, 0.35)'
                       : '0 2px 8px rgba(0, 0, 0, 0.2)',
                     transform: hoveredCard === card.id ? 'translateY(-2px)' : 'translateY(0)',
+                    opacity: isUserCurrentPlan ? 0.9 : 1,
                   }}
                   onMouseEnter={(e) => {
-                    if (card.id !== 'varsity') {
+                    if (card.id !== 'varsity' && !isUserCurrentPlan) {
                       e.currentTarget.style.background = `linear-gradient(135deg, ${borderPalette[card.id].hover}, rgba(255,255,255,0.25))`;
                     }
                   }}
@@ -385,7 +442,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
                     }
                   }}
                 >
-                  {card.buttonText}
+                  {isUserCurrentPlan ? 'Your Plan' : card.buttonText}
                 </button>
               </div>
             </div>

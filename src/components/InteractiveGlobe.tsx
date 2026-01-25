@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Globe from 'react-globe.gl@2.27.2';
-import { MapPin, X } from 'lucide-react';
+import { MapPin, X, Search } from 'lucide-react';
+import { locationOptions, LocationOption } from '../data/locations';
 
 interface Location {
   lat: number;
@@ -25,21 +26,98 @@ export function InteractiveGlobe({
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [tempLocation, setTempLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [filteredLocations, setFilteredLocations] = useState<LocationOption[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (globeEl.current) {
+      const controls = globeEl.current.controls();
       // Disable auto-rotate for better user control
-      globeEl.current.controls().autoRotate = false;
+      controls.autoRotate = false;
+      // Enable zoom
+      controls.enableZoom = true;
+      // Enable rotation (drag to rotate)
+      controls.enableRotate = true;
+      // Enable panning
+      controls.enablePan = true;
+      // Set zoom limits (closer = more zoomed in)
+      controls.minDistance = 150;
+      controls.maxDistance = 800;
+      // Make controls more responsive
+      controls.rotateSpeed = 0.5;
+      controls.zoomSpeed = 1.2;
+      // Enable damping for smoother interactions
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
     }
   }, []);
+
+  // Filter locations based on search query
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = locationOptions.filter(loc =>
+        loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        loc.country.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 10); // Limit to 10 results
+      setFilteredLocations(filtered);
+      setShowDropdown(true);
+    } else {
+      setFilteredLocations([]);
+      setShowDropdown(false);
+    }
+  }, [searchQuery]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showDropdown]);
 
   const handleGlobeClick = (coords: { lat: number; lng: number }) => {
     if (locations.length >= maxLocations) {
       return;
     }
     
+    // Zoom to clicked location
+    if (globeEl.current) {
+      globeEl.current.pointOfView({ lat: coords.lat, lng: coords.lng, altitude: 2 }, 1000);
+    }
+    
     setTempLocation(coords);
     setShowLabelInput(true);
+  };
+
+  const handleLocationSelect = (location: LocationOption) => {
+    if (locations.length >= maxLocations) {
+      return;
+    }
+    
+    // Zoom to selected location
+    if (globeEl.current) {
+      globeEl.current.pointOfView({ lat: location.lat, lng: location.lng, altitude: 2 }, 1000);
+    }
+    
+    // Add location immediately with the location name
+    onAddLocation({
+      lat: location.lat,
+      lng: location.lng,
+      label: location.name
+    });
+    
+    setSearchQuery('');
+    setShowDropdown(false);
   };
 
   const confirmLocation = () => {
@@ -61,9 +139,16 @@ export function InteractiveGlobe({
     setShowLabelInput(false);
   };
 
+  const handleAddLocationClick = () => {
+    if (locations.length >= maxLocations) {
+      return;
+    }
+    setShowLabelInput(true);
+  };
+
   return (
     <div className="relative">
-      <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700">
+      <div className="relative inline-block">
         <Globe
           ref={globeEl}
           globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -78,7 +163,17 @@ export function InteractiveGlobe({
           pointRadius={0.6}
           onGlobeClick={handleGlobeClick}
           pointLabel={(d: any) => d.label}
+          enablePointerInteraction={true}
         />
+        {/* Instructions overlay */}
+        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs p-3 rounded-lg border border-white/10 max-w-[200px] z-10">
+          <p className="font-semibold mb-1">How to use:</p>
+          <ul className="space-y-1 text-slate-300">
+            <li>• Drag to rotate</li>
+            <li>• Scroll to zoom</li>
+            <li>• Click to select location</li>
+          </ul>
+        </div>
       </div>
 
       {/* Selected Locations List */}
@@ -101,6 +196,57 @@ export function InteractiveGlobe({
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Location Search Dropdown */}
+      {locations.length < maxLocations && (
+        <div className="mt-4 relative">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowDropdown(true)}
+              placeholder="Search for a city or country..."
+              className="w-full bg-slate-800 text-white rounded-xl pl-10 pr-4 py-3 border border-slate-700 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+            />
+          </div>
+          
+          {/* Dropdown Results */}
+          {showDropdown && filteredLocations.length > 0 && (
+            <div
+              ref={dropdownRef}
+              className="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto"
+            >
+              {filteredLocations.map((location, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleLocationSelect(location)}
+                  className="w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors border-b border-slate-700 last:border-b-0"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-white font-medium">{location.name}</div>
+                      <div className="text-slate-400 text-sm">{location.country}</div>
+                    </div>
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {showDropdown && searchQuery && filteredLocations.length === 0 && (
+            <div
+              ref={dropdownRef}
+              className="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl p-4 text-center text-slate-400"
+            >
+              No locations found
+            </div>
+          )}
         </div>
       )}
 

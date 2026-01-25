@@ -3,9 +3,11 @@ import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community') => void;
+  onPlayerClick?: () => void;
+  onCoachClick?: () => void;
 }
 
-export function Hero({ onNavigate }: HeroProps = {}) {
+export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}) {
   const scrollToCourt = () => {
     const courtSection = document.getElementById('iso-court');
     if (courtSection) {
@@ -128,7 +130,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
                 />
 
                 <button
-                  onClick={() => onNavigate?.('player-portal')}
+                  onClick={() => onPlayerClick?.()}
                   className="relative px-6 py-3 rounded-full text-white text-base font-semibold transition-all z-10"
                   style={{ 
                     fontFamily: "'Bebas Neue', sans-serif",
@@ -185,7 +187,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
                 />
 
                 <button
-                  onClick={() => onNavigate?.('coach-portal')}
+                  onClick={() => onCoachClick?.()}
                   className="relative px-6 py-3 rounded-full text-white text-base font-semibold transition-all z-10"
                   style={{ 
                     fontFamily: "'Bebas Neue', sans-serif",

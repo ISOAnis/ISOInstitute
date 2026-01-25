@@ -12,6 +12,7 @@ import { MentorProfileSection } from './MentorProfileSection';
 import { AIMatchingDashboard } from './AIMatchingDashboard';
 import { LockerRoom } from './LockerRoom';
 import { MentorMenteeChat } from './MentorMenteeChat';
+import { CoachProfileCompletionModal } from './CoachProfileCompletionModal';
 
 interface Comment {
   id: string;
@@ -161,6 +162,7 @@ export function CoachPortal() {
   const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(players[0]);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showCoachProfileCompletionModal, setShowCoachProfileCompletionModal] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(() => {
     const saved = localStorage.getItem('coach_profile_completion');
     return saved ? Number(saved) : 0;
@@ -203,6 +205,13 @@ export function CoachPortal() {
     setTimeout(() => {
       profileSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 150);
+  };
+
+  const handleCoachProfileComplete = (profileData: any) => {
+    // Save profile data to localStorage
+    localStorage.setItem('coach_profile_data', JSON.stringify(profileData));
+    setShowCoachProfileCompletionModal(false);
+    setProfileCompletion(100);
   };
 
   const coachTutorialSteps = [
@@ -374,6 +383,14 @@ export function CoachPortal() {
         />
       )}
 
+      {/* Coach Profile Completion Modal */}
+      {showCoachProfileCompletionModal && (
+        <CoachProfileCompletionModal
+          onClose={() => setShowCoachProfileCompletionModal(false)}
+          onComplete={handleCoachProfileComplete}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto">
         {/* Profile Completion Banner */}
         {showProfileCompletion && (
@@ -390,7 +407,7 @@ export function CoachPortal() {
               </div>
             </div>
             <button
-              onClick={focusProfileSection}
+              onClick={() => setShowCoachProfileCompletionModal(true)}
               className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
             >
               Complete Profile
