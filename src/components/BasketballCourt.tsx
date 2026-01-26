@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { CategoryBubble } from './CategoryBubble';
 import { FeatureShowcase } from './FeatureShowcase';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Compass, BookOpen, Users, Briefcase } from 'lucide-react';
-import { getAccentColor } from './Pathways';
+import { getAccentColor } from './ForPlayers';
 
 interface CommitmentStatus {
   isCommitted: boolean;

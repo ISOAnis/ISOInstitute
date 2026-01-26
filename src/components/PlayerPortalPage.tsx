@@ -5,7 +5,7 @@ import { Footer } from './Footer';
 
 interface PlayerPortalPageProps {
   onNavigate: (
-    page: 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store'
+    page: 'home' | 'for-players' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store'
   ) => void;
 }
 

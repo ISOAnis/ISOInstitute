@@ -68,7 +68,7 @@ const PATHWAY_SELECTION_KEY = 'iso_pathway_selection_completed';
 type PlayerTab = 'progress' | 'messages' | 'profile';
 
 interface MenteePortalProps {
-  onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store') => void;
+  onNavigate?: (page: 'home' | 'for-players' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store') => void;
 }
 
 export function MenteePortal({ onNavigate }: MenteePortalProps) {

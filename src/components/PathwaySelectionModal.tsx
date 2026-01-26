@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, X, LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { getAccentColor } from './Pathways';
+import { getAccentColor } from './ForPlayers';
 
 type PathwayData = {
   id: string;

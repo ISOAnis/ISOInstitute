@@ -4,7 +4,7 @@ import { ChevronDown, X } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store';
+type Page = 'home' | 'for-players' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store';
 type UserRole = 'coach' | 'player' | 'community-leader';
 
 interface User {
@@ -169,16 +169,16 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
             
             <div className="flex items-center gap-6 text-sm">
               <button 
-                onClick={() => onNavigate('pathways')}
-                onMouseEnter={() => setHoveredItem('pathways')}
+                onClick={() => onNavigate('for-players')}
+                onMouseEnter={() => setHoveredItem('for-players')}
                 onMouseLeave={() => setHoveredItem(null)}
                 style={{ 
-                  color: hoveredItem === 'pathways' || currentPage === 'pathways' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
-                  textShadow: hoveredItem === 'pathways' || currentPage === 'pathways' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                  color: hoveredItem === 'for-players' || currentPage === 'for-players' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                  textShadow: hoveredItem === 'for-players' || currentPage === 'for-players' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
                   transition: 'all 0.3s ease'
                 }}
               >
-                Pathways
+                For Players
               </button>
               {/* Community tab - temporarily hidden */}
               {false && (

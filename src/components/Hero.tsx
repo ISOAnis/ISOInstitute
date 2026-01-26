@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
-  onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community') => void;
+  onNavigate?: (page: 'home' | 'for-players' | 'about' | 'community') => void;
   onPlayerClick?: () => void;
   onCoachClick?: () => void;
 }

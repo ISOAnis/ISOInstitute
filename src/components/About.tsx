@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 
 type Page =
   | "home"
-  | "pathways"
+  | "for-players"
   | "about"
   | "community"
   | "store"
@@ -1029,7 +1029,7 @@ function ClosingCTA({ onNavigate }: ClosingCTAProps) {
           {/* Call an ISO - Players */}
           <div style={{ textAlign: "center" }}>
             <button
-              onClick={() => onNavigate?.("pathways")}
+              onClick={() => onNavigate?.("for-players")}
               style={{
                 fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: "20px",

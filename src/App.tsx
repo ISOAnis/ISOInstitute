@@ -18,12 +18,12 @@ const ProductShowcase = lazy(() => import('./components/ProductShowcase').then(m
 const Pricing = lazy(() => import('./components/Pricing').then(m => ({ default: m.Pricing })));
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
 const WhyISO = lazy(() => import('./components/WhyISO').then(m => ({ default: m.WhyISO })));
-const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
+const ForPlayers = lazy(() => import('./components/ForPlayers').then(m => ({ default: m.ForPlayers })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
 const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store';
+type Page = 'home' | 'for-players' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -63,7 +63,7 @@ export default function App() {
         selectedCategoryId: string | null;
       }>;
 
-      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store'];
+      const validPages: Page[] = ['home', 'for-players', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store'];
       if (parsed.currentPage && validPages.includes(parsed.currentPage)) {
         // Only restore Call ISO page if we also have a coach to show
         const targetPage = parsed.currentPage === 'call-iso' && !parsed.selectedCoachName ? 'home' : parsed.currentPage;
@@ -106,8 +106,8 @@ export default function App() {
     }
     setCurrentPage(page);
     
-    // Scroll to top when navigating to pathways page
-    if (page === 'pathways') {
+    // Scroll to top when navigating to for-players page
+    if (page === 'for-players') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -297,7 +297,7 @@ export default function App() {
                 onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
                 forceOpenCategoryId={shouldReopenMentorModal ? selectedCategoryId : null}
                 onForceOpenHandled={() => setShouldReopenMentorModal(false)}
-                onNavigateToPathways={() => handleNavigate('pathways')}
+                onNavigateToPathways={() => handleNavigate('for-players')}
               />
             </Suspense>
           </div>
@@ -313,9 +313,9 @@ export default function App() {
         </>
       )}
 
-      {currentPage === 'pathways' && (
+      {currentPage === 'for-players' && (
         <Suspense fallback={<LoadingSpinner />}>
-        <Pathways 
+        <ForPlayers 
           onNavigate={setCurrentPage} 
           onNavigateToCallIso={navigateToCallIso}
           commitmentStatus={menteeCommitmentStatus}
