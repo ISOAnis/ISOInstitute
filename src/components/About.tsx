@@ -26,25 +26,20 @@ export function About({ onNavigate }: AboutProps) {
 function HeroSection() {
   const [showModal, setShowModal] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const modalVideoRef = useRef<HTMLVideoElement>(null);
 
   const handleWatchTrailer = () => {
     setShowModal(true);
-    // Small delay to ensure modal video element is mounted
-    setTimeout(() => {
-      if (modalVideoRef.current) {
-        modalVideoRef.current.muted = false;
-        modalVideoRef.current.currentTime = 0;
-        modalVideoRef.current.play().catch(console.error);
-      }
-    }, 100);
+    if (videoRef.current) {
+      videoRef.current.muted = false;
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
   };
 
   const handleCloseTrailer = () => {
     setShowModal(false);
-    if (modalVideoRef.current) {
-      modalVideoRef.current.pause();
-      modalVideoRef.current.muted = true;
+    if (videoRef.current) {
+      videoRef.current.muted = true;
     }
   };
 
@@ -79,7 +74,7 @@ function HeroSection() {
           muted
           playsInline
         >
-          <source src="/Show Dem Nike Football.mp4" type="video/mp4" />
+          <source src="Show Dem Nike Football.mp4" type="video/mp4" />
         </video>
 
         {/* Dark Overlay */}
@@ -191,12 +186,12 @@ function HeroSection() {
             }}
           >
             <video
-              ref={modalVideoRef}
+              ref={videoRef}
               style={{ width: '100%', height: '100%' }}
               controls
               autoPlay
             >
-              <source src="/Show Dem Nike Football.mp4" type="video/mp4" />
+              <source src="/your-video.mp4" type="video/mp4" />
             </video>
 
             <button
@@ -943,7 +938,7 @@ function ClosingCTA({ onNavigate }: ClosingCTAProps) {
         >
           ISO is built on courage from players
           <br />
-          and sustained by humility from coaches.
+          and sustained by humility.
             </h2>
 
         {/* CTA Buttons */}
@@ -1044,7 +1039,7 @@ function ClosingCTA({ onNavigate }: ClosingCTAProps) {
             </div>
           </div>
         </div>
-        </div>
-      </section>
+      </div>
+    </section>
   );
 }

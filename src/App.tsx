@@ -22,8 +22,9 @@ const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
 const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
+const ForCoaches = lazy(() => import('./pages/ForCoaches').then(m => ({ default: m.default })));
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store' | 'for-coaches';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -63,7 +64,7 @@ export default function App() {
         selectedCategoryId: string | null;
       }>;
 
-      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store'];
+      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store', 'for-coaches'];
       if (parsed.currentPage && validPages.includes(parsed.currentPage)) {
         // Only restore Call ISO page if we also have a coach to show
         const targetPage = parsed.currentPage === 'call-iso' && !parsed.selectedCoachName ? 'home' : parsed.currentPage;
@@ -329,6 +330,12 @@ export default function App() {
         </Suspense>
       )}
 
+      {currentPage === 'for-coaches' && (
+        <Suspense fallback={<LoadingSpinner />}>
+          <ForCoaches />
+        </Suspense>
+      )}
+
       {/* Community page - temporarily hidden */}
       {false && currentPage === 'community' && (
         <Suspense fallback={<LoadingSpinner />}>
@@ -346,7 +353,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {currentPage !== 'call-iso' && <Footer onNavigate={setCurrentPage} />}
+      {currentPage !== 'call-iso' && currentPage !== 'for-coaches' && <Footer onNavigate={setCurrentPage} />}
 
       {/* Consultation Modal - shown before Call ISO page */}
       {showConsultationModal && pendingCoachName && (
