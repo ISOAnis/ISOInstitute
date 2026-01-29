@@ -193,18 +193,14 @@
     font-feature-settings: var(--default-font-feature-settings, normal);
     font-variation-settings: var(--default-font-variation-settings, normal);
     -webkit-tap-highlight-color: transparent;
-    overflow-x: hidden;
-    scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
+    scroll-behavior: auto;
     background-color: #05060a;
-    overscroll-behavior: none;
   }
 
   body {
     line-height: inherit;
-    overflow-x: hidden;
-    scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
+    scroll-behavior: auto;
     background-color: #05060a;
-    overscroll-behavior: none;
     margin: 0;
     padding: 0;
   }
