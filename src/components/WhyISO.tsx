@@ -31,12 +31,13 @@ export function WhyISO() {
       <div style={{ textAlign: 'center', marginBottom: '40px', display: 'flex', justifyContent: 'center' }}>
         <div
           style={{
-            background: 'linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            padding: '32px 48px',
-            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3)',
-            display: 'inline-block',
+            background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '24px',
+            padding: '40px 60px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 255, 255, 0.02)',
+            maxWidth: '1280px',
+            width: '100%',
           }}
         >
           <h2
@@ -84,12 +85,12 @@ export function WhyISO() {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '80px',
+          gap: '40px',
           alignItems: 'center',
         }}
       >
         {/* Left Content */}
-        <div>
+        <div style={{ marginLeft: 'auto', maxWidth: '400px' }}>
           <h3
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
@@ -118,61 +119,64 @@ export function WhyISO() {
           </p>
         </div>
 
-        {/* Right Visualization */}
+        {/* Right Visualization - Radar */}
         <div
           style={{
             position: 'relative',
             height: '500px',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
+          {/* Descriptive Text */}
+          <p
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: '16px',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'rgba(255, 255, 255, 0.6)',
+              marginBottom: '16px',
+            }}
+          >
+            ISO expands your proximity beyond your natural reach.
+          </p>
+
+          {/* Radar Container */}
           <div
             style={{
               position: 'relative',
-              width: '100%',
-              height: '100%',
+              width: '400px',
+              height: '400px',
             }}
           >
-            {/* Rings */}
+            {/* Outer Circle - With ISO */}
             <div
-              className="degree-ring ring-1"
               style={{
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '160px',
-                height: '160px',
+                width: '380px',
+                height: '380px',
                 borderRadius: '50%',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '2px solid rgba(249, 115, 22, 0.6)',
               }}
             />
+
+            {/* Inner Circle - Without ISO */}
             <div
-              className="degree-ring ring-2"
               style={{
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '260px',
-                height: '260px',
+                width: '180px',
+                height: '180px',
                 borderRadius: '50%',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
-            />
-            <div
-              className="degree-ring ring-3"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '360px',
-                height: '360px',
-                borderRadius: '50%',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: '2px dashed rgba(150, 150, 150, 0.5)',
               }}
             />
 
@@ -183,15 +187,15 @@ export function WhyISO() {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '80px',
-                height: '80px',
+                width: '60px',
+                height: '60px',
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05))',
                 border: '2px solid rgba(255, 255, 255, 0.4)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '16px',
+                fontSize: '14px',
                 fontWeight: 'bold',
                 zIndex: 10,
                 boxShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
@@ -202,352 +206,217 @@ export function WhyISO() {
               YOU
             </div>
 
-            {/* First Degree Nodes */}
+            {/* Radar Pulse */}
             <div
-              className="node degree-1 node-1-1"
+              className="radar-pulse"
               style={{
                 position: 'absolute',
-                top: '15%',
+                top: '50%',
                 left: '50%',
-                transform: 'translateX(-50%)',
+                transform: 'translate(-50%, -50%)',
                 width: '50px',
                 height: '50px',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
                 borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
+                border: '3px solid rgba(249, 115, 22, 0.9)',
+                boxShadow: '0 0 25px rgba(249, 115, 22, 0.5), inset 0 0 15px rgba(249, 115, 22, 0.2)',
+                animation: 'radar-sweep 5s linear infinite',
               }}
-            >
-              1°
-            </div>
-            <div
-              className="node degree-1 node-1-2"
-              style={{
-                position: 'absolute',
-                bottom: '15%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '50px',
-                height: '50px',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              1°
-            </div>
-            <div
-              className="node degree-1 node-1-3"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '15%',
-                transform: 'translateY(-50%)',
-                width: '50px',
-                height: '50px',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              1°
-            </div>
-            <div
-              className="node degree-1 node-1-4"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                right: '15%',
-                transform: 'translateY(-50%)',
-                width: '50px',
-                height: '50px',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              1°
-            </div>
+            />
 
-            {/* Second Degree Nodes */}
-            <div
-              className="node node-2-1"
-              style={{
-                position: 'absolute',
-                top: '10%',
-                left: '25%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
-            <div
-              className="node node-2-2"
-              style={{
-                position: 'absolute',
-                top: '10%',
-                right: '25%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
-            <div
-              className="node node-2-3"
-              style={{
-                position: 'absolute',
-                bottom: '10%',
-                left: '25%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
-            <div
-              className="node node-2-4"
-              style={{
-                position: 'absolute',
-                bottom: '10%',
-                right: '25%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
-            <div
-              className="node node-2-5"
-              style={{
-                position: 'absolute',
-                top: '30%',
-                left: '5%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
-            <div
-              className="node node-2-6"
-              style={{
-                position: 'absolute',
-                top: '30%',
-                right: '5%',
-                width: '40px',
-                height: '40px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              2°
-            </div>
+            {/* Grey Dots - Without ISO zone */}
+            {(() => {
+              const greyDots = [
+                { x: 38, y: 35 },
+                { x: 62, y: 40 },
+                { x: 42, y: 65 },
+              ];
+              // Container is 400px, pulse goes from 25px to 190px radius over 80% of animation
+              const containerSize = 400;
+              const pulseStartRadius = 25;
+              const pulseEndRadius = 190;
+              const pulseTravelDistance = pulseEndRadius - pulseStartRadius;
+              const sweepPortionPercent = 80;
+              const holdEnd = 80;
 
-            {/* Third Degree Nodes */}
-            <div
-              className="node degree-3 node-3-1"
-              style={{
-                position: 'absolute',
-                top: '5%',
-                left: '15%',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
+              return greyDots.map((dot, i) => {
+                const centerX = 50;
+                const centerY = 50;
+                const dx = dot.x - centerX;
+                const dy = dot.y - centerY;
+                // Convert percentage distance to pixels (1% = 4px in 400px container)
+                const distanceInPixels = Math.sqrt(dx * dx + dy * dy) * (containerSize / 100);
+                const appearPercent = Math.max(0, ((distanceInPixels - pulseStartRadius) / pulseTravelDistance) * sweepPortionPercent);
+                const appear = Math.min(appearPercent, sweepPortionPercent - 2);
+
+                return (
+                  <React.Fragment key={`grey-${i}`}>
+                    <style>{`
+                      @keyframes grey-dot-${i} {
+                        0%, ${appear.toFixed(1)}% {
+                          opacity: 0;
+                          transform: translate(-50%, -50%) scale(0);
+                        }
+                        ${(appear + 1).toFixed(1)}% {
+                          opacity: 1;
+                          transform: translate(-50%, -50%) scale(1.25);
+                        }
+                        ${(appear + 3).toFixed(1)}%, ${holdEnd}% {
+                          opacity: 1;
+                          transform: translate(-50%, -50%) scale(1);
+                        }
+                        100% {
+                          opacity: 0;
+                          transform: translate(-50%, -50%) scale(0);
+                        }
+                      }
+                    `}</style>
+                    <div
+                      className="connection-dot"
+                      style={{
+                        position: 'absolute',
+                        left: `${dot.x}%`,
+                        top: `${dot.y}%`,
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        background: 'rgba(150, 150, 150, 0.9)',
+                        boxShadow: '0 0 8px rgba(150, 150, 150, 0.5)',
+                        animation: `grey-dot-${i} 5s linear infinite`,
+                      }}
+                    />
+                  </React.Fragment>
+                );
+              });
+            })()}
+
+            {/* Orange Dots - With ISO zone (scattered randomly) */}
+            {(() => {
+              const orangeDots = [
+                { x: 76, y: 38 },
+                { x: 24, y: 58 },
+                { x: 67, y: 78 },
+                { x: 18, y: 35 },
+                { x: 85, y: 52 },
+                { x: 38, y: 15 },
+                { x: 12, y: 48 },
+                { x: 72, y: 85 },
+                { x: 88, y: 38 },
+                { x: 28, y: 82 },
+                { x: 55, y: 8 },
+                { x: 8, y: 62 },
+                { x: 92, y: 55 },
+                { x: 45, y: 90 },
+                { x: 78, y: 22 },
+                { x: 20, y: 75 },
+              ];
+              // Container is 400px, pulse goes from 25px to 190px radius over 80% of animation
+              const containerSize = 400;
+              const pulseStartRadius = 25;
+              const pulseEndRadius = 190;
+              const pulseTravelDistance = pulseEndRadius - pulseStartRadius;
+              const sweepPortionPercent = 80;
+              const holdEnd = 80;
+
+              return orangeDots.map((dot, i) => {
+                const centerX = 50;
+                const centerY = 50;
+                const dx = dot.x - centerX;
+                const dy = dot.y - centerY;
+                // Convert percentage distance to pixels (1% = 4px in 400px container)
+                const distanceInPixels = Math.sqrt(dx * dx + dy * dy) * (containerSize / 100);
+                const appearPercent = Math.max(0, ((distanceInPixels - pulseStartRadius) / pulseTravelDistance) * sweepPortionPercent);
+                const appear = Math.min(appearPercent, sweepPortionPercent - 2);
+
+                return (
+                  <React.Fragment key={`orange-${i}`}>
+                    <style>{`
+                      @keyframes orange-dot-${i} {
+                        0%, ${appear.toFixed(1)}% {
+                          opacity: 0;
+                          transform: translate(-50%, -50%) scale(0);
+                        }
+                        ${(appear + 1).toFixed(1)}% {
+                          opacity: 1;
+                          transform: translate(-50%, -50%) scale(1.25);
+                        }
+                        ${(appear + 3).toFixed(1)}%, ${holdEnd}% {
+                          opacity: 1;
+                          transform: translate(-50%, -50%) scale(1);
+                        }
+                        100% {
+                          opacity: 0;
+                          transform: translate(-50%, -50%) scale(0);
+                        }
+                      }
+                    `}</style>
+                    <div
+                      className="connection-dot"
+                      style={{
+                        position: 'absolute',
+                        left: `${dot.x}%`,
+                        top: `${dot.y}%`,
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        background: 'rgba(249, 115, 22, 0.9)',
+                        boxShadow: '0 0 8px rgba(249, 115, 22, 0.5)',
+                        animation: `orange-dot-${i} 5s linear infinite`,
+                      }}
+                    />
+                  </React.Fragment>
+                );
+              });
+            })()}
+          </div>
+
+          {/* Legend */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '32px',
+              marginTop: '24px',
+              justifyContent: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: 'rgba(150, 150, 150, 0.9)',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                Natural Reach
+              </span>
             </div>
-            <div
-              className="node degree-3 node-3-2"
-              style={{
-                position: 'absolute',
-                top: '5%',
-                right: '15%',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
-            </div>
-            <div
-              className="node degree-3 node-3-3"
-              style={{
-                position: 'absolute',
-                bottom: '5%',
-                left: '15%',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
-            </div>
-            <div
-              className="node degree-3 node-3-4"
-              style={{
-                position: 'absolute',
-                bottom: '5%',
-                right: '15%',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
-            </div>
-            <div
-              className="node degree-3 node-3-5"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '2%',
-                transform: 'translateY(-50%)',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
-            </div>
-            <div
-              className="node degree-3 node-3-6"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                right: '2%',
-                transform: 'translateY(-50%)',
-                width: '30px',
-                height: '30px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '10px',
-                color: 'white',
-                fontFamily: "'Bebas Neue', sans-serif",
-              }}
-            >
-              3°
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: 'rgba(249, 115, 22, 0.9)',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                ISO Impact
+              </span>
             </div>
           </div>
         </div>
@@ -555,44 +424,31 @@ export function WhyISO() {
 
       {/* Animations and Responsive Styles */}
       <style>{`
-        @keyframes pulse-ring {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(0, -10px); }
+        @keyframes radar-sweep {
+          0% {
+            width: 50px;
+            height: 50px;
+            border-color: rgba(249, 115, 22, 1);
+            box-shadow: 0 0 40px rgba(249, 115, 22, 0.8), inset 0 0 25px rgba(249, 115, 22, 0.4);
+          }
+          80% {
+            width: 380px;
+            height: 380px;
+            border-color: rgba(249, 115, 22, 0.7);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.5), inset 0 0 15px rgba(249, 115, 22, 0.2);
+          }
+          100% {
+            width: 380px;
+            height: 380px;
+            border-color: rgba(249, 115, 22, 0);
+            box-shadow: 0 0 0px rgba(249, 115, 22, 0);
+            opacity: 0;
+          }
         }
 
-        .degree-ring {
-          animation: pulse-ring 3s ease-in-out infinite;
+        .connection-dot {
+          will-change: transform, opacity;
         }
-
-        .ring-1 { animation-delay: 0s; }
-        .ring-2 { animation-delay: 0.5s; }
-        .ring-3 { animation-delay: 1s; }
-
-        .node {
-          animation: float 4s ease-in-out infinite;
-        }
-
-        .node-1-1 { animation-delay: 0s; }
-        .node-1-2 { animation-delay: 0.5s; }
-        .node-1-3 { animation-delay: 1s; }
-        .node-1-4 { animation-delay: 1.5s; }
-        .node-2-1 { animation-delay: 0.3s; }
-        .node-2-2 { animation-delay: 0.6s; }
-        .node-2-3 { animation-delay: 0.9s; }
-        .node-2-4 { animation-delay: 1.2s; }
-        .node-2-5 { animation-delay: 1.5s; }
-        .node-2-6 { animation-delay: 1.8s; }
-        .node-3-1 { animation-delay: 0.4s; }
-        .node-3-2 { animation-delay: 0.7s; }
-        .node-3-3 { animation-delay: 1s; }
-        .node-3-4 { animation-delay: 1.3s; }
-        .node-3-5 { animation-delay: 1.6s; }
-        .node-3-6 { animation-delay: 1.9s; }
 
         @media (max-width: 968px) {
           section > div[style*="grid-template-columns"] {
@@ -621,12 +477,13 @@ export function WhyISO() {
       <div style={{ textAlign: 'center', marginBottom: '64px', display: 'flex', justifyContent: 'center' }}>
         <div
           style={{
-            background: 'linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            padding: '32px 48px',
-            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3)',
-            display: 'inline-block',
+            background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '24px',
+            padding: '40px 60px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 255, 255, 0.02)',
+            maxWidth: '1280px',
+            width: '100%',
           }}
         >
           <h3
@@ -775,54 +632,28 @@ export function WhyISO() {
                 overflowY: 'auto',
               }}
             >
-              <h4
+              <p
                 style={{
                   fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(24px, 3vw, 32px)',
-                  marginBottom: '24px',
-                  letterSpacing: '0.02em',
+                  fontSize: 'clamp(18px, 2vw, 22px)',
+                  lineHeight: '1.7',
                   color: 'rgba(255, 255, 255, 0.9)',
-                }}
-              >
-                Why Courage?
-              </h4>
-              <p
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
-                  lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
                   letterSpacing: '0.01em',
-                  marginBottom: '16px',
                 }}
               >
-                Calling an ISO means rejecting comfort. It's choosing to be seen, to be challenged,
-                to risk failure in front of people who will push you.
+                Calling an ISO means rejecting comfort. Choosing to be seen, challenged, and risking failure in front of people who will push you.
               </p>
               <p
                 style={{
                   fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
+                  fontSize: 'clamp(18px, 2vw, 22px)',
                   lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
+                  color: 'rgba(255, 255, 255, 0.9)',
                   letterSpacing: '0.01em',
-                  marginBottom: '16px',
+                  marginTop: '24px',
                 }}
               >
-                Most people never make that call. They stay in their routines, their safe spaces,
-                their isolated loops. ISO exists for the ones who choose differently.
-              </p>
-              <p
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
-                  lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
-                  letterSpacing: '0.01em',
-                }}
-              >
-                Players build ISO by showing up, doing the work, and refusing to settle for growth
-                that doesn't demand anything from them.
+                Most people never make that call. ISO exists for the ones who choose differently.
               </p>
               <span
                 style={{
@@ -938,55 +769,28 @@ export function WhyISO() {
                 overflowY: 'auto',
               }}
             >
-              <h4
+              <p
                 style={{
                   fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(24px, 3vw, 32px)',
-                  marginBottom: '24px',
-                  letterSpacing: '0.02em',
+                  fontSize: 'clamp(18px, 2vw, 22px)',
+                  lineHeight: '1.7',
                   color: 'rgba(255, 255, 255, 0.9)',
-                }}
-              >
-                Why Humility?
-              </h4>
-              <p
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
-                  lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
                   letterSpacing: '0.01em',
-                  marginBottom: '16px',
                 }}
               >
-                Accepting the call means putting someone else's growth above your own recognition.
-                It's choosing service over status, impact over income.
+                Accepting the call means putting someone else's growth above your own recognition. Choosing service over status, impact over income.
               </p>
               <p
                 style={{ 
                   fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
+                  fontSize: 'clamp(18px, 2vw, 22px)',
                   lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
+                  color: 'rgba(255, 255, 255, 0.9)',
                   letterSpacing: '0.01em',
-                  marginBottom: '16px',
+                  marginTop: '24px',
                 }}
               >
-                In a world that celebrates celebrity and personal brands, coaches choose
-                differently. They invest time, energy, and attention into people who may never make
-                them famous.
-              </p>
-              <p 
-                style={{ 
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: 'clamp(16px, 1.8vw, 20px)',
-                  lineHeight: '1.7',
-                  color: 'rgba(255, 255, 255, 0.75)',
-                  letterSpacing: '0.01em',
-                }}
-              >
-                Coaches sustain ISO by showing up consistently, sharing what they know, and
-                prioritizing the community over themselves.
+                In a world that celebrates celebrity, coaches invest in people who may never make them famous. That's humility.
               </p>
               <span
                 style={{
