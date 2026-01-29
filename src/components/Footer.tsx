@@ -1,6 +1,6 @@
-import { Instagram, Linkedin, Mail, Youtube } from 'lucide-react';
+import { Instagram, Linkedin, Mail, Youtube } from "lucide-react";
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
+type Page = "home" | "pathways" | "about" | "community" | "call-iso";
 
 interface FooterProps {
   onNavigate?: (page: Page) => void;
@@ -8,30 +8,42 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5" style={{ background: '#030305' }}>
+    <footer
+      className="text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5"
+      style={{ background: "#030305" }}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Left Column - Logo and Tagline */}
           <div>
             <div className="mb-6">
-              <img 
-                src="/ISO OFFICIAL.png" 
-                alt="ISO Logo" 
+              <img
+                src="/ISO OFFICIAL.png"
+                alt="ISO Logo"
                 className="h-12 w-auto object-contain mb-4"
                 onError={(e) => {
                   const target = e.currentTarget as HTMLImageElement;
-                  target.style.display = 'none';
+                  target.style.display = "none";
                 }}
               />
               <div className="space-y-1">
-                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                  Your Purpose.
+                <p
+                  className="text-white text-lg"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                >
+                  THE COMMUNITY.
                 </p>
-                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                  Your Coach.
+                <p
+                  className="text-white text-lg"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                >
+                  THE MOVEMENT.
                 </p>
-                <p className="text-white text-lg" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                  Your Next Move.
+                <p
+                  className="text-white text-lg"
+                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                >
+                  THE EXPERIENCE.
                 </p>
               </div>
             </div>
@@ -39,22 +51,37 @@ export function Footer({ onNavigate }: FooterProps) {
 
           {/* Resources Column */}
           <div>
-            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+            <h4
+              className="mb-4 font-semibold uppercase tracking-wide"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                color: "#a8a8a8",
+              }}
+            >
               Resources
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                <a
+                  href="#"
+                  className="text-white hover:text-orange-500 transition-colors"
+                >
                   FAQ
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                <a
+                  href="#"
+                  className="text-white hover:text-orange-500 transition-colors"
+                >
                   Terms and Conditions
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white hover:text-orange-500 transition-colors">
+                <a
+                  href="#"
+                  className="text-white hover:text-orange-500 transition-colors"
+                >
                   Privacy Policy
                 </a>
               </li>
@@ -63,20 +90,29 @@ export function Footer({ onNavigate }: FooterProps) {
 
           {/* Company Column */}
           <div>
-            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+            <h4
+              className="mb-4 font-semibold uppercase tracking-wide"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                color: "#a8a8a8",
+              }}
+            >
               Company
             </h4>
             <ul className="space-y-2">
               <li>
                 <button
-                  onClick={() => onNavigate?.('about')}
+                  onClick={() => onNavigate?.("about")}
                   className="text-white hover:text-orange-500 transition-colors text-left"
                 >
                   Our Story
                 </button>
               </li>
               <li>
-                <a href="#contact" className="text-white hover:text-orange-500 transition-colors">
+                <a
+                  href="#contact"
+                  className="text-white hover:text-orange-500 transition-colors"
+                >
                   Contact Us
                 </a>
               </li>
@@ -85,7 +121,13 @@ export function Footer({ onNavigate }: FooterProps) {
 
           {/* Follow Us Column */}
           <div>
-            <h4 className="mb-4 font-semibold uppercase tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#a8a8a8' }}>
+            <h4
+              className="mb-4 font-semibold uppercase tracking-wide"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                color: "#a8a8a8",
+              }}
+            >
               Follow Us
             </h4>
             <div className="grid grid-cols-2 gap-3 w-fit">
@@ -128,7 +170,10 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
 
         <div className="border-t border-white/10 pt-8 text-center text-white/70">
-          <p>&copy; {new Date().getFullYear()} ISO Institute. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} ISO Institute. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>
