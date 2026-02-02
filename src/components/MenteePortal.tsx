@@ -401,8 +401,8 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
 
           {/* My Progress Tab */}
           <TabsContent value="progress" className="space-y-6">
-            {/* Progress Tier System */}
-            <div id="tutorial-progress-bar" className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 rounded-2xl border border-orange-500/30 p-6 mb-8">
+            {/* Progress Tier System - container color matches For Players page (navy blue) */}
+            <div id="tutorial-progress-bar" className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6 mb-16" div>
               <h2 className="text-white text-center mb-2">Your Progress Level</h2>
               <p className="text-slate-400 text-center mb-6 text-sm">
                 Level up by completing games and achieving your goals
