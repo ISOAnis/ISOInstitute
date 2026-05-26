@@ -366,9 +366,9 @@ function ProblemsSection() {
           onFlip={() => setFlipped2(!flipped2)}
           front={{
             label: "Problem 02",
-            title: "Personal Development\nHas Lost Its Edge.",
+            title: "Development Has Become Performative.",
             description:
-              "Growth has been reduced to routines, slogans, and isolated loops. It's become quiet and uninspiring.",
+              "Growth became something you post, not something you feel. It's been reduced to routines, slogans, and content for show.",
           }}
           back={{
             label: "Problem 02 — Deep Dive",
