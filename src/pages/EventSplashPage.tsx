@@ -17,18 +17,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Linkedin, X } from 'lucide-react';
-import { saveWaitlistEntry } from '../utils/supabase';
-
-// =============================================================================
-// TYPES
-// =============================================================================
-
-interface WaitlistFormData {
-  fullName: string;
-  email: string;
-  phone: string;
-}
-
 // =============================================================================
 // CONSTANTS
 // =============================================================================
@@ -42,6 +30,9 @@ const SOCIAL_LINKS = {
 
 // Pilot program application URL - Typeform application
 const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
+
+// Temporary: Google Form while Supabase waitlist is unavailable
+const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 
 // =============================================================================
 // COMPONENTS
@@ -110,224 +101,6 @@ function TikTokIcon({ size = 24, className = '' }: { size?: number; className?: 
     >
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
     </svg>
-  );
-}
-
-/**
- * Waitlist Form Modal Component
- */
-function WaitlistModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const [formData, setFormData] = useState<WaitlistFormData>({
-    fullName: '',
-    email: '',
-    phone: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      // Save to database
-      const result = await saveWaitlistEntry({
-        fullName: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-      });
-
-      if (!result.success) {
-        setError(result.error || 'Failed to save. Please try again.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Success - show success message
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-
-      // Reset form after showing success
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({ fullName: '', email: '', phone: '' });
-        onClose();
-      }, 2000);
-    } catch (err) {
-      console.error('Error submitting waitlist:', err);
-      setError('An unexpected error occurred. Please try again.');
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  // Reset form when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setFormData({ fullName: '', email: '', phone: '' });
-      setIsSubmitted(false);
-    }
-  }, [isOpen]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Backdrop */}
-          <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={onClose}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
-
-          {/* Modal Content */}
-          <motion.div
-            className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0c] p-8 shadow-2xl"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          >
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 text-white/50 transition-colors hover:text-white"
-              aria-label="Close modal"
-            >
-              <X size={24} />
-            </button>
-
-            {isSubmitted ? (
-              <motion.div
-                className="py-8 text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <div className="mb-4 text-5xl">✓</div>
-                <h3
-                  className="mb-2 text-2xl font-bold text-white"
-                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                >
-                  You're on the list
-                </h3>
-                <p className="text-white">We'll be in touch soon.</p>
-              </motion.div>
-            ) : (
-              <>
-                <h2
-                  className="mb-2 text-3xl font-bold text-white"
-                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                >
-                  Join the Waitlist
-                </h2>
-                <p className="mb-6 text-white">
-                  Be the first to know when ISO launches.
-                </p>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="fullName"
-                      className="mb-1 block text-sm font-medium text-white"
-                    >
-                      Full Name <span className="text-white/60">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      required
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white/40 focus:outline-none focus:ring-1 focus:ring-white/30"
-                      placeholder="Your full name"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-1 block text-sm font-medium text-white"
-                    >
-                      Email <span className="text-white/60">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white/40 focus:outline-none focus:ring-1 focus:ring-white/30"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="mb-1 block text-sm font-medium text-white"
-                    >
-                      Phone Number <span className="text-white/60">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white/40 focus:outline-none focus:ring-1 focus:ring-white/30"
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </div>
-
-                  <p className="text-xs text-white">
-                    We'll only use this to keep you updated about ISO.
-                  </p>
-
-                  {error && (
-                    <div className="rounded-xl bg-red-500/20 border border-red-500/50 px-4 py-3 text-sm text-red-200">
-                      {error}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-xl bg-white py-3 text-lg font-semibold text-black transition-all hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                  >
-                    {isSubmitting ? 'Submitting...' : 'Join Waitlist'}
-                  </button>
-                </form>
-              </>
-            )}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -584,8 +357,11 @@ function CTAButtonsRow({
 // =============================================================================
 
 export function EventSplashPage() {
-  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [showPilotModal, setShowPilotModal] = useState(false);
+
+  const openWaitlistForm = () => {
+    window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div
@@ -708,7 +484,7 @@ export function EventSplashPage() {
             transition={{ duration: 0.8, delay: 0.5 }}
           >
             <CTAButtonsRow
-              onWaitlistClick={() => setShowWaitlistModal(true)}
+              onWaitlistClick={openWaitlistForm}
               onPilotClick={() => setShowPilotModal(true)}
             />
           </motion.div>
@@ -751,10 +527,6 @@ export function EventSplashPage() {
       </motion.footer>
 
       {/* Modals */}
-      <WaitlistModal
-        isOpen={showWaitlistModal}
-        onClose={() => setShowWaitlistModal(false)}
-      />
       <PilotInfoModal
         isOpen={showPilotModal}
         onClose={() => setShowPilotModal(false)}
