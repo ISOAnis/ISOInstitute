@@ -459,7 +459,7 @@ export function EventSplashPage() {
 
           {/* Mission Statement */}
           <motion.p
-            className="mb-12 text-sm sm:text-base md:text-lg uppercase tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
+            className="mb-12 text-sm sm:text-base md:text-lg tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               background: 'linear-gradient(135deg, #ffffff 0%, #959595 40%, #b5b5b5 60%, #ffffff 100%)',
@@ -471,9 +471,9 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A FAITH-DRIVEN DEVELOPMENTAL MOVEMENT AND PROGRESS-FOCUSED LIFESTYLE BRAND BUILT TO
+            A faith-driven cultural movement and premium lifestyle brand built
             <br />
-            INSPIRE AMBITION, ELEVATE TALENT, AND REBUILD COMMUNITY PATHWAYS TO SUCCESS.
+            to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
 
           {/* CTA Section */}
