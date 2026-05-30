@@ -164,6 +164,17 @@ function AssistCountdownSection() {
       >
         ISO: THE ASSIST
       </p>
+      <p
+        style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: '15px',
+          letterSpacing: '1px',
+          color: '#7f7f7f',
+          margin: '0 0 12px',
+        }}
+      >
+       A weekly talk dedicated to the ones our communities don't celebrate enough.
+      </p>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
