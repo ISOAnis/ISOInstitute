@@ -104,6 +104,134 @@ function TikTokIcon({ size = 24, className = '' }: { size?: number; className?: 
   );
 }
 
+function AssistCountdownSection() {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const target = new Date('2026-05-31T18:00:00');
+  const diff = Math.max(0, target.getTime() - now.getTime());
+
+  const days = String(Math.floor(diff / 86400000)).padStart(2, '0');
+  const hours = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+  const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+  const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+  const valueStyle = {
+    fontFamily: "'Bebas Neue', sans-serif",
+    fontSize: '56px',
+    fontWeight: 900,
+    fontVariantNumeric: 'tabular-nums' as const,
+    lineHeight: 1,
+    display: 'block',
+  };
+
+  const labelStyle = {
+    fontFamily: "'Bebas Neue', sans-serif",
+    fontSize: '8px',
+    letterSpacing: '4px',
+    textTransform: 'uppercase' as const,
+    color: '#555',
+    marginTop: '6px',
+    display: 'block',
+  };
+
+  return (
+    <div style={{ textAlign: 'center', padding: '0 0 12px' }}>
+      <div
+        style={{
+          width: '1px',
+          height: '36px',
+          background: 'linear-gradient(to bottom, transparent, #2a2a2a, transparent)',
+          margin: '0 auto 20px',
+        }}
+      />
+
+      <p
+        style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: '9px',
+          letterSpacing: '5px',
+          textTransform: 'uppercase',
+          color: '#666',
+          margin: '0 0 14px',
+        }}
+      >
+        ISO: THE ASSIST
+      </p>
+
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{days}</span>
+          </div>
+          <span style={labelStyle}>DAYS</span>
+        </div>
+        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{hours}</span>
+          </div>
+          <span style={labelStyle}>HOURS</span>
+        </div>
+        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{minutes}</span>
+          </div>
+          <span style={labelStyle}>MINS</span>
+        </div>
+        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+            <span style={{ ...valueStyle, color: '#555' }}>{seconds}</span>
+          </div>
+          <span style={labelStyle}>SECS</span>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          marginTop: '14px',
+        }}
+      >
+        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
+        <span
+          style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: '9px',
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#666',
+          }}
+        >
+          Every Sunday · 6-7 PM
+        </span>
+        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
+      </div>
+
+      <div
+        style={{
+          width: '1px',
+          height: '36px',
+          background: 'linear-gradient(to bottom, transparent, #2a2a2a, transparent)',
+          margin: '20px auto 0',
+        }}
+      />
+    </div>
+  );
+}
+
 /**
  * Pilot Program Info Modal Component
  */
@@ -459,7 +587,7 @@ export function EventSplashPage() {
 
           {/* Mission Statement */}
           <motion.p
-            className="mb-12 text-sm sm:text-base md:text-lg tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
+            className="mb-2 text-sm sm:text-base md:text-lg tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               background: 'linear-gradient(135deg, #ffffff 0%, #959595 40%, #b5b5b5 60%, #ffffff 100%)',
@@ -475,6 +603,8 @@ export function EventSplashPage() {
             <br />
             to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
+
+          <AssistCountdownSection />
 
           {/* CTA Section */}
           <motion.div
