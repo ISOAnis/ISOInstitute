@@ -552,7 +552,7 @@ export function EventSplashPage() {
 
   return (
     <div
-      className="relative min-h-screen overflow-hidden"
+      className="relative min-h-screen"
       style={{ background: '#030305' }}
     >
       {/* Navigation Bar */}
@@ -579,7 +579,7 @@ export function EventSplashPage() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16">
+      <div className="relative z-10 flex flex-col items-center px-4 pb-8" style={{ paddingTop: '100px' }}>
         <div className="w-full max-w-4xl text-center">
           {/* ISO Logo */}
           <motion.div
@@ -706,7 +706,7 @@ export function EventSplashPage() {
 
       {/* Optional Footer Text */}
       <motion.footer
-        className="absolute bottom-4 left-0 right-0 text-center"
+        className="pb-6 text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1 }}

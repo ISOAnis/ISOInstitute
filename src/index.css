@@ -194,17 +194,19 @@
     font-variation-settings: var(--default-font-variation-settings, normal);
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
+    overflow-y: auto;
     scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
     background-color: #05060a;
-    overscroll-behavior: none;
+    overscroll-behavior: auto;
   }
 
   body {
     line-height: inherit;
     overflow-x: hidden;
+    overflow-y: auto;
     scroll-behavior: auto; /* NO smooth scrolling - causes rubber band effect */
     background-color: #05060a;
-    overscroll-behavior: none;
+    overscroll-behavior: auto;
     margin: 0;
     padding: 0;
   }
@@ -3990,6 +3992,11 @@ html {
   syntax: "*";
   inherits: false
 }
+
+.splash-page {
+  overscroll-behavior: auto;
+}
+
 /* About Page Styles */
 .about-page {
   font-family: 'Bebas Neue', -apple-system, BlinkMacSystemFont, sans-serif;
