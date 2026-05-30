@@ -33,6 +33,8 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
+const LIVE_STREAM_URL = 'https://www.youtube.com/watch?v=InKonCD5Hbw';
+const ASSIST_STREAM_START = new Date('2026-05-31T18:00:00');
 
 // =============================================================================
 // COMPONENTS
@@ -112,8 +114,7 @@ function AssistCountdownSection() {
     return () => window.clearInterval(id);
   }, []);
 
-  const target = new Date('2026-05-31T18:00:00');
-  const diff = Math.max(0, target.getTime() - now.getTime());
+  const diff = Math.max(0, ASSIST_STREAM_START.getTime() - now.getTime());
 
   const days = String(Math.floor(diff / 86400000)).padStart(2, '0');
   const hours = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
@@ -131,7 +132,7 @@ function AssistCountdownSection() {
 
   const labelStyle = {
     fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: '8px',
+    fontSize: '12px',
     letterSpacing: '4px',
     textTransform: 'uppercase' as const,
     color: '#555',
@@ -143,9 +144,9 @@ function AssistCountdownSection() {
     <div style={{ textAlign: 'center', padding: '0 0 12px' }}>
       <div
         style={{
-          width: '1px',
+          width: '1.5px',
           height: '36px',
-          background: 'linear-gradient(to bottom, transparent, #2a2a2a, transparent)',
+          background: 'linear-gradient(to bottom, transparent, #4a4a4a, transparent)',
           margin: '0 auto 20px',
         }}
       />
@@ -153,10 +154,11 @@ function AssistCountdownSection() {
       <p
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: '9px',
+          fontSize: '18px',
+          fontWeight: 700,
           letterSpacing: '5px',
           textTransform: 'uppercase',
-          color: '#666',
+          color: '#9a9a9a',
           margin: '0 0 14px',
         }}
       >
@@ -209,22 +211,23 @@ function AssistCountdownSection() {
         <span
           style={{
             fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: '9px',
+            fontSize: '18px',
+            fontWeight: 700,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: '#666',
+            color: '#9a9a9a',
           }}
         >
-          Every Sunday · 6-7 PM
+          Every Sunday · 6-7 PM MST
         </span>
         <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
       </div>
 
       <div
         style={{
-          width: '1px',
+          width: '1.5px',
           height: '36px',
-          background: 'linear-gradient(to bottom, transparent, #2a2a2a, transparent)',
+          background: 'linear-gradient(to bottom, transparent, #4a4a4a, transparent)',
           margin: '20px auto 0',
         }}
       />
@@ -453,14 +456,54 @@ function CTAButton({
   );
 }
 
+function LiveStreamButton({ onClick }: { onClick: () => void }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const msUntilStart = ASSIST_STREAM_START.getTime() - now.getTime();
+  const shouldAnimate = msUntilStart > 0 && msUntilStart <= 60 * 60 * 1000;
+
+  return (
+    <motion.button
+      onClick={onClick}
+      className="w-[260px] rounded-2xl px-8 py-4 text-base font-extrabold text-center border-2 border-white"
+      style={{
+        fontFamily: "'Bebas Neue', sans-serif",
+        background:
+          'linear-gradient(120deg, #ffffff 0%, #d9d9d9 18%, #a8a8a8 36%, #efefef 52%, #8f8f8f 68%, #d7d7d7 84%, #ffffff 100%)',
+        backgroundSize: '320% 100%',
+        backgroundPosition: '0% 50%',
+        color: isHovered ? '#111111' : '#000000',
+        transition: 'color 0.3s ease',
+        boxShadow: isHovered ? '0 0 26px rgba(255,255,255,0.2)' : 'none',
+      }}
+      animate={shouldAnimate ? { backgroundPosition: ['0% 50%', '320% 50%'] } : undefined}
+      transition={shouldAnimate ? { duration: 5.6, repeat: Infinity, ease: 'linear' } : undefined}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      Join Live Stream
+    </motion.button>
+  );
+}
+
 /**
  * CTA Buttons Row
  */
 function CTAButtonsRow({
   onWaitlistClick,
+  onLiveClick,
   onPilotClick,
 }: {
   onWaitlistClick: () => void;
+  onLiveClick: () => void;
   onPilotClick: () => void;
 }) {
   // Temporarily suppress the application button - can be re-enabled by setting to true
@@ -471,6 +514,7 @@ function CTAButtonsRow({
       <CTAButton variant="primary" onClick={onWaitlistClick}>
         Join the Waitlist
       </CTAButton>
+      <LiveStreamButton onClick={onLiveClick} />
       {SHOW_PILOT_BUTTON && (
         <CTAButton variant="primary" onClick={onPilotClick}>
           Apply for Pilot Program
@@ -489,6 +533,10 @@ export function EventSplashPage() {
 
   const openWaitlistForm = () => {
     window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  const openLiveStream = () => {
+    window.open(LIVE_STREAM_URL, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -587,7 +635,7 @@ export function EventSplashPage() {
 
           {/* Mission Statement */}
           <motion.p
-            className="mb-2 text-sm sm:text-base md:text-lg tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
+            className="mb-2 text-lg sm:text-xl md:text-2xl tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               background: 'linear-gradient(135deg, #ffffff 0%, #959595 40%, #b5b5b5 60%, #ffffff 100%)',
@@ -615,6 +663,7 @@ export function EventSplashPage() {
           >
             <CTAButtonsRow
               onWaitlistClick={openWaitlistForm}
+              onLiveClick={openLiveStream}
               onPilotClick={() => setShowPilotModal(true)}
             />
           </motion.div>
