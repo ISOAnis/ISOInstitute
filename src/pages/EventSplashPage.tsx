@@ -658,7 +658,7 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A faith-driven cultural movement and premium lifestyle brand built
+            A faith-driven development platform and cultural movement built
             <br />
             to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
