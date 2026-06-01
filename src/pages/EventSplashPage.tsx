@@ -34,7 +34,39 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 const LIVE_STREAM_URL = 'https://www.youtube.com/watch?v=InKonCD5Hbw';
-const ASSIST_STREAM_START = new Date('2026-05-31T18:00:00');
+const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const ASSIST_LIVE_START_HOUR_MST = 18; // Sunday 6 PM MST
+const ASSIST_LIVE_END_HOUR_MST = 19; // Sunday 7 PM MST
+const MST_OFFSET_MS = -7 * 60 * 60 * 1000;
+
+function getAssistSchedule(now: Date) {
+  // Shift into a fixed MST timeline (UTC-7) to keep weekly boundaries stable.
+  const nowMs = now.getTime();
+  const nowMstMs = nowMs + MST_OFFSET_MS;
+  const nowMst = new Date(nowMstMs);
+
+  const day = nowMst.getUTCDay();
+  const hours = nowMst.getUTCHours();
+  const minutes = nowMst.getUTCMinutes();
+  const seconds = nowMst.getUTCSeconds();
+  const milliseconds = nowMst.getUTCMilliseconds();
+
+  const elapsedInWeekMs =
+    (((day * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000 + milliseconds;
+  const weekStartMstMs = nowMstMs - elapsedInWeekMs;
+
+  const liveStartMstMs = weekStartMstMs + ASSIST_LIVE_START_HOUR_MST * 60 * 60 * 1000;
+  const liveEndMstMs = weekStartMstMs + ASSIST_LIVE_END_HOUR_MST * 60 * 60 * 1000;
+
+  const isLive = nowMstMs >= liveStartMstMs && nowMstMs < liveEndMstMs;
+  const nextTargetMstMs = nowMstMs >= liveEndMstMs ? liveStartMstMs + ASSIST_WEEK_MS : liveStartMstMs;
+  const diffMs = isLive ? 0 : Math.max(0, nextTargetMstMs - nowMstMs);
+
+  return {
+    isLive,
+    diffMs,
+  };
+}
 
 // =============================================================================
 // COMPONENTS
@@ -114,7 +146,8 @@ function AssistCountdownSection() {
     return () => window.clearInterval(id);
   }, []);
 
-  const diff = Math.max(0, ASSIST_STREAM_START.getTime() - now.getTime());
+  const { diffMs } = getAssistSchedule(now);
+  const diff = diffMs;
 
   const days = String(Math.floor(diff / 86400000)).padStart(2, '0');
   const hours = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
@@ -476,8 +509,8 @@ function LiveStreamButton({ onClick }: { onClick: () => void }) {
     return () => window.clearInterval(id);
   }, []);
 
-  const msUntilStart = ASSIST_STREAM_START.getTime() - now.getTime();
-  const shouldAnimate = msUntilStart > 0 && msUntilStart <= 60 * 60 * 1000;
+  const { isLive, diffMs } = getAssistSchedule(now);
+  const shouldAnimate = isLive || (diffMs > 0 && diffMs <= 60 * 60 * 1000);
 
   return (
     <motion.button
@@ -500,7 +533,7 @@ function LiveStreamButton({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      Join Live Stream
+      {isLive ? 'Currently Live' : 'Join Live Stream'}
     </motion.button>
   );
 }
