@@ -38,6 +38,14 @@ const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const ASSIST_LIVE_START_HOUR_MST = 18; // Sunday 6 PM MST
 const ASSIST_LIVE_END_HOUR_MST = 19; // Sunday 7 PM MST
 const MST_OFFSET_MS = -7 * 60 * 60 * 1000;
+// First episode: Sunday May 31, 2026, 6:00 PM MST
+const ASSIST_FIRST_EPISODE_LIVE_START_MST_MS = Date.UTC(2026, 4, 31, 18, 0, 0);
+
+const episodeDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'Etc/GMT+7',
+});
 
 function getAssistSchedule(now: Date) {
   // Shift into a fixed MST timeline (UTC-7) to keep weekly boundaries stable.
@@ -62,9 +70,18 @@ function getAssistSchedule(now: Date) {
   const nextTargetMstMs = nowMstMs >= liveEndMstMs ? liveStartMstMs + ASSIST_WEEK_MS : liveStartMstMs;
   const diffMs = isLive ? 0 : Math.max(0, nextTargetMstMs - nowMstMs);
 
+  const episodeNumber =
+    Math.floor((nextTargetMstMs - ASSIST_FIRST_EPISODE_LIVE_START_MST_MS) / ASSIST_WEEK_MS) + 1;
+  const episodeSundayMstMs = nextTargetMstMs - ASSIST_LIVE_START_HOUR_MST * 60 * 60 * 1000;
+  const episodeDateLabel = episodeDateFormatter.format(
+    new Date(episodeSundayMstMs - MST_OFFSET_MS),
+  );
+
   return {
     isLive,
     diffMs,
+    episodeNumber,
+    episodeDateLabel,
   };
 }
 
@@ -146,8 +163,9 @@ function AssistCountdownSection() {
     return () => window.clearInterval(id);
   }, []);
 
-  const { diffMs } = getAssistSchedule(now);
+  const { diffMs, episodeNumber, episodeDateLabel } = getAssistSchedule(now);
   const diff = diffMs;
+  const episodeLabel = `EP. ${String(episodeNumber).padStart(2, '0')} • ${episodeDateLabel}`;
 
   const days = String(Math.floor(diff / 86400000)).padStart(2, '0');
   const hours = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
@@ -266,6 +284,20 @@ function AssistCountdownSection() {
         </span>
         <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
       </div>
+
+      <p
+        style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: '16px',
+          fontWeight: 700,
+          letterSpacing: '2px',
+          textTransform: 'uppercase',
+          color: '#7a7a7a',
+          margin: '10px 0 0',
+        }}
+      >
+        {episodeLabel}
+      </p>
 
       <div
         style={{
