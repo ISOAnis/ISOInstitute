@@ -4,6 +4,7 @@ import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Sprout, BookOpen, St
 import { motion } from 'motion/react';
 import { MentorModal } from './MentorModal';
 import { SignupModal } from './SignupModal';
+import { PATHWAYS } from '../data/pathways';
 
 // =============================================================================
 // UNIFIED PATHWAY CARD COMPONENT - Single consistent style for all cards
@@ -26,6 +27,7 @@ type PathwayData = {
   id: string;
   icon: LucideIcon;
   name: string;
+  legacyName: string;
   description: string;
   tagline: string;
   color: string; // Gradient string - converted to hex for icon
@@ -100,6 +102,7 @@ function PathwayCard({ pathway, isSelected, onClick }: PathwayCardProps) {
         >
           {pathway.name}
         </h3>
+        <p className="text-sm tracking-wide !text-white" style={{ color: '#ffffff' }}>{pathway.legacyName}</p>
       </div>
     </motion.div>
   );
@@ -200,56 +203,19 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
     };
   }, []);
 
-  const pathways = [
-    {
-      id: 'deen',
-      icon: Moon,
-      name: 'Deen & Purpose',
-      description: 'Spiritual development, Islamic knowledge, reflection, and balance between dunya and akhirah. This is the core of all growth — everything flows from this center.',
-      tagline: '"Center your faith before your function."',
-      color: 'from-emerald-500 to-teal-600', // Only used for icon gradient
-    },
-    {
-      id: 'health',
-      icon: Dumbbell,
-      name: 'Health & Fitness',
-      description: 'Discipline through the body — physical wellness, gym consistency, mental health, nutrition, and self-discipline.',
-      tagline: '"Train your body. Strengthen your mind."',
-      color: 'from-red-500 to-rose-600', // Only used for icon gradient
-    },
-    {
-      id: 'medicine',
-      icon: Activity,
-      name: 'Medicine & Healthcare',
-      description: 'Serving through healing — for those exploring pre-med, nursing, public health, or medical professions.',
-      tagline: '"Serve through science and compassion."',
-      color: 'from-blue-500 to-cyan-600', // Only used for icon gradient
-    },
-    {
-      id: 'engineering',
-      icon: Settings,
-      name: 'Engineering & Technology',
-      description: 'Building and solving — for innovators in STEM and design who want to leave a real-world impact.',
-      tagline: '"Design, build, and solve for tomorrow."',
-      color: 'from-purple-500 to-indigo-600', // Only used for icon gradient
-    },
-    {
-      id: 'entrepreneurship',
-      icon: Rocket,
-      name: 'Entrepreneurship & Business',
-      description: 'For builders, dreamers, and leaders turning ideas into reality — from startups to social ventures.',
-      tagline: '"Build something that outlasts you."',
-      color: 'from-orange-500 to-amber-600', // Only used for icon gradient
-    },
-    {
-      id: 'global',
-      icon: Globe,
-      name: 'Global Affairs, Law, & Policy',
-      description: 'For those navigating global impact — economics, diplomacy, international organizations, and ethical leadership.',
-      tagline: '"Lead globally. Move with purpose."',
-      color: 'from-cyan-500 to-blue-600', // Only used for icon gradient
-    },
-  ];
+  const pathwayIcons: Record<string, LucideIcon> = {
+    deen: Moon,
+    health: Dumbbell,
+    medicine: Activity,
+    engineering: Settings,
+    entrepreneurship: Rocket,
+    global: Globe,
+  };
+
+  const pathways = PATHWAYS.map((pathway) => ({
+    ...pathway,
+    icon: pathwayIcons[pathway.id],
+  }));
 
   const handlePathwayClick = (pathwayId: string) => {
     if (commitmentStatus?.isCommitted) {
@@ -310,12 +276,15 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                     <selectedPathwayData.icon className="w-8 h-8 text-white" />
                   </div>
                 )}
-                <h1 
-                  className="text-white text-4xl md:text-5xl"
-                  style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                >
-                  {selectedPathwayData.name}
-                </h1>
+                <div>
+                  <h1 
+                    className="text-white text-4xl md:text-5xl"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+                  >
+                    {selectedPathwayData.name}
+                  </h1>
+                  <p className="text-lg mt-2 !text-white" style={{ color: '#ffffff' }}>{selectedPathwayData.legacyName}</p>
+                </div>
               </div>
               <p className="text-white/70 text-lg max-w-3xl mx-auto mb-4">
                 {selectedPathwayData.description}
@@ -330,6 +299,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
               category={{
                 id: selectedPathwayData.id,
                 title: selectedPathwayData.name,
+                legacyName: selectedPathwayData.legacyName,
                 emoji: '',
                 description: selectedPathwayData.description,
                 tagline: selectedPathwayData.tagline,

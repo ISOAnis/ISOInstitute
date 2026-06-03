@@ -55,9 +55,9 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="text-white">You're Not Lost,</span>
+              <span className="text-white">You're Not Lost.</span>
               <br />
-              <span className="text-white">You're Just </span>
+              <span className="text-white">You're </span>
               <span 
                 className="inline-block"
                 style={{
@@ -68,7 +68,7 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
                   textShadow: '0 0 40px rgba(255, 255, 255, 0.2)',
                 }}
               >
-                In Search Of
+                In Search Of.
               </span>
         </motion.h1>
 
@@ -80,7 +80,7 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              The ISO Institute is a faith-rooted cultural movement designed to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
+              The ISO Institute is a faith-driven development platform & cultural movement built to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
         </motion.p>
 
             {/* CTA Buttons with Flowing Border */}

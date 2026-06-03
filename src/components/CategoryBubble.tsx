@@ -6,6 +6,7 @@ interface CategoryBubbleProps {
   category: {
     id: string;
     title: string;
+    subtitle?: string;
     icon?: LucideIcon;
     iconName?: string;
     emoji?: string;
@@ -258,16 +259,21 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <span 
-              className="text-[0.65rem] font-medium text-white/90"
-              style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3)',
-                letterSpacing: '0.3px',
-              }}
-            >
-              {category.title}
-            </span>
+            <div className="flex flex-col items-center">
+              <span 
+                className="text-[0.65rem] font-medium text-white/90"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3)',
+                  letterSpacing: '0.3px',
+                }}
+              >
+                {category.title}
+              </span>
+              {category.subtitle && (
+                <span className="text-[0.55rem] !text-white mt-0.5" style={{ color: '#ffffff' }}>{category.subtitle}</span>
+              )}
+            </div>
           </motion.div>
         )}
 
@@ -310,7 +316,12 @@ export function CategoryBubble({ category, onClick, isSelected, isOtherHovered =
               ) : (
               <span className={`text-2xl ${category.id === 'medicine' ? 'text-white' : ''}`}>{category.emoji}</span>
               )}
-              <h3 className="text-white font-semibold">{category.title}</h3>
+              <div>
+                <h3 className="text-white font-semibold">{category.title}</h3>
+                {category.subtitle && (
+                  <p className="text-sm !text-white" style={{ color: '#ffffff' }}>{category.subtitle}</p>
+                )}
+              </div>
             </div>
             <p className="text-slate-400 mb-3 text-center leading-relaxed" style={{ lineHeight: '1.7' }}>{category.description}</p>
             <p className="text-slate-300 italic text-center leading-relaxed" style={{ lineHeight: '1.7' }}>{category.tagline}</p>

@@ -5,6 +5,7 @@ import { CategoryBubble } from './CategoryBubble';
 import { FeatureShowcase } from './FeatureShowcase';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Compass, BookOpen, Users, Briefcase } from 'lucide-react';
 import { getAccentColor } from './Pathways';
+import { PATHWAYS, PATHWAYS_MARKETING_LIST } from '../data/pathways';
 
 interface CommitmentStatus {
   isCommitted: boolean;
@@ -23,74 +24,48 @@ interface BasketballCourtProps {
   onNavigateToPathways?: () => void;
 }
 
-const categories = [
-  {
-    id: 'deen',
-    title: 'Deen & Purpose',
-    icon: Moon,
-    iconName: 'Moon',
-    description: 'Spiritual development, Islamic knowledge, reflection, and balance between dunya and akhirah. This is the core of all growth — everything flows from this center.',
-    tagline: '"Center your faith before your function."',
-    color: 'from-emerald-500 to-teal-600',
-    position: { bottom: '5%', left: '50%', transform: 'translateX(-50%)' },
-    zIndex: 10,
-  },
-  {
-    id: 'health',
-    title: 'Health & Fitness',
-    icon: Dumbbell,
-    iconName: 'Dumbbell',
-    description: 'Discipline through the body — physical wellness, gym consistency, mental health, nutrition, and self-discipline.',
-    tagline: '"Train your body. Strengthen your mind."',
-    color: 'from-red-500 to-rose-600',
-    position: { bottom: '8%', right: '15%' },
-    zIndex: 10,
-  },
-  {
-    id: 'medicine',
-    title: 'Medicine & Healthcare',
-    icon: Activity,
-    iconName: 'Activity',
-    description: 'Serving through healing — for those exploring pre-med, nursing, public health, or medical professions.',
-    tagline: '"Serve through science and compassion."',
-    color: 'from-blue-500 to-cyan-600',
-    position: { top: '15%', right: '15%' },
-    zIndex: 10,
-  },
-  {
-    id: 'engineering',
-    title: 'Engineering & Technology',
-    icon: Settings,
-    iconName: 'Settings',
-    description: 'Building and solving — for innovators in STEM and design who want to leave a real-world impact.',
-    tagline: '"Design, build, and solve for tomorrow."',
-    color: 'from-purple-500 to-indigo-600',
-    position: { top: '10%', left: '50%', transform: 'translateX(-50%)' },
-    zIndex: 10,
-  },
-  {
-    id: 'entrepreneurship',
-    title: 'Entrepreneurship & Business',
-    icon: Rocket,
-    iconName: 'Rocket',
-    description: 'For builders, dreamers, and leaders turning ideas into reality — from startups to social ventures.',
-    tagline: '"Build something that outlasts you."',
-    color: 'from-orange-500 to-amber-600',
-    position: { top: '15%', left: '15%' },
-    zIndex: 10,
-  },
-  {
-    id: 'global',
-    title: 'Global Affairs, Law, & Policy',
-    icon: Globe,
-    iconName: 'Globe',
-    description: 'For those navigating global impact — economics, diplomacy, international organizations, and ethical leadership.',
-    tagline: '"Lead globally. Move with purpose."',
-    color: 'from-indigo-500 to-blue-600',
-    position: { bottom: '8%', left: '15%' },
-    zIndex: 10,
-  },
-];
+const categoryIcons: Record<string, typeof Moon> = {
+  deen: Moon,
+  health: Dumbbell,
+  medicine: Activity,
+  engineering: Settings,
+  entrepreneurship: Rocket,
+  global: Globe,
+};
+
+const categoryIconNames: Record<string, string> = {
+  deen: 'Moon',
+  health: 'Dumbbell',
+  medicine: 'Activity',
+  engineering: 'Settings',
+  entrepreneurship: 'Rocket',
+  global: 'Globe',
+};
+
+const categoryPositions: Record<string, React.CSSProperties & { zIndex: number }> = {
+  deen: { bottom: '5%', left: '50%', transform: 'translateX(-50%)', zIndex: 10 },
+  health: { bottom: '8%', right: '15%', zIndex: 10 },
+  medicine: { top: '15%', right: '15%', zIndex: 10 },
+  engineering: { top: '10%', left: '50%', transform: 'translateX(-50%)', zIndex: 10 },
+  entrepreneurship: { top: '15%', left: '15%', zIndex: 10 },
+  global: { bottom: '8%', left: '15%', zIndex: 10 },
+};
+
+const categories = PATHWAYS.map((pathway) => {
+  const position = categoryPositions[pathway.id];
+  return {
+    id: pathway.id,
+    title: pathway.name,
+    subtitle: pathway.legacyName,
+    icon: categoryIcons[pathway.id],
+    iconName: categoryIconNames[pathway.id],
+    description: pathway.description,
+    tagline: pathway.tagline,
+    color: pathway.color,
+    position,
+    zIndex: position.zIndex,
+  };
+});
 
 export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selectedCategoryId, onCategorySelect, forceOpenCategoryId, onForceOpenHandled, onNavigateToPathways }: BasketballCourtProps) {
   const [mode, setMode] = useState<'explore' | 'learn'>('explore');
@@ -112,7 +87,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
       number: '01',
       question: 'CHOOSE YOUR PATHWAY',
       heading: 'Navigate the Court',
-      description: 'Explore six pathways of growth and select the area that aligns with your goals. From Deen & Purpose to Engineering & Technology, find your starting point.',
+      description: `Explore six pathways of growth and select the area that aligns with your goals. From ${PATHWAYS_MARKETING_LIST}, find your starting point.`,
     },
     {
       number: '02',

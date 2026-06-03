@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Video, Users, MapPin, Send, Lock, Play, AlertTriangle, X } from 'lucide-react';
+import { PATHWAYS, PATHWAY_BY_ID, type PathwayId } from '../data/pathways';
 
 type UserRole = 'player' | 'coach';
-type PathwayId = 'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global';
 
 interface Message {
   id: string;
@@ -35,14 +35,22 @@ interface Video {
   isExclusive: boolean;
 }
 
-const pathways = [
-  { id: 'deen' as PathwayId, name: 'Deen & Purpose', icon: '☪️', color: 'from-emerald-500 to-teal-600' },
-  { id: 'health' as PathwayId, name: 'Health & Fitness', icon: '💪🏽', color: 'from-red-500 to-rose-600' },
-  { id: 'medicine' as PathwayId, name: 'Medicine & Healthcare', icon: '⚕️', color: 'from-blue-500 to-cyan-600' },
-  { id: 'engineering' as PathwayId, name: 'Engineering & Technology', icon: '⚙️', color: 'from-purple-500 to-indigo-600' },
-  { id: 'entrepreneurship' as PathwayId, name: 'Entrepreneurship & Innovation', icon: '🚀', color: 'from-orange-500 to-amber-600' },
-  { id: 'global' as PathwayId, name: 'Global Affairs & Business', icon: '🌍', color: 'from-teal-500 to-green-600' },
-];
+const pathwayIcons: Record<PathwayId, string> = {
+  deen: '☪️',
+  health: '💪🏽',
+  medicine: '⚕️',
+  engineering: '⚙️',
+  entrepreneurship: '🚀',
+  global: '🌍',
+};
+
+const pathways = PATHWAYS.map((pathway) => ({
+  id: pathway.id,
+  name: pathway.name,
+  legacyName: pathway.legacyName,
+  icon: pathwayIcons[pathway.id],
+  color: pathway.color,
+}));
 
 interface LockerRoomProps {
   userRole: UserRole;
@@ -150,7 +158,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     // Pathway-specific videos
     {
       id: '3',
-      title: 'Deen & Purpose: Building Spiritual Resilience',
+      title: `${PATHWAY_BY_ID.deen.name}: Building Spiritual Resilience`,
       description: 'Deep dive into integrating faith with daily life and purpose',
       thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
       duration: '22:15',
@@ -159,7 +167,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     },
     {
       id: '4',
-      title: 'Health & Fitness: Discipline Through the Body',
+      title: `${PATHWAY_BY_ID.health.name}: Discipline Through the Body`,
       description: 'Expert guidance on physical wellness and mental strength',
       thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
       duration: '18:30',
@@ -168,7 +176,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     },
     {
       id: '5',
-      title: 'Medicine & Healthcare: Serving Through Healing',
+      title: `${PATHWAY_BY_ID.medicine.name}: Serving Through Healing`,
       description: 'Panel discussion with medical professionals on career paths',
       thumbnail: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop',
       duration: '25:45',
@@ -177,7 +185,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     },
     {
       id: '6',
-      title: 'Engineering & Technology: Building Tomorrow',
+      title: `${PATHWAY_BY_ID.engineering.name}: Building Tomorrow`,
       description: 'Expert panel discussion on careers in tech and innovation',
       thumbnail: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop',
       duration: '28:45',
@@ -186,7 +194,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     },
     {
       id: '7',
-      title: 'Entrepreneurship & Innovation: From Idea to Impact',
+      title: `${PATHWAY_BY_ID.entrepreneurship.name}: From Idea to Impact`,
       description: 'Stories from successful Muslim entrepreneurs',
       thumbnail: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=300&fit=crop',
       duration: '31:20',
@@ -195,7 +203,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
     },
     {
       id: '8',
-      title: 'Global Affairs & Business: Leading with Purpose',
+      title: `${PATHWAY_BY_ID.global.name}: Leading with Purpose`,
       description: 'Navigating international careers and ethical leadership',
       thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop',
       duration: '26:10',
@@ -381,6 +389,9 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
               </div>
               <div>
                 <h3 className="text-white font-semibold">{selectedPathwayData?.name}</h3>
+                {selectedPathwayData?.legacyName && (
+                  <p className="text-xs !text-white" style={{ color: '#ffffff' }}>{selectedPathwayData.legacyName}</p>
+                )}
                 <p className="text-slate-400 text-xs">
                   {userRole === 'coach' 
                     ? 'Connect with other coaches' 

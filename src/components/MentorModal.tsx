@@ -63,6 +63,7 @@ interface MentorModalProps {
   category: {
     id: string;
     title: string;
+    legacyName?: string;
     emoji: string;
     description: string;
     tagline: string;
@@ -442,6 +443,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
             <span className="text-4xl">{category.emoji}</span>
             <div>
               <h2 className="text-white mb-1 text-xl">{category.title}</h2>
+              {category.legacyName && (
+                <p className="text-sm mb-1 !text-white" style={{ color: '#ffffff' }}>{category.legacyName}</p>
+              )}
               <p className="text-white/90 text-sm">{category.description}</p>
             </div>
           </div>

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Award, Users, MessageSquare, TrendingUp, ArrowLeft, ArrowRight, Medal, Trophy, Gem, Star, Calendar, Zap, GraduationCap, Briefcase, BookOpen, ArrowUp, Target, Clock } from 'lucide-react';
 
-
-
 const getAccentColor = (gradientString) => {
 
   const colorMap = {
@@ -290,7 +288,7 @@ function CoachCard({ overall, isFlipped, onFlip }) {
 
       <div className="flex justify-between items-start mb-4">
 
-        <h3 className="text-white text-xl">Deen & Purpose</h3>
+        <h3 className="text-white text-xl">The Seeker Pathway</h3>
 
         <div className="flex items-center gap-1 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
 
@@ -457,6 +455,9 @@ function PathwayCard({ pathway, isSelected, onClick }) {
         </div>
 
         <h3 className="text-white text-3xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{pathway.name}</h3>
+        {pathway.legacyName && (
+          <p className="text-sm tracking-wide !text-white" style={{ color: '#ffffff' }}>{pathway.legacyName}</p>
+        )}
 
       </div>
 
@@ -516,7 +517,8 @@ export default function ForCoaches() {
 
       icon: Moon,
 
-      name: 'Deen & Purpose',
+      name: 'The Seeker Pathway',
+      legacyName: 'Deen and Purpose',
 
       coachDescription: 'Guide young Muslims in developing their spiritual foundation, Islamic knowledge, and balancing worldly pursuits with faith. Help mentees build consistent prayer habits, deepen Quran understanding, and navigate modern challenges while staying rooted in Islamic principles.',
 
@@ -532,7 +534,8 @@ export default function ForCoaches() {
 
       icon: Dumbbell,
 
-      name: 'Health & Fitness',
+      name: 'The Warrior Pathway',
+      legacyName: 'Health and Wellness',
 
       coachDescription: 'Train mentees in building disciplined fitness routines, proper nutrition, and mental wellness habits. Support their journey in strength training, cardio consistency, injury prevention, and developing a healthy relationship with their body as an act of worship.',
 
@@ -548,7 +551,8 @@ export default function ForCoaches() {
 
       icon: Activity,
 
-      name: 'Medicine & Healthcare',
+      name: 'The Healer Pathway',
+      legacyName: 'Medicine and healthcare',
 
       coachDescription: 'Mentor aspiring healthcare professionals through pre-med preparation, MCAT strategy, medical school applications, clinical experience, and career planning. Share insights on balancing rigorous academic demands with ethical patient care and maintaining faith in medicine.',
 
@@ -564,7 +568,8 @@ export default function ForCoaches() {
 
       icon: Settings,
 
-      name: 'Engineering & Technology',
+      name: 'The Builder Pathway',
+      legacyName: 'Engineering and Tech',
 
       coachDescription: 'Guide future engineers and technologists through technical skill development, project building, internship preparation, and career navigation in STEM fields. Help mentees master coding, system design, problem-solving, and leveraging technology for positive impact.',
 
@@ -580,7 +585,8 @@ export default function ForCoaches() {
 
       icon: Rocket,
 
-      name: 'Entrepreneurship & Business',
+      name: 'The Founder Pathway',
+      legacyName: 'Entrepreneurship and business',
 
       coachDescription: 'Support aspiring entrepreneurs in validating business ideas, building MVPs, navigating fundraising, and scaling ventures. Share experience in leadership, strategic thinking, ethical business practices, and building enterprises that create lasting value.',
 
@@ -596,7 +602,8 @@ export default function ForCoaches() {
 
       icon: Globe,
 
-      name: 'Global Affairs, Law, & Policy',
+      name: 'The Reformer Pathway',
+      legacyName: 'Global Affairs, Law, and Policy',
 
       coachDescription: 'Mentor future leaders in international relations, law, public policy, and diplomacy. Guide mentees through law school preparation, policy analysis, understanding global systems, and developing the skills to lead with ethical principles and strategic insight.',
 

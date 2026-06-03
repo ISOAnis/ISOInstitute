@@ -36,7 +36,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
       num: "01",
       tag: "CHOOSE YOUR PATHWAY",
       title: "Navigate the Court",
-      desc: "Explore six pathways of growth and select the area that aligns with your goals. From Deen & Purpose to Engineering & Technology, find your starting point."
+      desc: "Explore six pathways of growth and select the area that aligns with your goals. From The Seeker to The Builder, find your starting point."
     },
     {
       num: "02",

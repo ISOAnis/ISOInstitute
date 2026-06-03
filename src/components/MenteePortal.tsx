@@ -8,6 +8,7 @@ import { MentorMenteeChat } from './MentorMenteeChat';
 import { PortalTutorial } from './PortalTutorial';
 import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
+import { PATHWAYS } from '../data/pathways';
 
 interface Bucket {
   id: string;
@@ -131,14 +132,21 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
   ];
 
   // Pathway mapping - maps pathway ID to category name and icon
-  const pathwayMap: Record<string, { name: string; icon: LucideIcon }> = {
-    'deen': { name: 'Deen & Purpose', icon: Moon },
-    'health': { name: 'Health & Fitness', icon: Dumbbell },
-    'medicine': { name: 'Medicine & Healthcare', icon: Activity },
-    'engineering': { name: 'Engineering & Technology', icon: Settings },
-    'entrepreneurship': { name: 'Entrepreneurship & Business', icon: Rocket },
-    'global': { name: 'Global Affairs, Law, & Policy', icon: Globe },
+  const pathwayIcons: Record<string, LucideIcon> = {
+    deen: Moon,
+    health: Dumbbell,
+    medicine: Activity,
+    engineering: Settings,
+    entrepreneurship: Rocket,
+    global: Globe,
   };
+
+  const pathwayMap = Object.fromEntries(
+    PATHWAYS.map((pathway) => [
+      pathway.id,
+      { name: pathway.name, legacyName: pathway.legacyName, icon: pathwayIcons[pathway.id] },
+    ]),
+  ) as Record<string, { name: string; legacyName: string; icon: LucideIcon }>;
 
   // Get selected pathway from localStorage (with state to track changes)
   const [selectedPathwayId, setSelectedPathwayId] = useState(() => {

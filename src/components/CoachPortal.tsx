@@ -58,7 +58,7 @@ const mockPlayers: Player[] = [
     id: '1',
     name: 'Ahmed Hassan',
     email: 'ahmed.hassan@email.com',
-    category: 'Deen & Purpose',
+    category: 'The Seeker Pathway',
     categoryIcon: Moon,
     joinedDate: '2024-09-01',
     games: [
@@ -121,7 +121,7 @@ const mockPlayers: Player[] = [
     id: '2',
     name: 'Fatima Ali',
     email: 'fatima.ali@email.com',
-    category: 'Deen & Purpose',
+    category: 'The Seeker Pathway',
     categoryIcon: Moon,
     joinedDate: '2024-10-01',
     games: [
@@ -244,7 +244,7 @@ export function CoachPortal() {
   // Mock current coach data
   const currentCoach = {
     name: 'Imam Abdullah Rahman',
-    category: 'Deen & Purpose',
+    category: 'The Seeker Pathway',
     categoryIcon: Moon,
     profilePicture: coachProfilePicture
   };

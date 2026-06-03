@@ -19,7 +19,7 @@ export function FAQ() {
                 How do ISO pathways work?
               </AccordionTrigger>
               <AccordionContent className="text-slate-300 text-base leading-relaxed pt-4">
-                ISO pathways are coaching categories that connect players with coaches who specialize in specific fields. Each pathway — like Deen & Purpose, Health & Fitness, Medicine & Healthcare, Engineering & Technology, Entrepreneurship, and Global Affairs & Business — offers curated coaching resources, community support, and pathway-specific guidance to help you navigate your journey.
+                ISO pathways are coaching categories that connect players with coaches who specialize in specific fields. Each pathway — The Seeker (Deen and Purpose), The Warrior (Health and Wellness), The Healer (Medicine and healthcare), The Builder (Engineering and Tech), The Founder (Entrepreneurship and business), and The Reformer (Global Affairs, Law, and Policy) — offers curated coaching resources, community support, and pathway-specific guidance to help you navigate your journey.
               </AccordionContent>
             </AccordionItem>
 

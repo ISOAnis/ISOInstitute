@@ -4,11 +4,13 @@ import { createPortal } from 'react-dom';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, X, LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getAccentColor } from './Pathways';
+import { PATHWAYS } from '../data/pathways';
 
 type PathwayData = {
   id: string;
   icon: LucideIcon;
   name: string;
+  legacyName: string;
   description: string;
   tagline: string;
   color: string;
@@ -21,56 +23,19 @@ interface PathwaySelectionModalProps {
 
 const CARD_SURFACE_BASE = "relative overflow-hidden rounded-3xl border border-white/10 backdrop-blur-md shadow-[0_0_60px_rgba(0,0,0,0.55)] p-12 cursor-pointer transition-all duration-300";
 
-const pathways: PathwayData[] = [
-  {
-    id: 'deen',
-    icon: Moon,
-    name: 'Deen & Purpose',
-    description: 'Spiritual development, Islamic knowledge, reflection, and balance between dunya and akhirah. This is the core of all growth — everything flows from this center.',
-    tagline: '"Center your faith before your function."',
-    color: 'from-emerald-500 to-teal-600',
-  },
-  {
-    id: 'health',
-    icon: Dumbbell,
-    name: 'Health & Fitness',
-    description: 'Discipline through the body — physical wellness, gym consistency, mental health, nutrition, and self-discipline.',
-    tagline: '"Train your body. Strengthen your mind."',
-    color: 'from-red-500 to-rose-600',
-  },
-  {
-    id: 'medicine',
-    icon: Activity,
-    name: 'Medicine & Healthcare',
-    description: 'Serving through healing — for those exploring pre-med, nursing, public health, or medical professions.',
-    tagline: '"Serve through science and compassion."',
-    color: 'from-blue-500 to-cyan-600',
-  },
-  {
-    id: 'engineering',
-    icon: Settings,
-    name: 'Engineering & Technology',
-    description: 'Building and solving — for innovators in STEM and design who want to leave a real-world impact.',
-    tagline: '"Design, build, and solve for tomorrow."',
-    color: 'from-purple-500 to-indigo-600',
-  },
-  {
-    id: 'entrepreneurship',
-    icon: Rocket,
-    name: 'Entrepreneurship & Business',
-    description: 'For builders, dreamers, and leaders turning ideas into reality — from startups to social ventures.',
-    tagline: '"Build something that outlasts you."',
-    color: 'from-orange-500 to-amber-600',
-  },
-  {
-    id: 'global',
-    icon: Globe,
-    name: 'Global Affairs, Law, & Policy',
-    description: 'For those navigating global impact — economics, diplomacy, international organizations, and ethical leadership.',
-    tagline: '"Lead globally. Move with purpose."',
-    color: 'from-cyan-500 to-blue-600',
-  },
-];
+const pathwayIcons: Record<string, LucideIcon> = {
+  deen: Moon,
+  health: Dumbbell,
+  medicine: Activity,
+  engineering: Settings,
+  entrepreneurship: Rocket,
+  global: Globe,
+};
+
+const pathways: PathwayData[] = PATHWAYS.map((pathway) => ({
+  ...pathway,
+  icon: pathwayIcons[pathway.id],
+}));
 
 function PathwayCard({ pathway, onClick }: { pathway: PathwayData; onClick: () => void }) {
   const IconComponent = pathway.icon;
@@ -127,6 +92,7 @@ function PathwayCard({ pathway, onClick }: { pathway: PathwayData; onClick: () =
         >
           {pathway.name}
         </h3>
+        <p className="text-sm tracking-wide !text-white" style={{ color: '#ffffff' }}>{pathway.legacyName}</p>
       </div>
     </motion.div>
   );

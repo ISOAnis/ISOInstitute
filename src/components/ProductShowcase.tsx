@@ -162,7 +162,7 @@ export function ProductShowcase() {
               marginBottom: '16px',
               lineHeight: '1.75'
             }}>
-              Navigate your journey through six key pathways. From Deen & Purpose to Engineering & Technology, find the coaches who align with your goals.
+              Navigate your journey through six key pathways. From The Seeker to The Builder, find the coaches who align with your goals.
             </p>
             <p style={{ 
               fontSize: '1.125rem', 

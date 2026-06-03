@@ -1010,9 +1010,9 @@ function ClosingCTA({ onNavigate }: ClosingCTAProps) {
             letterSpacing: "0.02em",
           }}
         >
-          ISO is built on courage from players
+          ISO is built by courage.
           <br />
-          and sustained by humility from coaches.
+          and sustained by humility.
         </h2>
 
         {/* CTA Buttons */}

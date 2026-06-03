@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { PATHWAYS } from '../data/pathways';
 
 interface Coach {
   name: string;
@@ -14,6 +15,7 @@ interface Coach {
   additionalPerks?: string[];
   categoryId?: string;
   categoryTitle?: string;
+  categoryLegacyName?: string;
   categoryEmoji?: string;
 }
 
@@ -176,14 +178,21 @@ const mentorData: Record<string, Array<{
   ],
 };
 
-const categoryInfo: Record<string, { title: string; emoji: string }> = {
-  deen: { title: 'Deen & Purpose', emoji: '🕌' },
-  health: { title: 'Health & Wellness', emoji: '💪' },
-  medicine: { title: 'Medicine & Healthcare', emoji: '⚕️' },
-  engineering: { title: 'Engineering & Tech', emoji: '💻' },
-  entrepreneurship: { title: 'Entrepreneurship & Business', emoji: '🚀' },
-  global: { title: 'Global Affairs & Policy', emoji: '🌍' },
+const categoryEmojis: Record<string, string> = {
+  deen: '🕌',
+  health: '💪',
+  medicine: '⚕️',
+  engineering: '💻',
+  entrepreneurship: '🚀',
+  global: '🌍',
 };
+
+const categoryInfo = Object.fromEntries(
+  PATHWAYS.map((pathway) => [
+    pathway.id,
+    { title: pathway.name, legacyName: pathway.legacyName, emoji: categoryEmojis[pathway.id] },
+  ]),
+) as Record<string, { title: string; legacyName: string; emoji: string }>;
 
 export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
@@ -202,6 +211,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
         ...coach,
         categoryId: catId,
         categoryTitle: categoryInfo[catId]?.title || catId,
+        categoryLegacyName: categoryInfo[catId]?.legacyName,
         categoryEmoji: categoryInfo[catId]?.emoji || '👤',
       };
       categoryId = catId;
@@ -821,6 +831,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                   fontFamily: "'Bebas Neue', sans-serif",
                 }}>
                   {coach.categoryTitle}
+                  {coach.categoryLegacyName ? ` · ${coach.categoryLegacyName}` : ''}
                 </span>
                 {coach.specialization.slice(0, 3).map((spec, idx) => (
                   <span
