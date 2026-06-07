@@ -35,47 +35,115 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 const LIVE_STREAM_URL = 'https://www.youtube.com/live/2dcEuVgps3I';
 const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const ASSIST_LIVE_START_HOUR_MST = 18; // Sunday 6 PM MST
-const ASSIST_LIVE_END_HOUR_MST = 19; // Sunday 7 PM MST
-const MST_OFFSET_MS = -7 * 60 * 60 * 1000;
-// First episode: Sunday May 31, 2026, 6:00 PM MST
-const ASSIST_FIRST_EPISODE_LIVE_START_MST_MS = Date.UTC(2026, 4, 31, 18, 0, 0);
+const ASSIST_LIVE_START_HOUR = 18; // Sunday 6 PM Mountain Time
+const ASSIST_LIVE_END_HOUR = 19; // Sunday 7 PM Mountain Time
+const MOUNTAIN_TIME_ZONE = 'America/Denver';
+
+function getZonedParts(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    weekday: 'short',
+    hour12: false,
+  }).formatToParts(date);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? '0';
+  const hourRaw = get('hour');
+
+  return {
+    year: Number(get('year')),
+    month: Number(get('month')),
+    day: Number(get('day')),
+    hour: Number(hourRaw === '24' ? '0' : hourRaw),
+    minute: Number(get('minute')),
+    second: Number(get('second')),
+    dayOfWeek: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')),
+  };
+}
+
+function zonedTimeToUtc(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute = 0,
+  second = 0,
+  timeZone: string,
+): number {
+  let utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
+
+  for (let i = 0; i < 4; i++) {
+    const parts = getZonedParts(new Date(utcGuess), timeZone);
+    const actualLocalMs = Date.UTC(
+      parts.year,
+      parts.month - 1,
+      parts.day,
+      parts.hour,
+      parts.minute,
+      parts.second,
+    );
+    const wantedLocalMs = Date.UTC(year, month - 1, day, hour, minute, second);
+    utcGuess += wantedLocalMs - actualLocalMs;
+  }
+
+  return utcGuess;
+}
+
+function getSundayLiveStartMs(year: number, month: number, day: number) {
+  const normalizedSunday = new Date(Date.UTC(year, month - 1, day));
+  return zonedTimeToUtc(
+    normalizedSunday.getUTCFullYear(),
+    normalizedSunday.getUTCMonth() + 1,
+    normalizedSunday.getUTCDate(),
+    ASSIST_LIVE_START_HOUR,
+    0,
+    0,
+    MOUNTAIN_TIME_ZONE,
+  );
+}
+
+// First episode: Sunday May 31, 2026, 6:00 PM Mountain Time
+const ASSIST_FIRST_EPISODE_LIVE_START_MS = zonedTimeToUtc(
+  2026,
+  5,
+  31,
+  ASSIST_LIVE_START_HOUR,
+  0,
+  0,
+  MOUNTAIN_TIME_ZONE,
+);
 
 const episodeDateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'long',
   day: 'numeric',
-  timeZone: 'Etc/GMT+7',
+  timeZone: MOUNTAIN_TIME_ZONE,
 });
 
 function getAssistSchedule(now: Date) {
-  // Shift into a fixed MST timeline (UTC-7) to keep weekly boundaries stable.
   const nowMs = now.getTime();
-  const nowMstMs = nowMs + MST_OFFSET_MS;
-  const nowMst = new Date(nowMstMs);
+  const parts = getZonedParts(now, MOUNTAIN_TIME_ZONE);
+  const sundayAnchor = new Date(Date.UTC(parts.year, parts.month - 1, parts.day - parts.dayOfWeek));
 
-  const day = nowMst.getUTCDay();
-  const hours = nowMst.getUTCHours();
-  const minutes = nowMst.getUTCMinutes();
-  const seconds = nowMst.getUTCSeconds();
-  const milliseconds = nowMst.getUTCMilliseconds();
+  const liveStartMs = getSundayLiveStartMs(
+    sundayAnchor.getUTCFullYear(),
+    sundayAnchor.getUTCMonth() + 1,
+    sundayAnchor.getUTCDate(),
+  );
+  const liveEndMs = liveStartMs + (ASSIST_LIVE_END_HOUR - ASSIST_LIVE_START_HOUR) * 60 * 60 * 1000;
 
-  const elapsedInWeekMs =
-    (((day * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000 + milliseconds;
-  const weekStartMstMs = nowMstMs - elapsedInWeekMs;
-
-  const liveStartMstMs = weekStartMstMs + ASSIST_LIVE_START_HOUR_MST * 60 * 60 * 1000;
-  const liveEndMstMs = weekStartMstMs + ASSIST_LIVE_END_HOUR_MST * 60 * 60 * 1000;
-
-  const isLive = nowMstMs >= liveStartMstMs && nowMstMs < liveEndMstMs;
-  const nextTargetMstMs = nowMstMs >= liveEndMstMs ? liveStartMstMs + ASSIST_WEEK_MS : liveStartMstMs;
-  const diffMs = isLive ? 0 : Math.max(0, nextTargetMstMs - nowMstMs);
+  const isLive = nowMs >= liveStartMs && nowMs < liveEndMs;
+  const nextTargetMs = nowMs >= liveEndMs ? liveStartMs + ASSIST_WEEK_MS : liveStartMs;
+  const diffMs = isLive ? 0 : Math.max(0, nextTargetMs - nowMs);
 
   const episodeNumber =
-    Math.floor((nextTargetMstMs - ASSIST_FIRST_EPISODE_LIVE_START_MST_MS) / ASSIST_WEEK_MS) + 1;
-  const episodeSundayMstMs = nextTargetMstMs - ASSIST_LIVE_START_HOUR_MST * 60 * 60 * 1000;
-  const episodeDateLabel = episodeDateFormatter.format(
-    new Date(episodeSundayMstMs - MST_OFFSET_MS),
-  );
+    Math.floor((nextTargetMs - ASSIST_FIRST_EPISODE_LIVE_START_MS) / ASSIST_WEEK_MS) + 1;
+  const episodeDateLabel = episodeDateFormatter.format(new Date(nextTargetMs));
 
   return {
     isLive,
