@@ -34,6 +34,7 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 const LIVE_STREAM_URL = 'https://www.youtube.com/live/2dcEuVgps3I';
+const PREVIOUS_EPISODE_URL = 'https://youtu.be/cWm4Hp3NwOA';
 const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const ASSIST_LIVE_START_HOUR = 18; // Sunday 6 PM Mountain Time
 const ASSIST_LIVE_END_HOUR = 19; // Sunday 7 PM Mountain Time
@@ -654,11 +655,27 @@ function CTAButtonsRow({
   const SHOW_PILOT_BUTTON = false;
   
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-center gap-4 pb-5">
       <CTAButton variant="primary" onClick={onWaitlistClick}>
         Join the Waitlist
       </CTAButton>
-      <LiveStreamButton onClick={onLiveClick} />
+      <div className="relative">
+        <LiveStreamButton onClick={onLiveClick} />
+        <a
+          href={PREVIOUS_EPISODE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap text-[11px] uppercase tracking-[2.5px] no-underline transition-colors hover:underline"
+          style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            color: '#888888',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = '#aaaaaa'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = '#888888'; }}
+        >
+          View previous episode
+        </a>
+      </div>
       {SHOW_PILOT_BUTTON && (
         <CTAButton variant="primary" onClick={onPilotClick}>
           Apply for Pilot Program
