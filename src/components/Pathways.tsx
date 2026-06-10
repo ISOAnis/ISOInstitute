@@ -108,10 +108,10 @@ function PathwayCard({ pathway, isSelected, onClick }: PathwayCardProps) {
   );
 }
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'join';
 
 interface PathwaysProps {
-  onNavigate: (page: Page) => void;
+  onNavigate: (page: string) => void;
   onNavigateToCallIso?: (coachName: string, categoryId?: string) => void;
   commitmentStatus?: {
     isCommitted: boolean;
@@ -255,7 +255,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
       <>
         <div 
           className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8"
-          style={{ background: '#030305' }}
+          style={{ background: '#111111' }}
         >
           <div className="max-w-6xl mx-auto">
             {/* Back Button */}
@@ -325,14 +325,113 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
   return (
     <>
       <div 
-        className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen pb-32 px-4 sm:px-6 lg:px-8"
         style={{
-          background: '#030305',
+          background: '#111111',
         }}
       >
         <div className="max-w-6xl mx-auto">
-          {/* How It Works - Minimal & Elegant */}
-          <div className="text-center mb-16">
+
+          {/* ── HERO HOOK ── */}
+          <motion.div
+            className="text-center"
+            style={{ marginBottom: 70, paddingTop: 96 }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span
+              className="inline-block px-4 py-2 rounded-full text-sm mb-8"
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                color: 'rgba(255,255,255,0.6)',
+              }}
+            >
+              For Players
+            </span>
+            <h1
+              className="mb-6"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(48px, 10vw, 96px)',
+                lineHeight: 1,
+                letterSpacing: '2px',
+                color: '#F2F2F2',
+              }}
+            >
+              This Is What{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Structured
+              </span>
+              <br />
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Development
+              </span>{' '}
+              Actually Looks Like.
+            </h1>
+            <p
+              className="mx-auto mb-10"
+              style={{
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: 'clamp(16px, 2.5vw, 20px)',
+                color: 'rgba(255,255,255,0.5)',
+                lineHeight: 1.75,
+                maxWidth: 600,
+              }}
+            >
+              ISO isn't a content library. It's a system — assessment, placement, a real coach, and a path that moves as you do.
+            </p>
+            <motion.button
+              onClick={() => onNavigate('join' as Page)}
+              className="inline-flex items-center gap-3 rounded-full font-semibold"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: '18px',
+                letterSpacing: '3px',
+                background: 'rgba(255,255,255,0.92)',
+                color: '#080808',
+                padding: '16px 40px',
+                border: '1px solid rgba(255,255,255,0.5)',
+                marginTop: 24,
+              }}
+              whileHover={{ scale: 1.03, boxShadow: '0 0 32px rgba(255,255,255,0.15)' }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Find Your Level
+              <ArrowRight size={16} />
+            </motion.button>
+            <p
+              style={{
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.25)',
+                marginTop: 14,
+              }}
+            >
+              Free to start · No commitment required
+            </p>
+          </motion.div>
+
+          {/* ── HOW IT WORKS ── */}
+          <div className="text-center" style={{ marginBottom: 80 }}>
             <div className="inline-block mb-6">
               <span className="px-4 py-2 text-white rounded-full backdrop-blur-[10px]" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
                 The ISO System
@@ -364,10 +463,10 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                     className="text-white mb-4 text-2xl text-center"
                     style={{ fontFamily: "'Bebas Neue', sans-serif" }}
                   >
-                    Choose Your Pathway
+                    Get Assessed
                   </h3>
                   <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Select the area where you want to grow. Each pathway has experienced coaches ready to guide you.
+                    Answer a short intake and ISO places you at your real level — Freshman, JV, or Varsity. No self-selecting, no guessing.
                   </p>
                 </motion.div>
 
@@ -389,7 +488,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                     Connect with a Coach
                   </h3>
                   <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Browse coach profiles and book a session with a coach who aligns with your goals and schedule.
+                    Browse verified coach profiles in your pathway. Every ISO coach is reviewed by the Advisory Board before they work with players.
                   </p>
                 </motion.div>
 
@@ -411,16 +510,130 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                     Start Getting Buckets
                   </h3>
                   <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Set micro-goals, win games, and work toward your championship ring — all while building discipline and faith.
+                    Set micro-goals, win games, and level up — all while building discipline, character, and real accountability.
                   </p>
                 </motion.div>
               </div>
             </div>
           </div>
 
+          {/* ── WHAT A SESSION LOOKS LIKE ── */}
+          <motion.div
+            style={{ marginBottom: 96 }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <div className="text-center mb-10">
+              <div className="inline-block mb-4">
+                <span className="px-4 py-2 text-white rounded-full backdrop-blur-[10px]" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
+                  Real Coaching. Not Just Content.
+                </span>
+              </div>
+              <h2
+                className="text-white text-5xl md:text-6xl"
+                style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+              >
+                What a Session Actually Looks Like
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  step: '01',
+                  title: 'Review Your Last 30 Days',
+                  body: 'Your coach checks in on the goals you set last session. What landed, what didn\'t, and why — no sugarcoating.',
+                  color: '#22c55e',
+                },
+                {
+                  step: '02',
+                  title: 'Identify Your #1 Blocker',
+                  body: 'Together you zero in on the one thing holding you back most right now — not ten things. One thing, with a real plan.',
+                  color: '#3b82f6',
+                },
+                {
+                  step: '03',
+                  title: 'Set Your 2-Week Focus',
+                  body: 'You leave with a specific, measurable target for the next two weeks. Your coach holds you to it at the next check-in.',
+                  color: '#a855f7',
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className="rounded-2xl p-8"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <div
+                    className="text-5xl mb-4"
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      color: item.color,
+                      opacity: 0.6,
+                    }}
+                  >
+                    {item.step}
+                  </div>
+                  <h3
+                    className="text-white mb-3 text-xl"
+                    style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '1px' }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: '15px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
+                    {item.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* ── STAT ROW ── */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-px rounded-2xl overflow-hidden"
+            style={{ marginBottom: 96 }}
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            {[
+              { stat: '3–4×', label: 'faster progression with a dedicated coach vs. going solo' },
+              { stat: 'Walk-On', label: 'is free — one conversation a month, zero commitment required' },
+              { stat: '100%', label: 'of ISO coaches are advisory-board reviewed before working with players' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="text-center py-10 px-8"
+                style={{ background: '#111111' }}
+              >
+                <div
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: 'clamp(36px, 6vw, 56px)',
+                    color: 'rgba(255,255,255,0.9)',
+                    letterSpacing: '2px',
+                    lineHeight: 1,
+                    marginBottom: 10,
+                  }}
+                >
+                  {item.stat}
+                </div>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: '14px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+
           {/* Progress System Overview */}
           <div 
-            className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6 mb-16"
+            className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6"
+            style={{ marginTop: 64, marginBottom: 96 }}
             onMouseEnter={() => setIsHoveringProgressBox(true)}
             onMouseLeave={() => setIsHoveringProgressBox(false)}
           >
@@ -586,35 +799,61 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             </div>
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-16">
-            <div className="inline-block mb-6">
-              <span className="px-4 py-2 text-white rounded-full backdrop-blur-[10px]" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
-                Six Pathways to Growth
-              </span>
-            </div>
-            <h1 
-              className="text-white mb-4 text-5xl md:text-6xl"
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+          {/* ── CTA BLOCK ── */}
+          <motion.div
+            className="text-center rounded-3xl py-16 px-8"
+            style={{
+              background: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 70%)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2
+              className="text-white mb-4"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: 'clamp(40px, 8vw, 72px)',
+                letterSpacing: '2px',
+                lineHeight: 1,
+              }}
             >
-              Choose Your Pathway
-            </h1>
-            <p className="text-white/70 text-xl max-w-3xl mx-auto" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-              Select a pathway to browse coaches and begin your ISO journey. Each pathway offers experienced coaches ready to guide you.
+              Ready to Find Your Level?
+            </h2>
+            <p
+              className="mx-auto mb-8"
+              style={{
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: '17px',
+                color: 'rgba(255,255,255,0.45)',
+                lineHeight: 1.75,
+                maxWidth: 500,
+              }}
+            >
+              Start free. Walk-On gives you one conversation a month and a shadowing opportunity — enough to know if ISO is right for you.
             </p>
-          </div>
+            <motion.button
+              onClick={() => onNavigate('join' as Page)}
+              className="inline-flex items-center gap-3 rounded-full"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                fontSize: '18px',
+                letterSpacing: '3px',
+                background: 'rgba(255,255,255,0.92)',
+                color: '#080808',
+                padding: '16px 44px',
+                border: '1px solid rgba(255,255,255,0.5)',
+              }}
+              whileHover={{ scale: 1.03, boxShadow: '0 0 32px rgba(255,255,255,0.15)' }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Find Your Level
+              <ArrowRight size={16} />
+            </motion.button>
+          </motion.div>
 
-          {/* Pathways Grid - Now Clickable */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {pathways.map((pathway) => (
-              <PathwayCard 
-                key={pathway.id}
-                pathway={pathway as PathwayData}
-                isSelected={selectedPathway === pathway.id}
-                onClick={() => handlePathwayClick(pathway.id)}
-              />
-            ))}
-          </div>
         </div>
       </div>
 

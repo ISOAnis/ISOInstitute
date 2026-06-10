@@ -10,7 +10,7 @@ export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer
       className="text-white py-16 px-4 sm:px-6 lg:px-8 border-t border-white/5"
-      style={{ background: "#030305" }}
+      style={{ background: "#111111" }}
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">

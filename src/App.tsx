@@ -402,7 +402,7 @@ export default function App() {
     <div 
       className="min-h-screen"
       style={{
-        background: '#030305',
+        background: '#111111',
       }}
     >
       <Navigation 
@@ -466,7 +466,7 @@ export default function App() {
 
       {currentPage === 'for-coaches' && (
         <Suspense fallback={<LoadingSpinner />}>
-          <ForCoaches />
+          <ForCoaches onNavigate={handleNavigate} />
         </Suspense>
       )}
 

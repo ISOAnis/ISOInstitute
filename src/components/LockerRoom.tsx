@@ -263,7 +263,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
 
   if (showLockedMessage) {
     return (
-      <div className="min-h-screen text-white flex items-center justify-center p-8" style={{ background: '#030305' }}>
+      <div className="min-h-screen text-white flex items-center justify-center p-8" style={{ background: '#111111' }}>
         <div className="max-w-md w-full rounded-2xl border border-white/10 p-8 text-center" style={{ background: '#0a0a0f' }}>
           <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-orange-400" />
@@ -286,7 +286,7 @@ export function LockerRoom({ userRole, isPaidMember = true, onClose, activePathw
   }
 
   return (
-    <div className="min-h-screen text-white flex rounded-2xl overflow-hidden" style={{ background: '#030305' }}>
+    <div className="min-h-screen text-white flex rounded-2xl overflow-hidden" style={{ background: '#111111' }}>
       {/* Locked Pathway Overlay */}
       {showLockedOverlay && (
         <div 

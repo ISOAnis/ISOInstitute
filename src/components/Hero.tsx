@@ -20,7 +20,7 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
     <section 
       className="relative overflow-hidden min-h-screen flex items-center px-4 py-20"
       style={{
-        background: '#030305',
+        background: '#111111',
       }}
     >
       <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -56,9 +56,9 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="text-white">You're Not Lost.</span>
+              <span style={{ color: '#F2F2F2' }}>You're Not Lost.</span>
               <br />
-              <span className="text-white">You're </span>
+              <span style={{ color: '#F2F2F2' }}>You're </span>
               <span 
                 className="inline-block"
                 style={{

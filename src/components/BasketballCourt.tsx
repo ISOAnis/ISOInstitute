@@ -375,7 +375,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
         id="iso-court" 
         className="pt-8 pb-20 px-4 sm:px-6 lg:px-8"
         style={{
-          background: '#030305',
+          background: '#111111',
         }}
       >
         <div className="max-w-7xl mx-auto">

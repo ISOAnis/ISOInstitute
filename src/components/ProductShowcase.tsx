@@ -81,7 +81,7 @@ export function ProductShowcase() {
     <section 
       id="product-showcase"
       style={{ 
-      background: '#030305', 
+      background: '#111111', 
       paddingTop: '80px',
       paddingBottom: '80px',
       paddingLeft: '32px',

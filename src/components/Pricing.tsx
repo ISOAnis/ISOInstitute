@@ -222,7 +222,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
   return (
     <>
     <section style={{
-      background: '#030305',
+      background: '#111111',
         paddingTop: '50px',
         paddingBottom: '50px',
         paddingLeft: '20px',
@@ -455,7 +455,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
       {false && <section 
         className="border-t border-white/5"
         style={{
-          background: '#030305',
+          background: '#111111',
         }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">

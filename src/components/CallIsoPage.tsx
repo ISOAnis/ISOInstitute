@@ -223,7 +223,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#030305',
+        backgroundColor: '#111111',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -341,7 +341,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#030305',
+        backgroundColor: '#111111',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -435,7 +435,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#030305',
+        backgroundColor: '#111111',
         padding: '80px 32px',
       }}>
         <div style={{
@@ -670,7 +670,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#030305',
+      backgroundColor: '#111111',
       paddingTop: '40px',
       paddingBottom: '40px',
       paddingLeft: '32px',

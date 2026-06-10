@@ -251,7 +251,7 @@ export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
 
   // Dashboard View
   return (
-    <div className="min-h-screen pt-20" style={{ background: '#030305' }}>
+    <div className="min-h-screen pt-20" style={{ background: '#111111' }}>
       {/* Header */}
       <div className="sticky top-20 z-30 backdrop-blur-md border-b border-white/10" style={{ background: 'rgba(3, 3, 5, 0.95)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

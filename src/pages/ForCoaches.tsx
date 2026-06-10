@@ -489,7 +489,7 @@ const FlowConnector = () => (
 
 
 
-export default function ForCoaches() {
+export default function ForCoaches({ onNavigate }: { onNavigate?: (page: string) => void }) {
 
   const [selectedPathway, setSelectedPathway] = useState(null);
 
@@ -684,7 +684,7 @@ export default function ForCoaches() {
 
     return (
 
-      <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8" style={{ background: '#030305' }}>
+      <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8" style={{ background: '#111111' }}>
 
         <div className="max-w-6xl mx-auto">
 
@@ -846,11 +846,96 @@ export default function ForCoaches() {
 
   return (
 
-    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8" style={{ background: '#030305' }}>
+    <div className="min-h-screen pb-24 px-4 sm:px-6 lg:px-8" style={{ background: '#111111' }}>
 
       <div className="max-w-6xl mx-auto">
 
-        
+        {/* ── HERO HOOK ── */}
+        <motion.div
+          className="text-center"
+          style={{ paddingTop: 96, marginBottom: 100 }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <span
+            className="inline-block px-4 py-2 rounded-full text-sm mb-8"
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              letterSpacing: '3px',
+              textTransform: 'uppercase',
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              color: 'rgba(255,255,255,0.6)',
+            }}
+          >
+            For Coaches
+          </span>
+          <h1
+            className="mb-6"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 'clamp(48px, 10vw, 96px)',
+              lineHeight: 1,
+              letterSpacing: '2px',
+              color: '#F2F2F2',
+            }}
+          >
+            Tired of Being Overlooked?<br />
+            <span
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              At ISO, You're a Superstar.
+            </span>
+          </h1>
+          <p
+            className="mx-auto mb-10"
+            style={{
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: 'clamp(16px, 2.5vw, 20px)',
+              color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1.75,
+              maxWidth: 600,
+              marginTop: 24,
+            }}
+          >
+            ISO exists to give coaches the platform, the players, and the recognition they've always deserved. Your expertise has value — let's prove it.
+          </p>
+          <motion.button
+            onClick={() => onNavigate?.('join')}
+            className="inline-flex items-center gap-3 rounded-full font-semibold"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: '18px',
+              letterSpacing: '3px',
+              background: 'rgba(255,255,255,0.92)',
+              color: '#080808',
+              padding: '16px 40px',
+              border: '1px solid rgba(255,255,255,0.5)',
+              marginTop: 24,
+            }}
+            whileHover={{ scale: 1.03, boxShadow: '0 0 32px rgba(255,255,255,0.15)' }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Apply as a Coach
+            <ArrowRight size={16} />
+          </motion.button>
+          <p
+            style={{
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.25)',
+              marginTop: 14,
+            }}
+          >
+            Advisory Board reviewed · Every application considered
+          </p>
+        </motion.div>
 
         {/* How It Works */}
 

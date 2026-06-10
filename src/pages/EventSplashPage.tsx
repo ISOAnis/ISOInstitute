@@ -590,7 +590,7 @@ export function EventSplashPage() {
   return (
     <div
       className="relative min-h-screen overflow-hidden"
-      style={{ background: '#030305' }}
+      style={{ background: '#111111' }}
     >
       {/* Navigation Bar */}
       <SplashNavigation />
@@ -602,7 +602,7 @@ export function EventSplashPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at center, transparent 0%, #030305 70%)',
+              'radial-gradient(ellipse at center, transparent 0%, #111111 70%)',
           }}
         />
         {/* Subtle center glow */}

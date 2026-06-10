@@ -280,7 +280,7 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   };
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#030305' }}>
+    <div className="min-h-screen text-white" style={{ background: '#111111' }}>
       {/* Tutorial */}
       {showTutorial && (
         <PortalTutorial

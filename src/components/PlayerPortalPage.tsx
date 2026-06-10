@@ -15,7 +15,7 @@ export function PlayerPortalPage({ onNavigate }: PlayerPortalPageProps) {
   }, []);
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#030305' }}>
+    <div className="min-h-screen text-white" style={{ background: '#111111' }}>
       <Navigation currentPage="player-portal" onNavigate={onNavigate} />
       <div className="pt-28 pb-16 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto">

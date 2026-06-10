@@ -3989,7 +3989,7 @@ html {
 /* About Page Styles */
 .about-page {
   font-family: 'Bebas Neue', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #030305;
+  background: #111111;
   color: #fff;
   overflow-x: hidden;
 }
@@ -4110,7 +4110,7 @@ html {
 }
 
 .about-page .value-card {
-  background: linear-gradient(135deg, #0a0a0f 0%, #030305 100%);
+  background: linear-gradient(135deg, #0a0a0f 0%, #111111 100%);
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid #1e293b;
