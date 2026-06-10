@@ -1,8 +1,9 @@
+import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
-  onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community') => void;
+  onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community' | 'join') => void;
   onPlayerClick?: () => void;
   onCoachClick?: () => void;
 }
@@ -83,126 +84,36 @@ export function Hero({ onNavigate, onPlayerClick, onCoachClick }: HeroProps = {}
               The ISO Institute is a faith-driven development platform & cultural movement built to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
         </motion.p>
 
-            {/* CTA Buttons with Flowing Border */}
+
+            {/* Join ISO primary CTA */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
             >
-              {/* For Players Button */}
-              <motion.div
-                className="relative inline-flex rounded-full"
-                style={{ padding: '1px' }}
+              <button
+                onClick={() => onNavigate?.('join')}
+                className="flex items-center gap-3 px-8 py-4 rounded-full font-semibold transition-all duration-200"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: '18px',
+                  letterSpacing: '3px',
+                  background: 'rgba(255,255,255,0.92)',
+                  color: '#080808',
+                  border: '1px solid rgba(255,255,255,0.5)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = '#ffffff';
+                  e.currentTarget.style.boxShadow = '0 0 32px rgba(255,255,255,0.15)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.92)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
-                {/* Animated flowing border */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #f97316, #fb923c, #3b82f6, #60a5fa, #f97316)',
-                    backgroundSize: '200% 100%',
-                  }}
-                  animate={{ 
-                    backgroundPosition: ['0% 50%', '200% 50%'],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
-                />
-                
-                {/* Glow effect */}
-                <motion.div
-                  className="absolute -inset-2 rounded-full blur-xl -z-10"
-                  style={{ 
-                    background: 'linear-gradient(90deg, #f97316, #3b82f6)',
-                  }}
-                  animate={{
-                    scale: [1, 1.15, 1],
-                    opacity: [0.4, 0.7, 0.4],
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-
-                <button
-                  onClick={() => onPlayerClick?.()}
-                  className="relative px-6 py-3 rounded-full text-white text-base font-semibold transition-all z-10"
-                  style={{ 
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(90deg, rgba(249, 115, 22, 0.3), rgba(59, 130, 246, 0.25))';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))';
-                  }}
-                >
-                  for players
-                </button>
-              </motion.div>
-
-              {/* For Coaches Button */}
-              <motion.div
-                className="relative inline-flex rounded-full"
-                style={{ padding: '1px' }}
-              >
-                {/* Animated flowing border */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #f97316, #fb923c, #3b82f6, #60a5fa, #f97316)',
-                    backgroundSize: '200% 100%',
-                  }}
-                  animate={{ 
-                    backgroundPosition: ['0% 50%', '200% 50%'],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
-                />
-                
-                {/* Glow effect */}
-                <motion.div
-                  className="absolute -inset-2 rounded-full blur-xl -z-10"
-                  style={{ 
-                    background: 'linear-gradient(90deg, #f97316, #3b82f6)',
-                  }}
-                  animate={{
-                    scale: [1, 1.15, 1],
-                    opacity: [0.4, 0.7, 0.4],
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-
-                <button
-                  onClick={() => onCoachClick?.()}
-                  className="relative px-6 py-3 rounded-full text-white text-base font-semibold transition-all z-10"
-                  style={{ 
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(90deg, rgba(249, 115, 22, 0.3), rgba(59, 130, 246, 0.25))';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85))';
-                  }}
-                >
-                  for coaches
-                </button>
-              </motion.div>
+                Join ISO
+                <ArrowRight size={16} />
+              </button>
             </motion.div>
           </div>
 

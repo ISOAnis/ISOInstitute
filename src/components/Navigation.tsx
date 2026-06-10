@@ -4,7 +4,7 @@ import { ChevronDown, X } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store' | 'for-coaches';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store' | 'for-coaches' | 'join';
 type UserRole = 'coach' | 'player' | 'community-leader';
 
 interface User {
@@ -37,6 +37,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
   const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isOnboarded, setIsOnboarded] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -77,6 +78,16 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
       window.removeEventListener('storage', checkUserState);
       clearInterval(interval);
     };
+  }, []);
+
+  // Sync onboarding completion state
+  useEffect(() => {
+    const checkOnboarding = () => {
+      setIsOnboarded(!!localStorage.getItem('iso_onboarding_complete'));
+    };
+    checkOnboarding();
+    const interval = setInterval(checkOnboarding, 500);
+    return () => clearInterval(interval);
   }, []);
 
   const handleCoachLogin = (email: string, password: string) => {
@@ -140,7 +151,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
       <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
         <div className="w-full max-w-5xl">
           <div
-            className={`flex items-center justify-between rounded-full pl-5 pr-5 py-2 shadow-lg transition-all duration-300 ${
+            className={`flex items-center justify-between rounded-full pl-5 pr-5 py-1 shadow-lg transition-all duration-300 ${
               isScrolled
                 ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
                 : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
@@ -214,18 +225,21 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 About
               </button>
 
-              <button 
-                onClick={() => onNavigate('store')}
-                onMouseEnter={() => setHoveredItem('store')}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{ 
-                  color: hoveredItem === 'store' || currentPage === 'store' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
-                  textShadow: hoveredItem === 'store' || currentPage === 'store' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Store
-              </button>
+              {/* Store - hidden on onboarding branch */}
+              {false && (
+                <button 
+                  onClick={() => onNavigate('store')}
+                  onMouseEnter={() => setHoveredItem('store')}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  style={{ 
+                    color: hoveredItem === 'store' || currentPage === 'store' ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                    textShadow: hoveredItem === 'store' || currentPage === 'store' ? '0 0 12px rgba(255, 255, 255, 0.8)' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  Store
+                </button>
+              )}
               
               {/* Portal Dropdown */}
               <div className="relative">
@@ -317,21 +331,31 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                 )}
               </div>
               
-              {user ? (
-                <button 
-                  onClick={handleLogout}
-                  className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
-                >
-                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Sign Out</span>
-                </button>
-              ) : (
-                <button 
-                  onClick={() => setShowPlayerLogin(true)}
-                  className="create-account-btn relative px-6 py-2 rounded-full overflow-hidden ml-2 mr-2"
-                >
-                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Log In</span>
-                </button>
-              )}
+              {/* Auth area — single contextual button */}
+              <button
+                onClick={isOnboarded ? handleLogout : () => onNavigate('join')}
+                onMouseEnter={() => setHoveredItem('join')}
+                onMouseLeave={() => setHoveredItem(null)}
+                className="relative rounded-full font-semibold transition-all duration-200"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: '14px',
+                  letterSpacing: '2px',
+                  padding: '7px 22px',
+                  margin: '3px 6px 3px 8px',
+                  background: hoveredItem === 'join' || currentPage === 'join'
+                    ? 'rgba(255,255,255,0.95)'
+                    : 'rgba(255,255,255,0.88)',
+                  color: '#0A0A0A',
+                  border: '1px solid rgba(255,255,255,0.6)',
+                  boxShadow: hoveredItem === 'join' || currentPage === 'join'
+                    ? '0 0 20px rgba(255,255,255,0.2)'
+                    : 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {isOnboarded ? 'Sign Out' : 'Join ISO'}
+              </button>
             </div>
           </div>
         </div>

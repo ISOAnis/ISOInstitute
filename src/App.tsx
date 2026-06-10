@@ -23,8 +23,9 @@ const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
 const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
 const ForCoaches = lazy(() => import('./pages/ForCoaches').then(m => ({ default: m.default })));
+const JoinISOPage = lazy(() => import('./pages/JoinISOPage').then(m => ({ default: m.JoinISOPage })));
 
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store' | 'for-coaches';
+type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store' | 'for-coaches' | 'join';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -64,7 +65,7 @@ export default function App() {
         selectedCategoryId: string | null;
       }>;
 
-      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store', 'for-coaches'];
+      const validPages: Page[] = ['home', 'pathways', 'about', 'community', 'call-iso', 'coach-portal', 'player-portal', 'store', 'for-coaches', 'join'];
       if (parsed.currentPage && validPages.includes(parsed.currentPage)) {
         // Only restore Call ISO page if we also have a coach to show
         const targetPage = parsed.currentPage === 'call-iso' && !parsed.selectedCoachName ? 'home' : parsed.currentPage;
@@ -248,6 +249,69 @@ export default function App() {
     setPendingPortalType(null);
   };
 
+  // Portal gate — must be logged in AND have completed onboarding
+  const isOnboarded = (() => {
+    try { return !!localStorage.getItem('iso_onboarding_complete'); } catch { return false; }
+  })();
+  const isLoggedIn = (() => {
+    try { return !!localStorage.getItem('iso_demo_user'); } catch { return false; }
+  })();
+
+  if ((currentPage === 'coach-portal' || currentPage === 'player-portal') && (!isLoggedIn || !isOnboarded)) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 460 }}>
+          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '4px', color: 'rgba(255,255,255,0.25)', marginBottom: 24 }}>
+            ISO · ACCESS REQUIRED
+          </div>
+          <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(40px, 8vw, 64px)', color: 'rgba(180,180,180,0.9)', letterSpacing: '2px', lineHeight: 1, marginBottom: 16 }}>
+            Complete Onboarding First.
+          </h1>
+          <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: '15px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, marginBottom: 36 }}>
+            {isLoggedIn
+              ? "You're signed in, but you haven't completed your onboarding yet. Finish your assessment to unlock your portal."
+              : "You need to create an account and complete your onboarding before accessing this portal."}
+          </p>
+          <button
+            onClick={() => handleNavigate('join')}
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: '14px',
+              letterSpacing: '3px',
+              background: 'rgba(180,180,180,0.9)',
+              color: '#0A0A0A',
+              border: 'none',
+              borderRadius: '999px',
+              padding: '14px 36px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              marginRight: 12,
+            }}
+          >
+            {isLoggedIn ? 'Begin Onboarding' : 'Join ISO'}
+          </button>
+          <button
+            onClick={() => handleNavigate('home')}
+            style={{
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: '13px',
+              background: 'none',
+              color: 'rgba(255,255,255,0.3)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              marginTop: 16,
+              display: 'block',
+              margin: '16px auto 0',
+            }}
+          >
+            Back to home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (currentPage === 'coach-portal') {
     return <CoachPortalPage onNavigate={handleNavigate} />;
   }
@@ -256,13 +320,14 @@ export default function App() {
     return <PlayerPortalPage onNavigate={handleNavigate} />;
   }
 
-  if (currentPage === 'store') {
-    return (
-      <Suspense fallback={<LoadingSpinner />}>
-        <StoreDashboard onBack={() => handleNavigate('home')} />
-      </Suspense>
-    );
-  }
+  // Store hidden on onboarding branch
+  // if (currentPage === 'store') {
+  //   return (
+  //     <Suspense fallback={<LoadingSpinner />}>
+  //       <StoreDashboard onBack={() => handleNavigate('home')} />
+  //     </Suspense>
+  //   );
+  // }
 
   return (
     <div 
@@ -336,6 +401,12 @@ export default function App() {
         </Suspense>
       )}
 
+      {currentPage === 'join' && (
+        <Suspense fallback={<LoadingSpinner />}>
+          <JoinISOPage onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
       {/* Community page - temporarily hidden */}
       {false && currentPage === 'community' && (
         <Suspense fallback={<LoadingSpinner />}>
@@ -353,7 +424,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {currentPage !== 'call-iso' && currentPage !== 'for-coaches' && <Footer onNavigate={setCurrentPage} />}
+      {currentPage !== 'call-iso' && currentPage !== 'for-coaches' && currentPage !== 'join' && <Footer onNavigate={setCurrentPage} />}
 
       {/* Consultation Modal - shown before Call ISO page */}
       {showConsultationModal && pendingCoachName && (
