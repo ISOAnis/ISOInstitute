@@ -13,7 +13,7 @@ export function WhyISO() {
         maxWidth: '1200px',
         margin: '0 auto',
         textAlign: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#111111',
       }}
     >
     </section>
@@ -24,14 +24,14 @@ export function WhyISO() {
         padding: '60px 24px',
         maxWidth: '1400px',
         margin: '0 auto',
-        backgroundColor: '#000',
+        backgroundColor: '#111111',
       }}
     >
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '40px', display: 'flex', justifyContent: 'center' }}>
         <div
           style={{
-            background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+            background: 'linear-gradient(145deg, #1a1a1a 0%, #202020 50%, #1a1a1a 100%)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
             borderRadius: '24px',
             padding: '40px 60px',
@@ -470,14 +470,14 @@ export function WhyISO() {
         maxWidth: '1200px',
         margin: '0 auto',
         textAlign: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#111111',
       }}
     >
       {/* Foundation Statement */}
       <div style={{ textAlign: 'center', marginBottom: '64px', display: 'flex', justifyContent: 'center' }}>
         <div
           style={{
-            background: 'linear-gradient(145deg, #0f0f0f 0%, #181818 50%, #0f0f0f 100%)',
+            background: 'linear-gradient(145deg, #1a1a1a 0%, #202020 50%, #1a1a1a 100%)',
             border: '1px solid rgba(255, 255, 255, 0.15)',
             borderRadius: '24px',
             padding: '40px 60px',

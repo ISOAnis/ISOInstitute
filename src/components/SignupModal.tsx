@@ -87,7 +87,7 @@ export function SignupModal({ onClose, onSignupComplete }: SignupModalProps) {
                     onSignupComplete(mockAppleUser);
                   }}
                   className="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-xl transition-colors font-medium w-full"
-                  style={{ backgroundColor: '#000000' }}
+                  style={{ backgroundColor: '#111111' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#000000'}
                 >

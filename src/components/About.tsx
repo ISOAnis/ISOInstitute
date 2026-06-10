@@ -17,7 +17,7 @@ interface AboutProps {
 
 export function About({ onNavigate }: AboutProps) {
   return (
-    <div style={{ backgroundColor: "#000000", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#111111", minHeight: "100vh" }}>
       <HeroSection />
       <MissionSection />
       <ProblemsSection />
@@ -193,7 +193,7 @@ function HeroSection() {
               width: "100%",
               maxWidth: "1200px",
               aspectRatio: "16/9",
-              backgroundColor: "#000",
+              backgroundColor: "#111111",
               borderRadius: "16px",
               overflow: "hidden",
             }}
@@ -244,7 +244,7 @@ function MissionSection() {
       style={{
         textAlign: "center",
         padding: "64px 24px",
-        backgroundColor: "#000",
+        backgroundColor: "#111111",
       }}
     >
       <div
@@ -286,7 +286,7 @@ function ProblemsSection() {
     <section
       style={{
         padding: "5px 24px",
-        backgroundColor: "#000",
+        backgroundColor: "#111111",
       }}
     >
       <div
@@ -658,7 +658,7 @@ function ConnectionAndApproach() {
   }, [isVisible]);
 
   return (
-    <section style={{ padding: "0 24px 64px", backgroundColor: "#000" }}>
+    <section style={{ padding: "0 24px 64px", backgroundColor: "#111111" }}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         {/* Connection Lines */}
         <div
@@ -882,7 +882,7 @@ function WhyItMattersSection() {
       ref={sectionRef}
       style={{
         padding: "120px 24px",
-        backgroundColor: "#000",
+        backgroundColor: "#111111",
       }}
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
@@ -994,7 +994,7 @@ function ClosingCTA({ onNavigate }: ClosingCTAProps) {
     <section
       style={{
         padding: "10px 24px 160px",
-        backgroundColor: "#000",
+        backgroundColor: "#111111",
         textAlign: "center",
       }}
     >
