@@ -21,7 +21,7 @@ export function BecomeACoach() {
   // Animated counter states
   const [counterValues, setCounterValues] = useState({
     coaches: 0,
-    mentees: 0,
+    players: 0,
     sessions: 0,
   });
 
@@ -84,7 +84,7 @@ export function BecomeACoach() {
       const interval = duration / steps;
 
       let currentStep = 0;
-      const targets = { coaches: 150, mentees: 500, sessions: 1200 };
+      const targets = { coaches: 150, players: 500, sessions: 1200 };
 
       const timer = setInterval(() => {
         currentStep++;
@@ -92,7 +92,7 @@ export function BecomeACoach() {
         
         setCounterValues({
           coaches: Math.floor(targets.coaches * progress),
-          mentees: Math.floor(targets.mentees * progress),
+          players: Math.floor(targets.players * progress),
           sessions: Math.floor(targets.sessions * progress),
         });
 
@@ -235,7 +235,7 @@ export function BecomeACoach() {
           <div className="grid md:grid-cols-3 gap-6 mb-20">
             {[
               { label: 'Active Coaches', value: counterValues.coaches, icon: Users, color: 'text-orange-500' },
-              { label: 'Players Helped', value: counterValues.mentees, icon: Star, color: 'text-orange-400' },
+              { label: 'Players Helped', value: counterValues.players, icon: Star, color: 'text-orange-400' },
               { label: 'Sessions Completed', value: counterValues.sessions, icon: Award, color: 'text-orange-600' },
             ].map((stat, index) => {
               const Icon = stat.icon;

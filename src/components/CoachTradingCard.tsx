@@ -5,7 +5,7 @@ import { X, Star, Calendar, Zap, BookOpen, Briefcase, DollarSign, GraduationCap,
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CoachCardProps {
-  mentor: {
+  coach: {
     name: string;
     role: string;
     bio: string;
@@ -33,7 +33,7 @@ interface CoachCardProps {
   onBookSession?: () => void;
 }
 
-export function CoachTradingCard({ mentor, category, onClose, onBookSession }: CoachCardProps) {
+export function CoachTradingCard({ coach, category, onClose, onBookSession }: CoachCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -102,18 +102,18 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
   }, [isFlipped]);
   
   // Default values for stats
-  const overall = mentor.rating ? Math.round(60 + (mentor.rating / 5) * 40) : 85; // Convert 1-5 rating to 60-100 scale, default to 85
-  const sessionsCompleted = mentor.sessionsCompleted || 150;
-  const responseTime = mentor.responseTime || '< 24hrs';
+  const overall = coach.rating ? Math.round(60 + (coach.rating / 5) * 40) : 85; // Convert 1-5 rating to 60-100 scale, default to 85
+  const sessionsCompleted = coach.sessionsCompleted || 150;
+  const responseTime = coach.responseTime || '< 24hrs';
   
   // Mock education data
-  const education = mentor.education || [
+  const education = coach.education || [
     'BS Computer Science, Stanford University',
     'MS Engineering, MIT'
   ];
   
   // Mock career timeline
-  const careerTimeline = mentor.careerTimeline || [
+  const careerTimeline = coach.careerTimeline || [
     { year: '2019', role: 'Software Engineer', company: 'Apple' },
     { year: '2021', role: 'Senior Engineer', company: 'Zoox' },
     { year: '2023', role: 'Lead Engineer', company: 'Zoox' },
@@ -121,8 +121,8 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
   ];
 
   const getImageSrc = () => {
-    if (mentor.photo) {
-      return mentor.photo;
+    if (coach.photo) {
+      return coach.photo;
     }
     return `https://images.unsplash.com/photo-1609503842755-77f4a81d69ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW50b3IlMjBwcm9mZXNzaW9uYWx8ZW58MXx8fHwxNzYyNjQ0MTgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral`;
   };
@@ -254,19 +254,19 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   bottom: 0,
                   borderRadius: '16px',
                   padding: '4px',
-                  background: mentor.tier === 'premium' 
+                  background: coach.tier === 'premium' 
                     ? 'linear-gradient(135deg, #9333ea 0%, #f97316 100%)'
-                    : mentor.tier === 'specialist'
+                    : coach.tier === 'specialist'
                     ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
                     : 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)',
-                  animation: mentor.tier === 'premium' 
+                  animation: coach.tier === 'premium' 
                     ? 'glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    : mentor.tier === 'specialist'
+                    : coach.tier === 'specialist'
                     ? 'gold-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                     : 'none',
-                  boxShadow: mentor.tier === 'premium'
+                  boxShadow: coach.tier === 'premium'
                     ? '0 0 30px rgba(249, 115, 22, 0.8), 0 0 50px rgba(147, 51, 234, 0.6)'
-                    : mentor.tier === 'specialist'
+                    : coach.tier === 'specialist'
                     ? '0 0 25px rgba(234, 179, 8, 0.7), 0 0 45px rgba(245, 158, 11, 0.5)'
                     : 'none',
                 }}
@@ -299,10 +299,10 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       <span style={{ fontSize: '20px' }}>{category.emoji}</span>
                       <span style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>{category.title}</span>
                     </div>
-                    {mentor.tier === 'premium' && (
+                    {coach.tier === 'premium' && (
                       <span style={{ color: '#facc15', fontSize: '12px', fontWeight: '600' }}>⭐ PREMIUM</span>
                     )}
-                    {mentor.tier === 'specialist' && (
+                    {coach.tier === 'specialist' && (
                       <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: '600' }}>⭐ SPECIALIST</span>
                     )}
                   </div>
@@ -319,11 +319,11 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   }}>
                     <ImageWithFallback
                       src={getImageSrc()}
-                      alt={mentor.name}
+                      alt={coach.name}
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: mentor.name === 'Anis Benyoucef' ? 'contain' : 'cover'
+                        objectFit: coach.name === 'Anis Benyoucef' ? 'contain' : 'cover'
                       }}
                     />
                     <div style={{
@@ -347,9 +347,9 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       fontFamily: "'Bebas Neue', sans-serif",
                       textTransform: 'uppercase'
                     }}>
-                      {mentor.name}
+                      {coach.name}
                     </h3>
-                      {mentor.successRate && (
+                      {coach.successRate && (
                         <span style={{
                           color: '#f97316',
                           fontSize: '12px',
@@ -359,11 +359,11 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                           borderRadius: '9999px',
                           border: '1px solid rgba(249, 115, 22, 0.3)'
                         }}>
-                          {mentor.successRate}
+                          {coach.successRate}
                         </span>
                       )}
                     </div>
-                    <p style={{ color: '#f97316', fontSize: '14px', fontWeight: '500', margin: 0 }}>{mentor.role}</p>
+                    <p style={{ color: '#f97316', fontSize: '14px', fontWeight: '500', margin: 0 }}>{coach.role}</p>
                   </div>
 
                   {/* Quick Stats */}
@@ -412,7 +412,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                     gap: '8px',
                     marginBottom: '16px'
                   }}>
-                    {mentor.specialization.slice(0, 4).map((spec, idx) => (
+                    {coach.specialization.slice(0, 4).map((spec, idx) => (
                       <span
                         key={idx}
                         style={{
@@ -531,9 +531,9 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                     fontFamily: "'Bebas Neue', sans-serif",
                     textTransform: 'uppercase'
                   }}>
-                    {mentor.name}
+                    {coach.name}
                   </h3>
-                    {mentor.successRate && (
+                    {coach.successRate && (
                       <span style={{
                         color: '#f97316',
                         fontSize: '11px',
@@ -543,14 +543,14 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                         borderRadius: '9999px',
                         border: '1px solid rgba(249, 115, 22, 0.3)'
                       }}>
-                        {mentor.successRate}
+                        {coach.successRate}
                       </span>
                     )}
                   </div>
 
                   {/* Full Bio */}
                   <div style={{ marginBottom: '16px' }}>
-                    <p style={{ color: '#cbd5e1', fontSize: '14px', lineHeight: '1.75', margin: 0 }}>{mentor.bio}</p>
+                    <p style={{ color: '#cbd5e1', fontSize: '14px', lineHeight: '1.75', margin: 0 }}>{coach.bio}</p>
                   </div>
 
                   {/* Education Section */}
@@ -630,7 +630,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                       gap: '8px',
                       marginLeft: '24px'
                     }}>
-                      {mentor.specialization.map((spec, idx) => (
+                      {coach.specialization.map((spec, idx) => (
                         <span
                           key={idx}
                           style={{
@@ -649,7 +649,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                   </div>
 
                   {/* Coach-Specific Benefits */}
-                  {mentor.additionalPerks && mentor.additionalPerks.length > 0 && (
+                  {coach.additionalPerks && coach.additionalPerks.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <div style={{
                         display: 'flex',
@@ -669,7 +669,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
                         flexDirection: 'column',
                         gap: '6px'
                       }}>
-                        {mentor.additionalPerks.map((perk, idx) => (
+                        {coach.additionalPerks.map((perk, idx) => (
                           <li key={idx} style={{ 
                             color: '#fbbf24', 
                             fontSize: '12px',

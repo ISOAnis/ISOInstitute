@@ -248,7 +248,7 @@ const mockMembers: CommunityMember[] = [
         duration: 45,
         format: 'video',
         notes: [
-          { id: 'n2', text: 'New shahada. Discussed prayer basics and connected with sister mentor.', createdAt: '2024-10-25', isPrivate: false }
+          { id: 'n2', text: 'New shahada. Discussed prayer basics and connected with sister coach.', createdAt: '2024-10-25', isPrivate: false }
         ]
       }
     ]

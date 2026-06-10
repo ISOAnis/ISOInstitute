@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
-interface MenteeRequest {
+interface PlayerRequest {
   id: string;
   name: string;
   email: string;
@@ -35,7 +35,7 @@ interface MatchInsight {
 }
 
 // Mock data - would come from AI analysis
-const mockRequests: MenteeRequest[] = [
+const mockRequests: PlayerRequest[] = [
   {
     id: '1',
     name: 'Sarah Johnson',
@@ -51,7 +51,7 @@ const mockRequests: MenteeRequest[] = [
     matchScore: 92,
     matchReasons: [
       'Strong alignment with your career transition expertise',
-      'Commitment level matches your preferred mentee intensity',
+      'Commitment level matches your preferred player intensity',
       'Goals align with your structured approach to skill-building',
       'Availability fits your preferred meeting times',
       'Demonstrates growth mindset and coachability'
@@ -99,7 +99,7 @@ const mockRequests: MenteeRequest[] = [
     challenges: 'Balancing academics with extracurriculars, financial stress, family pressure.',
     matchScore: 85,
     matchReasons: [
-      'High commitment level matches your mentoring style',
+      'High commitment level matches your coaching style',
       'Goal-oriented and action-focused traits',
       'Values alignment around service and excellence',
       'Clear timeline and structured approach preference'
@@ -112,8 +112,8 @@ const mockRequests: MenteeRequest[] = [
 ];
 
 export function AIMatchingDashboard() {
-  const [requests, setRequests] = useState<MenteeRequest[]>(mockRequests);
-  const [selectedRequest, setSelectedRequest] = useState<MenteeRequest | null>(null);
+  const [requests, setRequests] = useState<PlayerRequest[]>(mockRequests);
+  const [selectedRequest, setSelectedRequest] = useState<PlayerRequest | null>(null);
 
   const getMatchColor = (score: number) => {
     if (score >= 85) return 'text-green-400 bg-green-500/10 border-green-500/30';
@@ -127,7 +127,7 @@ export function AIMatchingDashboard() {
     return 'Fair Match';
   };
 
-  const calculateInsights = (request: MenteeRequest): MatchInsight[] => {
+  const calculateInsights = (request: PlayerRequest): MatchInsight[] => {
     return [
       {
         category: 'Goals Alignment',
@@ -139,14 +139,14 @@ export function AIMatchingDashboard() {
       {
         category: 'Commitment Level',
         score: 95,
-        details: `${request.timeframe} weekly matches your mentoring capacity`,
+        details: `${request.timeframe} weekly matches your coaching capacity`,
         icon: Clock,
         color: 'text-blue-400'
       },
       {
         category: 'Communication Style',
         score: 85,
-        details: 'Their learning style fits your mentoring approach',
+        details: 'Their learning style fits your coaching approach',
         icon: MessageSquare,
         color: 'text-purple-400'
       },
@@ -183,7 +183,7 @@ export function AIMatchingDashboard() {
           <div>
             <h2 className="text-white mb-2">AI-Powered Matching</h2>
             <p className="text-slate-300 mb-4">
-              Our AI analyzes mentor profiles and mentee questionnaires to suggest optimal matches based on goals, 
+              Our AI analyzes coach profiles and player questionnaires to suggest optimal matches based on goals, 
               availability, communication styles, and success patterns.
             </p>
             <div className="flex gap-4 text-sm">
@@ -278,7 +278,7 @@ export function AIMatchingDashboard() {
                 </div>
               </Card>
 
-              {/* Mentee Info */}
+              {/* Player Info */}
               <Card className="bg-slate-900 border-slate-800 p-6">
                 <div className="flex items-start gap-4 mb-6">
                   <Avatar className="w-16 h-16">
@@ -354,7 +354,7 @@ export function AIMatchingDashboard() {
                 <h4 className="text-white mb-4">Questionnaire Responses</h4>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-slate-400 text-sm mb-2">Why do they want a mentor?</p>
+                    <p className="text-slate-400 text-sm mb-2">Why do they want a coach?</p>
                     <p className="text-slate-200">{selectedRequest.commitment}</p>
                   </div>
                   <div>

@@ -24,8 +24,8 @@ interface CallIsoPageProps {
   onBack: () => void;
 }
 
-// Import mentor data from MentorModal
-const mentorData: Record<string, Array<{
+// Import coach data from CoachModal
+const coachData: Record<string, Array<{
   name: string;
   role: string;
   bio: string;
@@ -39,7 +39,7 @@ const mentorData: Record<string, Array<{
   deen: [
     { 
       name: 'Imam Abdullah Rahman', 
-      role: 'Islamic Scholar & Youth Mentor', 
+      role: 'Islamic Scholar & Youth Coach', 
       bio: 'Dedicated to helping young Muslims navigate faith in modern society. 15+ years of experience in youth development and Islamic education.',
       varsityPrice: 45,
       yearsExperience: 15,
@@ -204,7 +204,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
   let selectedCoach: Coach | null = null;
   let categoryId = '';
   
-  for (const [catId, coaches] of Object.entries(mentorData)) {
+  for (const [catId, coaches] of Object.entries(coachData)) {
     const coach = coaches.find(c => c.name === coachName);
     if (coach) {
       selectedCoach = {

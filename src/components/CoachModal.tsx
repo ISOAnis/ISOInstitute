@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar } from './ui/calendar';
 import { ISOEvaluationModal } from './ISOEvaluationModal';
-import { calculateMatch, type MenteeProfile, type MentorProfile } from '../utils/matching';
+import { calculateMatch, type PlayerProfile, type CoachProfile } from '../utils/matching';
 import { Badge } from './ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { CoachTradingCard } from './CoachTradingCard';
 
 // Mock availability data - in production, this would come from a backend/database
-const mentorAvailability: Record<string, Array<{date: string, slots: Array<{id: string, start: string, end: string, booked?: boolean}>}>> = {
+const coachAvailability: Record<string, Array<{date: string, slots: Array<{id: string, start: string, end: string, booked?: boolean}>}>> = {
   'Imam Abdullah Rahman': [
     { 
       date: '2024-11-15', 
@@ -59,7 +59,7 @@ const mentorAvailability: Record<string, Array<{date: string, slots: Array<{id: 
   ]
 };
 
-interface MentorModalProps {
+interface CoachModalProps {
   category: {
     id: string;
     title: string;
@@ -73,7 +73,7 @@ interface MentorModalProps {
   onNavigateToCallIso?: (coachName: string) => void;
 }
 
-const mentorData: Record<string, Array<{
+const coachData: Record<string, Array<{
   name: string;
   role: string;
   bio: string;
@@ -87,7 +87,7 @@ const mentorData: Record<string, Array<{
   deen: [
     { 
       name: 'Imam Abdullah Rahman', 
-      role: 'Islamic Scholar & Youth Mentor', 
+      role: 'Islamic Scholar & Youth Coach', 
       bio: 'Dedicated to helping young Muslims navigate faith in modern society. 15+ years of experience in youth development and Islamic education.',
       varsityPrice: 45,
       yearsExperience: 15,
@@ -226,21 +226,21 @@ const mentorData: Record<string, Array<{
   ],
 };
 
-export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorModalProps) {
-  const mentors = mentorData[category.id] || [];
+export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModalProps) {
+  const coaches = coachData[category.id] || [];
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [showCalendarForMentor, setShowCalendarForMentor] = useState<string | null>(null);
+  const [showCalendarForCoach, setShowCalendarForCoach] = useState<string | null>(null);
   const [isISOEvaluationModalOpen, setIsISOEvaluationModalOpen] = useState(false);
-  const [selectedMentor, setSelectedMentor] = useState<typeof mentors[0] | null>(null);
+  const [selectedCoach, setSelectedCoach] = useState<typeof coaches[0] | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'match' | 'experience' | 'overall' | 'availability'>('match');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewingCard, setViewingCard] = useState<typeof mentors[0] | null>(null);
+  const [viewingCard, setViewingCard] = useState<typeof coaches[0] | null>(null);
   const [animatingCardId, setAnimatingCardId] = useState<string | null>(null);
 
-  // Get mentee profile from props or context (would come from auth in production)
+  // Get player profile from props or context (would come from auth in production)
   // For now, using mock data - in production this would come from logged-in user
-  const menteeProfile: MenteeProfile = {
+  const playerProfile: PlayerProfile = {
     commitment: '',
     goals: 'Land a software engineering role and build my skills',
     timeframe: '5-10-hours',
@@ -255,35 +255,35 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
     faithImportance: ''
   };
 
-  // Mock mentor profiles for matching
-  const getMentorProfile = (mentorName: string): MentorProfile => {
+  // Mock coach profiles for matching
+  const getCoachProfile = (coachName: string): CoachProfile => {
     // In production, this would come from a database
     const baseProfile = {
-      bio: mentors.find(m => m.name === mentorName)?.bio || '',
+      bio: coaches.find(m => m.name === coachName)?.bio || '',
       yearsOfExperience: '8',
-      currentRole: mentors.find(m => m.name === mentorName)?.role || '',
+      currentRole: coaches.find(m => m.name === coachName)?.role || '',
       expertiseAreas: ['Career Transition', 'Interview Prep', 'Leadership Development'],
       specificSkills: [],
       industryExperience: [],
-      mentoringStyle: 'balanced' as const,
+      coachingStyle: 'balanced' as const,
       communicationStyle: 'balanced' as const,
       structurePreference: 'adaptive' as const,
       weeklyHoursAvailable: '3-5',
       preferredMeetingTimes: ['Weekday Evenings', 'Weekend Afternoons'],
-      maxMentees: '3-5',
-      idealMenteeTraits: ['Highly Motivated', 'Open to Feedback', 'Goal-Oriented'],
-      mentoringGoals: 'Help mentees achieve their career goals',
+      maxPlayers: '3-5',
+      idealPlayerTraits: ['Highly Motivated', 'Open to Feedback', 'Goal-Oriented'],
+      coachingGoals: 'Help players achieve their career goals',
       successStories: 'Various success stories',
       coreValues: ['Excellence', 'Integrity', 'Growth Mindset', 'Faith-Centered'],
-      faithIntegration: 'Integrate faith into all aspects of mentoring',
+      faithIntegration: 'Integrate faith into all aspects of coaching',
       motivations: 'Passionate about helping others succeed'
     };
     
-    // Customize based on mentor
-    if (mentorName === 'Anis Benyoucef') {
+    // Customize based on coach
+    if (coachName === 'Anis Benyoucef') {
       return {
         ...baseProfile,
-        mentoringStyle: 'hands-on',
+        coachingStyle: 'hands-on',
         communicationStyle: 'supportive',
         expertiseAreas: ['Career Transition', 'Technical Skills', 'Interview Prep'],
         coreValues: ['Excellence', 'Community', 'Growth Mindset']
@@ -293,10 +293,10 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
     return baseProfile;
   };
 
-  const getMatchScore = (mentorName: string) => {
-    if (!menteeProfile) return null;
-    const mentorProfile = getMentorProfile(mentorName);
-    return calculateMatch(menteeProfile, mentorProfile);
+  const getMatchScore = (coachName: string) => {
+    if (!playerProfile) return null;
+    const coachProfile = getCoachProfile(coachName);
+    return calculateMatch(playerProfile, coachProfile);
   };
 
   const getMatchColor = (score: number) => {
@@ -311,9 +311,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
     return 'Fair Match';
   };
 
-  const getAvailableSlots = (mentorName: string, date: Date) => {
+  const getAvailableSlots = (coachName: string, date: Date) => {
     const formattedDate = date.toISOString().split('T')[0];
-    return mentorAvailability[mentorName]?.find(d => d.date === formattedDate)?.slots || [];
+    return coachAvailability[coachName]?.find(d => d.date === formattedDate)?.slots || [];
   };
 
   const getTierBadgeStyle = (tier: 'standard' | 'specialist' | 'premium') => {
@@ -339,8 +339,8 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
   };
 
   // Get availability status (mock data - in production would come from backend)
-  const getAvailabilityStatus = (mentorName: string): string => {
-    const availability = mentorAvailability[mentorName];
+  const getAvailabilityStatus = (coachName: string): string => {
+    const availability = coachAvailability[coachName];
     if (!availability || availability.length === 0) return 'Unavailable';
     const totalSlots = availability.reduce((sum, day) => sum + day.slots.length, 0);
     if (totalSlots > 10) return 'High';
@@ -349,7 +349,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
   };
 
   // Get overall score (60-100) from rating (mock data - in production would come from backend)
-  const getOverall = (mentorName: string): number => {
+  const getOverall = (coachName: string): number => {
     const ratings: Record<string, number> = {
       'Imam Abdullah Rahman': 4.9,
       'Sister Amina Khalid': 4.7,
@@ -364,21 +364,21 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
       'Ambassador David Chen': 4.9,
       'Nadia Ibrahim': 4.7,
     };
-    const rating = ratings[mentorName] || 4.5;
+    const rating = ratings[coachName] || 4.5;
     // Convert 1-5 rating to 60-100 overall scale
     return Math.round(60 + (rating / 5) * 40);
   };
 
-  // Filter and sort mentors
-  const getFilteredAndSortedMentors = () => {
-    let filtered = mentors;
+  // Filter and sort coaches
+  const getFilteredAndSortedCoaches = () => {
+    let filtered = coaches;
     
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(mentor =>
-        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.specialization.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+      filtered = filtered.filter(coach =>
+        coach.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        coach.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        coach.specialization.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
     
@@ -403,9 +403,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
     });
   };
 
-  const filteredMentors = getFilteredAndSortedMentors();
+  const filteredCoaches = getFilteredAndSortedCoaches();
   
-  const getImageSrc = (mentorName: string) => {
+  const getImageSrc = (coachName: string) => {
     return `https://images.unsplash.com/photo-1609503842755-77f4a81d69ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW50b3IlMjBwcm9mZXNzaW9uYWx8ZW58MXx8fHwxNzYyNjQ0MTgyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral`;
   };
 
@@ -467,7 +467,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <span className="font-semibold text-base" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Understanding Match Scores</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 text-sm pb-6 px-6 leading-relaxed">
-                    Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400 font-semibold">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400 font-semibold">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best mentorships come from unexpected pairings.
+                    Match percentages are based on your profile and help identify strong initial compatibility — but they're <span className="text-orange-400 font-semibold">not the final word</span>. If a coach's story, expertise, or journey resonates with you, that matters more than any algorithm. Trust your instincts! A <span className="text-orange-400 font-semibold">Try Out</span> is always a great way to explore the connection, regardless of the score. Sometimes the best coacheships come from unexpected pairings.
                   </AccordionContent>
                 </AccordionItem>
           </div>
@@ -497,7 +497,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <span className="font-semibold text-base text-orange-400" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Call an ISO</span>
                   </AccordionTrigger>
                   <AccordionContent className="text-slate-300 pb-6 px-6 leading-relaxed">
-                When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive mentorship nights, inspiring events, and local initiatives.
+                When you're ready to dive in fully, call an ISO. Get matched with coaches who align with your goals and values. Get access to exclusive coacheship nights, inspiring events, and local initiatives.
                   </AccordionContent>
                 </AccordionItem>
             </div>
@@ -511,7 +511,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               style={{ fontFamily: "'Bebas Neue', sans-serif", fontWeight: '800' }}
             >
               <span className="text-white">Coaches</span>
-              <span className="text-slate-500 text-lg font-normal">({filteredMentors.length})</span>
+              <span className="text-slate-500 text-lg font-normal">({filteredCoaches.length})</span>
             </h3>
             </div>
             
@@ -545,10 +545,10 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
           
           {/* Modern Card-Based Coach Grid */}
           <div className="grid grid-cols-1 gap-4">
-            {filteredMentors.map((mentor, index) => {
-              const matchResult = getMatchScore(mentor.name);
-              const overall = getOverall(mentor.name);
-              const availabilityStatus = getAvailabilityStatus(mentor.name);
+            {filteredCoaches.map((coach, index) => {
+              const matchResult = getMatchScore(coach.name);
+              const overall = getOverall(coach.name);
+              const availabilityStatus = getAvailabilityStatus(coach.name);
               
               return (
                 <motion.div
@@ -563,14 +563,14 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                     <div className="relative flex-shrink-0">
                       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-700 border-2 border-slate-600 group-hover:border-orange-500/50 transition-colors shadow-lg">
                   <ImageWithFallback
-                          src={getImageSrc(mentor.name)}
-                    alt={mentor.name}
-                    className={`w-full h-full ${mentor.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
+                          src={getImageSrc(coach.name)}
+                    alt={coach.name}
+                    className={`w-full h-full ${coach.name === 'Anis Benyoucef' ? 'object-contain' : 'object-cover'}`}
                   />
                 </div>
-                      {mentor.tier && (
-                        <div className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-lg text-xs font-bold ${getTierBadgeStyle(mentor.tier)} border-2 shadow-lg`}>
-                          {getTierLabel(mentor.tier)}
+                      {coach.tier && (
+                        <div className={`absolute -bottom-2 -right-2 px-2 py-1 rounded-lg text-xs font-bold ${getTierBadgeStyle(coach.tier)} border-2 shadow-lg`}>
+                          {getTierLabel(coach.tier)}
                         </div>
                       )}
                     </div>
@@ -580,9 +580,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="text-white text-xl font-bold mb-1" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                            {mentor.name}
+                            {coach.name}
                           </h4>
-                          <p className="text-slate-400 text-sm mb-3">{mentor.role}</p>
+                          <p className="text-slate-400 text-sm mb-3">{coach.role}</p>
                         </div>
                         
                         {/* Match Score Badge */}
@@ -605,16 +605,16 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                           <span className="text-slate-300 text-sm font-medium capitalize">{availabilityStatus}</span>
                           <span className="text-slate-500 text-xs">Availability</span>
                         </div>
-                        {mentor.successRate && (
+                        {coach.successRate && (
                           <div className="text-slate-400 text-xs">
-                            {mentor.successRate}
+                            {coach.successRate}
                           </div>
                         )}
                       </div>
                   
                   {/* Specialization Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {mentor.specialization.slice(0, 3).map((spec, idx) => (
+                    {coach.specialization.slice(0, 3).map((spec, idx) => (
                       <span
                         key={idx}
                             className="px-3 py-1 bg-slate-700/50 text-slate-300 text-xs rounded-lg border border-slate-600/50"
@@ -622,9 +622,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                         {spec}
                       </span>
                     ))}
-                        {mentor.specialization.length > 3 && (
+                        {coach.specialization.length > 3 && (
                           <span className="px-3 py-1 text-slate-400 text-xs">
-                            +{mentor.specialization.length - 3} more
+                            +{coach.specialization.length - 3} more
                           </span>
                         )}
                   </div>
@@ -635,7 +635,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                       <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowCalendarForMentor(mentor.name);
+                          setShowCalendarForCoach(coach.name);
                           setSelectedDate(undefined);
                           setSelectedTimeSlot(null);
                         }}
@@ -653,9 +653,9 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                       <motion.button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setAnimatingCardId(mentor.name);
+                          setAnimatingCardId(coach.name);
                           setTimeout(() => {
-                            setViewingCard(mentor);
+                            setViewingCard(coach);
                             setAnimatingCardId(null);
                           }, 400);
                         }}
@@ -685,7 +685,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               );
             })}
             
-            {filteredMentors.length === 0 && (
+            {filteredCoaches.length === 0 && (
               <div className="text-center py-16">
                 <Search className="w-16 h-16 text-slate-600 mx-auto mb-4 opacity-50" />
                 <p className="text-slate-400 text-lg font-medium mb-2">No coaches found</p>
@@ -699,12 +699,12 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
       )}
 
       {/* Try Out Calendar Modal - Rendered via Portal */}
-      {showCalendarForMentor && typeof document !== 'undefined' && createPortal(
+      {showCalendarForCoach && typeof document !== 'undefined' && createPortal(
         <div 
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" 
           style={{ zIndex: 9999 }}
           onClick={() => {
-            setShowCalendarForMentor(null);
+            setShowCalendarForCoach(null);
             setSelectedDate(undefined);
             setSelectedTimeSlot(null);
           }}
@@ -719,11 +719,11 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
           >
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-white text-lg font-semibold">
-                Book a Try Out with {showCalendarForMentor}
+                Book a Try Out with {showCalendarForCoach}
               </h4>
               <button
                 onClick={() => {
-                  setShowCalendarForMentor(null);
+                  setShowCalendarForCoach(null);
                   setSelectedDate(undefined);
                   setSelectedTimeSlot(null);
                 }}
@@ -756,7 +756,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 <div className="bg-slate-900 p-4 rounded-xl border border-slate-700">
                             <h5 className="text-white mb-3">Available Times</h5>
                             {(() => {
-                    const availableSlots = getAvailableSlots(showCalendarForMentor, selectedDate);
+                    const availableSlots = getAvailableSlots(showCalendarForCoach, selectedDate);
                               
                               if (availableSlots.length === 0) {
                                 return (
@@ -789,7 +789,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                 <div className="flex gap-3">
                             <button 
                               onClick={() => {
-                                setShowCalendarForMentor(null);
+                                setShowCalendarForCoach(null);
                                 setSelectedDate(undefined);
                                 setSelectedTimeSlot(null);
                               }}
@@ -803,10 +803,10 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
                                   alert('Please select a time slot');
                                   return;
                                 }
-                      const slot = getAvailableSlots(showCalendarForMentor, selectedDate).find(s => s.id === selectedTimeSlot);
-                      console.log(`Booking try out with ${showCalendarForMentor} on ${selectedDate.toLocaleDateString()} at ${slot?.start}`);
-                      alert(`Try Out with ${showCalendarForMentor} scheduled for ${selectedDate.toLocaleDateString()} at ${slot?.start}! Check your email for confirmation.`);
-                                setShowCalendarForMentor(null);
+                      const slot = getAvailableSlots(showCalendarForCoach, selectedDate).find(s => s.id === selectedTimeSlot);
+                      console.log(`Booking try out with ${showCalendarForCoach} on ${selectedDate.toLocaleDateString()} at ${slot?.start}`);
+                      alert(`Try Out with ${showCalendarForCoach} scheduled for ${selectedDate.toLocaleDateString()} at ${slot?.start}! Check your email for confirmation.`);
+                                setShowCalendarForCoach(null);
                                 setSelectedDate(undefined);
                                 setSelectedTimeSlot(null);
                               }}
@@ -826,7 +826,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
       {/* Trading Card Modal */}
       {viewingCard && (
         <CoachTradingCard
-          mentor={{
+          coach={{
             ...viewingCard,
             rating: (getOverall(viewingCard.name) - 60) / 8, // Convert back to 1-5 scale for card compatibility
             sessionsCompleted: 150, // Mock data
@@ -839,7 +839,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               { year: '2019', role: 'Software Engineer', company: 'Apple' },
               { year: '2021', role: 'Senior Engineer', company: 'Zoox' },
               { year: '2023', role: 'Lead Engineer', company: 'Zoox' },
-              { year: '2024', role: 'Mentor & Community Builder', company: 'ISO Institute' }
+              { year: '2024', role: 'Coach & Community Builder', company: 'ISO Institute' }
             ],
             photo:
               typeof window !== 'undefined' &&

@@ -1217,6 +1217,30 @@ input[type="range"].iso-join__range::-moz-range-thumb {
   margin-top: 1px;
 }
 
+/* Plan card merch note */
+.iso-join__plan-merch-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-top: 2px;
+}
+
+.iso-join__plan-merch-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.iso-join__plan-merch-note p {
+  font-family: var(--ff-body);
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 0;
+}
+
 /* Performance prediction toggle */
 .iso-join__pred-toggle {
   display: flex;
@@ -1825,12 +1849,137 @@ input[type="range"].iso-join__range::-moz-range-thumb {
 }
 
 /* ====================================================================
+   EXPLORER TRACK
+   ==================================================================== */
+
+/* 3-card grid on the join screen */
+.iso-join__cards--3 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  max-width: 1000px;
+}
+
+.iso-join__cards--3 .iso-join__card {
+  flex: 1 1 280px;
+  max-width: 320px;
+}
+
+/* Explorer card has a teal/compass accent */
+.iso-join__card--explorer {
+  border-color: rgba(20, 184, 166, 0.25) !important;
+}
+
+.iso-join__card--explorer:hover {
+  border-color: rgba(20, 184, 166, 0.6) !important;
+  box-shadow: 0 0 28px rgba(20, 184, 166, 0.12) !important;
+}
+
+/* Explorer progress bar fill — teal */
+.iso-join__pb-fill--explorer {
+  background: linear-gradient(90deg, #14b8a6, #0ea5e9);
+}
+
+/* Explorer success screen */
+.iso-join__success--explorer {
+  max-width: 560px;
+}
+
+.iso-join__explorer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  border-radius: 999px;
+  padding: 6px 18px;
+}
+
+.iso-join__explorer-badge-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.iso-join__explorer-badge-label {
+  font-family: var(--ff-condensed);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #2dd4bf;
+}
+
+/* Walk-On perks list */
+.iso-join__explorer-perks {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px 28px;
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+  margin: 24px 0 16px;
+}
+
+.iso-join__explorer-perks-title {
+  font-family: var(--ff-condensed);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 18px;
+}
+
+.iso-join__explorer-perk {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.iso-join__explorer-perk:last-child {
+  margin-bottom: 0;
+}
+
+.iso-join__explorer-perk-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  line-height: 1;
+}
+
+.iso-join__explorer-perk-text {
+  font-family: var(--ff-body);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+}
+
+.iso-join__explorer-note {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.65;
+  text-align: center;
+  max-width: 440px;
+  margin-bottom: 28px;
+  font-style: italic;
+}
+
+/* ====================================================================
    RESPONSIVE
    ==================================================================== */
 
 @media (max-width: 600px) {
   .iso-join__plan-cards {
     grid-template-columns: 1fr;
+  }
+  .iso-join__cards--3 .iso-join__card {
+    max-width: 100%;
+    flex: 1 1 100%;
   }
   .iso-join__cards {
     flex-direction: column;
@@ -1864,4 +2013,457 @@ input[type="range"].iso-join__range::-moz-range-thumb {
   .iso-join__cc-stats {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* ====================================================================
+   TIER / LEVEL BENEFITS SECTION
+   ==================================================================== */
+
+.iso-join__benefits-wrap {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.iso-join__benefits-eyebrow {
+  font-family: var(--ff-condensed);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--silver-dim);
+  margin-bottom: 8px;
+}
+
+.iso-join__benefits-headline {
+  font-family: var(--ff-display);
+  font-size: clamp(26px, 5vw, 42px);
+  letter-spacing: 2px;
+  color: var(--white);
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.iso-join__benefits-sub {
+  font-family: var(--ff-body);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.7;
+  text-align: center;
+  max-width: 560px;
+  margin: 0 0 28px;
+}
+
+/* Tab row */
+.iso-join__benefits-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.iso-join__benefits-tabs--5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.iso-join__benefits-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.iso-join__benefits-tab:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.iso-join__benefits-tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.iso-join__benefits-tab-name {
+  font-family: var(--ff-condensed);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.iso-join__benefits-tab-range {
+  font-family: var(--ff-body);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.iso-join__benefits-tab-you {
+  font-family: var(--ff-condensed);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #0A0A0A;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 2px;
+}
+
+.iso-join__benefits-tab-lock {
+  font-size: 10px;
+  margin-top: 2px;
+  opacity: 0.5;
+}
+
+/* Expanded panel */
+.iso-join__benefits-panel {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px 28px;
+  transition: all 0.3s ease;
+}
+
+.iso-join__benefits-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.iso-join__benefits-panel-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.iso-join__benefits-panel-name {
+  font-family: var(--ff-display);
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.iso-join__benefits-panel-range {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.iso-join__benefits-panel-badge {
+  margin-left: auto;
+  font-family: var(--ff-condensed);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.iso-join__benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.iso-join__benefits-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--ff-body);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+}
+
+.iso-join__benefits-check {
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Merch explanation banner inside PlayerLevelBenefits */
+.iso-join__benefits-merch-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 13px 16px;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 0 20px;
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+  text-align: left;
+}
+
+.iso-join__benefits-merch-banner-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.iso-join__benefits-merch-banner strong {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.iso-join__benefits-disclaimer {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 560px;
+  margin: 16px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+  width: 100%;
+}
+
+.iso-join__benefits-disclaimer strong {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .iso-join__benefits-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .iso-join__benefits-tabs--5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .iso-join__benefits-panel-badge {
+    display: none;
+  }
+}
+
+/* ====================================================================
+   CONTRACTOR NOTE (coach success screen)
+   ==================================================================== */
+
+.iso-join__contractor-note {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 18px 22px;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 0 24px;
+  text-align: left;
+}
+
+.iso-join__contractor-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.iso-join__contractor-note p {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.iso-join__contractor-note strong {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+}
+
+/* ====================================================================
+   COACH PENDING BOX (success screen)
+   ==================================================================== */
+
+.iso-join__coach-pending-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 540px;
+  text-align: left;
+  margin: 20px 0 28px;
+}
+
+.iso-join__coach-pending-title {
+  font-family: var(--ff-condensed);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
+}
+
+.iso-join__coach-pending-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  counter-reset: none;
+}
+
+.iso-join__coach-pending-steps li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.iso-join__coach-pending-num {
+  font-family: var(--ff-condensed);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.2);
+  min-width: 18px;
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+
+.iso-join__coach-pending-steps span:last-child {
+  font-family: var(--ff-body);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.65;
+}
+
+.iso-join__coach-pending-steps strong {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+}
+
+.iso-join__coach-pending-note {
+  font-family: var(--ff-body);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+  margin: 0;
+}
+
+.iso-join__coach-pending-note strong {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ====================================================================
+   PHOTO UPLOAD
+   ==================================================================== */
+
+.iso-join__photo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.iso-join__photo-label {
+  display: block;
+  cursor: pointer;
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.iso-join__photo-label:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.06);
+}
+
+.iso-join__photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+}
+
+.iso-join__photo-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.iso-join__photo-hint {
+  font-family: var(--ff-condensed);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.iso-join__photo-sub {
+  font-family: var(--ff-body);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.iso-join__photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.iso-join__photo-retake {
+  background: none;
+  border: none;
+  font-family: var(--ff-body);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+  padding: 4px 8px;
+}
+
+.iso-join__photo-retake:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Coach card headshot */
+.iso-join__cc-headshot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  z-index: 0;
 }

@@ -203,7 +203,7 @@ function CoachCard({ overall, isFlipped, onFlip }) {
 
               <div>
 
-                <div className="text-white font-semibold text-sm">Mentor & Community Builder</div>
+                <div className="text-white font-semibold text-sm">Coach & Community Builder</div>
 
                 <div className="text-white text-sm">ISO Institute</div>
 
@@ -328,7 +328,7 @@ function CoachCard({ overall, isFlipped, onFlip }) {
 
         </div>
 
-        <p className="text-orange-400 font-semibold">Islamic Scholar & Youth Mentor</p>
+        <p className="text-orange-400 font-semibold">Islamic Scholar & Youth Coach</p>
 
       </div>
 
@@ -520,9 +520,9 @@ export default function ForCoaches() {
       name: 'The Seeker Pathway',
       legacyName: 'Deen and Purpose',
 
-      coachDescription: 'Guide young Muslims in developing their spiritual foundation, Islamic knowledge, and balancing worldly pursuits with faith. Help mentees build consistent prayer habits, deepen Quran understanding, and navigate modern challenges while staying rooted in Islamic principles.',
+      coachDescription: 'Guide young Muslims in developing their spiritual foundation, Islamic knowledge, and balancing worldly pursuits with faith. Help players build consistent prayer habits, deepen Quran understanding, and navigate modern challenges while staying rooted in Islamic principles.',
 
-      coachRole: 'Spiritual Guide & Faith Mentor',
+      coachRole: 'Spiritual Guide & Faith Coach',
 
       color: 'from-emerald-500 to-teal-600',
 
@@ -537,9 +537,9 @@ export default function ForCoaches() {
       name: 'The Warrior Pathway',
       legacyName: 'Health and Wellness',
 
-      coachDescription: 'Train mentees in building disciplined fitness routines, proper nutrition, and mental wellness habits. Support their journey in strength training, cardio consistency, injury prevention, and developing a healthy relationship with their body as an act of worship.',
+      coachDescription: 'Train players in building disciplined fitness routines, proper nutrition, and mental wellness habits. Support their journey in strength training, cardio consistency, injury prevention, and developing a healthy relationship with their body as an act of worship.',
 
-      coachRole: 'Fitness Coach & Wellness Mentor',
+      coachRole: 'Fitness Coach & Wellness Coach',
 
       color: 'from-red-500 to-rose-600',
 
@@ -554,9 +554,9 @@ export default function ForCoaches() {
       name: 'The Healer Pathway',
       legacyName: 'Medicine and healthcare',
 
-      coachDescription: 'Mentor aspiring healthcare professionals through pre-med preparation, MCAT strategy, medical school applications, clinical experience, and career planning. Share insights on balancing rigorous academic demands with ethical patient care and maintaining faith in medicine.',
+      coachDescription: 'Coach aspiring healthcare professionals through pre-med preparation, MCAT strategy, medical school applications, clinical experience, and career planning. Share insights on balancing rigorous academic demands with ethical patient care and maintaining faith in medicine.',
 
-      coachRole: 'Medical Mentor & Career Guide',
+      coachRole: 'Medical Coach & Career Guide',
 
       color: 'from-blue-500 to-cyan-600',
 
@@ -571,9 +571,9 @@ export default function ForCoaches() {
       name: 'The Builder Pathway',
       legacyName: 'Engineering and Tech',
 
-      coachDescription: 'Guide future engineers and technologists through technical skill development, project building, internship preparation, and career navigation in STEM fields. Help mentees master coding, system design, problem-solving, and leveraging technology for positive impact.',
+      coachDescription: 'Guide future engineers and technologists through technical skill development, project building, internship preparation, and career navigation in STEM fields. Help players master coding, system design, problem-solving, and leveraging technology for positive impact.',
 
-      coachRole: 'Technical Mentor & Industry Guide',
+      coachRole: 'Technical Coach & Industry Guide',
 
       color: 'from-purple-500 to-indigo-600',
 
@@ -605,9 +605,9 @@ export default function ForCoaches() {
       name: 'The Reformer Pathway',
       legacyName: 'Global Affairs, Law, and Policy',
 
-      coachDescription: 'Mentor future leaders in international relations, law, public policy, and diplomacy. Guide mentees through law school preparation, policy analysis, understanding global systems, and developing the skills to lead with ethical principles and strategic insight.',
+      coachDescription: 'Coach future leaders in international relations, law, public policy, and diplomacy. Guide players through law school preparation, policy analysis, understanding global systems, and developing the skills to lead with ethical principles and strategic insight.',
 
-      coachRole: 'Policy Mentor & Leadership Guide',
+      coachRole: 'Policy Coach & Leadership Guide',
 
       color: 'from-cyan-500 to-blue-600',
 
@@ -625,33 +625,33 @@ export default function ForCoaches() {
 
     { range: '80-89', tier: 'Gold', icon: Trophy, color: '#ffd700', gradient: 'from-yellow-400 to-yellow-600', description: 'High-performing coach with excellent player outcomes and satisfaction.' },
 
-    { range: '90-99', tier: 'Premium', icon: Gem, color: '#a855f7', gradient: 'from-purple-500 to-orange-500', description: 'Elite-tier coach. Exceptional mentorship, transformation, and community leadership.' }
+    { range: '90-99', tier: 'Premium', icon: Gem, color: '#a855f7', gradient: 'from-purple-500 to-orange-500', description: 'Elite-tier coach. Exceptional coacheship, transformation, and community leadership.' }
 
   ];
 
   const tierDetails = {
     'Bronze': {
       title: 'Building Your Foundation',
-      description: 'Focus on consistency, building your coaching style, and establishing strong relationships with your mentees. This tier emphasizes steady growth and player engagement.',
+      description: 'Focus on consistency, building your coaching style, and establishing strong relationships with your players. This tier emphasizes steady growth and player engagement.',
       requirements: 'Maintain regular sessions, respond to player inquiries promptly, and build a track record of positive outcomes.',
       gear: 'Unlock basic coaching gear and ISO merchandise as you build your foundation and complete your first successful coaching cycles.'
     },
     'Silver': {
       title: 'Established Performance',
-      description: 'You\'ve proven your coaching effectiveness with solid performance metrics. Your reputation is growing, and players recognize your value as a mentor.',
-      requirements: 'Continue delivering quality sessions, maintain high satisfaction ratings, and demonstrate consistent commitment to your mentees\' growth.',
-      gear: 'Access exclusive Silver-tier gear, premium ISO apparel, and coaching resources to enhance your mentorship capabilities.'
+      description: 'You\'ve proven your coaching effectiveness with solid performance metrics. Your reputation is growing, and players recognize your value as a coach.',
+      requirements: 'Continue delivering quality sessions, maintain high satisfaction ratings, and demonstrate consistent commitment to your players\' growth.',
+      gear: 'Access exclusive Silver-tier gear, premium ISO apparel, and coaching resources to enhance your coacheship capabilities.'
     },
     'Gold': {
       title: 'High-Performing Coach',
       description: 'Excellent player outcomes and satisfaction ratings demonstrate your expertise. You\'re recognized as a top-tier coach in your pathway.',
-      requirements: 'Sustain exceptional performance, maintain outstanding ratings, and continue to deliver transformative mentorship experiences.',
-      gear: 'Unlock Gold-tier exclusive gear, limited edition ISO merchandise, and premium coaching tools to support your high-level mentorship.'
+      requirements: 'Sustain exceptional performance, maintain outstanding ratings, and continue to deliver transformative coacheship experiences.',
+      gear: 'Unlock Gold-tier exclusive gear, limited edition ISO merchandise, and premium coaching tools to support your high-level coacheship.'
     },
     'Premium': {
       title: 'Elite-Tier Excellence',
-      description: 'The highest tier of coaching excellence. You demonstrate exceptional mentorship, drive transformation, and serve as a community leader. Premium coaches set the standard for others.',
-      requirements: 'Maintain elite performance across all metrics, serve as a mentor to other coaches, and contribute significantly to the ISO community.',
+      description: 'The highest tier of coaching excellence. You demonstrate exceptional coacheship, drive transformation, and serve as a community leader. Premium coaches set the standard for others.',
+      requirements: 'Maintain elite performance across all metrics, serve as a coach to other coaches, and contribute significantly to the ISO community.',
       gear: 'Access the most exclusive Premium-tier gear, signature ISO collections, and elite coaching resources reserved for top performers.'
     }
   };
@@ -738,9 +738,9 @@ export default function ForCoaches() {
 
                 <div>
 
-                  <h3 className="text-white text-xl font-semibold mb-2">1-on-1 Mentorship</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2">1-on-1 Coacheship</h3>
 
-                  <p className="text-white text-sm">Conduct personalized coaching sessions, set goals with mentees, provide accountability, and track their progress over 30-day commitment periods.</p>
+                  <p className="text-white text-sm">Conduct personalized coaching sessions, set goals with players, provide accountability, and track their progress over 30-day commitment periods.</p>
 
                 </div>
 
@@ -764,7 +764,7 @@ export default function ForCoaches() {
 
                   <h3 className="text-white text-xl font-semibold mb-2">Ongoing Support</h3>
 
-                  <p className="text-white text-sm">Provide guidance between sessions, answer questions, share resources, and help mentees overcome obstacles as they work toward their goals.</p>
+                  <p className="text-white text-sm">Provide guidance between sessions, answer questions, share resources, and help players overcome obstacles as they work toward their goals.</p>
 
                 </div>
 
@@ -788,7 +788,7 @@ export default function ForCoaches() {
 
                   <h3 className="text-white text-xl font-semibold mb-2">Progress Tracking</h3>
 
-                  <p className="text-white text-sm">Monitor micro-goals, celebrate wins, help mentees level up through the ISO system, and provide constructive feedback to accelerate their growth.</p>
+                  <p className="text-white text-sm">Monitor micro-goals, celebrate wins, help players level up through the ISO system, and provide constructive feedback to accelerate their growth.</p>
 
                 </div>
 
@@ -940,7 +940,7 @@ export default function ForCoaches() {
 
                 <p className="text-white text-base leading-relaxed md:text-lg text-center mx-auto">
 
-                  Guide your mentees through goals, earn ratings, and progress through coach tiers as you make a lasting impact.
+                  Guide your players through goals, earn ratings, and progress through coach tiers as you make a lasting impact.
 
                 </p>
 
@@ -966,7 +966,7 @@ export default function ForCoaches() {
 
           <p className="text-white text-center mb-6 max-w-2xl mx-auto text-sm">
 
-            Your coach ranking is based on player satisfaction, session consistency, response time, and mentee outcomes. 
+            Your coach ranking is based on player satisfaction, session consistency, response time, and player outcomes. 
 
             <span className="text-orange-400"> Coaches can start at higher overalls depending on experience. No coach can start at Platinum.</span> Platinum status is earned through exceptional performance over time.
 
@@ -1168,7 +1168,7 @@ export default function ForCoaches() {
                   <Star className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <h4 className="text-white text-sm font-semibold mb-1">Player Satisfaction</h4>
-                    <p className="text-white text-xs">Based on post-session ratings and feedback from your mentees.</p>
+                    <p className="text-white text-xs">Based on post-session ratings and feedback from your players.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -1316,7 +1316,7 @@ export default function ForCoaches() {
 
           <p className="text-white text-xl max-w-3xl mx-auto">
 
-            Select the area where you want to mentor and guide the next generation. Each pathway represents a unique opportunity to make lasting impact.
+            Select the area where you want to coach and guide the next generation. Each pathway represents a unique opportunity to make lasting impact.
 
           </p>
 

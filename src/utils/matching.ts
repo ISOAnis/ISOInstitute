@@ -1,6 +1,6 @@
-// AI Matching Algorithm for Mentor-Mentee Compatibility
+// AI Matching Algorithm for Coach-Player Compatibility
 
-export interface MenteeProfile {
+export interface PlayerProfile {
   // From questionnaire
   commitment: string;
   goals: string;
@@ -20,7 +20,7 @@ export interface MenteeProfile {
   faithImportance: 'central' | 'moderate' | 'flexible' | '';
 }
 
-export interface MentorProfile {
+export interface CoachProfile {
   // Basic Info
   bio: string;
   yearsOfExperience: string;
@@ -31,19 +31,19 @@ export interface MentorProfile {
   specificSkills: string[];
   industryExperience: string[];
   
-  // Mentoring Style
-  mentoringStyle: 'hands-on' | 'advisory' | 'balanced' | '';
+  // Coaching Style
+  coachingStyle: 'hands-on' | 'advisory' | 'balanced' | '';
   communicationStyle: 'direct' | 'supportive' | 'balanced' | '';
   structurePreference: 'structured' | 'flexible' | 'adaptive' | '';
   
   // Availability
   weeklyHoursAvailable: string;
   preferredMeetingTimes: string[];
-  maxMentees: string;
+  maxPlayers: string;
   
-  // Mentee Preferences
-  idealMenteeTraits: string[];
-  mentoringGoals: string;
+  // Player Preferences
+  idealPlayerTraits: string[];
+  coachingGoals: string;
   successStories: string;
   
   // Values & Approach
@@ -56,7 +56,7 @@ export interface MatchResult {
   score: number;
   topReasons: string[];
   styleAlignment: {
-    mentoring: string;
+    coaching: string;
     communication: string;
     structure: string;
   };
@@ -64,19 +64,19 @@ export interface MatchResult {
   confidenceLevel: 'high' | 'medium' | 'low';
 }
 
-export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): MatchResult {
+export function calculateMatch(player: PlayerProfile, coach: CoachProfile): MatchResult {
   let totalScore = 0;
   const reasons: string[] = [];
   const maxScore = 100;
   
   // 1. Communication Style Match (20 points)
-  if (mentee.communicationPreference && mentor.communicationStyle) {
-    if (mentee.communicationPreference === mentor.communicationStyle) {
+  if (player.communicationPreference && coach.communicationStyle) {
+    if (player.communicationPreference === coach.communicationStyle) {
       totalScore += 20;
       reasons.push('Communication styles perfectly align');
-    } else if (mentor.communicationStyle === 'balanced') {
+    } else if (coach.communicationStyle === 'balanced') {
       totalScore += 15;
-      reasons.push('Mentor adapts communication style to your needs');
+      reasons.push('Coach adapts communication style to your needs');
     } else {
       totalScore += 10;
     }
@@ -85,13 +85,13 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   }
   
   // 2. Structure Preference Match (15 points)
-  if (mentee.structurePreference && mentor.structurePreference) {
-    if (mentee.structurePreference === mentor.structurePreference) {
+  if (player.structurePreference && coach.structurePreference) {
+    if (player.structurePreference === coach.structurePreference) {
       totalScore += 15;
       reasons.push('Both prefer the same learning structure');
-    } else if (mentor.structurePreference === 'adaptive') {
+    } else if (coach.structurePreference === 'adaptive') {
       totalScore += 12;
-      reasons.push('Mentor adapts structure to your pace');
+      reasons.push('Coach adapts structure to your pace');
     } else {
       totalScore += 7;
     }
@@ -100,11 +100,11 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   }
   
   // 3. Time Commitment Match (15 points)
-  if (mentee.timeframe && mentor.weeklyHoursAvailable) {
-    const menteeHours = parseTimeframe(mentee.timeframe);
-    const mentorHours = parseTimeframe(mentor.weeklyHoursAvailable);
+  if (player.timeframe && coach.weeklyHoursAvailable) {
+    const playerHours = parseTimeframe(player.timeframe);
+    const coachHours = parseTimeframe(coach.weeklyHoursAvailable);
     
-    if (menteeHours <= mentorHours) {
+    if (playerHours <= coachHours) {
       totalScore += 15;
       reasons.push('Your time commitment fits their availability');
     } else {
@@ -115,9 +115,9 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   }
   
   // 4. Values Alignment (15 points)
-  if (mentee.topValues.length > 0 && mentor.coreValues.length > 0) {
-    const sharedValues = mentee.topValues.filter(v => mentor.coreValues.includes(v));
-    const valueScore = Math.min(15, (sharedValues.length / Math.min(mentee.topValues.length, 3)) * 15);
+  if (player.topValues.length > 0 && coach.coreValues.length > 0) {
+    const sharedValues = player.topValues.filter(v => coach.coreValues.includes(v));
+    const valueScore = Math.min(15, (sharedValues.length / Math.min(player.topValues.length, 3)) * 15);
     totalScore += valueScore;
     
     if (sharedValues.length > 0) {
@@ -128,16 +128,16 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   }
   
   // 5. Expertise Match (20 points)
-  const goalKeywords = extractKeywords(mentee.goals);
-  const mentorKeywords = [
-    ...mentor.expertiseAreas,
-    ...mentor.specificSkills,
-    ...extractKeywords(mentor.bio)
+  const goalKeywords = extractKeywords(player.goals);
+  const coachKeywords = [
+    ...coach.expertiseAreas,
+    ...coach.specificSkills,
+    ...extractKeywords(coach.bio)
   ].map(k => k.toLowerCase());
   
   let expertiseMatches = 0;
   goalKeywords.forEach(keyword => {
-    if (mentorKeywords.some(mk => mk.includes(keyword) || keyword.includes(mk))) {
+    if (coachKeywords.some(mk => mk.includes(keyword) || keyword.includes(mk))) {
       expertiseMatches++;
     }
   });
@@ -150,13 +150,13 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   }
   
   // 6. Motivation & Commitment Match (15 points)
-  if (mentee.motivationLevel) {
-    if (mentee.motivationLevel === 'all-in' && mentor.mentoringStyle === 'hands-on') {
+  if (player.motivationLevel) {
+    if (player.motivationLevel === 'all-in' && coach.coachingStyle === 'hands-on') {
       totalScore += 15;
       reasons.push('Your high commitment matches their hands-on approach');
-    } else if (mentee.motivationLevel === 'committed') {
+    } else if (player.motivationLevel === 'committed') {
       totalScore += 12;
-      reasons.push('Good commitment level for this mentorship');
+      reasons.push('Good commitment level for this coacheship');
     } else {
       totalScore += 8;
     }
@@ -172,13 +172,13 @@ export function calculateMatch(mentee: MenteeProfile, mentor: MentorProfile): Ma
   
   // Build style alignment summary
   const styleAlignment = {
-    mentoring: getMentoringStyleDescription(mentor.mentoringStyle),
-    communication: getCommunicationStyleDescription(mentor.communicationStyle),
-    structure: getStructureDescription(mentor.structurePreference)
+    coaching: getCoachingStyleDescription(coach.coachingStyle),
+    communication: getCommunicationStyleDescription(coach.communicationStyle),
+    structure: getStructureDescription(coach.structurePreference)
   };
   
   // Availability match description
-  const availabilityMatch = getAvailabilityDescription(mentee.timeframe, mentor.weeklyHoursAvailable);
+  const availabilityMatch = getAvailabilityDescription(player.timeframe, coach.weeklyHoursAvailable);
   
   // Confidence level
   let confidenceLevel: 'high' | 'medium' | 'low' = 'medium';
@@ -217,7 +217,7 @@ function extractKeywords(text: string): string[] {
   return [...new Set(keywords)];
 }
 
-function getMentoringStyleDescription(style: string): string {
+function getCoachingStyleDescription(style: string): string {
   switch (style) {
     case 'hands-on':
       return 'Hands-on coach with active guidance';
@@ -226,7 +226,7 @@ function getMentoringStyleDescription(style: string): string {
     case 'balanced':
       return 'Balanced approach, adapts to your needs';
     default:
-      return 'Flexible mentoring approach';
+      return 'Flexible coaching approach';
   }
 }
 
@@ -256,11 +256,11 @@ function getStructureDescription(preference: string): string {
   }
 }
 
-function getAvailabilityDescription(menteeTime: string, mentorTime: string): string {
-  const menteeHours = parseTimeframe(menteeTime);
-  const mentorHours = parseTimeframe(mentorTime);
+function getAvailabilityDescription(playerTime: string, coachTime: string): string {
+  const playerHours = parseTimeframe(playerTime);
+  const coachHours = parseTimeframe(coachTime);
   
-  if (menteeHours <= mentorHours) {
+  if (playerHours <= coachHours) {
     return 'Excellent - Your schedules align well';
   } else {
     return 'Your time commitment may need adjustment';

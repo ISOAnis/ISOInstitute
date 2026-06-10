@@ -16,9 +16,9 @@ interface NavigationProps {
   onOpenCommunityPortal?: () => void;
   currentPage: Page;
   onNavigate: (page: Page) => void;
-  onMenteeStatusChange?: (status: {
+  onPlayerStatusChange?: (status: {
     isCommitted: boolean;
-    mentorName?: string;
+    coachName?: string;
     category?: string;
     daysRemaining?: number;
   } | null) => void;
@@ -27,7 +27,7 @@ interface NavigationProps {
 const STORAGE_KEY = 'iso_demo_user';
 const STORAGE_PORTAL_KEY = 'iso_demo_portal';
 
-export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onMenteeStatusChange }: NavigationProps) {
+export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onPlayerStatusChange }: NavigationProps) {
   const [user, setUser] = useState<User | null>(null);
   const [showCoachLogin, setShowCoachLogin] = useState(false);
   const [showPlayerLogin, setShowPlayerLogin] = useState(false);
@@ -121,10 +121,15 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
 
   const handleLogout = () => {
     setUser(null);
+    setIsOnboarded(false);
     
-    // Clear localStorage
+    // Clear all auth + onboarding state
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_PORTAL_KEY);
+    localStorage.removeItem('iso_onboarding_complete');
+    localStorage.removeItem('iso_coach_pending');
+    localStorage.removeItem('iso_explorer');
+    localStorage.removeItem('iso-onboarding');
     onNavigate('home');
   };
 

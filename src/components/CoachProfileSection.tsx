@@ -12,7 +12,7 @@ interface Location {
   label: string;
 }
 
-interface MentorProfile {
+interface CoachProfile {
   // Basic Info
   bio: string;
   yearsOfExperience: string;
@@ -24,19 +24,19 @@ interface MentorProfile {
   specificSkills: string[];
   industryExperience: string[];
   
-  // Mentoring Style
-  mentoringStyle: 'hands-on' | 'advisory' | 'balanced' | '';
+  // Coaching Style
+  coachingStyle: 'hands-on' | 'advisory' | 'balanced' | '';
   communicationStyle: 'direct' | 'supportive' | 'balanced' | '';
   structurePreference: 'structured' | 'flexible' | 'adaptive' | '';
   
   // Availability
   weeklyHoursAvailable: string;
   preferredMeetingTimes: string[];
-  maxMentees: string;
+  maxPlayers: string;
   
-  // Mentee Preferences
-  idealMenteeTraits: string[];
-  mentoringGoals: string;
+  // Player Preferences
+  idealPlayerTraits: string[];
+  coachingGoals: string;
   successStories: string;
   
   // Values & Approach
@@ -45,7 +45,7 @@ interface MentorProfile {
   motivations: string;
 }
 
-const defaultProfile: MentorProfile = {
+const defaultProfile: CoachProfile = {
   bio: '',
   yearsOfExperience: '',
   currentRole: '',
@@ -53,32 +53,32 @@ const defaultProfile: MentorProfile = {
   expertiseAreas: [],
   specificSkills: [],
   industryExperience: [],
-  mentoringStyle: '',
+  coachingStyle: '',
   communicationStyle: '',
   structurePreference: '',
   weeklyHoursAvailable: '',
   preferredMeetingTimes: [],
-  maxMentees: '',
-  idealMenteeTraits: [],
-  mentoringGoals: '',
+  maxPlayers: '',
+  idealPlayerTraits: [],
+  coachingGoals: '',
   successStories: '',
   coreValues: [],
   faithIntegration: '',
   motivations: ''
 };
 
-interface MentorProfileSectionProps {
+interface CoachProfileSectionProps {
   onProfileCompletionChange?: (percentage: number) => void;
   onProfilePictureChange?: (image: string | null) => void;
   initialProfilePicture?: string | null;
 }
 
-export function MentorProfileSection({
+export function CoachProfileSection({
   onProfileCompletionChange,
   onProfilePictureChange,
   initialProfilePicture = null,
-}: MentorProfileSectionProps) {
-  const [profile, setProfile] = useState<MentorProfile>(() => {
+}: CoachProfileSectionProps) {
+  const [profile, setProfile] = useState<CoachProfile>(() => {
     try {
       const saved = localStorage.getItem('coach_profile_data');
       if (saved) {
@@ -102,7 +102,7 @@ export function MentorProfileSection({
 
   const handleSave = () => {
     // In production, this would save to backend
-    console.log('Saving mentor profile:', profile);
+    console.log('Saving coach profile:', profile);
     setIsEditing(false);
   };
 
@@ -136,7 +136,7 @@ export function MentorProfileSection({
     'Accountability', 'Faith-Centered', 'Community', 'Discipline'
   ];
 
-  const menteeTraitOptions = [
+  const playerTraitOptions = [
     'Highly Motivated', 'Open to Feedback', 'Consistent', 'Self-Starter',
     'Goal-Oriented', 'Action-Taker', 'Reflective', 'Coachable'
   ];
@@ -155,13 +155,13 @@ export function MentorProfileSection({
       Boolean(profile.yearsOfExperience?.trim()),
       Boolean(profile.currentRole?.trim()),
       profile.expertiseAreas.length > 0,
-      profile.mentoringStyle !== '',
+      profile.coachingStyle !== '',
       profile.communicationStyle !== '',
       profile.structurePreference !== '',
       Boolean(profile.weeklyHoursAvailable),
       profile.preferredMeetingTimes.length > 0,
-      Boolean(profile.maxMentees),
-      profile.idealMenteeTraits.length > 0,
+      Boolean(profile.maxPlayers),
+      profile.idealPlayerTraits.length > 0,
       profile.coreValues.length > 0,
       Boolean(profile.faithIntegration?.trim()),
       Boolean(profile.motivations?.trim()),
@@ -469,7 +469,7 @@ export function MentorProfileSection({
           </div>
         )}
 
-        {/* Mentoring Style Section */}
+        {/* Coaching Style Section */}
         {activeSection === 'style' && (
           <div className="space-y-6">
             <div>
@@ -482,10 +482,10 @@ export function MentorProfileSection({
                 ].map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => isEditing && setProfile({ ...profile, mentoringStyle: option.value as any })}
+                    onClick={() => isEditing && setProfile({ ...profile, coachingStyle: option.value as any })}
                     disabled={!isEditing}
                     className={`p-4 rounded-xl text-left border-2 transition-all ${
-                      profile.mentoringStyle === option.value
+                      profile.coachingStyle === option.value
                         ? 'border-orange-500 bg-orange-500/10'
                         : 'border-slate-700 bg-slate-800 hover:border-slate-600'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -582,8 +582,8 @@ export function MentorProfileSection({
               <div>
                 <label className="block text-white mb-2">Max Number of Players</label>
                 <select
-                  value={profile.maxMentees}
-                  onChange={(e) => setProfile({ ...profile, maxMentees: e.target.value })}
+                  value={profile.maxPlayers}
+                  onChange={(e) => setProfile({ ...profile, maxPlayers: e.target.value })}
                   disabled={!isEditing}
                   className="w-full bg-slate-800 text-white rounded-lg p-3 border border-slate-700 focus:border-orange-500 focus:outline-none disabled:opacity-50"
                 >
@@ -638,17 +638,17 @@ export function MentorProfileSection({
                 What qualities do you look for in players you work best with?
               </p>
               <div className="flex flex-wrap gap-2">
-                {menteeTraitOptions.map((trait) => (
+                {playerTraitOptions.map((trait) => (
                   <button
                     key={trait}
                     onClick={() => isEditing && toggleArrayItem(
-                      profile.idealMenteeTraits,
+                      profile.idealPlayerTraits,
                       trait,
-                      (val) => setProfile({ ...profile, idealMenteeTraits: val })
+                      (val) => setProfile({ ...profile, idealPlayerTraits: val })
                     )}
                     disabled={!isEditing}
                     className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                      profile.idealMenteeTraits.includes(trait)
+                      profile.idealPlayerTraits.includes(trait)
                         ? 'bg-orange-500 text-white'
                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -662,8 +662,8 @@ export function MentorProfileSection({
             <div>
               <label className="block text-white mb-2">Your Coaching Goals</label>
               <Textarea
-                value={profile.mentoringGoals}
-                onChange={(e) => setProfile({ ...profile, mentoringGoals: e.target.value })}
+                value={profile.coachingGoals}
+                onChange={(e) => setProfile({ ...profile, coachingGoals: e.target.value })}
                 placeholder="What do you hope to achieve through coaching? What impact do you want to make?"
                 disabled={!isEditing}
                 className="bg-slate-800 border-slate-700 text-white min-h-[100px]"

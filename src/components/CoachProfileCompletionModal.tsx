@@ -19,15 +19,15 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
     expertiseAreas: [] as string[],
     specificSkills: '',
     coreValues: [] as string[],
-    mentoringStyle: '' as 'hands-on' | 'advisory' | 'balanced' | '',
+    coachingStyle: '' as 'hands-on' | 'advisory' | 'balanced' | '',
     communicationStyle: '' as 'direct' | 'supportive' | 'balanced' | '',
     structurePreference: '' as 'structured' | 'flexible' | 'adaptive' | '',
     faithIntegration: '',
     weeklyHoursAvailable: '',
     preferredMeetingTimes: [] as string[],
-    maxMentees: '',
-    idealMenteeTraits: [] as string[],
-    mentoringGoals: '',
+    maxPlayers: '',
+    idealPlayerTraits: [] as string[],
+    coachingGoals: '',
     successStories: '',
     motivations: '',
   });
@@ -43,7 +43,7 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
     'Accountability', 'Faith-Centered', 'Community', 'Discipline'
   ];
 
-  const menteeTraitOptions = [
+  const playerTraitOptions = [
     'Highly Motivated', 'Open to Feedback', 'Consistent', 'Self-Starter',
     'Goal-Oriented', 'Action-Taker', 'Reflective', 'Coachable'
   ];
@@ -81,11 +81,11 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
     }
   };
 
-  const toggleMenteeTrait = (trait: string) => {
-    if (profileData.idealMenteeTraits.includes(trait)) {
-      setProfileData({ ...profileData, idealMenteeTraits: profileData.idealMenteeTraits.filter(t => t !== trait) });
+  const togglePlayerTrait = (trait: string) => {
+    if (profileData.idealPlayerTraits.includes(trait)) {
+      setProfileData({ ...profileData, idealPlayerTraits: profileData.idealPlayerTraits.filter(t => t !== trait) });
     } else {
-      setProfileData({ ...profileData, idealMenteeTraits: [...profileData.idealMenteeTraits, trait] });
+      setProfileData({ ...profileData, idealPlayerTraits: [...profileData.idealPlayerTraits, trait] });
     }
   };
 
@@ -112,15 +112,15 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
       expertiseAreas: profileData.expertiseAreas,
       specificSkills: profileData.specificSkills.split(',').map(s => s.trim()).filter(Boolean),
       coreValues: profileData.coreValues,
-      mentoringStyle: profileData.mentoringStyle,
+      coachingStyle: profileData.coachingStyle,
       communicationStyle: profileData.communicationStyle,
       structurePreference: profileData.structurePreference,
       faithIntegration: profileData.faithIntegration,
       weeklyHoursAvailable: profileData.weeklyHoursAvailable,
       preferredMeetingTimes: profileData.preferredMeetingTimes,
-      maxMentees: profileData.maxMentees,
-      idealMenteeTraits: profileData.idealMenteeTraits,
-      mentoringGoals: profileData.mentoringGoals,
+      maxPlayers: profileData.maxPlayers,
+      idealPlayerTraits: profileData.idealPlayerTraits,
+      coachingGoals: profileData.coachingGoals,
       successStories: profileData.successStories,
       motivations: profileData.motivations
     };
@@ -138,13 +138,13 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
              profileData.currentRole.trim() !== '';
     }
     if (currentStep === 3) {
-      return profileData.mentoringStyle !== '' && 
+      return profileData.coachingStyle !== '' && 
              profileData.communicationStyle !== '' && 
              profileData.structurePreference !== '';
     }
     if (currentStep === 4) {
       return profileData.weeklyHoursAvailable !== '' && 
-             profileData.maxMentees !== '' &&
+             profileData.maxPlayers !== '' &&
              profileData.preferredMeetingTimes.length > 0;
     }
     return true;
@@ -361,9 +361,9 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
                   ].map((option) => (
                     <button
                       key={option.value}
-                      onClick={() => setProfileData({ ...profileData, mentoringStyle: option.value as any })}
+                      onClick={() => setProfileData({ ...profileData, coachingStyle: option.value as any })}
                       className={`p-4 rounded-xl text-left border-2 transition-all ${
-                        profileData.mentoringStyle === option.value
+                        profileData.coachingStyle === option.value
                           ? 'border-orange-500 bg-orange-500/10'
                           : 'border-slate-700 bg-slate-800 hover:border-slate-600'
                       }`}
@@ -479,8 +479,8 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
                 <div>
                   <label className="block text-white mb-2">Max Number of Players</label>
                   <select
-                    value={profileData.maxMentees}
-                    onChange={(e) => setProfileData({ ...profileData, maxMentees: e.target.value })}
+                    value={profileData.maxPlayers}
+                    onChange={(e) => setProfileData({ ...profileData, maxPlayers: e.target.value })}
                     className="w-full bg-slate-800 text-white rounded-lg p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
                   >
                     <option value="">Select number...</option>
@@ -545,12 +545,12 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
                   What qualities do you look for in players you work best with?
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {menteeTraitOptions.map((trait) => (
+                  {playerTraitOptions.map((trait) => (
                     <button
                       key={trait}
-                      onClick={() => toggleMenteeTrait(trait)}
+                      onClick={() => togglePlayerTrait(trait)}
                       className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                        profileData.idealMenteeTraits.includes(trait)
+                        profileData.idealPlayerTraits.includes(trait)
                           ? 'bg-orange-500 text-white'
                           : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                       }`}
@@ -564,8 +564,8 @@ export function CoachProfileCompletionModal({ onClose, onComplete }: CoachProfil
               <div>
                 <label className="block text-white mb-2">Your Coaching Goals</label>
                 <Textarea
-                  value={profileData.mentoringGoals}
-                  onChange={(e) => setProfileData({ ...profileData, mentoringGoals: e.target.value })}
+                  value={profileData.coachingGoals}
+                  onChange={(e) => setProfileData({ ...profileData, coachingGoals: e.target.value })}
                   placeholder="What do you hope to achieve through coaching? What impact do you want to make?"
                   className="bg-slate-800 border-slate-700 text-white min-h-[100px]"
                 />

@@ -8,7 +8,7 @@ interface Message {
   content: string;
   senderId: string;
   senderName: string;
-  senderRole: 'mentor' | 'mentee';
+  senderRole: 'coach' | 'player';
   timestamp: Date;
   read: boolean;
   attachments?: Array<{
@@ -21,13 +21,13 @@ interface Message {
 
 type CategoryIconType = string | React.ComponentType<{ className?: string }>;
 
-interface MentorMenteeChatProps {
+interface CoachPlayerChatProps {
   currentUserId: string;
   currentUserName: string;
-  currentUserRole: 'mentor' | 'mentee';
+  currentUserRole: 'coach' | 'player';
   otherUserId: string;
   otherUserName: string;
-  otherUserRole: 'mentor' | 'mentee';
+  otherUserRole: 'coach' | 'player';
   otherUserAvatar?: string;
   category?: string;
   categoryIcon?: CategoryIconType;
@@ -38,69 +38,69 @@ const mockMessages: Message[] = [
   {
     id: '1',
     content: 'Assalamu alaikum! Welcome to our coaching journey. I\'m excited to work with you.',
-    senderId: 'mentor-1',
+    senderId: 'coach-1',
     senderName: 'Imam Abdullah Rahman',
-    senderRole: 'mentor',
+    senderRole: 'coach',
     timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     read: true,
   },
   {
     id: '2',
     content: 'Wa alaikum assalam! Thank you so much. I\'m really looking forward to learning from you.',
-    senderId: 'mentee-1',
+    senderId: 'player-1',
     senderName: 'You',
-    senderRole: 'mentee',
+    senderRole: 'player',
     timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000),
     read: true,
   },
   {
     id: '3',
     content: 'Great! Let\'s start by setting up your daily prayer routine. How are you doing with your current prayer schedule?',
-    senderId: 'mentor-1',
+    senderId: 'coach-1',
     senderName: 'Imam Abdullah Rahman',
-    senderRole: 'mentor',
+    senderRole: 'coach',
     timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
     read: true,
   },
   {
     id: '4',
     content: 'I\'ve been trying to pray all five prayers, but sometimes I miss Fajr. I really want to be more consistent.',
-    senderId: 'mentee-1',
+    senderId: 'player-1',
     senderName: 'You',
-    senderRole: 'mentee',
+    senderRole: 'player',
     timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000 + 10 * 60 * 1000),
     read: true,
   },
   {
     id: '5',
     content: 'That\'s completely normal! Let\'s work on building that consistency. I\'ve created your first game focused on establishing a daily prayer routine. Check it out in your progress tab!',
-    senderId: 'mentor-1',
+    senderId: 'coach-1',
     senderName: 'Imam Abdullah Rahman',
-    senderRole: 'mentor',
+    senderRole: 'coach',
     timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
     read: true,
   },
   {
     id: '6',
     content: 'Thank you! I just saw it. I\'m going to start working on it right away.',
-    senderId: 'mentee-1',
+    senderId: 'player-1',
     senderName: 'You',
-    senderRole: 'mentee',
+    senderRole: 'player',
     timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
     read: true,
   },
   {
     id: '7',
     content: 'Excellent progress on your prayer routine! I noticed you completed the first bucket. Keep up the great work! 🎉',
-    senderId: 'mentor-1',
+    senderId: 'coach-1',
     senderName: 'Imam Abdullah Rahman',
-    senderRole: 'mentor',
+    senderRole: 'coach',
     timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     read: true,
   },
 ];
 
-export function MentorMenteeChat({
+export function CoachPlayerChat({
   currentUserId,
   currentUserName,
   currentUserRole,
@@ -110,7 +110,7 @@ export function MentorMenteeChat({
   otherUserAvatar,
   category,
   categoryIcon,
-}: MentorMenteeChatProps) {
+}: CoachPlayerChatProps) {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [messageInput, setMessageInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

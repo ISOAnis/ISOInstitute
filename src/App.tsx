@@ -38,13 +38,13 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedCoachName, setSelectedCoachName] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [menteeCommitmentStatus, setMenteeCommitmentStatus] = useState<{
+  const [playerCommitmentStatus, setPlayerCommitmentStatus] = useState<{
     isCommitted: boolean;
-    mentorName?: string;
+    coachName?: string;
     category?: string;
     daysRemaining?: number;
   } | null>(null);
-  const [shouldReopenMentorModal, setShouldReopenMentorModal] = useState(false);
+  const [shouldReopenCoachModal, setShouldReopenCoachModal] = useState(false);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
@@ -101,7 +101,7 @@ export default function App() {
     if (page === 'home') {
       setSelectedCoachName(null);
       setSelectedCategoryId(null);
-      setShouldReopenMentorModal(false);
+      setShouldReopenCoachModal(false);
       setShowConsultationModal(false);
       setPendingCoachName(null);
       setPendingCategoryId(null);
@@ -133,14 +133,14 @@ export default function App() {
     }
   };
 
-  // Helper to navigate back to coaches (reopen MentorModal)
+  // Helper to navigate back to coaches (reopen CoachModal)
   const navigateBackToCoaches = (categoryId?: string) => {
     setCurrentPage('home');
     setSelectedCoachName(null);
     if (categoryId) {
       setSelectedCategoryId(categoryId);
     }
-    setShouldReopenMentorModal(true);
+    setShouldReopenCoachModal(true);
     
     // Scroll to court section after navigation
     setTimeout(() => {
@@ -175,6 +175,10 @@ export default function App() {
   const signOutUser = () => {
     localStorage.removeItem('iso_demo_user');
     localStorage.removeItem('iso_demo_portal');
+    localStorage.removeItem('iso_onboarding_complete');
+    localStorage.removeItem('iso_coach_pending');
+    localStorage.removeItem('iso_explorer');
+    localStorage.removeItem('iso-onboarding');
   };
 
   // Handle "for players" button click - check if user is logged in
@@ -249,14 +253,79 @@ export default function App() {
     setPendingPortalType(null);
   };
 
-  // Portal gate — must be logged in AND have completed onboarding
+  // Portal gate — check login, onboarding, and coach pending status
   const isOnboarded = (() => {
     try { return !!localStorage.getItem('iso_onboarding_complete'); } catch { return false; }
   })();
   const isLoggedIn = (() => {
     try { return !!localStorage.getItem('iso_demo_user'); } catch { return false; }
   })();
+  const isCoachPending = (() => {
+    try { return !!localStorage.getItem('iso_coach_pending'); } catch { return false; }
+  })();
 
+  // Coach applied but not yet approved — show pending screen
+  if (currentPage === 'coach-portal' && isCoachPending && !isOnboarded) {
+    const GS = { fontFamily: "'Bebas Neue', sans-serif" } as React.CSSProperties;
+    const BS = { fontFamily: "'Barlow', sans-serif" } as React.CSSProperties;
+    return (
+      <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 500 }}>
+          <div style={{ ...GS, fontSize: '11px', letterSpacing: '4px', color: 'rgba(255,255,255,0.25)', marginBottom: 24 }}>
+            ISO · ADVISORY BOARD REVIEW
+          </div>
+          <h1 style={{ ...GS, fontSize: 'clamp(38px, 8vw, 58px)', color: 'rgba(180,180,180,0.9)', letterSpacing: '2px', lineHeight: 1, marginBottom: 16 }}>
+            Application Under Review.
+          </h1>
+          <p style={{ ...BS, fontSize: '15px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.8, marginBottom: 32 }}>
+            Your coach application has been submitted to the ISO Advisory Board. Portal access is granted only after your credentials are verified and your application is approved.
+          </p>
+          <div style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '14px',
+            padding: '24px 28px',
+            marginBottom: 32,
+            textAlign: 'left',
+          }}>
+            <div style={{ ...GS, fontSize: '11px', letterSpacing: '3px', color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>WHAT TO EXPECT</div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[
+                'ISO will email you at the address you provided requesting supporting documentation (diploma, certifications, licenses, or other proof).',
+                'The Advisory Board reviews your materials alongside your intake assessment.',
+                'Once approved, you\'ll receive portal access and your official coach card goes live.',
+                'Review typically takes 5–10 business days.',
+              ].map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <span style={{ ...GS, fontSize: '12px', color: 'rgba(255,255,255,0.2)', minWidth: 18, paddingTop: 2 }}>{i + 1}</span>
+                  <span style={{ ...BS, fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button
+            onClick={() => handleNavigate('home')}
+            style={{
+              ...GS,
+              fontSize: '14px',
+              letterSpacing: '3px',
+              background: 'rgba(180,180,180,0.9)',
+              color: '#0A0A0A',
+              border: 'none',
+              borderRadius: '999px',
+              padding: '14px 36px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            Back to ISO
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // General portal gate — not logged in or no onboarding
   if ((currentPage === 'coach-portal' || currentPage === 'player-portal') && (!isLoggedIn || !isOnboarded)) {
     return (
       <div style={{ minHeight: '100vh', background: '#0A0A0A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
@@ -357,12 +426,12 @@ export default function App() {
           <div id="iso-court">
             <Suspense fallback={<LoadingSpinner />}>
               <BasketballCourt 
-                commitmentStatus={menteeCommitmentStatus}
+                commitmentStatus={playerCommitmentStatus}
                 onNavigateToCallIso={navigateToCallIso}
                 selectedCategoryId={selectedCategoryId}
                 onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
-                forceOpenCategoryId={shouldReopenMentorModal ? selectedCategoryId : null}
-                onForceOpenHandled={() => setShouldReopenMentorModal(false)}
+                forceOpenCategoryId={shouldReopenCoachModal ? selectedCategoryId : null}
+                onForceOpenHandled={() => setShouldReopenCoachModal(false)}
                 onNavigateToPathways={() => handleNavigate('pathways')}
               />
             </Suspense>
@@ -384,7 +453,7 @@ export default function App() {
         <Pathways 
           onNavigate={setCurrentPage} 
           onNavigateToCallIso={navigateToCallIso}
-          commitmentStatus={menteeCommitmentStatus}
+          commitmentStatus={playerCommitmentStatus}
         />
         </Suspense>
       )}

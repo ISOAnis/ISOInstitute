@@ -351,14 +351,14 @@ export function ProductShowcase() {
               marginBottom: '16px',
               lineHeight: '1.75'
             }}>
-              Explore detailed coach cards that showcase each mentor's expertise, background, and approach. Each card provides a comprehensive profile including their career journey, education, specialization areas, and overall match score.
+              Explore detailed coach cards that showcase each coach's expertise, background, and approach. Each card provides a comprehensive profile including their career journey, education, specialization areas, and overall match score.
             </p>
             <p style={{ 
               fontSize: '1.125rem', 
               color: '#64748b',
               lineHeight: '1.75'
             }}>
-              Flip through interactive trading cards to learn about coaching styles, success stories, and what makes each mentor unique. Find the perfect match for your personal and professional growth.
+              Flip through interactive trading cards to learn about coaching styles, success stories, and what makes each coach unique. Find the perfect match for your personal and professional growth.
             </p>
           </div>
         </div>

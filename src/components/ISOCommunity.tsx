@@ -44,7 +44,7 @@ export function ISOCommunity() {
     { emoji: '🤲', name: 'Spiritual Counseling', description: 'Faith guidance and Islamic advice' },
     { emoji: '💔', name: 'Marriage & Divorce', description: 'Mediation and family counseling' },
     { emoji: '📿', name: 'Ruqya Sessions', description: 'Spiritual healing and protection' },
-    { emoji: '🕌', name: 'Convert Support', description: 'New Muslim guidance and mentorship' },
+    { emoji: '🕌', name: 'Convert Support', description: 'New Muslim guidance and coacheship' },
     { emoji: '💭', name: 'Mental Health', description: 'Islamic perspective on wellbeing' },
     { emoji: '⚖️', name: 'Community Disputes', description: 'Mediation and conflict resolution' }
   ];
@@ -61,11 +61,11 @@ export function ISOCommunity() {
           </div>
           <h1 className="text-white mb-6">Community Leadership Tools</h1>
           <p className="text-slate-300 text-xl max-w-3xl mx-auto mb-4">
-            The same mentorship platform — now available for community leaders.
+            The same coacheship platform — now available for community leaders.
           </p>
           <p className="text-slate-400 max-w-2xl mx-auto mb-8">
             ISO also offers an optional community module for imams, chaplains, and leaders to manage counseling sessions, 
-            meetings, and community requests with the same structure and discipline that drives our mentorship institute.
+            meetings, and community requests with the same structure and discipline that drives our coacheship institute.
           </p>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Streamlines scheduling, integrates prayer times, ensures privacy, and allows for optional donation-based bookings — 

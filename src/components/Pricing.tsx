@@ -73,7 +73,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
       name: 'ISO',
       response: '✔ Yes',
       affordable: '✔ High value',
-      relatable: '✔ Near-peer mentors',
+      relatable: '✔ Near-peer coaches',
       structure: '✔ Weekly check-ins',
       culture: '✔ Yes',
       highlight: true,
@@ -83,7 +83,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
       name: 'LinkedIn Premium',
       response: '✖ No',
       affordable: '$39.99/mo',
-      relatable: '✖ Not mentorship',
+      relatable: '✖ Not coacheship',
       structure: '✖ None',
       culture: '✖ No',
     },
@@ -101,13 +101,13 @@ export function Pricing({ onLoginClick }: PricingProps) {
       name: 'Curious Cardinals',
       response: '✖ No',
       affordable: '✖ Expensive',
-      relatable: '✔ Student mentors',
+      relatable: '✔ Student coaches',
       structure: '✔ Some structure',
       culture: '✖ No',
     },
     {
-      id: 'mentorcruise',
-      name: 'MentorCruise',
+      id: 'coachcruise',
+      name: 'CoachCruise',
       response: '✖ Not guaranteed',
       affordable: '✔ Varies',
       relatable: '✔ Industry pros',
@@ -129,7 +129,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
     { label: 'Guaranteed Response', key: 'response' },
     { label: 'Affordable', key: 'affordable' },
     { label: 'Relatable Coaches', key: 'relatable' },
-    { label: 'Structured Mentorship', key: 'structure' },
+    { label: 'Structured Coacheship', key: 'structure' },
     { label: 'Faith/Culture Aware', key: 'culture' },
   ] as const;
 
@@ -143,7 +143,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
       description: 'Affordable pathways without sacrificing depth or rigor.',
     },
     {
-      title: 'Culture-Aware Mentors',
+      title: 'Culture-Aware Coaches',
       description: 'Coaches who mirror your lived experience and values.',
     },
     {
@@ -462,7 +462,7 @@ export function Pricing({ onLoginClick }: PricingProps) {
           <div className="text-center max-w-4xl mx-auto mb-12 lg:mb-16">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">How We Compare</p>
             <h2 className="text-4xl sm:text-5xl font-bold">Competitive Landscape — ISO vs. Existing Solutions</h2>
-            <p className="text-white/70 mt-4">The mentorship market is fragmented. ISO delivers what others can’t: guaranteed, affordable, culturally-aligned guidance.</p>
+            <p className="text-white/70 mt-4">The coacheship market is fragmented. ISO delivers what others can’t: guaranteed, affordable, culturally-aligned guidance.</p>
           </div>
 
           <div className="rounded-3xl border border-white/5 bg-slate-900/70 p-4 lg:p-6 overflow-x-auto">

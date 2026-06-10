@@ -9,7 +9,7 @@ import { PATHWAYS, PATHWAYS_MARKETING_LIST } from '../data/pathways';
 
 interface CommitmentStatus {
   isCommitted: boolean;
-  mentorName?: string;
+  coachName?: string;
   category?: string;
   daysRemaining?: number;
 }
@@ -93,7 +93,7 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
       number: '02',
       question: 'CALL AN ISO',
       heading: 'Connect with Your Coach',
-      description: 'Browse coach profiles, read their stories, and connect with a mentor who understands your journey. Schedule your first session and begin your mentorship.',
+      description: 'Browse coach profiles, read their stories, and connect with a coach who understands your journey. Schedule your first session and begin your coacheship.',
     },
     {
       number: '03',
@@ -113,8 +113,8 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
     {
       number: '01',
       question: 'ACCEPT ISOs',
-      heading: 'Review Mentorship Requests',
-      description: 'Players in your pathway reach out. Understand their goals and accept mentorship requests that align with your expertise.',
+      heading: 'Review Coacheship Requests',
+      description: 'Players in your pathway reach out. Understand their goals and accept coacheship requests that align with your expertise.',
     },
     {
       number: '02',
@@ -737,14 +737,14 @@ export function BasketballCourt({ commitmentStatus, onNavigateToCallIso, selecte
                   </div>
                   <h3 className="text-white mb-3">Commitment Period Active</h3>
                   <p className="text-white/70 mb-4">
-                    You're currently committed to <span className="text-orange-400">{commitmentStatus.category}</span> with {commitmentStatus.mentorName}.
+                    You're currently committed to <span className="text-orange-400">{commitmentStatus.category}</span> with {commitmentStatus.coachName}.
                   </p>
                   <div className="flex items-center justify-center gap-2 text-white/70 mb-6">
                     <Clock className="w-5 h-5" />
                     <span>{commitmentStatus.daysRemaining} days remaining until you can explore other pathways</span>
                   </div>
                   <p className="text-slate-500 text-sm">
-                    This ensures you stay focused and give your mentorship the commitment it deserves. 
+                    This ensures you stay focused and give your coacheship the commitment it deserves. 
                     Check your Player Portal to track your progress!
                   </p>
                 </div>

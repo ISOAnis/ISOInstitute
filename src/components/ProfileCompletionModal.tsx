@@ -85,7 +85,7 @@ export function ProfileCompletionModal({ onClose, onComplete }: ProfileCompletio
               <div>
                 <h3 className="text-white mb-4">Tell us about your background</h3>
                 <p className="text-slate-400 mb-4 text-sm">
-                  Understanding your cultural and educational background helps us match you with mentors who share similar experiences or can provide relevant guidance. This creates more meaningful connections and better support.
+                  Understanding your cultural and educational background helps us match you with coaches who share similar experiences or can provide relevant guidance. This creates more meaningful connections and better support.
                 </p>
                 
                 {/* Interactive Globe */}
@@ -154,9 +154,9 @@ export function ProfileCompletionModal({ onClose, onComplete }: ProfileCompletio
                         className="mt-1 w-5 h-5 rounded border-slate-600 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
                       />
                       <div>
-                        <span className="text-white block mb-1">I prefer mentors from similar cultural backgrounds</span>
+                        <span className="text-white block mb-1">I prefer coaches from similar cultural backgrounds</span>
                         <span className="text-slate-400 text-sm">
-                          We'll prioritize matching you with mentors who share your cultural heritage or have lived in similar regions
+                          We'll prioritize matching you with coaches who share your cultural heritage or have lived in similar regions
                         </span>
                       </div>
                     </label>
@@ -187,7 +187,7 @@ export function ProfileCompletionModal({ onClose, onComplete }: ProfileCompletio
               <div>
                 <h3 className="text-white mb-4">What are your main goals?</h3>
                 <p className="text-slate-400 mb-4">
-                  This helps us match you with mentors who can best support your journey.
+                  This helps us match you with coaches who can best support your journey.
                 </p>
                 <textarea
                   value={profileData.goals}

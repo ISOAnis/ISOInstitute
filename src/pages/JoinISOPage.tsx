@@ -21,11 +21,13 @@ type Screen =
   | 'coach'
   | 'coach-proc'
   | 'coach-result'
-  | 'success-coach';
+  | 'success-coach'
+  | 'explorer'
+  | 'success-explorer';
 
 type PlayerLevel = 'freshman' | 'jv' | 'varsity';
 type CoachTier = 'bronze' | 'silver';
-type QType = 'name' | 'mc' | 'multi' | 'slider' | 'text' | 'textarea' | 'pathway' | 'scenario' | 'checklist' | 'input';
+type QType = 'name' | 'mc' | 'multi' | 'slider' | 'text' | 'textarea' | 'pathway' | 'scenario' | 'checklist' | 'input' | 'photo';
 
 type AnswerVal = string | string[] | number | null;
 type Answers = Record<string, AnswerVal>;
@@ -312,7 +314,7 @@ const PLAYER_CORE: Question[] = [
     options: [
       'Stay the course — trust the process and stay consistent',
       'Audit my approach and make targeted adjustments',
-      'Seek feedback from a mentor or someone further along',
+      'Seek feedback from a coach or someone further along',
       'Step back and recalibrate my goals and timeline',
     ],
     required: true,
@@ -324,7 +326,7 @@ const PLAYER_CORE: Question[] = [
     sectionLabel: 'Self-Awareness',
     options: [
       'I set clear goals and hold myself accountable',
-      "I work best with structure and a mentor's guidance",
+      "I work best with structure and a coach's guidance",
       'I give strong effort when reminded or held accountable',
       "I'm still figuring out my rhythm and approach",
     ],
@@ -336,7 +338,7 @@ const PLAYER_CORE: Question[] = [
     question: 'Who supports your growth?',
     sub: 'Select all that apply.',
     sectionLabel: 'Support System',
-    options: ['Parents or family', 'Coach or mentor', 'Friends or peers', 'Community or faith community', 'Teammates or colleagues', 'No strong support system yet'],
+    options: ['Parents or family', 'Coach or coach', 'Friends or peers', 'Community or faith community', 'Teammates or colleagues', 'No strong support system yet'],
     hasOther: true, multiMin: 0, required: false,
   },
   {
@@ -344,7 +346,7 @@ const PLAYER_CORE: Question[] = [
     type: 'mc',
     question: 'What brought you to ISO?',
     sectionLabel: 'Joining ISO',
-    options: ['The Assist talk series or content', 'A recommendation from someone I trust', 'Looking for mentorship and accountability', 'I want to be part of something bigger', 'I want structured development, not just inspiration'],
+    options: ['The Assist talk series or content', 'A recommendation from someone I trust', 'Looking for coacheship and accountability', 'I want to be part of something bigger', 'I want structured development, not just inspiration'],
     hasOther: true, required: true,
   },
   {
@@ -383,6 +385,14 @@ const COACH_QS: Question[] = [
     required: true,
   },
   {
+    id: 'c_photo',
+    type: 'photo',
+    question: 'Upload your professional headshot.',
+    sub: 'This photo will appear on your coach card. Use a clear, professional photo with good lighting.',
+    sectionLabel: 'Getting Started',
+    required: true,
+  },
+  {
     id: 'c_email',
     type: 'input',
     question: 'Your professional email?',
@@ -404,13 +414,13 @@ const COACH_QS: Question[] = [
     type: 'mc',
     question: 'What best describes your current role?',
     sectionLabel: 'Identity',
-    options: ['Active coach or mentor', 'Educator or professor', 'Industry professional pivoting to coaching', 'Entrepreneur or founder', 'Retired professional now mentoring', 'Recently transitioned into coaching'],
+    options: ['Active coach or coach', 'Educator or professor', 'Industry professional pivoting to coaching', 'Entrepreneur or founder', 'Retired professional now coaching', 'Recently transitioned into coaching'],
     hasOther: true, required: true,
   },
   {
     id: 'c_years',
     type: 'slider',
-    question: 'Years of coaching or mentoring experience?',
+    question: 'Years of coaching or coaching experience?',
     sectionLabel: 'Experience',
     min: 0, max: 25, unit: ' yrs',
     labels: ['Under 1 year', '25+ years'],
@@ -429,7 +439,7 @@ const COACH_QS: Question[] = [
   {
     id: 'c_coached_count',
     type: 'mc',
-    question: 'Approximately how many individuals have you formally coached or mentored?',
+    question: 'Approximately how many individuals have you formally coached or coached?',
     sectionLabel: 'Experience',
     options: ['1–5 individuals', '6–20 individuals', '21–50 individuals', '51–100 individuals', '100+ individuals'],
     required: true,
@@ -493,14 +503,23 @@ const COACH_QS: Question[] = [
   {
     id: 'c_humility',
     type: 'mc',
-    question: 'A player you mentor earns an opportunity you also applied for. How do you respond?',
+    question: 'A player you coach earns an opportunity you also applied for. How do you respond?',
     sectionLabel: 'Character',
     options: [
-      'Genuinely celebrate them — that outcome is what mentorship is for',
+      'Genuinely celebrate them — that outcome is what coacheship is for',
       'Celebrate them fully, though it would take me a moment to process',
       'Focus on what I can do differently and keep building',
       'Recognize it as confirmation that my coaching is working',
     ],
+    required: true,
+  },
+  {
+    id: 'c_skills',
+    type: 'textarea',
+    question: 'What are your top 3 coaching strengths?',
+    sub: 'These will appear as tags on your coach card. Be specific and authentic.',
+    sectionLabel: 'Your Brand',
+    placeholder: 'e.g. Accountability, Strategic Planning, Faith-Driven Development',
     required: true,
   },
   {
@@ -509,7 +528,7 @@ const COACH_QS: Question[] = [
     question: 'List 1–2 professional or community references.',
     sub: 'Include name, title, relationship, and contact. Verified references score significantly higher.',
     sectionLabel: 'References',
-    placeholder: 'e.g. Dr. James Carter, Director of Athletics, longtime mentor — jcarter@university.edu',
+    placeholder: 'e.g. Dr. James Carter, Director of Athletics, longtime coach — jcarter@university.edu',
     optional: true, required: false,
   },
   {
@@ -532,7 +551,79 @@ const COACH_QS: Question[] = [
       'I understand that ISO is a faith-informed, values-driven platform',
       'I understand that my Overall Rating is a starting point, not a final evaluation',
       'I commit to showing up consistently for the players I coach on this platform',
+      'I understand I am operating as an independent contractor and ISO will issue a 1099 for income earned through the platform',
     ],
+    required: true,
+  },
+];
+
+// ====================================================================
+// QUESTION DATA — EXPLORER (short track, no pathway selection)
+// ====================================================================
+
+const EXPLORER_QS: Question[] = [
+  {
+    id: 'e_name',
+    type: 'name',
+    question: 'First, who are you?',
+    sub: 'Your name will appear on your ISO profile.',
+    sectionLabel: 'Getting Started',
+    required: true,
+  },
+  {
+    id: 'e_stage',
+    type: 'mc',
+    question: 'Where are you right now in life?',
+    sectionLabel: 'Your Context',
+    options: [
+      'High school — figuring out what comes next',
+      'College — building my foundation',
+      'Early career — finding my direction',
+      'Transitioning — pivoting to something new',
+      'Life happened — restarting and rebuilding',
+    ],
+    hasOther: true,
+    required: true,
+  },
+  {
+    id: 'e_goal',
+    type: 'mc',
+    question: 'What are you In Search Of?',
+    sectionLabel: 'Your Intent',
+    options: [
+      'Clarity on what direction to pursue',
+      'A coach or coach who gets where I am',
+      'A community of people on similar journeys',
+      'Structured development — even if I don\'t know for what yet',
+      'Inspiration to take the next step',
+    ],
+    hasOther: true,
+    required: true,
+  },
+  {
+    id: 'e_consistency',
+    type: 'slider',
+    question: 'How consistently can you show up each month?',
+    sub: 'No judgment — just be honest. It helps us set expectations.',
+    sectionLabel: 'Commitment',
+    min: 1, max: 5, unit: '',
+    labels: ['Rarely', 'Every week'],
+    descs: [null, 'Occasionally — if something fits', 'Once or twice a month', 'A few times a month', 'Most weeks', 'Every week, without question'],
+    required: true,
+  },
+  {
+    id: 'e_heard',
+    type: 'mc',
+    question: 'How did you first hear about ISO?',
+    sectionLabel: 'Joining ISO',
+    options: [
+      'The Assist talk series or content',
+      'A recommendation from someone I trust',
+      'Social media or online content',
+      'A school, mosque, or community event',
+      'I was looking for something like this',
+    ],
+    hasOther: true,
     required: true,
   },
 ];
@@ -576,7 +667,7 @@ function scorePlayer(answers: Answers): PlayerResult {
   // Self-ownership
   const identity = (answers.identity as string) ?? '';
   if (identity.includes('set clear goals')) score += 2;
-  else if (identity.includes("mentor's")) score += 1;
+  else if (identity.includes("coach's")) score += 1;
 
   // Platform commitment signal
   const commitISO = (answers.commit_iso as number) ?? 1;
@@ -600,17 +691,17 @@ function scorePlayer(answers: Answers): PlayerResult {
     level = 'varsity';
     levelLabel = 'Varsity';
     reasoning = `Your intake reflects strong, consistent commitment habits and meaningful depth in your pathway. You've demonstrated the kind of intentional development and resilient growth mindset that aligns with Varsity readiness on ISO.`;
-    breakthrough = `Continued consistency, documented outcomes, and seeking high-quality mentorship may accelerate your path toward D1 designation. The next level is about depth of impact, not just effort.`;
+    breakthrough = `Continued consistency, documented outcomes, and seeking high-quality coacheship may accelerate your path toward D1 designation. The next level is about depth of impact, not just effort.`;
   } else if (score >= 7) {
     level = 'jv';
     levelLabel = 'JV';
     reasoning = `You're showing real momentum. Your commitment signals and foundational experience in your pathway indicate someone genuinely invested in building toward something greater. You have the ingredients — now it's about consistency.`;
-    breakthrough = `Strengthening your daily habits, increasing intentional training frequency, and engaging actively with ISO mentors may accelerate your progression toward Varsity.`;
+    breakthrough = `Strengthening your daily habits, increasing intentional training frequency, and engaging actively with ISO coaches may accelerate your progression toward Varsity.`;
   } else {
     level = 'freshman';
     levelLabel = 'Freshman';
     reasoning = `Every major journey starts here. Your placement reflects where you are right now — not where you're going. ISO recognizes your willingness to step up and start. That alone takes real courage.`;
-    breakthrough = `Building a consistent daily practice, engaging with your pathway community, and finding a mentor will set the foundation for your progression toward JV. The foundation matters.`;
+    breakthrough = `Building a consistent daily practice, engaging with your pathway community, and finding a coach will set the foundation for your progression toward JV. The foundation matters.`;
   }
 
   return { level, levelLabel, score, reasoning, breakthrough };
@@ -818,6 +909,46 @@ interface InputProps {
 
 function QuestionInput({ q, answers, otherText, onAnswer, onOther }: InputProps) {
   const val = answers[q.id];
+
+  // PHOTO UPLOAD
+  if (q.type === 'photo') {
+    const photoVal = val as string | null;
+    return (
+      <div className="iso-join__photo-wrap">
+        <label className="iso-join__photo-label">
+          {photoVal ? (
+            <img src={photoVal} alt="Headshot preview" className="iso-join__photo-preview" />
+          ) : (
+            <div className="iso-join__photo-placeholder">
+              <span className="iso-join__photo-icon">📷</span>
+              <span className="iso-join__photo-hint">Click to upload</span>
+              <span className="iso-join__photo-sub">JPG or PNG · Professional photo required</span>
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            style={{ display: 'none' }}
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => onAnswer(q.id, ev.target?.result as string);
+              reader.readAsDataURL(file);
+            }}
+          />
+        </label>
+        {photoVal && (
+          <button
+            className="iso-join__photo-retake"
+            onClick={() => onAnswer(q.id, null)}
+          >
+            Use a different photo
+          </button>
+        )}
+      </div>
+    );
+  }
 
   // NAME
   if (q.type === 'name') {
@@ -1142,6 +1273,7 @@ const PLANS = [
       'Pathway-specific resources & curriculum',
       'Community support network',
     ],
+    merchNote: null,
     prediction: 'Get a feel for ISO. One focused check-in a month to start building the habit and see if it clicks.',
   },
   {
@@ -1156,7 +1288,9 @@ const PLANS = [
       'Community discussions & accountability',
       'Weekly motivational content drops',
       'Early access to events & announcements',
+      'Access to exclusive ISO merch drops',
     ],
+    merchNote: 'Locker Room members unlock access to exclusive ISO merch they can purchase — limited drops not available to the public.',
     prediction: 'Build real momentum. Weekly content + community accountability dramatically increases consistency for players who need more than one monthly touchpoint.',
   },
   {
@@ -1171,8 +1305,9 @@ const PLANS = [
       'Structured curriculum & personal playbook',
       'Resume, LinkedIn & interview prep',
       'Professional network & referrals',
-      'Priority event access',
+      'Priority event access + exclusive merch drops',
     ],
+    merchNote: 'Varsity members get first access to every exclusive ISO drop — plus ISO gifts merch for hitting milestones inside your program.',
     prediction: 'The fastest growth track. Players with a dedicated coach show 3–4x the progression speed — weekly accountability changes everything.',
   },
 ];
@@ -1258,6 +1393,14 @@ function PlanRecommendation({ level }: { level: PlayerLevel }) {
                 ))}
               </ul>
 
+              {/* Merch callout */}
+              {plan.merchNote && (
+                <div className="iso-join__plan-merch-note" style={{ borderColor: `${plan.color}28`, background: `${plan.color}0a` }}>
+                  <span className="iso-join__plan-merch-icon">👕</span>
+                  <p style={{ color: `rgba(255,255,255,0.55)` }}>{plan.merchNote}</p>
+                </div>
+              )}
+
               {/* Performance prediction toggle */}
               <button
                 className="iso-join__pred-toggle"
@@ -1284,46 +1427,68 @@ function PlanRecommendation({ level }: { level: PlayerLevel }) {
 }
 
 // ====================================================================
-// TIER PROGRESSION VISUAL
+// TIER PROGRESSION VISUAL (segmented bar)
 // ====================================================================
 
+const TIER_COLORS: Record<string, string> = {
+  bronze:  '#CD7F32',
+  silver:  '#A8A8A8',
+  gold:    '#D4AF37',
+  premium: '#C8A96E',
+};
+
 function TierViz({ assignedTier }: { assignedTier: CoachTier }) {
-  const tierIndex = COACH_TIERS.findIndex(t => t.id === assignedTier);
+  const assignedIdx = COACH_TIERS.findIndex(t => t.id === assignedTier);
 
   return (
     <div className="iso-join__viz">
       <div className="iso-join__viz-label">Your Tier Path</div>
-      <div className="iso-join__viz-track">
-        <div className="iso-join__viz-line" />
-        <div className="iso-join__viz-nodes">
-          {COACH_TIERS.map((t, i) => {
-            const isActive = i === tierIndex;
-            const isLocked = t.locked;
 
-            return (
-              <div key={t.id} className="iso-join__viz-node">
-                <div
-                  className={[
-                    'iso-join__viz-dot',
-                    isActive ? 'iso-join__viz-dot--active' : '',
-                    isLocked ? 'iso-join__viz-dot--locked' : '',
-                  ].join(' ')}
-                />
-                <span
-                  className={[
-                    'iso-join__viz-name',
-                    isActive ? 'iso-join__viz-name--active' : '',
-                    isLocked ? 'iso-join__viz-name--locked' : '',
-                  ].join(' ')}
-                >
-                  {t.label}
-                </span>
-                {isLocked && <span className="iso-join__viz-lock">🔒</span>}
-                {isActive && <span className="iso-join__viz-you">You</span>}
-              </div>
-            );
-          })}
-        </div>
+      <div className="iso-join__viz-bar-wrap">
+        {COACH_TIERS.map((t, i) => {
+          const filled   = i <= assignedIdx && !t.locked;
+          const isActive = i === assignedIdx;
+          const color    = TIER_COLORS[t.id] ?? '#555';
+          return (
+            <div
+              key={t.id}
+              className="iso-join__viz-seg"
+              style={{
+                background: filled ? color : t.locked ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.06)',
+                boxShadow: isActive ? `0 0 16px ${color}88` : 'none',
+                opacity: t.locked ? 0.4 : 1,
+                position: 'relative',
+              }}
+            >
+              {t.locked && (
+                <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: 10 }}>🔒</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="iso-join__viz-labels">
+        {COACH_TIERS.map((t, i) => {
+          const isActive = i === assignedIdx;
+          const color    = TIER_COLORS[t.id] ?? '#555';
+          return (
+            <div key={t.id} className="iso-join__viz-label-col">
+              {isActive && (
+                <span className="iso-join__viz-you-marker" style={{ color }}>▲ YOU</span>
+              )}
+              <span
+                className="iso-join__viz-lbl"
+                style={{
+                  color: isActive ? color : t.locked ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.35)',
+                  fontWeight: isActive ? 700 : 400,
+                }}
+              >
+                {t.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1332,6 +1497,302 @@ function TierViz({ assignedTier }: { assignedTier: CoachTier }) {
 // ====================================================================
 // COACH CARD
 // ====================================================================
+
+// ====================================================================
+// COACH TIER BENEFITS
+// ====================================================================
+
+const COACH_TIER_BENEFITS = [
+  {
+    id: 'bronze' as CoachTier,
+    label: 'Bronze',
+    range: '60 – 69',
+    color: '#CD7F32',
+    icon: '🥉',
+    locked: false,
+    perks: [
+      'Standard ISO platform listing & coach profile',
+      'Access to ISO coaching curriculum library',
+      'Bronze badge — verified ISO coach',
+      'ISO Coach Welcome Kit (hat + tee)',
+      '1099 income reporting provided by ISO',
+    ],
+  },
+  {
+    id: 'silver' as CoachTier,
+    label: 'Silver',
+    range: '70 – 79',
+    color: '#A8A8A8',
+    icon: '🥈',
+    locked: false,
+    perks: [
+      'Featured placement in pathway search results',
+      'Silver badge + elevated profile visibility',
+      'Higher session rate potential & booking priority',
+      'ISO Silver gear pack (premium hoodie + cap)',
+      'Expanded curriculum access & event invitations',
+    ],
+  },
+  {
+    id: 'gold' as CoachTier,
+    label: 'Gold',
+    range: '80 – 89',
+    color: '#D4AF37',
+    icon: '🏅',
+    locked: true,
+    perks: [
+      'Priority search placement — visible first',
+      'ISO Certified Gold badge + advanced analytics',
+      'ISO Gold exclusive gear collection (full kit)',
+      'Invitation to ISO Gold coach retreats & events',
+      'Recognition in ISO platform content & features',
+    ],
+  },
+  {
+    id: 'premium' as CoachTier,
+    label: 'Premium',
+    range: '90 – 99',
+    color: '#C8A96E',
+    icon: '💎',
+    locked: true,
+    perks: [
+      'Top-of-platform placement — always visible',
+      'ISO Ambassador status & speaking opportunities',
+      'ISO Premium limited-edition gear drop (exclusive colorway)',
+      'Co-branded content & platform feature opportunities',
+      'Highest earning ceiling + direct advisory board access',
+    ],
+  },
+];
+
+function CoachTierBenefits({ assignedTier }: { assignedTier: CoachTier }) {
+  const [expanded, setExpanded] = React.useState<string>(assignedTier);
+  const active = COACH_TIER_BENEFITS.find(t => t.id === expanded) ?? COACH_TIER_BENEFITS[0];
+
+  return (
+    <div className="iso-join__benefits-wrap">
+      <div className="iso-join__benefits-eyebrow">Your Tier Path</div>
+      <h2 className="iso-join__benefits-headline">What Each Tier Unlocks</h2>
+      <p className="iso-join__benefits-sub">
+        Your overall rating is a living score. Excel on the platform and the Advisory Board will advance your tier — unlocking more earning potential, visibility, and influence.
+      </p>
+
+      {/* Tier selector row */}
+      <div className="iso-join__benefits-tabs">
+        {COACH_TIER_BENEFITS.map(t => {
+          const isCurrent = t.id === assignedTier;
+          const isActive  = t.id === expanded;
+          return (
+            <button
+              key={t.id}
+              className={`iso-join__benefits-tab${isActive ? ' iso-join__benefits-tab--active' : ''}${isCurrent ? ' iso-join__benefits-tab--current' : ''}`}
+              style={{
+                borderColor: isActive ? t.color : 'rgba(255,255,255,0.07)',
+                background: isActive ? `${t.color}14` : 'rgba(255,255,255,0.02)',
+                boxShadow: isActive ? `0 0 18px ${t.color}22` : 'none',
+                opacity: t.locked && !isActive ? 0.55 : 1,
+              }}
+              onClick={() => setExpanded(t.id)}
+            >
+              <span className="iso-join__benefits-tab-icon">{t.icon}</span>
+              <span className="iso-join__benefits-tab-name" style={{ color: isActive ? t.color : 'rgba(255,255,255,0.6)' }}>{t.label}</span>
+              <span className="iso-join__benefits-tab-range">{t.range}</span>
+              {isCurrent && <span className="iso-join__benefits-tab-you" style={{ background: t.color }}>YOU</span>}
+              {t.locked && !isCurrent && <span className="iso-join__benefits-tab-lock">🔒</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Expanded perk list */}
+      <div
+        className="iso-join__benefits-panel"
+        style={{ borderColor: `${active.color}33`, background: `${active.color}0c` }}
+      >
+        <div className="iso-join__benefits-panel-header">
+          <span className="iso-join__benefits-panel-icon">{active.icon}</span>
+          <div>
+            <div className="iso-join__benefits-panel-name" style={{ color: active.color }}>{active.label} Coach</div>
+            <div className="iso-join__benefits-panel-range">Overall {active.range}</div>
+          </div>
+          {active.locked && (
+            <span className="iso-join__benefits-panel-badge" style={{ borderColor: `${active.color}44`, color: active.color }}>
+              Earned Through Progression
+            </span>
+          )}
+        </div>
+        <ul className="iso-join__benefits-list">
+          {active.perks.map(p => (
+            <li key={p} className="iso-join__benefits-item">
+              <span className="iso-join__benefits-check" style={{ color: active.color }}>✓</span>
+              {p}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="iso-join__benefits-disclaimer">
+        As an ISO coach, you operate as an <strong>independent contractor</strong>. ISO provides a 1099 form for all income earned through the platform at year end.
+      </p>
+    </div>
+  );
+}
+
+// ====================================================================
+// PLAYER LEVEL BENEFITS
+// ====================================================================
+
+const PLAYER_LEVEL_BENEFITS = [
+  {
+    id: 'freshman' as PlayerLevel,
+    label: 'Freshman',
+    color: '#6b8cff',
+    icon: '🌱',
+    locked: false,
+    headline: 'Begin your ISO journey.',
+    perks: [
+      'Walk-On plan access (free)',
+      '30-minute monthly coach check-in',
+      'Shadowing opportunity with a verified ISO coach',
+      'Pathway-specific resources & curriculum',
+      'ISO Freshman Welcome Kit (digital badge + sticker pack)',
+    ],
+  },
+  {
+    id: 'jv' as PlayerLevel,
+    label: 'JV',
+    color: '#22c55e',
+    icon: '⚡',
+    locked: false,
+    headline: 'Build momentum and habits.',
+    perks: [
+      'Locker Room plan eligible ($10/mo)',
+      'Weekly motivational content drops',
+      'Community discussions & accountability groups',
+      'Early event access & announcements',
+      'ISO JV gear reward (cap or tee)',
+    ],
+  },
+  {
+    id: 'varsity' as PlayerLevel,
+    label: 'Varsity',
+    color: '#f59e0b',
+    icon: '🔥',
+    locked: false,
+    headline: 'Serious intent. Structured growth.',
+    perks: [
+      'Varsity Program eligible (weekly coach sessions)',
+      'Personal playbook + structured development curriculum',
+      'Resume, LinkedIn & career/interview prep',
+      'Professional network & coach referrals',
+      'ISO Varsity Kit (hoodie + cap + tee — full fit)',
+    ],
+  },
+  {
+    id: 'd1' as PlayerLevel,
+    label: 'D1',
+    color: '#a855f7',
+    icon: '🏆',
+    locked: true,
+    headline: 'Elite performance tracking.',
+    perks: [
+      'D1 performance analytics dashboard',
+      'Elite coach matching & priority booking',
+      'Priority seats at all ISO events',
+      'D1 badge + elevated profile visibility',
+      'ISO D1 exclusive gear drop (limited colorway)',
+    ],
+  },
+  {
+    id: 'professional' as PlayerLevel,
+    label: 'Professional',
+    color: '#e5c46b',
+    icon: '🌟',
+    locked: true,
+    headline: 'The top of the ISO ladder.',
+    perks: [
+      'Pro placement support & executive referrals',
+      'ISO Pro badge — top-tier platform visibility',
+      'Speaking, coacheship & platform feature opportunities',
+      'Direct advisory board access',
+      'ISO Pro limited-edition collab gear drop',
+    ],
+  },
+];
+
+function PlayerLevelBenefits({ assignedLevel }: { assignedLevel: PlayerLevel }) {
+  const [expanded, setExpanded] = React.useState<string>(assignedLevel);
+  const active = PLAYER_LEVEL_BENEFITS.find(l => l.id === expanded) ?? PLAYER_LEVEL_BENEFITS[0];
+
+  return (
+    <div className="iso-join__benefits-wrap">
+      <div className="iso-join__benefits-eyebrow">Your Level Path</div>
+      <h2 className="iso-join__benefits-headline">What Each Level Unlocks</h2>
+      <p className="iso-join__benefits-sub">
+        Your level isn't permanent — it's your starting point. Keep showing up, hit your milestones, and your ISO level moves with you.
+      </p>
+      <div className="iso-join__benefits-merch-banner">
+        <span className="iso-join__benefits-merch-banner-icon">👕</span>
+        <span>
+          <strong>ISO gifts gear for progress.</strong> Earn it by leveling up — not by paying for it. Locker Room &amp; Varsity members also unlock exclusive merch drops available to purchase.
+        </span>
+      </div>
+
+      {/* Level selector row */}
+      <div className="iso-join__benefits-tabs iso-join__benefits-tabs--5">
+        {PLAYER_LEVEL_BENEFITS.map(l => {
+          const isCurrent = l.id === assignedLevel;
+          const isActive  = l.id === expanded;
+          return (
+            <button
+              key={l.id}
+              className={`iso-join__benefits-tab${isActive ? ' iso-join__benefits-tab--active' : ''}${isCurrent ? ' iso-join__benefits-tab--current' : ''}`}
+              style={{
+                borderColor: isActive ? l.color : 'rgba(255,255,255,0.07)',
+                background: isActive ? `${l.color}14` : 'rgba(255,255,255,0.02)',
+                boxShadow: isActive ? `0 0 18px ${l.color}22` : 'none',
+                opacity: l.locked && !isActive ? 0.5 : 1,
+              }}
+              onClick={() => setExpanded(l.id)}
+            >
+              <span className="iso-join__benefits-tab-icon">{l.icon}</span>
+              <span className="iso-join__benefits-tab-name" style={{ color: isActive ? l.color : 'rgba(255,255,255,0.6)' }}>{l.label}</span>
+              {isCurrent && <span className="iso-join__benefits-tab-you" style={{ background: l.color }}>YOU</span>}
+              {l.locked && !isCurrent && <span className="iso-join__benefits-tab-lock">🔒</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Expanded perk list */}
+      <div
+        className="iso-join__benefits-panel"
+        style={{ borderColor: `${active.color}33`, background: `${active.color}0c` }}
+      >
+        <div className="iso-join__benefits-panel-header">
+          <span className="iso-join__benefits-panel-icon">{active.icon}</span>
+          <div>
+            <div className="iso-join__benefits-panel-name" style={{ color: active.color }}>{active.label}</div>
+            <div className="iso-join__benefits-panel-range">{active.headline}</div>
+          </div>
+          {active.locked && (
+            <span className="iso-join__benefits-panel-badge" style={{ borderColor: `${active.color}44`, color: active.color }}>
+              Earned Through Progress
+            </span>
+          )}
+        </div>
+        <ul className="iso-join__benefits-list">
+          {active.perks.map(p => (
+            <li key={p} className="iso-join__benefits-item">
+              <span className="iso-join__benefits-check" style={{ color: active.color }}>✓</span>
+              {p}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 function CoachCard({ result, answers }: { result: CoachResult; answers: Answers }) {
   const fname = (answers.fname as string) ?? '';
@@ -1342,8 +1803,14 @@ function CoachCard({ result, answers }: { result: CoachResult; answers: Answers 
   const role = (answers.c_role as string) ?? '';
   const tierIcon = result.tier === 'silver' ? '⚙️' : '🏅';
   const years = (answers.c_years as number) ?? 0;
-  const strengthCount = result.strengths.length;
+  const photo = (answers.c_photo as string) ?? null;
   const outcomeCount = ((answers.c_outcomes as string[]) ?? []).length;
+
+  // Skills from user-entered c_skills (comma-separated), fallback to AI strengths
+  const rawSkills = (answers.c_skills as string) ?? '';
+  const skillTags = rawSkills
+    ? rawSkills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3)
+    : result.strengths.slice(0, 3).map(s => s.split(' ').slice(0, 3).join(' '));
 
   return (
     <div className="iso-join__cc-wrap">
@@ -1353,7 +1820,11 @@ function CoachCard({ result, answers }: { result: CoachResult; answers: Answers 
         <div className="iso-join__cc-sheen" />
 
         <div className="iso-join__cc-photo-area">
-          <div className="iso-join__cc-bg-text">ISO</div>
+          {photo ? (
+            <img src={photo} alt="Coach headshot" className="iso-join__cc-headshot" />
+          ) : (
+            <div className="iso-join__cc-bg-text">ISO</div>
+          )}
           <div className="iso-join__cc-ovr">
             <div className="iso-join__cc-ovr-num">{result.overall}</div>
             <div className="iso-join__cc-ovr-lbl">Overall</div>
@@ -1375,8 +1846,8 @@ function CoachCard({ result, answers }: { result: CoachResult; answers: Answers 
               <span className="iso-join__cc-stat-key">Years</span>
             </div>
             <div className="iso-join__cc-stat">
-              <span className="iso-join__cc-stat-val">{strengthCount}</span>
-              <span className="iso-join__cc-stat-key">Strengths</span>
+              <span className="iso-join__cc-stat-val">{skillTags.length}</span>
+              <span className="iso-join__cc-stat-key">Skills</span>
             </div>
             <div className="iso-join__cc-stat">
               <span className="iso-join__cc-stat-val">{outcomeCount}</span>
@@ -1384,14 +1855,14 @@ function CoachCard({ result, answers }: { result: CoachResult; answers: Answers 
             </div>
           </div>
           <div className="iso-join__cc-tags">
-            {result.strengths.slice(0, 3).map(s => (
-              <span key={s} className="iso-join__cc-tag">{s.split(' ').slice(0, 3).join(' ')}</span>
+            {skillTags.map(s => (
+              <span key={s} className="iso-join__cc-tag">{s}</span>
             ))}
           </div>
         </div>
 
         <div className="iso-join__cc-footer">
-          <span className="iso-join__cc-footer-text">ISO · Season 1</span>
+          <span className="iso-join__cc-footer-text">ISO Institute</span>
           <span className="iso-join__cc-footer-text">{result.tierLabel} Coach</span>
         </div>
       </div>
@@ -1433,6 +1904,9 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
     if (screen.startsWith('coach') || screen === 'success-coach') {
       return COACH_QS;
     }
+    if (screen === 'explorer' || screen === 'success-explorer') {
+      return EXPLORER_QS;
+    }
     return [];
   }, [screen, answers.pathway]);
 
@@ -1464,7 +1938,9 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
       case 'input':
         return !!((a as string)?.trim());
       case 'textarea':
-        return true; // optional textarea
+        return !q.required || !!((a as string)?.trim());
+      case 'photo':
+        return !!(a as string);
       case 'pathway':
         return !!a;
       case 'checklist':
@@ -1487,7 +1963,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
 
   // --- Persist progress ---
   useEffect(() => {
-    const nonPersistScreens: Screen[] = ['create-account', 'success-player', 'success-coach'];
+    const nonPersistScreens: Screen[] = ['create-account', 'success-player', 'success-coach', 'success-explorer'];
     if (!nonPersistScreens.includes(screen)) {
       localStorage.setItem('iso-onboarding', JSON.stringify({ screen, currentQ, answers }));
     }
@@ -1511,7 +1987,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
         const saved = localStorage.getItem('iso-onboarding');
         if (saved) {
           const { screen: s, currentQ: q, answers: a } = JSON.parse(saved);
-          if (s === 'player' || s === 'coach') {
+          if (s === 'player' || s === 'coach' || s === 'explorer') {
             setScreen(s); setCurrentQ(q); setAnswers(a);
             return;
           }
@@ -1538,7 +2014,9 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
       setCurrentQ(q => q + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      screen === 'player' ? submitPlayer() : submitCoach();
+      if (screen === 'player') submitPlayer();
+      else if (screen === 'coach') submitCoach();
+      else if (screen === 'explorer') submitExplorer();
     }
   };
 
@@ -1585,6 +2063,14 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
     setTimeout(() => { setScreen('coach-result'); setExiting(false); window.scrollTo({ top: 0 }); }, 280);
   };
 
+  const submitExplorer = async () => {
+    // Short processing moment — just enough to feel considered
+    setExiting(true);
+    await new Promise(r => setTimeout(r, 600));
+    setExiting(false);
+    goto('success-explorer');
+  };
+
   const clearProgress = () => {
     localStorage.removeItem('iso-onboarding');
     setAnswers({});
@@ -1617,10 +2103,21 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
     }
   };
 
-  // --- Mark onboarding complete ---
-  const completeOnboarding = (role: 'player' | 'coach') => {
-    localStorage.setItem('iso_onboarding_complete', 'true');
-    localStorage.setItem('iso_demo_portal', role);
+  // --- Mark onboarding complete (player/explorer) or pending review (coach) ---
+  const completeOnboarding = (role: 'player' | 'coach' | 'explorer') => {
+    if (role === 'player') {
+      localStorage.setItem('iso_onboarding_complete', 'true');
+      localStorage.setItem('iso_demo_portal', 'player');
+    } else if (role === 'explorer') {
+      localStorage.setItem('iso_onboarding_complete', 'true');
+      localStorage.setItem('iso_demo_portal', 'player');
+      localStorage.setItem('iso_explorer', 'true'); // flag so portal knows they're exploring
+    } else {
+      // Coach: application submitted — portal access pending Advisory Board approval
+      localStorage.setItem('iso_coach_pending', 'true');
+      localStorage.setItem('iso_demo_portal', 'coach');
+      // Do NOT set iso_onboarding_complete — portal access blocked until approved
+    }
     const existing = localStorage.getItem('iso_demo_user');
     if (existing) {
       try {
@@ -1649,7 +2146,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
             <div className="iso-join__auth-form">
               <div className="iso-join__season-tag" style={{ alignSelf: 'flex-start', marginBottom: 28 }}>
                 <span className="iso-join__season-dot" />
-                ISO · Season 1
+                ISO Platform
               </div>
 
               <h1 className="iso-join__auth-headline">
@@ -1730,11 +2227,11 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
           <div className="iso-join__hero">
             <div className="iso-join__season-tag">
               <span className="iso-join__season-dot" />
-              ISO · Season 1
+              ISO Platform
             </div>
             <h1 className="iso-join__headline">Choose Your Path.</h1>
-            <p className="iso-join__subhead">Join ISO as a player or coach.</p>
-            <div className="iso-join__cards">
+            <p className="iso-join__subhead">Know where you're headed — or start by finding out.</p>
+            <div className="iso-join__cards iso-join__cards--3">
               <button
                 className="iso-join__card"
                 onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('player'); }}
@@ -1743,12 +2240,28 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
                 <div className="iso-join__card-icon-wrap">🏅</div>
                 <div className="iso-join__card-label">Join as</div>
                 <div className="iso-join__card-title">Player</div>
-                <div className="iso-join__card-desc">Develop your pathway. Find your level. Begin your ascent.</div>
+                <div className="iso-join__card-desc">You know your direction. Get assessed, placed, and matched with coaches in your pathway.</div>
                 <div className="iso-join__card-cta">
                   Start assessment
                   <span className="iso-join__card-arrow">→</span>
                 </div>
               </button>
+
+              <button
+                className="iso-join__card iso-join__card--explorer"
+                onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('explorer'); }}
+                aria-label="Still Exploring"
+              >
+                <div className="iso-join__card-icon-wrap">🧭</div>
+                <div className="iso-join__card-label">I'm</div>
+                <div className="iso-join__card-title">Still Exploring</div>
+                <div className="iso-join__card-desc">Not sure yet? ISO gives you one conversation per month per pathway and a shadowing opportunity to help you decide.</div>
+                <div className="iso-join__card-cta">
+                  Explore first
+                  <span className="iso-join__card-arrow">→</span>
+                </div>
+              </button>
+
               <button
                 className="iso-join__card"
                 onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('coach'); }}
@@ -1757,7 +2270,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
                 <div className="iso-join__card-icon-wrap">⭐</div>
                 <div className="iso-join__card-label">Join as</div>
                 <div className="iso-join__card-title">Coach</div>
-                <div className="iso-join__card-desc">Guide others through theirs. Build your legacy on ISO.</div>
+                <div className="iso-join__card-desc">Guide others through theirs. Apply for advisory review and build your legacy on ISO.</div>
                 <div className="iso-join__card-cta">
                   Apply now
                   <span className="iso-join__card-arrow">→</span>
@@ -1773,7 +2286,6 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
         const pw = answers.pathway as string | undefined;
         const pwColor = pw ? (PATHWAYS.find(p => p.id === pw)?.color ?? null) : null;
         const pastPathwayQ = currentQuestion.type !== 'pathway' && !!pw;
-        const pwIcon = pw ? PATHWAYS.find(p => p.id === pw)?.Icon : null;
         return (
         <div
           className="iso-join__screen iso-join__q-screen"
@@ -1784,22 +2296,6 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
             transition: 'background 0.8s ease',
           }}
         >
-          {/* Watermark icon */}
-          {pastPathwayQ && pwColor && pwIcon && React.createElement(pwIcon, {
-            size: 440,
-            strokeWidth: 0.3,
-            style: {
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: pwColor,
-              opacity: 0.04,
-              pointerEvents: 'none',
-              zIndex: 0,
-              transition: 'opacity 0.8s ease',
-            }
-          })}
           {/* Progress bar */}
           <div className="iso-join__progress-bar">
             <div className="iso-join__pb-inner">
@@ -1895,6 +2391,10 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
 
             <div style={{ height: 40 }} />
 
+            <PlayerLevelBenefits assignedLevel={playerResult.level} />
+
+            <div style={{ height: 40 }} />
+
             <PlanRecommendation level={playerResult.level} />
 
             <div style={{ height: 40 }} />
@@ -1919,7 +2419,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
               Your ISO profile has been created. You've been placed at <strong style={{ color: '#A8A8A8' }}>{playerResult.levelLabel}</strong> in the {PATHWAYS.find(p => p.id === answers.pathway)?.name ?? 'ISO'} pathway.
               Your journey starts now.
             </p>
-            <div className="iso-join__success-badge">ISO {playerResult.levelLabel} · Season 1</div>
+            <div className="iso-join__success-badge">ISO · {playerResult.levelLabel}</div>
             <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('player'); onNavigate('player-portal'); }}>
               Enter My Portal
             </button>
@@ -1930,9 +2430,114 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
         </div>
       )}
 
+      {/* ── EXPLORER QUESTIONS ── */}
+      {screen === 'explorer' && currentQuestion && (
+        <div className="iso-join__screen iso-join__q-screen" style={{ background: '#0C0C0C' }}>
+          <div className="iso-join__progress-bar">
+            <div className="iso-join__pb-inner">
+              <button className="iso-join__pb-back" onClick={handleBack} aria-label="Back">‹</button>
+              <div className="iso-join__pb-track">
+                <div className="iso-join__pb-fill iso-join__pb-fill--explorer" style={{ width: `${progress}%` }} />
+              </div>
+              <span className="iso-join__pb-count">{currentQ + 1} / {totalQ}</span>
+              {currentQuestion.sectionLabel && (
+                <span className="iso-join__pb-section">{currentQuestion.sectionLabel}</span>
+              )}
+            </div>
+          </div>
+          <div className="iso-join__q-body">
+            <div key={currentQ} className="iso-join__q-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h2 className="iso-join__q-text">{currentQuestion.question}</h2>
+              {currentQuestion.sub && (
+                <p className="iso-join__q-sub">{currentQuestion.sub}</p>
+              )}
+              <QuestionInput
+                q={currentQuestion}
+                answers={answers}
+                otherText={otherText}
+                onAnswer={updateAnswer}
+                onOther={updateOther}
+              />
+            </div>
+          </div>
+          <div className="iso-join__nav-bar">
+            <div className="iso-join__nav-inner">
+              <button
+                className={`iso-join__btn-next${isValid ? ' iso-join__btn-next--ready' : ''}`}
+                onClick={handleNext}
+                disabled={!isValid}
+              >
+                {currentQ === totalQ - 1 ? 'See My Options' : 'Continue'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── EXPLORER SUCCESS ── */}
+      {screen === 'success-explorer' && (
+        <div className="iso-join__screen">
+          <div className="iso-join__success iso-join__success--explorer">
+            <div className="iso-join__explorer-badge">
+              <span className="iso-join__explorer-badge-icon">🧭</span>
+              <span className="iso-join__explorer-badge-label">Explorer</span>
+            </div>
+            <h1 className="iso-join__success-title" style={{ marginTop: 20 }}>
+              Welcome{displayName}.
+            </h1>
+            <p className="iso-join__success-msg">
+              You don't need to pick a path today — that's exactly what ISO's Walk-On plan is for. Explore every pathway, meet coaches, and let the right one find you.
+            </p>
+
+            {/* What explorers get */}
+            <div className="iso-join__explorer-perks">
+              <div className="iso-join__explorer-perks-title">Your Walk-On Access</div>
+              {[
+                { icon: '💬', text: '1 free conversation per month with a coach in each pathway you\'re curious about' },
+                { icon: '👁️', text: 'Shadowing opportunity in one pathway — see the real work up close' },
+                { icon: '🗺️', text: 'Browse all six ISO pathways and see what each one is really about' },
+                { icon: '🎯', text: 'Commit to a pathway anytime from your portal — no re-onboarding needed' },
+                { icon: '🔒', text: 'Coach profiles visible once you\'re inside — protected from public view' },
+              ].map(p => (
+                <div key={p.text} className="iso-join__explorer-perk">
+                  <span className="iso-join__explorer-perk-icon">{p.icon}</span>
+                  <span className="iso-join__explorer-perk-text">{p.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="iso-join__explorer-note">
+              When you find the pathway that clicks, your level will be assessed at that point — you'll pick up right where you are, not start over.
+            </div>
+
+            <button
+              className="iso-join__btn-primary"
+              onClick={() => { completeOnboarding('explorer'); onNavigate('player-portal'); }}
+            >
+              Start Exploring
+            </button>
+            <button
+              className="iso-join__btn-home"
+              style={{ marginTop: 10 }}
+              onClick={() => { completeOnboarding('explorer'); onNavigate('home'); }}
+            >
+              Back to ISO
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── COACH QUESTIONS ── */}
       {screen === 'coach' && currentQuestion && (
-        <div className="iso-join__screen iso-join__q-screen">
+        <div
+          className="iso-join__screen iso-join__q-screen"
+          style={{
+            background: (currentQuestion.type !== 'pathway' && answers.c_pathway)
+              ? `radial-gradient(ellipse at 50% -5%, ${PATHWAYS.find(p => p.id === answers.c_pathway)?.color ?? '#555'}1c 0%, #0C0C0C 52%)`
+              : '#0C0C0C',
+            transition: 'background 0.8s ease',
+          }}
+        >
           <div className="iso-join__progress-bar">
             <div className="iso-join__pb-inner">
               <button className="iso-join__pb-back" onClick={handleBack} aria-label="Back">‹</button>
@@ -2002,7 +2607,7 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
             <h1 className="iso-join__result-level" style={{ fontSize: 'clamp(52px,12vw,88px)', marginBottom: 4 }}>
               {coachResult.overall}
             </h1>
-            <p className="iso-join__result-subtitle">{coachResult.tierLabel} Coach · Season 1</p>
+            <p className="iso-join__result-subtitle">{coachResult.tierLabel} Coach · ISO Institute</p>
 
             <CoachCard result={coachResult} answers={answers} />
 
@@ -2037,6 +2642,12 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
               <em>Your Overall reflects who you are on ISO today — not simply your credentials on paper.</em>
             </div>
 
+            <div style={{ height: 40 }} />
+
+            <CoachTierBenefits assignedTier={coachResult.tier} />
+
+            <div style={{ height: 40 }} />
+
             <button
               className="iso-join__btn-primary"
               onClick={() => goto('success-coach')}
@@ -2051,19 +2662,49 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
       {screen === 'success-coach' && coachResult && (
         <div className="iso-join__screen">
           <div className="iso-join__success">
-            <div className="iso-join__success-mark">⭐</div>
-            <h1 className="iso-join__success-title">Submitted.</h1>
+            <div className="iso-join__success-mark">📋</div>
+            <h1 className="iso-join__success-title">Application Submitted.</h1>
             <p className="iso-join__success-msg">
-              Your application has been submitted for ISO Advisory Board review.
-              We'll be in touch at the email you provided. In the meantime, your {coachResult.tierLabel} Coach profile is being prepared.
+              Your application has been received by the ISO Advisory Board. Every coach is personally reviewed before being approved to work with players on this platform.
             </p>
+
             <div className="iso-join__success-badge">
-              {coachResult.tierLabel} Coach · Overall {coachResult.overall} · Season 1
+              {coachResult.tierLabel} Coach · Overall {coachResult.overall} · Pending Review
             </div>
-            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('coach'); onNavigate('coach-portal'); }}>
-              Enter Coach Portal
-            </button>
-            <button className="iso-join__btn-home" style={{ marginTop: 10 }} onClick={() => { completeOnboarding('coach'); onNavigate('home'); }}>
+
+            {/* Advisory Board notice */}
+            <div className="iso-join__coach-pending-box">
+              <div className="iso-join__coach-pending-title">What Happens Next</div>
+              <ol className="iso-join__coach-pending-steps">
+                <li>
+                  <span className="iso-join__coach-pending-num">1</span>
+                  <span>The Advisory Board reviews your application and assigned rating.</span>
+                </li>
+                <li>
+                  <span className="iso-join__coach-pending-num">2</span>
+                  <span>
+                    <strong>ISO will contact you at the email you provided</strong> to request supporting documentation — diploma, certifications, licenses, or other proof of credentials. Submitting complete, verified materials strengthens your rating.
+                  </span>
+                </li>
+                <li>
+                  <span className="iso-join__coach-pending-num">3</span>
+                  <span>Once approved, you'll receive an email with access to your Coach Portal and your official coach card goes live.</span>
+                </li>
+              </ol>
+              <p className="iso-join__coach-pending-note">
+                Review typically takes <strong>5–10 business days</strong>. Portal access is granted only after Advisory Board approval — no exceptions.
+              </p>
+            </div>
+
+            {/* 1099 / contractor notice */}
+            <div className="iso-join__contractor-note">
+              <span className="iso-join__contractor-icon">📄</span>
+              <p>
+                As an ISO coach you operate as an <strong>independent contractor</strong>. ISO provides a <strong>1099 form</strong> for all income earned through the platform. Keep records of your sessions and earnings — you are responsible for your own tax filings.
+              </p>
+            </div>
+
+            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('coach'); onNavigate('home'); }}>
               Back to ISO
             </button>
           </div>

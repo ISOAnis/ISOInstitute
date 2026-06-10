@@ -329,7 +329,7 @@ function ProblemsSection() {
                     marginBottom: "16px",
                   }}
                 >
-                  → disconnected from mentors
+                  → disconnected from coaches
                   <br />
                   → separated from peers operating at a high level
                   <br />→ hidden behind geography, networks, or circumstance
@@ -426,7 +426,7 @@ function ProblemsSection() {
                   Society elevates people based on fame and followers, not on
                   the value they create or the lives they impact. Celebrities
                   with massive platforms get endless attention simply for
-                  existing, while local builders, mentors, and doers remain
+                  existing, while local builders, coaches, and doers remain
                   invisible.
                 </p>
                 <p style={{ marginBottom: "16px" }}>
@@ -445,7 +445,7 @@ function ProblemsSection() {
                   <br />→ Real impact in small communities goes unrecognized
                 </p>
                 <p style={{ marginBottom: "16px" }}>
-                  The person mentoring dozens of young people in their town
+                  The person coaching dozens of young people in their town
                   deserves more recognition than someone famous for being
                   famous. But our systems don't reward that.
                 </p>

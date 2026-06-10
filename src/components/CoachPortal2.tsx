@@ -13,7 +13,7 @@ interface Availability {
   slots: TimeSlot[];
 }
 
-export function MentorPortal() {
+export function CoachPortal() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [newSlotStart, setNewSlotStart] = useState('09:00');
@@ -61,9 +61,9 @@ export function MentorPortal() {
     <div className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-white mb-2">Mentor Portal</h1>
+          <h1 className="text-white mb-2">Coach Portal</h1>
           <p className="text-slate-400">
-            Manage your availability so mentees can book at your earliest convenience
+            Manage your availability so players can book at your earliest convenience
           </p>
         </div>
 

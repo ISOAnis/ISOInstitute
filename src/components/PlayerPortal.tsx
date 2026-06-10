@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Lock, Clock, User, UserCircle, Users, X, Moon, Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle, ArrowRight, Dumbbell, Activity, Settings, Rocket, Globe, LucideIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { MenteeProfileSection } from './MenteeProfileSection';
+import { PlayerProfileSection } from './PlayerProfileSection';
 import { LockerRoom } from './LockerRoom';
-import { MentorMenteeChat } from './MentorMenteeChat';
+import { CoachPlayerChat } from './CoachPlayerChat';
 import { PortalTutorial } from './PortalTutorial';
 import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
@@ -68,11 +68,11 @@ const PLAYER_TUTORIAL_KEY = 'iso_tutorial_completed_player_page';
 const PATHWAY_SELECTION_KEY = 'iso_pathway_selection_completed';
 type PlayerTab = 'progress' | 'messages' | 'profile';
 
-interface MenteePortalProps {
+interface PlayerPortalProps {
   onNavigate?: (page: 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store') => void;
 }
 
-export function MenteePortal({ onNavigate }: MenteePortalProps) {
+export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   const [games, setGames] = useState<Game[]>(mockGames);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showLockerRoom, setShowLockerRoom] = useState(false);
@@ -183,13 +183,13 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
   // Get pathway info based on selected pathway
   const selectedPathway = pathwayMap[selectedPathwayId] || pathwayMap['deen'];
 
-  // Mock current mentorship data - in production would come from backend
+  // Mock current coacheship data - in production would come from backend
   // Uses selected pathway to determine category
-  const currentMentor = useMemo(() => ({
+  const currentCoach = useMemo(() => ({
     name: 'Imam Abdullah Rahman',
     category: selectedPathway.name,
     categoryIcon: selectedPathway.icon,
-    startDate: '2024-10-15', // Date mentee started with this mentor
+    startDate: '2024-10-15', // Date player started with this coach
   }), [selectedPathway]);
 
   // Get active pathways (pathways where user has a coach)
@@ -197,7 +197,7 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
     [selectedPathwayId as 'deen' | 'health' | 'medicine' | 'engineering' | 'entrepreneurship' | 'global'];
 
   // Calculate commitment progress (30 days = 1 month)
-  const startDate = new Date(currentMentor.startDate);
+  const startDate = new Date(currentCoach.startDate);
   const today = new Date();
   const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   const commitmentDays = 30;
@@ -351,10 +351,10 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
             <div>
               <h1 className="text-white mb-2">Your Season</h1>
               <div className="flex items-center gap-2 text-slate-400">
-              {React.createElement(currentMentor.categoryIcon, { className: 'w-6 h-6 text-white' })}
+              {React.createElement(currentCoach.categoryIcon, { className: 'w-6 h-6 text-white' })}
                 <div>
-                  <span className="text-orange-400">{currentMentor.category}</span>
-                  <span> with {currentMentor.name}</span>
+                  <span className="text-orange-400">{currentCoach.category}</span>
+                  <span> with {currentCoach.name}</span>
                 </div>
               </div>
             </div>
@@ -773,7 +773,7 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
                       <Calendar className="w-5 h-5 text-orange-500" />
                       <div>
                         <p className="text-white">Weekly Check-in</p>
-                        <p className="text-slate-400 text-sm">with {currentMentor.name}</p>
+                        <p className="text-slate-400 text-sm">with {currentCoach.name}</p>
                       </div>
                     </div>
                     <span className="text-slate-400 text-sm">Nov 15, 2:00 PM</span>
@@ -824,14 +824,14 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
                   <p className="text-slate-400 mb-6">
                     {canExploreNewPathway ? (
                       <>
-                        Congratulations! You've completed your 30-day commitment period with {currentMentor.name}. 
+                        Congratulations! You've completed your 30-day commitment period with {currentCoach.name}. 
                         You can now explore other pathways and work with additional coaches if you'd like to grow in multiple areas of your life.
                       </>
                     ) : (
                       <>
                         We require a <span className="text-orange-400">30-day minimum commitment</span> to your current coach 
                         before you can explore other pathways. This ensures you take your coaching seriously and give it the focus it deserves. 
-                        Stay committed to <span className="text-orange-400">{currentMentor.category}</span> with {currentMentor.name} — 
+                        Stay committed to <span className="text-orange-400">{currentCoach.category}</span> with {currentCoach.name} — 
                         you started on <span className="text-slate-300">{startDate.toLocaleDateString()}</span>.
                       </>
                     )}
@@ -895,15 +895,15 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-6">
             <div className="h-[calc(100vh-400px)] min-h-[500px] max-h-[800px]">
-              <MentorMenteeChat
-                currentUserId="mentee-1"
+              <CoachPlayerChat
+                currentUserId="player-1"
                 currentUserName="You"
-                currentUserRole="mentee"
-                otherUserId="mentor-1"
-                otherUserName={currentMentor.name}
-                otherUserRole="mentor"
-                category={currentMentor.category}
-                categoryIcon={currentMentor.categoryIcon}
+                currentUserRole="player"
+                otherUserId="coach-1"
+                otherUserName={currentCoach.name}
+                otherUserRole="coach"
+                category={currentCoach.category}
+                categoryIcon={currentCoach.categoryIcon}
               />
             </div>
           </TabsContent>
@@ -911,7 +911,7 @@ export function MenteePortal({ onNavigate }: MenteePortalProps) {
           {/* My Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
             <div ref={profileSectionRef} id="player-profile-section">
-              <MenteeProfileSection onProfileCompletionChange={setPlayerProfileCompletion} />
+              <PlayerProfileSection onProfileCompletionChange={setPlayerProfileCompletion} />
             </div>
           </TabsContent>
         </Tabs>

@@ -5,13 +5,13 @@ import { useState } from 'react';
 interface ISOEvaluationModalProps {
   onClose: () => void;
   categoryTitle: string;
-  mentorName?: string;
+  coachName?: string;
   categoryId?: string;
-  menteeProfile?: {
+  playerProfile?: {
     motivationLevel?: 'exploring' | 'committed' | 'all-in';
     timeframe?: string;
   };
-  mentorDetails?: {
+  coachDetails?: {
     name?: string;
     varsityPrice?: number;
     varsityPriceRange?: string; // Optional override like "$25/mo – $60/mo"
@@ -34,10 +34,10 @@ const scrollToCourt = () => {
 export function ISOEvaluationModal({ 
   onClose, 
   categoryTitle, 
-  mentorName, 
+  coachName, 
   categoryId = 'global', 
-  menteeProfile, 
-  mentorDetails 
+  playerProfile, 
+  coachDetails 
 }: ISOEvaluationModalProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -56,11 +56,11 @@ export function ISOEvaluationModal({
   ];
 
   // Coach-specific perks
-  const coachSpecificPerks = mentorDetails?.varsityPerks || mentorDetails?.additionalPerks || [];
+  const coachSpecificPerks = coachDetails?.varsityPerks || coachDetails?.additionalPerks || [];
 
   // Determine price display
-  const varsityPriceDisplay = mentorDetails?.varsityPriceRange || '$10/mo – $100/mo';
-  const coachName = mentorDetails?.name || mentorName || 'your coach';
+  const varsityPriceDisplay = coachDetails?.varsityPriceRange || '$10/mo – $100/mo';
+  const coachName = coachDetails?.name || coachName || 'your coach';
 
   // Handle Walk-On button click
   const handleWalkOnClick = () => {
@@ -97,9 +97,9 @@ export function ISOEvaluationModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          coachId: mentorDetails?.name,
+          coachId: coachDetails?.name,
           coachName: coachName,
-          amount: mentorDetails?.varsityPrice || 50, // Use actual price
+          amount: coachDetails?.varsityPrice || 50, // Use actual price
           currency: 'usd',
           capture_method: 'manual', // Don't charge immediately
           metadata: {
@@ -166,7 +166,7 @@ export function ISOEvaluationModal({
               className="text-white/90 text-lg"
               style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             >
-            {mentorName ? `Request mentorship from ${mentorName}` : `Request mentorship in ${categoryTitle}`}
+            {coachName ? `Request coacheship from ${coachName}` : `Request coacheship in ${categoryTitle}`}
           </p>
           </div>
         </div>
@@ -224,9 +224,9 @@ export function ISOEvaluationModal({
                   marginBottom: '16px',
                   fontFamily: "'Bebas Neue', sans-serif",
                 }}>
-                  {mentorName ? (
+                  {coachName ? (
                     <>
-                      Your request has been sent to <span style={{ color: '#f97316', fontWeight: '600' }}>{mentorName}</span> for review.
+                      Your request has been sent to <span style={{ color: '#f97316', fontWeight: '600' }}>{coachName}</span> for review.
                     </>
                   ) : (
                     "Your request has been sent to the coach for review."
@@ -283,7 +283,7 @@ export function ISOEvaluationModal({
                         marginBottom: '4px',
                         fontFamily: "'Bebas Neue', sans-serif",
                       }}>
-                        Mentor reviews your profile
+                        Coach reviews your profile
                       </p>
                       <p style={{
                         fontSize: '0.875rem',
@@ -486,7 +486,7 @@ export function ISOEvaluationModal({
                 }}>
                   {[
                     '30-minute monthly check-in',
-                    'Mentorship nights & events',
+                    'Coacheship nights & events',
                     'Pathway resources',
                     'Community support',
                   ].map((feature, index) => (

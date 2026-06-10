@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe, Sprout, BookOpen, Star, Trophy, Gem, Target, Clock, ArrowUp, Circle, Sparkles, ArrowLeft, ArrowRight, LucideIcon } from 'lucide-react';
 import { motion } from 'motion/react';
-import { MentorModal } from './MentorModal';
+import { CoachModal } from './CoachModal';
 import { SignupModal } from './SignupModal';
 import { PATHWAYS } from '../data/pathways';
 
@@ -115,7 +115,7 @@ interface PathwaysProps {
   onNavigateToCallIso?: (coachName: string, categoryId?: string) => void;
   commitmentStatus?: {
     isCommitted: boolean;
-    mentorName?: string;
+    coachName?: string;
     category?: string;
     daysRemaining?: number;
   } | null;
@@ -155,8 +155,8 @@ const levelDetails: Record<string, { title: string; description: string; gear: s
   },
   professional: {
     title: 'Professional Level',
-    description: 'You\'ve reached the pinnacle. As a mentor, you guide others on their journey while continuing your own mastery.',
-    gear: 'Unlock: Custom signature gear with your name, mentor status badge, the legendary ISO tracksuit, and your own colorway collection.'
+    description: 'You\'ve reached the pinnacle. As a coach, you guide others on their journey while continuing your own mastery.',
+    gear: 'Unlock: Custom signature gear with your name, coach status badge, the legendary ISO tracksuit, and your own colorway collection.'
   }
 };
 
@@ -242,7 +242,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
     
     setIsLoggedIn(true);
     setShowSignupModal(false);
-    // selectedPathway is already set, so the MentorModal will open automatically
+    // selectedPathway is already set, so the CoachModal will open automatically
   };
 
   const selectedPathwayData = selectedPathway 
@@ -295,7 +295,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             </div>
 
             {/* Coach Selection Modal */}
-            <MentorModal
+            <CoachModal
               category={{
                 id: selectedPathwayData.id,
                 title: selectedPathwayData.name,
@@ -389,7 +389,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                     Connect with a Coach
                   </h3>
                   <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Browse coach profiles and book a session with a mentor who aligns with your goals and schedule.
+                    Browse coach profiles and book a session with a coach who aligns with your goals and schedule.
                   </p>
                 </motion.div>
 
@@ -522,7 +522,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                       </div>
                       {stage.special && (
                         <div className="text-yellow-400 text-xs mt-1 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" /> Mentor
+                          <Sparkles className="w-3 h-3" /> Coach
                         </div>
                       )}
                     </div>
@@ -633,7 +633,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             </div>
             <h3 className="text-white text-center mb-4">Already Committed</h3>
             <p className="text-white/70 text-center mb-6">
-              You're currently working with {commitmentStatus?.mentorName} in <span className="text-orange-400">{commitmentStatus?.category}</span>. 
+              You're currently working with {commitmentStatus?.coachName} in <span className="text-orange-400">{commitmentStatus?.category}</span>. 
               Complete your 30-day commitment period before exploring other pathways.
             </p>
             <button

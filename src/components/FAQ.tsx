@@ -48,7 +48,7 @@ export function FAQ() {
                   </div>
                   <div>
                     <p className="font-semibold text-orange-500 mb-2">Varsity Program ($10/month – $100/month)</p>
-                    <p>Everything in Walk-On and Locker Room Pass, plus weekly check-ins with your dedicated coach, personalized mentorship, priority support, and access to exclusive workshops and events. Pricing varies by coach tier and commitment level.</p>
+                    <p>Everything in Walk-On and Locker Room Pass, plus weekly check-ins with your dedicated coach, personalized coacheship, priority support, and access to exclusive workshops and events. Pricing varies by coach tier and commitment level.</p>
                   </div>
                 </div>
               </AccordionContent>

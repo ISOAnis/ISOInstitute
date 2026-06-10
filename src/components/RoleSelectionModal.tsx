@@ -51,7 +51,7 @@ export function RoleSelectionModal({ onClose, onSelectRole, userName }: RoleSele
                 <div className="flex-1">
                   <h3 className="text-white text-xl font-bold mb-1">Player</h3>
                   <p className="text-slate-400 text-sm">
-                    Get matched with coaches, track your progress, and grow with personalized mentorship
+                    Get matched with coaches, track your progress, and grow with personalized coacheship
                   </p>
                 </div>
               </div>
@@ -72,7 +72,7 @@ export function RoleSelectionModal({ onClose, onSelectRole, userName }: RoleSele
                 <div className="flex-1">
                   <h3 className="text-white text-xl font-bold mb-1">Coach</h3>
                   <p className="text-slate-400 text-sm">
-                    Share your expertise, mentor the next generation, and build your coaching brand
+                    Share your expertise, coach the next generation, and build your coaching brand
                   </p>
                 </div>
               </div>

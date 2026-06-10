@@ -8,10 +8,10 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { MentorProfileSection } from './MentorProfileSection';
+import { CoachProfileSection } from './CoachProfileSection';
 import { AIMatchingDashboard } from './AIMatchingDashboard';
 import { LockerRoom } from './LockerRoom';
-import { MentorMenteeChat } from './MentorMenteeChat';
+import { CoachPlayerChat } from './CoachPlayerChat';
 import { CoachProfileCompletionModal } from './CoachProfileCompletionModal';
 
 interface Comment {
@@ -533,13 +533,13 @@ export function CoachPortal() {
               <div className="lg:col-span-3">
                 {selectedPlayerForChat ? (
                   <div className="h-[calc(100vh-300px)] min-h-[600px]">
-                    <MentorMenteeChat
-                      currentUserId="mentor-1"
+                    <CoachPlayerChat
+                      currentUserId="coach-1"
                       currentUserName={currentCoach.name}
-                      currentUserRole="mentor"
+                      currentUserRole="coach"
                       otherUserId={selectedPlayerForChat.id}
                       otherUserName={selectedPlayerForChat.name}
-                      otherUserRole="mentee"
+                      otherUserRole="player"
                       otherUserAvatar={selectedPlayerForChat.avatar}
                       category={selectedPlayerForChat.category}
                       categoryIcon={selectedPlayerForChat.categoryIcon}
@@ -964,7 +964,7 @@ export function CoachPortal() {
           {/* My Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
             <div ref={profileSectionRef} id="coach-profile-section">
-              <MentorProfileSection
+              <CoachProfileSection
                 onProfileCompletionChange={setProfileCompletion}
                 onProfilePictureChange={setCoachProfilePicture}
                 initialProfilePicture={coachProfilePicture}

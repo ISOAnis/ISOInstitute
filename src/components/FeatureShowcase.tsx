@@ -42,7 +42,7 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
       num: "02",
       tag: "CALL AN ISO",
       title: "Connect with Your Coach",
-      desc: "Browse coach profiles, read their stories, and connect with a mentor who understands your journey. Schedule your first session and begin your mentorship."
+      desc: "Browse coach profiles, read their stories, and connect with a coach who understands your journey. Schedule your first session and begin your coacheship."
     },
     {
       num: "03",
@@ -62,8 +62,8 @@ export function FeatureShowcase({ role = 'players' }: FeatureShowcaseProps) {
     {
       num: "01",
       tag: "FIND YOUR PLAYERS",
-      title: "Choose Your Mentees with AI Matching",
-      desc: "Browse player profiles and discover those seeking mentorship. Select players who align with your coaching philosophy and build meaningful connections."
+      title: "Choose Your Players with AI Matching",
+      desc: "Browse player profiles and discover those seeking coacheship. Select players who align with your coaching philosophy and build meaningful connections."
     },
     {
       num: "02",

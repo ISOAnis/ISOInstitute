@@ -12,7 +12,7 @@ interface Location {
   label: string;
 }
 
-interface MenteeProfile {
+interface PlayerProfile {
   name: string;
   email: string;
   age: string;
@@ -27,7 +27,7 @@ interface MenteeProfile {
   topValues: string[];
 }
 
-const defaultProfile: MenteeProfile = {
+const defaultProfile: PlayerProfile = {
   name: '',
   email: '',
   age: '',
@@ -76,12 +76,12 @@ const motivationLabels = {
   'all-in': 'All In - Ready to Transform'
 };
 
-interface MenteeProfileSectionProps {
+interface PlayerProfileSectionProps {
   onProfileCompletionChange?: (percentage: number) => void;
 }
 
-export function MenteeProfileSection({ onProfileCompletionChange }: MenteeProfileSectionProps) {
-  const [profile, setProfile] = useState<MenteeProfile>(() => {
+export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfileSectionProps) {
+  const [profile, setProfile] = useState<PlayerProfile>(() => {
     try {
       const saved = localStorage.getItem('player_profile_data');
       if (saved) {
@@ -95,7 +95,7 @@ export function MenteeProfileSection({ onProfileCompletionChange }: MenteeProfil
   const [isEditingBasics, setIsEditingBasics] = useState(false);
   const [isEditingDemographics, setIsEditingDemographics] = useState(false);
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
-  const [tempProfile, setTempProfile] = useState<MenteeProfile>(() => profile);
+  const [tempProfile, setTempProfile] = useState<PlayerProfile>(() => profile);
 
   useEffect(() => {
     localStorage.setItem('player_profile_data', JSON.stringify(profile));
