@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { ChevronDown, X } from 'lucide-react';
-import { LoginModal } from './LoginModal';
-import { SignupModal } from './SignupModal';
 
 type Page = 'home' | 'pathways' | 'about' | 'community' | 'coach-portal' | 'player-portal' | 'call-iso' | 'store' | 'for-coaches' | 'join';
 type UserRole = 'coach' | 'player' | 'community-leader';
@@ -29,10 +27,7 @@ const STORAGE_PORTAL_KEY = 'iso_demo_portal';
 
 export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onPlayerStatusChange }: NavigationProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [showCoachLogin, setShowCoachLogin] = useState(false);
-  const [showPlayerLogin, setShowPlayerLogin] = useState(false);
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -90,40 +85,9 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
     return () => clearInterval(interval);
   }, []);
 
-  const handleCoachLogin = (email: string, password: string) => {
-    // Mock authentication - in production, this would call an API
-    // For now: all coaches have access to Community Leader Portal
-    const roles: UserRole[] = ['coach', 'community-leader'];
-    const userData = { email, roles };
-    
-    setUser(userData);
-    setShowCoachLogin(false);
-    setShowPortalDropdown(false);
-    onNavigate('coach-portal');
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    localStorage.setItem(STORAGE_PORTAL_KEY, 'coach');
-  };
-
-  const handlePlayerLogin = (email: string, password: string) => {
-    // Mock authentication
-    const userData = { email, roles: ['player'] as UserRole[] };
-    setUser(userData);
-    setShowPlayerLogin(false);
-    setShowPortalDropdown(false);
-    onNavigate('player-portal');
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    localStorage.setItem(STORAGE_PORTAL_KEY, 'player');
-  };
-
   const handleLogout = () => {
     setUser(null);
     setIsOnboarded(false);
-    
-    // Clear all auth + onboarding state
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_PORTAL_KEY);
     localStorage.removeItem('iso_onboarding_complete');
@@ -133,19 +97,13 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
     onNavigate('home');
   };
 
-  // Handle sign out confirmation
   const handleConfirmSignOut = () => {
     handleLogout();
     setShowSignOutModal(false);
-    if (pendingPortalType === 'player') {
-      setShowPlayerLogin(true);
-    } else if (pendingPortalType === 'coach') {
-      setShowCoachLogin(true);
-    }
     setPendingPortalType(null);
+    onNavigate('join');
   };
 
-  // Handle cancel sign out
   const handleCancelSignOut = () => {
     setShowSignOutModal(false);
     setPendingPortalType(null);
@@ -278,7 +236,8 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
                           setShowSignOutModal(true);
                           setShowPortalDropdown(false);
                         } else {
-                          setShowCoachLogin(true);
+                          localStorage.setItem('iso_join_intent', 'signin');
+                          onNavigate('join');
                           setShowPortalDropdown(false);
                         }
                       }}
@@ -300,12 +259,12 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
                           onNavigate('player-portal');
                           setShowPortalDropdown(false);
                         } else if (user && savedPortal === 'coach') {
-                          // User is logged in as coach, show sign out modal
                           setPendingPortalType('player');
                           setShowSignOutModal(true);
                           setShowPortalDropdown(false);
                         } else {
-                          setShowPlayerLogin(true);
+                          localStorage.setItem('iso_join_intent', 'signin');
+                          onNavigate('join');
                           setShowPortalDropdown(false);
                         }
                       }}
@@ -324,7 +283,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
                     {false && (
                       <button
                         onClick={() => {
-                          setShowCoachLogin(true);
+                          onNavigate('join');
                           setShowPortalDropdown(false);
                         }}
                         className="w-full text-left px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
@@ -336,77 +295,128 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onP
                 )}
               </div>
               
-              {/* Auth area — single contextual button */}
-              <button
-                onClick={isOnboarded ? handleLogout : () => onNavigate('join')}
-                onMouseEnter={() => setHoveredItem('join')}
-                onMouseLeave={() => setHoveredItem(null)}
-                className="relative rounded-full font-semibold transition-all duration-200"
-                style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: '14px',
-                  letterSpacing: '2px',
-                  padding: '7px 22px',
-                  margin: '3px 6px 3px 8px',
-                  background: hoveredItem === 'join' || currentPage === 'join'
-                    ? 'rgba(255,255,255,0.95)'
-                    : 'rgba(255,255,255,0.88)',
-                  color: '#0A0A0A',
-                  border: '1px solid rgba(255,255,255,0.6)',
-                  boxShadow: hoveredItem === 'join' || currentPage === 'join'
-                    ? '0 0 20px rgba(255,255,255,0.2)'
-                    : 'none',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {isOnboarded ? 'Sign Out' : 'Join ISO'}
-              </button>
+              {/* Auth area — state-aware buttons */}
+              {(() => {
+                const loggedIn = !!localStorage.getItem('iso_demo_user');
+                if (isOnboarded) {
+                  // Fully onboarded — just sign out
+                  return (
+                    <button
+                      onClick={handleLogout}
+                      onMouseEnter={() => setHoveredItem('signout')}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className="relative rounded-full font-semibold transition-all duration-200"
+                      style={{
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        fontSize: '14px',
+                        letterSpacing: '2px',
+                        padding: '7px 22px',
+                        margin: '3px 6px 3px 8px',
+                        background: hoveredItem === 'signout' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+                        color: 'rgba(255,255,255,0.85)',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  );
+                } else if (loggedIn) {
+                  // Logged in but not onboarded — Onboard + Sign Out
+                  return (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: '3px 6px 3px 8px' }}>
+                      <button
+                        onClick={() => { localStorage.removeItem('iso_join_intent'); onNavigate('join'); }}
+                        onMouseEnter={() => setHoveredItem('onboard')}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className="relative rounded-full font-semibold transition-all duration-200"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: '14px',
+                          letterSpacing: '2px',
+                          padding: '7px 22px',
+                          background: hoveredItem === 'onboard' ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.88)',
+                          color: '#0A0A0A',
+                          border: '1px solid rgba(255,255,255,0.6)',
+                          boxShadow: hoveredItem === 'onboard' ? '0 0 20px rgba(255,255,255,0.2)' : 'none',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Onboard
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        onMouseEnter={() => setHoveredItem('signout')}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className="relative rounded-full font-semibold transition-all duration-200"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: '14px',
+                          letterSpacing: '2px',
+                          padding: '7px 22px',
+                          background: hoveredItem === 'signout' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+                          color: 'rgba(255,255,255,0.85)',
+                          border: '1px solid rgba(255,255,255,0.25)',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  );
+                } else {
+                  // Not logged in — Join ISO + Sign In
+                  return (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: '3px 6px 3px 8px' }}>
+                      <button
+                        onClick={() => { localStorage.setItem('iso_join_intent', 'signin'); onNavigate('join'); }}
+                        onMouseEnter={() => setHoveredItem('signin')}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className="relative rounded-full font-semibold transition-all duration-200"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: '14px',
+                          letterSpacing: '2px',
+                          padding: '7px 22px',
+                          background: 'transparent',
+                          color: hoveredItem === 'signin' ? '#ffffff' : 'rgba(255,255,255,0.7)',
+                          border: '1px solid rgba(255,255,255,0.25)',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => { localStorage.removeItem('iso_join_intent'); onNavigate('join'); }}
+                        onMouseEnter={() => setHoveredItem('join')}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className="relative rounded-full font-semibold transition-all duration-200"
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: '14px',
+                          letterSpacing: '2px',
+                          padding: '7px 22px',
+                          background: hoveredItem === 'join' || currentPage === 'join'
+                            ? 'rgba(255,255,255,0.95)'
+                            : 'rgba(255,255,255,0.88)',
+                          color: '#0A0A0A',
+                          border: '1px solid rgba(255,255,255,0.6)',
+                          boxShadow: hoveredItem === 'join' || currentPage === 'join'
+                            ? '0 0 20px rgba(255,255,255,0.2)'
+                            : 'none',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        Join ISO
+                      </button>
+                    </div>
+                  );
+                }
+              })()}
             </div>
           </div>
         </div>
       </nav>
-
-      {/* Coach Login Modal */}
-      {showCoachLogin && (
-        <LoginModal
-          title="Coach Portal Sign In"
-          onClose={() => setShowCoachLogin(false)}
-          onLogin={handleCoachLogin}
-          onSignupClick={() => {
-            setShowCoachLogin(false);
-            setShowSignupModal(true);
-          }}
-        />
-      )}
-
-      {/* Player Login Modal */}
-      {showPlayerLogin && (
-        <LoginModal
-          title="Log In"
-          onClose={() => setShowPlayerLogin(false)}
-          onLogin={handlePlayerLogin}
-          onSignupClick={() => {
-            setShowPlayerLogin(false);
-            setShowSignupModal(true);
-          }}
-        />
-      )}
-
-      {/* Signup Modal */}
-      {showSignupModal && (
-        <SignupModal
-          onClose={() => setShowSignupModal(false)}
-          onSignupComplete={(userData) => {
-            console.log('Account created:', userData);
-            setShowSignupModal(false);
-            const userDataForLogin = { email: userData.email, roles: ['player'] as UserRole[] };
-            setUser(userDataForLogin);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(userDataForLogin));
-            localStorage.setItem(STORAGE_PORTAL_KEY, 'player');
-            onNavigate('player-portal');
-          }}
-        />
-      )}
 
       {/* Sign Out Confirmation Modal */}
       {showSignOutModal && (

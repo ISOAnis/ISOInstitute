@@ -6,8 +6,6 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { CoachPortalPage } from './components/CoachPortalPage';
 import { PlayerPortalPage } from './components/PlayerPortalPage';
 import { About } from './components/About';
-import { LoginModal } from './components/LoginModal';
-import { SignupModal } from './components/SignupModal';
 import { X } from 'lucide-react';
 import './styles/about.css';
 
@@ -36,6 +34,7 @@ const LoadingSpinner = () => (
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [joinAuthMode, setJoinAuthMode] = useState<'create' | 'signin'>('create');
   const [selectedCoachName, setSelectedCoachName] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [playerCommitmentStatus, setPlayerCommitmentStatus] = useState<{
@@ -48,9 +47,6 @@ export default function App() {
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
-  const [showPlayerLogin, setShowPlayerLogin] = useState(false);
-  const [showCoachLogin, setShowCoachLogin] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
 
@@ -152,23 +148,12 @@ export default function App() {
   };
 
   // Handle player login
-  const handlePlayerLogin = (email: string, password: string) => {
-    // Mock authentication - in production, this would call an API
-    const userData = { email, roles: ['player'] };
-    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
-    localStorage.setItem('iso_demo_portal', 'player');
-    setShowPlayerLogin(false);
-    handleNavigate('player-portal');
+  const handlePlayerLogin = (_email: string, _password: string) => {
+    handleNavigate('join');
   };
 
-  // Handle coach login
-  const handleCoachLogin = (email: string, password: string) => {
-    // Mock authentication - in production, this would call an API
-    const userData = { email, roles: ['coach', 'community-leader'] };
-    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
-    localStorage.setItem('iso_demo_portal', 'coach');
-    setShowCoachLogin(false);
-    handleNavigate('coach-portal');
+  const handleCoachLogin = (_email: string, _password: string) => {
+    handleNavigate('join');
   };
 
   // Helper function to sign out user
@@ -198,13 +183,12 @@ export default function App() {
           handleNavigate('player-portal');
         }
       } else {
-        // User is not logged in, show login modal
-        setShowPlayerLogin(true);
+        // User is not logged in — go to Join ISO auth flow
+        handleNavigate('join');
       }
     } catch (error) {
       console.error('Failed to check login state:', error);
-      // If there's an error, show login modal as fallback
-      setShowPlayerLogin(true);
+      handleNavigate('join');
     }
   };
 
@@ -225,13 +209,12 @@ export default function App() {
           handleNavigate('coach-portal');
         }
       } else {
-        // User is not logged in, show login modal
-        setShowCoachLogin(true);
+        // User is not logged in — go to Join ISO auth flow
+        handleNavigate('join');
       }
     } catch (error) {
       console.error('Failed to check login state:', error);
-      // If there's an error, show login modal as fallback
-      setShowCoachLogin(true);
+      handleNavigate('join');
     }
   };
 
@@ -239,12 +222,8 @@ export default function App() {
   const handleConfirmSignOut = () => {
     signOutUser();
     setShowSignOutModal(false);
-    if (pendingPortalType === 'player') {
-      setShowPlayerLogin(true);
-    } else if (pendingPortalType === 'coach') {
-      setShowCoachLogin(true);
-    }
     setPendingPortalType(null);
+    handleNavigate('join');
   };
 
   // Handle cancel sign out
@@ -443,7 +422,7 @@ export default function App() {
           </Suspense>
           */}
           <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
-            <Pricing onLoginClick={() => setShowPlayerLogin(true)} />
+            <Pricing onLoginClick={() => handleNavigate('join')} />
           </Suspense>
         </>
       )}
@@ -506,44 +485,6 @@ export default function App() {
             setPendingCategoryId(null);
           }}
           onScheduleComplete={handleConsultationComplete}
-        />
-      )}
-
-      {/* Player Login Modal */}
-      {showPlayerLogin && (
-        <LoginModal
-          title="Log In"
-          onClose={() => setShowPlayerLogin(false)}
-          onLogin={handlePlayerLogin}
-          onSignupClick={() => {
-            setShowPlayerLogin(false);
-            setShowSignupModal(true);
-          }}
-        />
-      )}
-
-      {/* Coach Login Modal */}
-      {showCoachLogin && (
-        <LoginModal
-          title="Coach Portal Sign In"
-          onClose={() => setShowCoachLogin(false)}
-          onLogin={handleCoachLogin}
-          onSignupClick={() => {
-            setShowCoachLogin(false);
-            setShowSignupModal(true);
-          }}
-        />
-      )}
-
-      {/* Signup Modal */}
-      {showSignupModal && (
-        <SignupModal
-          onClose={() => setShowSignupModal(false)}
-          onSignupComplete={(userData) => {
-            console.log('Account created:', userData);
-            setShowSignupModal(false);
-            handleNavigate('player-portal');
-          }}
         />
       )}
 

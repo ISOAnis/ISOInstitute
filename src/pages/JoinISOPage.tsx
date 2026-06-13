@@ -1876,9 +1876,10 @@ function CoachCard({ result, answers }: { result: CoachResult; answers: Answers 
 
 interface JoinISOPageProps {
   onNavigate: (page: string) => void;
+  initialAuthMode?: 'create' | 'signin';
 }
 
-export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
+export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOPageProps) {
   const [screen, setScreen] = useState<Screen>('create-account');
   const [exiting, setExiting] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
@@ -1888,8 +1889,15 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
   const [coachResult, setCoachResult] = useState<CoachResult | null>(null);
   const [procMsg, setProcMsg] = useState('Reading your intake...');
 
-  // Account creation / sign-in state
-  const [authMode, setAuthMode] = useState<'create' | 'signin'>('create');
+  // Account creation / sign-in state — read intent flag set by portal nav
+  const [authMode, setAuthMode] = useState<'create' | 'signin'>(() => {
+    const intent = localStorage.getItem('iso_join_intent');
+    if (intent === 'signin') {
+      localStorage.removeItem('iso_join_intent');
+      return 'signin';
+    }
+    return initialAuthMode;
+  });
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authError, setAuthError] = useState('');
@@ -2277,11 +2285,34 @@ export function JoinISOPage({ onNavigate }: JoinISOPageProps) {
                 </div>
               </button>
             </div>
+            <p style={{
+              marginTop: '28px',
+              fontSize: '13px',
+              color: 'rgba(255,255,255,0.35)',
+              textAlign: 'center',
+              fontFamily: "'Barlow', sans-serif",
+              letterSpacing: '0.01em',
+              lineHeight: 1.6,
+            }}>
+              Not ready to onboard yet?{' '}
+              <button
+                onClick={() => onNavigate('pathways')}
+                style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
+              >
+                For Players
+              </button>
+              {' '}or{' '}
+              <button
+                onClick={() => onNavigate('for-coaches')}
+                style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
+              >
+                For Coaches
+              </button>
+              {' '}— learn more and come back when you're ready.
+            </p>
           </div>
         </div>
       )}
-
-      {/* ── PLAYER QUESTIONS ── */}
       {screen === 'player' && currentQuestion && (() => {
         const pw = answers.pathway as string | undefined;
         const pwColor = pw ? (PATHWAYS.find(p => p.id === pw)?.color ?? null) : null;

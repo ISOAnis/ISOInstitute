@@ -881,7 +881,7 @@ export default function ForCoaches({ onNavigate }: { onNavigate?: (page: string)
               color: '#F2F2F2',
             }}
           >
-            Tired of Being Overlooked?<br />
+            You Did the Work.<br />
             <span
               style={{
                 background: 'linear-gradient(135deg, #ffffff 0%, #a8a8a8 40%, #d0d0d0 60%, #ffffff 100%)',
@@ -890,7 +890,7 @@ export default function ForCoaches({ onNavigate }: { onNavigate?: (page: string)
                 backgroundClip: 'text',
               }}
             >
-              At ISO, You're a Superstar.
+              Now Give the Game Back.
             </span>
           </h1>
           <p
