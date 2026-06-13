@@ -90,7 +90,7 @@ export function PathwayChangeRequestModal({ onClose, onPathwayChanged }: Pathway
         ) : (
           <>
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.6 }}>
-              You're locked to <strong style={{ color: lockedHex }}>{currentName}</strong>. Locker Room members must stay in one pathway for community identity, goal setting, and future AI coaching. Submit a request with justification to switch.
+              You're locked to <strong style={{ color: lockedHex }}>{currentName}</strong>. Locker Room members stay in one pathway for community identity and goal setting. Submit a request with justification to switch.
             </p>
             <label style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Request New Pathway</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 20 }}>

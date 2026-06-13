@@ -90,3 +90,19 @@ export function getPathwayName(id: string): string {
 export function getPathwayLegacyName(id: string): string {
   return PATHWAY_BY_ID[id as PathwayId]?.legacyName ?? id;
 }
+
+/** Onboarding UI uses archetype ids; portal/coaches use canonical pathway ids */
+export const ONBOARDING_PATHWAY_ALIASES: Record<string, PathwayId> = {
+  seeker: 'deen',
+  warrior: 'health',
+  healer: 'medicine',
+  builder: 'engineering',
+  founder: 'entrepreneurship',
+  reformer: 'global',
+};
+
+export function normalizePathwayId(id: string | null | undefined): PathwayId | null {
+  if (!id?.trim()) return null;
+  if (PATHWAY_BY_ID[id as PathwayId]) return id as PathwayId;
+  return ONBOARDING_PATHWAY_ALIASES[id] ?? null;
+}

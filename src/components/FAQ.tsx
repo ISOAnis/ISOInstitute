@@ -43,12 +43,12 @@ export function FAQ() {
                     <p>30-minute monthly check-ins, access to coaching nights & events, pathway-specific resources, and community support.</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-orange-500 mb-2">Locker Room Pass ($5/month)</p>
-                    <p>Full access to The Locker Room video library, community discussions, motivational content drops, and early event announcements. Perfect for those who want inspiration and community without committing to a coach.</p>
+                    <p className="font-semibold text-orange-500 mb-2">Locker Room ($15/month)</p>
+                    <p>Three 30-minute try outs per month with different coaches in your locked pathway, plus Locker Room chat, goals, community, and the online ISO store. All Locker Room revenue supports ISO — coaches earn when you Call an ISO and join them on the ISO Pass.</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-orange-500 mb-2">Varsity Program ($10/month – $100/month)</p>
-                    <p>Everything in Walk-On and Locker Room Pass, plus weekly check-ins with your dedicated coach, personalized coacheship, priority support, and access to exclusive workshops and events. Pricing varies by coach tier and commitment level.</p>
+                    <p className="font-semibold text-orange-500 mb-2">ISO Pass (coach sets price · ISO 15% fee)</p>
+                    <p>Everything in Locker Room, plus weekly 1:1 with your dedicated coach, DMs, playbook, and ISO progress tracking. Coaches set their monthly rate; ISO takes a 15% platform fee. Scholarship path available via the ISO Foundation.</p>
                   </div>
                 </div>
               </AccordionContent>

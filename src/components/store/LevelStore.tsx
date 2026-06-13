@@ -32,6 +32,8 @@ interface LevelStoreProps {
   onOpenCart: () => void;
   onBack: () => void;
   onClaimRewards: (level: UserLevel, clothingItem: StoreItem | null, accessoryItem: StoreItem | null) => void;
+  previewMode?: boolean;
+  onUpgradeToVarsity?: () => void;
 }
 
 /**
@@ -44,6 +46,8 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
   onOpenCart,
   onBack,
   onClaimRewards,
+  previewMode = false,
+  onUpgradeToVarsity,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<UserLevel>(user.currentLevel);
   const [showClaimModal, setShowClaimModal] = useState(false);
@@ -90,12 +94,17 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
                 <ArrowLeft className="w-5 h-5 text-slate-400" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-white">ISO Level Store</h1>
-                <p className="text-sm text-slate-400">Earned gear system</p>
+                <h1 className="text-xl font-bold text-white">
+                  {previewMode ? 'Varsity Milestone Store' : 'ISO Level Store'}
+                </h1>
+                <p className="text-sm text-slate-400">
+                  {previewMode ? 'Preview exclusive level gear' : 'Earned gear system'}
+                </p>
               </div>
             </div>
 
             {/* Cart Button */}
+            {!previewMode && (
             <button
               onClick={onOpenCart}
               className="relative flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
@@ -108,9 +117,28 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
                 </span>
               )}
             </button>
+            )}
           </div>
         </div>
       </div>
+
+      {previewMode && (
+        <div className="border-b border-purple-500/20 bg-purple-500/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-sm text-slate-300">
+              <strong className="text-purple-300">Locker Room preview</strong> — browse Varsity milestone merch. Upgrade to Varsity to earn level rewards and purchase exclusive gear.
+            </p>
+            {onUpgradeToVarsity && (
+              <button
+                onClick={onUpgradeToVarsity}
+                className="flex-shrink-0 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl text-sm transition-colors"
+              >
+                Upgrade to Varsity
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Level Tabs */}
       <div className="border-b border-white/10" style={{ background: 'rgba(10, 10, 15, 0.5)' }}>
@@ -195,7 +223,7 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
         </div>
 
         {/* Rewards Section (if accessible) */}
-        {isAccessible && (
+        {!previewMode && isAccessible && (
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <Gift className="w-5 h-5 text-orange-400" />
@@ -219,7 +247,7 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
         )}
 
         {/* Locked Overlay Message */}
-        {!isAccessible && (
+        {!previewMode && !isAccessible && (
           <div className="mb-8 p-6 bg-slate-800/50 border border-slate-700 rounded-2xl text-center">
             <Lock className="w-12 h-12 text-slate-500 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-white mb-2">
@@ -227,6 +255,14 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
             </h3>
             <p className="text-slate-400 max-w-md mx-auto">
               Reach {currentTier?.xpRequired.toLocaleString()} XP to unlock the {selectedLevel} store and claim your free rewards.
+            </p>
+          </div>
+        )}
+
+        {previewMode && (
+          <div className="mb-8 p-5 bg-slate-800/40 border border-purple-500/20 rounded-2xl">
+            <p className="text-sm text-slate-400">
+              This is the <strong className="text-white">{selectedLevel}</strong> collection — milestone gear Varsity players earn through real progress with a dedicated coach.
             </p>
           </div>
         )}
@@ -243,10 +279,11 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
                 item={item}
                 onAddToCart={onAddToCart}
                 isInCart={cartItemIds.has(item.id)}
-                isDisabled={!canAddToCart || !isAccessible}
-                disabledReason={!isAccessible ? 'Level locked' : !canAddToCart ? 'Monthly limit reached' : undefined}
-                showFreeTag={isAccessible}
-                isLocked={!isAccessible}
+                isDisabled={previewMode || !canAddToCart || !isAccessible}
+                disabledReason={previewMode ? 'Varsity only' : !isAccessible ? 'Level locked' : !canAddToCart ? 'Monthly limit reached' : undefined}
+                showFreeTag={isAccessible && !previewMode}
+                isLocked={!previewMode && !isAccessible}
+                previewOnly={previewMode}
               />
             ))}
           </div>
@@ -254,7 +291,7 @@ export const LevelStore: React.FC<LevelStoreProps> = ({
       </div>
 
       {/* Claim Modal */}
-      {showClaimModal && (
+      {!previewMode && showClaimModal && (
         <RewardClaimModal
           level={selectedLevel}
           onClose={() => setShowClaimModal(false)}

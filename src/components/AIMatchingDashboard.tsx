@@ -295,7 +295,7 @@ export function AIMatchingDashboard() {
                         {selectedRequest.category}
                       </Badge>
                       <Badge className={selectedRequest.plan === 'varsity' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}>
-                        {selectedRequest.plan === 'varsity' ? 'Varsity Program' : 'Walk-On Program'}
+                        {selectedRequest.plan === 'varsity' ? 'ISO Pass' : 'Walk-On Program'}
                       </Badge>
                     </div>
                   </div>

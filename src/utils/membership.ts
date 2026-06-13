@@ -1,3 +1,5 @@
+import { normalizePathwayId } from '../data/pathways';
+
 export type MembershipPlan = 'walk-on' | 'locker-room' | 'varsity';
 export type UserGender = 'male' | 'female';
 export type AssessedLevel = 'freshman' | 'jv' | 'varsity' | 'd1' | 'professional';
@@ -79,7 +81,7 @@ export function setAssessedLevel(level: AssessedLevel) {
 export const PLAN_LABELS: Record<MembershipPlan, string> = {
   'walk-on': 'Walk-On',
   'locker-room': 'Locker Room',
-  varsity: 'Varsity Program',
+  varsity: 'ISO Pass',
 };
 
 export const LEVEL_LABELS: Record<AssessedLevel, string> = {
@@ -89,8 +91,6 @@ export const LEVEL_LABELS: Record<AssessedLevel, string> = {
   d1: 'D1',
   professional: 'Pro',
 };
-
-// ─── PATHWAY LOCKING ─────────────────────────────────────────────────────────
 
 export interface PathwayChangeRequest {
   currentPathway: string;
@@ -107,32 +107,41 @@ export function isPathwayLocked(plan: MembershipPlan): boolean {
 /** Walk-On exploratory pathway — changes freely */
 export function getExploringPathway(): string {
   try {
-    return localStorage.getItem('iso_exploring_pathway')
+    const raw = localStorage.getItem('iso_exploring_pathway')
       || localStorage.getItem('iso_selected_pathway')
       || '';
+    return normalizePathwayId(raw) ?? raw;
   } catch {
     return '';
   }
 }
 
 export function setExploringPathway(pathwayId: string) {
-  localStorage.setItem('iso_exploring_pathway', pathwayId);
-  localStorage.setItem('iso_selected_pathway', pathwayId);
+  const normalized = normalizePathwayId(pathwayId) ?? pathwayId;
+  localStorage.setItem('iso_exploring_pathway', normalized);
+  localStorage.setItem('iso_selected_pathway', normalized);
 }
 
 /** Locker Room / Varsity committed pathway — frozen until advisory approval */
 export function getLockedPathway(): string | null {
   try {
     const locked = localStorage.getItem('iso_locked_pathway');
-    return locked || null;
+    if (!locked) return null;
+    const normalized = normalizePathwayId(locked);
+    if (normalized && normalized !== locked) {
+      localStorage.setItem('iso_locked_pathway', normalized);
+      localStorage.setItem('iso_selected_pathway', normalized);
+    }
+    return normalized ?? locked;
   } catch {
     return null;
   }
 }
 
 export function lockPathway(pathwayId: string) {
-  localStorage.setItem('iso_locked_pathway', pathwayId);
-  localStorage.setItem('iso_selected_pathway', pathwayId);
+  const normalized = normalizePathwayId(pathwayId) ?? pathwayId;
+  localStorage.setItem('iso_locked_pathway', normalized);
+  localStorage.setItem('iso_selected_pathway', normalized);
 }
 
 export function getActivePathway(plan: MembershipPlan): string {

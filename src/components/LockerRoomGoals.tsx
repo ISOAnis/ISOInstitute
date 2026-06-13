@@ -66,7 +66,7 @@ export function LockerRoomGoals({ membershipPlan, onUpgrade, accentColor = '#f97
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, padding: '12px 18px', background: `${accentColor}10`, border: `1px solid ${accentColor}25`, borderRadius: 12 }}>
           <Lock size={16} style={{ color: accentColor, flexShrink: 0 }} />
           <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>
-            Goals scoped to your locked <strong style={{ color: accentColor }}>{lockedPathwayName}</strong> pathway · future AI coaching will assist within this pathway only
+            Goals scoped to your locked <strong style={{ color: accentColor }}>{lockedPathwayName}</strong> pathway
           </p>
         </div>
       )}
@@ -92,7 +92,7 @@ export function LockerRoomGoals({ membershipPlan, onUpgrade, accentColor = '#f97
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Sparkles size={16} style={{ color: '#a855f7' }} />
-              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#a855f7', textTransform: 'uppercase' }}>Varsity Program Preview</span>
+              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#a855f7', textTransform: 'uppercase' }}>ISO Pass Preview</span>
             </div>
             <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, color: 'rgba(255,255,255,0.7)', margin: '0 0 6px', letterSpacing: 0.5 }}>
               This is where you'd be with a dedicated coach

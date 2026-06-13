@@ -11,6 +11,7 @@ interface ProductCardProps {
   disabledReason?: string;
   showFreeTag?: boolean;
   isLocked?: boolean;
+  previewOnly?: boolean;
 }
 
 /**
@@ -24,6 +25,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   disabledReason,
   showFreeTag = false,
   isLocked = false,
+  previewOnly = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const levelColor = item.levelRequirement ? levelColors[item.levelRequirement] : null;
@@ -32,7 +34,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <div
       className={`
         relative group rounded-2xl border overflow-hidden transition-all duration-300
-        ${isLocked 
+        ${isLocked && !previewOnly
           ? 'border-slate-700 bg-slate-800/30' 
           : 'border-slate-700 bg-slate-800/50 hover:border-slate-600 hover:shadow-lg hover:shadow-black/20'
         }
@@ -47,11 +49,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           alt={item.name}
           className={`w-full h-full object-cover transition-transform duration-300 ${
             isHovered && !isLocked ? 'scale-105' : 'scale-100'
-          } ${isLocked ? 'blur-[3px] opacity-50' : ''}`}
+          } ${isLocked && !previewOnly ? 'blur-[3px] opacity-50' : ''}`}
         />
 
         {/* Locked Overlay */}
-        {isLocked && (
+        {isLocked && !previewOnly && (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50">
             <div className="flex flex-col items-center gap-2 text-center px-4">
               <Lock className="w-8 h-8 text-slate-400" />
@@ -106,12 +108,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </span>
 
           <button
-            onClick={() => !isDisabled && !isLocked && onAddToCart(item)}
-            disabled={isDisabled || isLocked}
+            onClick={() => !isDisabled && !isLocked && !previewOnly && onAddToCart(item)}
+            disabled={isDisabled || isLocked || previewOnly}
             className={`
               flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
               ${isInCart
                 ? 'bg-green-500/20 text-green-400 cursor-default'
+                : previewOnly
+                ? 'bg-purple-500/20 text-purple-400 cursor-not-allowed'
                 : isDisabled
                 ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 : isLocked
@@ -121,7 +125,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             `}
             title={disabledReason}
           >
-            {isInCart ? (
+            {previewOnly ? (
+              <>
+                <Lock className="w-4 h-4" />
+                <span>Varsity Only</span>
+              </>
+            ) : isInCart ? (
               <>
                 <Check className="w-4 h-4" />
                 <span>Added</span>

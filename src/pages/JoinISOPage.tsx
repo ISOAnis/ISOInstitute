@@ -6,7 +6,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 import './JoinISOPage.css';
-import { setAssessedLevel, setExploringPathway } from '../utils/membership';
+import { LockerRoomCheckoutModal } from '../components/LockerRoomCheckoutModal';
+import { setAssessedLevel, setExploringPathway, lockPathway, setUserPlan, type MembershipPlan } from '../utils/membership';
+import { LOCKER_ROOM_PRICE_USD } from '../utils/explorerUsage';
+import { savePlayerProfileFromAssessment } from '../utils/playerProfile';
 
 // ====================================================================
 // TYPES
@@ -126,6 +129,15 @@ const PLAYER_BASE: Question[] = [
     question: 'Who are you?',
     sub: 'Your name personalizes your ISO profile.',
     sectionLabel: 'Getting Started',
+    required: true,
+  },
+  {
+    id: 'gender',
+    type: 'mc',
+    question: 'I am a...',
+    sub: 'ISO matches you with coaches of the same gender.',
+    sectionLabel: 'Getting Started',
+    options: ['Male', 'Female'],
     required: true,
   },
   {
@@ -562,6 +574,8 @@ const COACH_QS: Question[] = [
       'I understand that my Overall Rating is a starting point, not a final evaluation',
       'I commit to showing up consistently for the players I coach on this platform',
       'I understand I am operating as an independent contractor and ISO will issue a 1099 for income earned through the platform',
+      'I commit to at least 1 try out slot per month — serving players, not selling (coaches earn on ISO Pass)',
+      'I will not solicit or accept off-platform contact with ISO players per platform terms',
     ],
     required: true,
   },
@@ -1277,70 +1291,76 @@ const PLANS = [
     badge: null,
     color: '#10b981',
     features: [
-      '30-minute monthly check-in with a coach',
-      'Shadowing opportunity with a coach',
+      'Explore all pathways freely',
+      '1 × 30-min try out per pathway per month',
+      'Shadowing after your try out',
       'Coaching nights & pathway events',
-      'Pathway-specific resources & curriculum',
-      'Community support network',
+      'Pathway-specific resources',
     ],
     merchNote: null,
-    prediction: 'Get a feel for ISO. One focused check-in a month to start building the habit and see if it clicks.',
+    prediction: 'Sample ISO across pathways. Great if you\'re still deciding where you belong — upgrade when you\'re ready to commit.',
   },
   {
     id: 'locker-room',
     name: 'Locker Room',
-    price: '$10 / month',
-    badge: 'Most Popular',
-    color: '#3b82f6',
+    price: `$${LOCKER_ROOM_PRICE_USD} / month`,
+    badge: 'Recommended',
+    color: '#f97316',
     features: [
-      'Everything in Walk-On',
-      'Full Locker Room video library',
-      'Community discussions & accountability',
-      'Weekly motivational content drops',
-      'Early access to events & announcements',
-      'Access to exclusive ISO merch drops',
+      '3 × 30-min try outs/month — different coaches only',
+      'Locked pathway identity in community chat',
+      'Locker Room chat, goals & online ISO store',
+      'Priority shadowing in your pathway',
+      'ISO Pass milestone gear preview',
     ],
-    merchNote: 'Locker Room members unlock access to exclusive ISO merch they can purchase — limited drops not available to the public.',
-    prediction: 'Build real momentum. Weekly content + community accountability dramatically increases consistency for players who need more than one monthly touchpoint.',
+    merchNote: 'Locker Room members unlock exclusive ISO merch drops — not available on Walk-On.',
+    prediction: 'The sweet spot for serious players. Three try outs let you compare coaches in your pathway before Calling an ISO.',
   },
   {
     id: 'varsity',
-    name: 'Varsity Program',
-    price: 'Varies by coach',
+    name: 'ISO Pass',
+    price: 'Coach sets price',
     badge: 'Premium',
     color: '#a855f7',
     features: [
       'Everything in Locker Room',
-      'Weekly check-ins with a dedicated coach',
-      'Structured curriculum & personal playbook',
-      'Resume, LinkedIn & interview prep',
-      'Professional network & referrals',
-      'Priority event access + exclusive merch drops',
+      'Weekly 1:1 with your dedicated coach',
+      'DMs, playbook & ISO progress bar',
+      'Coach sets monthly rate · ISO 15% platform fee',
+      'Scholarship path via ISO Foundation',
     ],
-    merchNote: 'Varsity members get first access to every exclusive ISO drop — plus ISO gifts merch for hitting milestones inside your program.',
-    prediction: 'The fastest growth track. Players with a dedicated coach show 3–4x the progression speed — weekly accountability changes everything.',
+    merchNote: 'ISO Pass members get milestone gear gifts and first access to every exclusive drop.',
+    prediction: 'The fastest growth track. Call an ISO after your try out — weekly accountability changes everything.',
   },
 ];
 
 const PLAN_RECS: Record<PlayerLevel, { planId: string; headline: string; reason: string }> = {
   freshman: {
-    planId: 'walk-on',
-    headline: 'Start with Walk-On — experience ISO first.',
-    reason: 'Based on where you are right now, the best move is to join free, experience a check-in, and decide from there. Upgrading before you\'ve felt the value rarely sticks.',
+    planId: 'locker-room',
+    headline: 'Locker Room is our recommendation for you.',
+    reason: 'You\'re building foundations — three try outs in your pathway help you find the right coach voice while Locker Room keeps you accountable.',
   },
   jv: {
-    planId: 'walk-on',
-    headline: 'Walk-On to start. Locker Room when you\'re ready.',
-    reason: 'You\'re showing real momentum — that\'s great. Start free, lock in a check-in, and if you want community + content to reinforce your habits, Locker Room is a natural next step.',
+    planId: 'locker-room',
+    headline: 'Locker Room matches your momentum.',
+    reason: 'You\'re showing real consistency. Locker Room gives you community, goals, and three try outs a month to sharpen your direction.',
   },
   varsity: {
     planId: 'locker-room',
-    headline: 'Locker Room is your match. Varsity when you find your coach.',
-    reason: 'Your assessment shows committed habits and serious intent. Locker Room gives you the community and content to stay sharp while you explore the right coach for your Varsity journey.',
+    headline: 'Start Locker Room, then Call an ISO with your coach.',
+    reason: 'Your habits are strong. Use Locker Room try outs to find your dedicated coach, then Call an ISO to upgrade to the ISO Pass when the fit is right.',
   },
 };
 
-function PlanRecommendation({ level }: { level: PlayerLevel }) {
+function PlanRecommendation({
+  level,
+  selectedPlan,
+  onSelectPlan,
+}: {
+  level: PlayerLevel;
+  selectedPlan: MembershipPlan;
+  onSelectPlan: (plan: MembershipPlan) => void;
+}) {
   const [expanded, setExpanded] = React.useState<string | null>(null);
   const rec = PLAN_RECS[level];
 
@@ -1352,7 +1372,7 @@ function PlanRecommendation({ level }: { level: PlayerLevel }) {
         <div className="iso-join__plans-eyebrow">Choose Your Plan</div>
         <h2 className="iso-join__plans-headline">Where Do You Want to Start?</h2>
         <p className="iso-join__plans-sub">
-          Every ISO journey begins with Walk-On — free, no commitment. Upgrade whenever it makes sense for you.
+          We recommend Locker Room for most players. Walk-On stays free if you want to explore every pathway first.
         </p>
       </div>
 
@@ -1367,16 +1387,25 @@ function PlanRecommendation({ level }: { level: PlayerLevel }) {
       <div className="iso-join__plan-cards">
         {PLANS.map(plan => {
           const isRec = plan.id === rec.planId;
+          const isSelected = plan.id === selectedPlan;
           const isOpen = expanded === plan.id;
           return (
             <div
               key={plan.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelectPlan(plan.id as MembershipPlan)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onSelectPlan(plan.id as MembershipPlan); }}
               className={`iso-join__plan-card${isRec ? ' iso-join__plan-card--rec' : ''}`}
               style={{
-                borderColor: isRec ? `${plan.color}55` : 'var(--border)',
-                background: isRec
-                  ? `radial-gradient(ellipse at 0% 0%, ${plan.color}12 0%, var(--surface) 60%)`
-                  : 'var(--surface)',
+                borderColor: isSelected ? `${plan.color}88` : isRec ? `${plan.color}55` : 'var(--border)',
+                background: isSelected
+                  ? `radial-gradient(ellipse at 0% 0%, ${plan.color}18 0%, var(--surface) 60%)`
+                  : isRec
+                    ? `radial-gradient(ellipse at 0% 0%, ${plan.color}12 0%, var(--surface) 60%)`
+                    : 'var(--surface)',
+                cursor: 'pointer',
+                outline: isSelected ? `2px solid ${plan.color}44` : undefined,
               }}
             >
               <div className="iso-join__plan-top">
@@ -1676,7 +1705,7 @@ const PLAYER_LEVEL_BENEFITS = [
     locked: false,
     headline: 'Build momentum and habits.',
     perks: [
-      'Locker Room plan eligible ($10/mo)',
+      `Locker Room plan eligible ($${LOCKER_ROOM_PRICE_USD}/mo)`,
       'Weekly motivational content drops',
       'Community discussions & accountability groups',
       'Early event access & announcements',
@@ -1691,7 +1720,7 @@ const PLAYER_LEVEL_BENEFITS = [
     locked: false,
     headline: 'Serious intent. Structured growth.',
     perks: [
-      'Varsity Program eligible (weekly coach sessions)',
+      'ISO Pass eligible (weekly coach sessions)',
       'Personal playbook + structured development curriculum',
       'Resume, LinkedIn & career/interview prep',
       'Professional network & coach referrals',
@@ -1898,6 +1927,9 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   const [playerResult, setPlayerResult] = useState<PlayerResult | null>(null);
   const [coachResult, setCoachResult] = useState<CoachResult | null>(null);
   const [procMsg, setProcMsg] = useState('Reading your intake...');
+  const [selectedPlan, setSelectedPlan] = useState<MembershipPlan>('locker-room');
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [pendingLockerRoomPaid, setPendingLockerRoomPaid] = useState(false);
 
   // Account creation / sign-in state — read intent flag set by portal nav
   const [authMode, setAuthMode] = useState<'create' | 'signin'>(() => {
@@ -1910,7 +1942,6 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   });
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  const [authGender, setAuthGender] = useState<'male' | 'female' | ''>('');
   const [authError, setAuthError] = useState('');
 
   // --- Build the active questions list based on role + pathway ---
@@ -2101,9 +2132,8 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   const handleCreateAccount = () => {
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
     if (authPassword.length < 6) { setAuthError('Password must be at least 6 characters.'); return; }
-    if (!authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
     setAuthError('');
-    const userData = { email: authEmail, roles: [] as string[], gender: authGender };
+    const userData = { email: authEmail, roles: [] as string[] };
     localStorage.setItem('iso_demo_user', JSON.stringify(userData));
     localStorage.setItem('iso_demo_plan', 'walk-on');
     goto('join');
@@ -2114,7 +2144,7 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
     setAuthError('');
     const existing = localStorage.getItem('iso_demo_user');
-    let userData = { email: authEmail, roles: [] as string[], gender: authGender || undefined as 'male' | 'female' | undefined };
+    let userData = { email: authEmail, roles: [] as string[] };
     if (existing) {
       try {
         const parsed = JSON.parse(existing);
@@ -2132,14 +2162,26 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   };
 
   // --- Mark onboarding complete (player/explorer) or pending review (coach) ---
-  const completeOnboarding = (role: 'player' | 'coach' | 'explorer') => {
+  const completeOnboarding = (role: 'player' | 'coach' | 'explorer', plan: MembershipPlan = 'walk-on') => {
     if (role === 'player') {
       localStorage.setItem('iso_onboarding_complete', 'true');
       localStorage.setItem('iso_demo_portal', 'player');
-      localStorage.setItem('iso_demo_plan', 'walk-on');
+      localStorage.setItem('iso_demo_plan', plan);
       localStorage.removeItem('iso_explorer');
       if (playerResult) setAssessedLevel(playerResult.level);
-      if (answers.pathway) setExploringPathway(answers.pathway as string);
+      if (answers.pathway) {
+        if (plan === 'locker-room' || plan === 'varsity') {
+          lockPathway(answers.pathway as string);
+        } else {
+          setExploringPathway(answers.pathway as string);
+        }
+      }
+      let email = authEmail;
+      try {
+        const u = JSON.parse(localStorage.getItem('iso_demo_user') || '{}');
+        email = u.email ?? email;
+      } catch {}
+      savePlayerProfileFromAssessment(answers, email);
     } else if (role === 'explorer') {
       localStorage.setItem('iso_onboarding_complete', 'true');
       localStorage.setItem('iso_demo_portal', 'player');
@@ -2158,6 +2200,9 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
         u.roles = [role];
         if (role === 'coach' && answers.c_gender) {
           u.gender = (answers.c_gender as string).toLowerCase() === 'female' ? 'female' : 'male';
+        }
+        if (role === 'player' && answers.gender) {
+          u.gender = (answers.gender as string).toLowerCase() === 'female' ? 'female' : 'male';
         }
         localStorage.setItem('iso_demo_user', JSON.stringify(u));
       } catch {}
@@ -2196,9 +2241,8 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
               {/* Social buttons */}
               <button className="iso-join__social-btn" onClick={() => {
-                if (authMode === 'create' && !authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
                 setAuthError('');
-                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'google@user.com', roles: [], gender: authGender || undefined }));
+                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'google@user.com', roles: [] }));
                 localStorage.setItem('iso_demo_plan', 'walk-on');
                 goto('join');
               }}>
@@ -2206,9 +2250,8 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
                 Continue with Google
               </button>
               <button className="iso-join__social-btn" onClick={() => {
-                if (authMode === 'create' && !authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
                 setAuthError('');
-                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'apple@user.com', roles: [], gender: authGender || undefined }));
+                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'apple@user.com', roles: [] }));
                 localStorage.setItem('iso_demo_plan', 'walk-on');
                 goto('join');
               }}>
@@ -2233,29 +2276,6 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
                   onKeyDown={e => e.key === 'Enter' && (authMode === 'create' ? handleCreateAccount() : handleSignIn())}
                   autoFocus
                 />
-                {authMode === 'create' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <span style={{ fontFamily: 'var(--ff-barlow)', fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>I am a... (required for coach matching)</span>
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      {(['male', 'female'] as const).map(g => (
-                        <button
-                          key={g}
-                          type="button"
-                          onClick={() => { setAuthGender(g); setAuthError(''); }}
-                          style={{
-                            flex: 1, padding: '12px 0', borderRadius: 10, cursor: 'pointer',
-                            fontFamily: 'var(--ff-condensed)', fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
-                            background: authGender === g ? 'var(--silver-mid)' : 'transparent',
-                            color: authGender === g ? '#0C0C0C' : 'rgba(255,255,255,0.5)',
-                            border: authGender === g ? 'none' : '1px solid var(--border)',
-                          }}
-                        >
-                          {g === 'male' ? 'Male' : 'Female'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 <input
                   className="iso-join__text-input"
                   type="password"
@@ -2489,16 +2509,56 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
             <div style={{ height: 40 }} />
 
-            <PlanRecommendation level={playerResult.level} />
+            <PlanRecommendation
+              level={playerResult.level}
+              selectedPlan={selectedPlan}
+              onSelectPlan={setSelectedPlan}
+            />
 
             <div style={{ height: 40 }} />
 
-            <button
-              className="iso-join__btn-primary"
-              onClick={() => goto('success-player')}
-            >
-              Accept My Placement
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 420, margin: '0 auto' }}>
+              {selectedPlan === 'locker-room' && (
+                <button
+                  className="iso-join__btn-primary"
+                  onClick={() => setShowCheckout(true)}
+                >
+                  Join Locker Room — ${LOCKER_ROOM_PRICE_USD}/mo
+                </button>
+              )}
+              {selectedPlan === 'walk-on' && (
+                <button
+                  className="iso-join__btn-primary"
+                  onClick={() => goto('success-player')}
+                >
+                  Start Free with Walk-On
+                </button>
+              )}
+              {selectedPlan === 'varsity' && (
+                <button
+                  className="iso-join__btn-primary"
+                  onClick={() => { setSelectedPlan('locker-room'); setShowCheckout(true); }}
+                >
+                  Start Locker Room — Call an ISO After Your Try Outs
+                </button>
+              )}
+              <button
+                className="iso-join__btn-home"
+                onClick={() => {
+                  if (selectedPlan === 'locker-room') {
+                    setSelectedPlan('walk-on');
+                    goto('success-player');
+                  } else if (selectedPlan === 'varsity') {
+                    setSelectedPlan('walk-on');
+                    goto('success-player');
+                  }
+                }}
+                style={{ opacity: selectedPlan === 'walk-on' ? 0.5 : 1 }}
+                disabled={selectedPlan === 'walk-on'}
+              >
+                {selectedPlan === 'locker-room' ? 'Or explore free with Walk-On instead' : selectedPlan === 'varsity' ? 'Explore free first with Walk-On' : 'Walk-On selected'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2511,13 +2571,19 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
             <h1 className="iso-join__success-title">Welcome{displayName}.</h1>
             <p className="iso-join__success-msg">
               Your ISO profile has been created. You've been placed at <strong style={{ color: '#A8A8A8' }}>{playerResult.levelLabel}</strong> in the {PATHWAYS.find(p => p.id === answers.pathway)?.name ?? 'ISO'} pathway.
-              Your journey starts now.
+              {selectedPlan === 'locker-room' && pendingLockerRoomPaid && (
+                <> You're on <strong style={{ color: '#f97316' }}>Locker Room</strong> — 3 try outs/month in your locked pathway.</>
+              )}
+              {selectedPlan === 'walk-on' && (
+                <> You're on <strong style={{ color: '#10b981' }}>Walk-On</strong> — explore every pathway freely.</>
+              )}
+              {' '}Your journey starts now.
             </p>
             <div className="iso-join__success-badge">ISO · {playerResult.levelLabel}</div>
-            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('player'); onNavigate('player-portal'); }}>
+            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('player', selectedPlan); onNavigate('player-portal'); }}>
               Enter My Portal
             </button>
-            <button className="iso-join__btn-home" style={{ marginTop: 10 }} onClick={() => { completeOnboarding('player'); onNavigate('home'); }}>
+            <button className="iso-join__btn-home" style={{ marginTop: 10 }} onClick={() => { completeOnboarding('player', selectedPlan); onNavigate('home'); }}>
               Back to ISO
             </button>
           </div>
@@ -2803,6 +2869,18 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
             </button>
           </div>
         </div>
+      )}
+
+      {showCheckout && (
+        <LockerRoomCheckoutModal
+          onClose={() => setShowCheckout(false)}
+          onSuccess={() => {
+            setShowCheckout(false);
+            setSelectedPlan('locker-room');
+            setPendingLockerRoomPaid(true);
+            goto('success-player');
+          }}
+        />
       )}
 
     </div>

@@ -5,12 +5,13 @@ import { Store, Crown, Lock, ArrowRight } from 'lucide-react';
 interface StoreTilesProps {
   user: User;
   onSelectStore: (store: StoreType) => void;
+  levelStorePreview?: boolean;
 }
 
 /**
  * Store access tiles for dashboard
  */
-export const StoreTiles: React.FC<StoreTilesProps> = ({ user, onSelectStore }) => {
+export const StoreTiles: React.FC<StoreTilesProps> = ({ user, onSelectStore, levelStorePreview = false }) => {
   const hasPass = user.hasLockerRoomPass;
 
   return (
@@ -18,7 +19,7 @@ export const StoreTiles: React.FC<StoreTilesProps> = ({ user, onSelectStore }) =
       {/* General Store Tile */}
       <StoreTile
         title="ISO General Store"
-        description="Lifestyle collection for the ISO community"
+        description="Locker Room lifestyle collection — tees, hoodies & community gear"
         icon={<Store className="w-7 h-7" />}
         isLocked={!hasPass}
         lockMessage="Requires Locker Room Pass"
@@ -31,8 +32,10 @@ export const StoreTiles: React.FC<StoreTilesProps> = ({ user, onSelectStore }) =
 
       {/* Level Store Tile */}
       <StoreTile
-        title="ISO Level Store"
-        description={`${user.currentLevel} collection & exclusive gear`}
+        title={levelStorePreview ? 'Varsity Milestone Store' : 'ISO Level Store'}
+        description={levelStorePreview
+          ? 'Preview exclusive Varsity milestone gear — upgrade to earn & purchase'
+          : `${user.currentLevel} collection & exclusive earned gear`}
         icon={<Crown className="w-7 h-7" />}
         isLocked={!hasPass}
         lockMessage="Requires Locker Room Pass"
@@ -40,7 +43,7 @@ export const StoreTiles: React.FC<StoreTilesProps> = ({ user, onSelectStore }) =
         accentColor="text-orange-400"
         borderColor="border-orange-500/30"
         hoverColor="hover:border-orange-500/50"
-        badge={hasPass ? user.currentLevel : undefined}
+        badge={levelStorePreview ? 'PREVIEW' : hasPass ? user.currentLevel : undefined}
         onClick={() => hasPass && onSelectStore('level')}
       />
     </div>

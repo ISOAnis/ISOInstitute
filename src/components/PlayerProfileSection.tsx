@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { Edit3, Save, X, MapPin, User, Calendar, GraduationCap, Globe2, Heart, MessageCircle, Layout, Zap } from 'lucide-react';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
+import { Edit3, Save, X, MapPin, User, MessageCircle, Layout, Zap, Heart, Compass, Trophy } from 'lucide-react';
 import { InteractiveGlobe } from './InteractiveGlobe';
-import { getUserGender, saveUserGender, type UserGender } from '../utils/membership';
+import {
+  getUserGender, saveUserGender, getUserPlan, getAssessedLevel, getActivePathway,
+  PLAN_LABELS, LEVEL_LABELS, type UserGender, type MembershipPlan,
+} from '../utils/membership';
+import { PATHWAY_BY_ID } from '../data/pathways';
 
 interface Location {
   lat: number;
@@ -30,19 +31,9 @@ interface PlayerProfile {
 }
 
 const defaultProfile: PlayerProfile = {
-  name: '',
-  email: '',
-  gender: '',
-  age: '',
-  schoolYear: '',
-  locations: [],
-  prefersSameBackground: false,
-  goals: '',
-  timeframe: '',
-  communicationPreference: '',
-  structurePreference: '',
-  motivationLevel: '',
-  topValues: []
+  name: '', email: '', gender: '', age: '', schoolYear: '',
+  locations: [], prefersSameBackground: false, goals: '', timeframe: '',
+  communicationPreference: '', structurePreference: '', motivationLevel: '', topValues: [],
 };
 
 const schoolYearLabels: Record<string, string> = {
@@ -58,33 +49,122 @@ const schoolYearLabels: Record<string, string> = {
   'recent-grad': 'Recent Graduate (0-2 years)',
   'young-professional': 'Young Professional (3-5 years)',
   'experienced-professional': 'Experienced Professional (5+ years)',
-  'other': 'Other'
+  other: 'Other',
 };
 
 const communicationLabels = {
   direct: 'Direct & Candid',
   supportive: 'Warm & Supportive',
-  balanced: 'Balanced Approach'
+  balanced: 'Balanced Approach',
 };
 
 const structureLabels = {
   structured: 'Highly Structured',
   flexible: 'Flexible & Adaptive',
-  adaptive: 'Responsive to My Needs'
+  adaptive: 'Responsive to My Needs',
 };
 
 const motivationLabels = {
   exploring: 'Just Exploring',
   committed: 'Seriously Committed',
-  'all-in': 'All In - Ready to Transform'
+  'all-in': 'All In',
 };
 
 interface PlayerProfileSectionProps {
   onProfileCompletionChange?: (percentage: number) => void;
   onGenderChange?: (gender: UserGender | null) => void;
+  accentColor?: string;
 }
 
-export function PlayerProfileSection({ onProfileCompletionChange, onGenderChange }: PlayerProfileSectionProps) {
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label style={{
+      fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700,
+      letterSpacing: 2, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase',
+      display: 'block', marginBottom: 8,
+    }}>
+      {children}
+    </label>
+  );
+}
+
+function FieldValue({ children, empty }: { children: React.ReactNode; empty?: boolean }) {
+  return (
+    <p style={{
+      fontFamily: "'Barlow', sans-serif", fontSize: 14, margin: 0,
+      color: empty ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.75)',
+      fontStyle: empty ? 'italic' : 'normal',
+    }}>
+      {children}
+    </p>
+  );
+}
+
+function Pill({ children, color }: { children: React.ReactNode; color?: string }) {
+  const c = color ?? '#f97316';
+  return (
+    <span style={{
+      fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 1,
+      color: c, background: `${c}18`, border: `1px solid ${c}35`,
+      borderRadius: 100, padding: '4px 12px', textTransform: 'uppercase',
+    }}>
+      {children}
+    </span>
+  );
+}
+
+function EditBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 6,
+      background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+      borderRadius: 8, padding: '6px 14px', color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
+      fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 1,
+    }}>
+      <Edit3 size={12} /> EDIT
+    </button>
+  );
+}
+
+function SaveCancel({ onSave, onCancel, accentColor }: { onSave: () => void; onCancel: () => void; accentColor: string }) {
+  return (
+    <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+      <button onClick={onSave} style={{
+        display: 'flex', alignItems: 'center', gap: 6, background: accentColor, color: '#fff',
+        border: 'none', borderRadius: 8, padding: '10px 20px', cursor: 'pointer',
+        fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1,
+      }}>
+        <Save size={13} /> SAVE
+      </button>
+      <button onClick={onCancel} style={{
+        display: 'flex', alignItems: 'center', gap: 6, background: 'transparent',
+        border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 20px',
+        color: 'rgba(255,255,255,0.45)', cursor: 'pointer',
+        fontFamily: "'Barlow', sans-serif", fontSize: 13,
+      }}>
+        <X size={13} /> Cancel
+      </button>
+    </div>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 10, padding: '11px 14px', color: '#fff', fontFamily: "'Barlow', sans-serif",
+  fontSize: 14, outline: 'none', boxSizing: 'border-box',
+};
+
+const cardStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 16, padding: '22px 24px', marginBottom: 16,
+};
+
+export function PlayerProfileSection({ onProfileCompletionChange, onGenderChange, accentColor = '#f97316' }: PlayerProfileSectionProps) {
+  const plan = getUserPlan() as MembershipPlan;
+  const assessedLevel = getAssessedLevel();
+  const pathwayId = getActivePathway(plan);
+  const pathwayName = pathwayId ? PATHWAY_BY_ID[pathwayId as keyof typeof PATHWAY_BY_ID]?.name : null;
+
   const [profile, setProfile] = useState<PlayerProfile>(() => {
     try {
       const saved = localStorage.getItem('player_profile_data');
@@ -93,513 +173,328 @@ export function PlayerProfileSection({ onProfileCompletionChange, onGenderChange
         const parsed = JSON.parse(saved);
         return { ...defaultProfile, ...parsed, gender: parsed.gender || savedGender || '' };
       }
-      if (savedGender) {
-        return { ...defaultProfile, gender: savedGender };
-      }
-    } catch (error) {
-      console.warn('Failed to load player profile data:', error);
-    }
+      if (savedGender) return { ...defaultProfile, gender: savedGender };
+    } catch {}
     return defaultProfile;
   });
-  const [isEditingBasics, setIsEditingBasics] = useState(false);
-  const [isEditingDemographics, setIsEditingDemographics] = useState(false);
-  const [isEditingPreferences, setIsEditingPreferences] = useState(false);
-  const [tempProfile, setTempProfile] = useState<PlayerProfile>(() => profile);
 
-  useEffect(() => {
-    localStorage.setItem('player_profile_data', JSON.stringify(profile));
-  }, [profile]);
+  const [editingSection, setEditingSection] = useState<'basics' | 'demographics' | 'preferences' | null>(null);
+  const [tempProfile, setTempProfile] = useState<PlayerProfile>(profile);
 
-  const completionPercentage = useMemo(() => {
-    // Check if profile was completed via the modal (has all modal fields but may not have name/email)
-    const hasAllModalFields = 
-      Boolean(profile.gender) &&
-      Boolean(profile.age?.trim()) &&
-      Boolean(profile.schoolYear?.trim()) &&
-      profile.locations.length > 0 &&
-      profile.prefersSameBackground !== null &&
-      Boolean(profile.goals?.trim()) &&
-      Boolean(profile.timeframe?.trim()) &&
-      profile.communicationPreference !== '' &&
-      profile.structurePreference !== '' &&
-      profile.motivationLevel !== '' &&
-      profile.topValues.length >= 2;
-    
-    // If all modal fields are complete, consider it 100% (name/email are optional for profile completion)
-    if (hasAllModalFields) {
-      return 100;
-    }
-    
-    // Otherwise, calculate based on all fields
-    const checks: Array<boolean> = [
+  const completionPct = useMemo(() => {
+    const checks = [
       Boolean(profile.name?.trim()),
       Boolean(profile.email?.trim()),
       Boolean(profile.gender),
-      Boolean(profile.age?.trim()),
-      Boolean(profile.schoolYear?.trim()),
-      profile.locations.length > 0,
-      profile.prefersSameBackground !== null,
       Boolean(profile.goals?.trim()),
       Boolean(profile.timeframe?.trim()),
+      Boolean(profile.schoolYear?.trim()) || Boolean(profile.age?.trim()),
       profile.communicationPreference !== '',
       profile.structurePreference !== '',
       profile.motivationLevel !== '',
-      profile.topValues.length >= 2,
+      profile.topValues.length >= 1,
     ];
-    const completed = checks.filter(Boolean).length;
-    return Math.round((completed / checks.length) * 100);
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
   }, [profile]);
 
   useEffect(() => {
-    onProfileCompletionChange?.(completionPercentage);
-  }, [completionPercentage, onProfileCompletionChange]);
+    localStorage.setItem('player_profile_data', JSON.stringify(profile));
+    localStorage.setItem('player_profile_completion', String(completionPct));
+  }, [profile, completionPct]);
 
-  const startEditBasics = () => {
+  useEffect(() => {
+    onProfileCompletionChange?.(completionPct);
+  }, [completionPct, onProfileCompletionChange]);
+
+  const startEdit = (section: 'basics' | 'demographics' | 'preferences') => {
     setTempProfile({ ...profile });
-    setIsEditingBasics(true);
+    setEditingSection(section);
   };
 
-  const saveBasics = () => {
-    setProfile({ ...tempProfile });
-    setIsEditingBasics(false);
-  };
-
-  const cancelEditBasics = () => {
-    setTempProfile({ ...profile });
-    setIsEditingBasics(false);
-  };
-
-  const startEditDemographics = () => {
-    setTempProfile({ ...profile });
-    setIsEditingDemographics(true);
-  };
-
-  const saveDemographics = () => {
+  const saveSection = () => {
     setProfile({ ...tempProfile });
     if (tempProfile.gender === 'male' || tempProfile.gender === 'female') {
       saveUserGender(tempProfile.gender);
       onGenderChange?.(tempProfile.gender);
     }
-    setIsEditingDemographics(false);
+    setEditingSection(null);
   };
 
-  const cancelEditDemographics = () => {
+  const cancelEdit = () => {
     setTempProfile({ ...profile });
-    setIsEditingDemographics(false);
+    setEditingSection(null);
   };
 
-  const startEditPreferences = () => {
-    setTempProfile({ ...profile });
-    setIsEditingPreferences(true);
-  };
+  const display = editingSection ? tempProfile : profile;
+  const initials = (profile.name || 'ISO').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'ISO';
+  const schoolLabel = schoolYearLabels[profile.schoolYear] || profile.schoolYear;
 
-  const savePreferences = () => {
-    setProfile({ ...tempProfile });
-    setIsEditingPreferences(false);
-  };
-
-  const cancelEditPreferences = () => {
-    setTempProfile({ ...profile });
-    setIsEditingPreferences(false);
-  };
+  const RadioOption = ({ name, value, label, field }: { name: string; value: string; label: string; field: keyof PlayerProfile }) => (
+    <button
+      type="button"
+      onClick={() => setTempProfile({ ...tempProfile, [field]: value })}
+      style={{
+        width: '100%', textAlign: 'left', padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
+        background: tempProfile[field] === value ? `${accentColor}15` : 'rgba(255,255,255,0.03)',
+        border: tempProfile[field] === value ? `1px solid ${accentColor}40` : '1px solid rgba(255,255,255,0.08)',
+        color: tempProfile[field] === value ? '#fff' : 'rgba(255,255,255,0.5)',
+        fontFamily: "'Barlow', sans-serif", fontSize: 13, marginBottom: 8,
+      }}
+    >
+      {label}
+    </button>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Info Banner */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-            <Globe2 className="w-5 h-5 text-blue-400" />
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>My Profile</h2>
+        <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+          Your ISO identity — powers coach matching and your season card
+        </p>
+      </div>
+
+      {/* Identity card */}
+      <div style={{
+        ...cardStyle,
+        background: `linear-gradient(135deg, ${accentColor}12 0%, rgba(255,255,255,0.02) 100%)`,
+        border: `1px solid ${accentColor}25`,
+        display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap',
+        marginBottom: 24,
+      }}>
+        <div style={{
+          width: 72, height: 72, borderRadius: 14, flexShrink: 0,
+          background: `${accentColor}20`, border: `2px solid ${accentColor}40`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, color: accentColor, letterSpacing: 1,
+        }}>
+          {initials}
+        </div>
+        <div style={{ flex: 1, minWidth: 180 }}>
+          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: '#F2F2F2', letterSpacing: 0.5, lineHeight: 1.1 }}>
+            {profile.name || 'Set your name'}
           </div>
-          <div>
-            <h4 className="text-white mb-2">How Your Profile Helps Matching</h4>
-            <p className="text-slate-300 text-sm mb-3">
-              Your profile information helps our AI matching system pair you with the best coaches:
-            </p>
-            <ul className="text-slate-300 text-sm space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-orange-400 mt-1">•</span>
-                <span><strong>Gender</strong> ensures you're matched with coaches of the same gender</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-orange-400 mt-1">•</span>
-                <span><strong>Demographics</strong> help us match you with coaches who understand your cultural background and life stage</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-orange-400 mt-1">•</span>
-                <span><strong>Goals & Timeframe</strong> ensure your coach can help you achieve what you're aiming for</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-orange-400 mt-1">•</span>
-                <span><strong>Communication & Structure</strong> preferences match you with coaches whose style resonates with you</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-orange-400 mt-1">•</span>
-                <span><strong>Values</strong> align you with coaches who share what matters most to you</span>
-              </li>
-            </ul>
+          <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>
+            {profile.email || 'No email set'}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+            <Pill color={accentColor}>{PLAN_LABELS[plan]}</Pill>
+            {pathwayName && <Pill color={accentColor}>{pathwayName}</Pill>}
+            <Pill color="#a855f7">{LEVEL_LABELS[assessedLevel]}</Pill>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right', minWidth: 100 }}>
+          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: accentColor, lineHeight: 1 }}>
+            {completionPct}%
+          </div>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>
+            Complete
+          </div>
+          <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 100, marginTop: 10, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${completionPct}%`, background: accentColor, borderRadius: 100, transition: 'width 0.3s' }} />
           </div>
         </div>
       </div>
 
-      {/* Basic Info */}
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-orange-500" />
-            <h3 className="text-white">Basic Information</h3>
+      {/* Basics */}
+      <div style={cardStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <User size={16} style={{ color: accentColor }} />
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: '#F2F2F2', letterSpacing: 0.5 }}>Basic Info</span>
           </div>
-          {!isEditingBasics && (
-            <Button onClick={startEditBasics} variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-              <Edit3 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          )}
+          {editingSection !== 'basics' && <EditBtn onClick={() => startEdit('basics')} />}
         </div>
-
-        <div className="space-y-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
           <div>
-            <label className="block text-slate-400 text-sm mb-2">Name</label>
-            {isEditingBasics ? (
-              <input
-                type="text"
-                value={tempProfile.name}
-                onChange={(e) => setTempProfile({ ...tempProfile, name: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
-              />
-            ) : (
-              <p className="text-white">{profile.name}</p>
-            )}
+            <FieldLabel>Name</FieldLabel>
+            {editingSection === 'basics'
+              ? <input style={inputStyle} value={tempProfile.name} onChange={e => setTempProfile({ ...tempProfile, name: e.target.value })} />
+              : <FieldValue empty={!profile.name}>{profile.name || 'Not set'}</FieldValue>}
           </div>
-
           <div>
-            <label className="block text-slate-400 text-sm mb-2">Email</label>
-            {isEditingBasics ? (
-              <input
-                type="email"
-                value={tempProfile.email}
-                onChange={(e) => setTempProfile({ ...tempProfile, email: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
-              />
-            ) : (
-              <p className="text-white">{profile.email}</p>
-            )}
+            <FieldLabel>Email</FieldLabel>
+            {editingSection === 'basics'
+              ? <input style={inputStyle} type="email" value={tempProfile.email} onChange={e => setTempProfile({ ...tempProfile, email: e.target.value })} />
+              : <FieldValue empty={!profile.email}>{profile.email || 'Not set'}</FieldValue>}
           </div>
-
-          <div>
-            <label className="block text-slate-400 text-sm mb-2">Your Goals</label>
-            {isEditingBasics ? (
-              <Textarea
-                value={tempProfile.goals}
-                onChange={(e) => setTempProfile({ ...tempProfile, goals: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none min-h-[100px]"
-                placeholder="What do you hope to achieve through coaching?"
-              />
-            ) : (
-              <p className="text-white">{profile.goals}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-slate-400 text-sm mb-2">Desired Timeframe</label>
-            {isEditingBasics ? (
-              <select
-                value={tempProfile.timeframe}
-                onChange={(e) => setTempProfile({ ...tempProfile, timeframe: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
-              >
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <FieldLabel>Goals</FieldLabel>
+          {editingSection === 'basics'
+            ? <textarea style={{ ...inputStyle, minHeight: 90, resize: 'vertical' }} value={tempProfile.goals} onChange={e => setTempProfile({ ...tempProfile, goals: e.target.value })} placeholder="What are you working toward?" />
+            : <FieldValue empty={!profile.goals}>{profile.goals || 'Not set'}</FieldValue>}
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <FieldLabel>Timeframe</FieldLabel>
+          {editingSection === 'basics'
+            ? (
+              <select style={inputStyle} value={tempProfile.timeframe} onChange={e => setTempProfile({ ...tempProfile, timeframe: e.target.value })}>
+                <option value="">Select...</option>
                 <option value="1-3 months">1-3 months</option>
                 <option value="3-6 months">3-6 months</option>
                 <option value="6-12 months">6-12 months</option>
                 <option value="1+ years">1+ years</option>
+                {profile.timeframe && !['1-3 months','3-6 months','6-12 months','1+ years'].includes(profile.timeframe) && (
+                  <option value={profile.timeframe}>{profile.timeframe}</option>
+                )}
               </select>
-            ) : (
-              <p className="text-white">{profile.timeframe}</p>
-            )}
-          </div>
-
-          {isEditingBasics && (
-            <div className="flex gap-3 pt-4">
-              <Button onClick={saveBasics} className="bg-orange-500 text-white hover:bg-orange-600">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button onClick={cancelEditBasics} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                <X className="w-4 h-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          )}
+            )
+            : <FieldValue empty={!profile.timeframe}>{profile.timeframe || 'Not set'}</FieldValue>}
         </div>
+        {editingSection === 'basics' && <SaveCancel onSave={saveSection} onCancel={cancelEdit} accentColor={accentColor} />}
       </div>
 
       {/* Demographics */}
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-orange-500" />
-            <h3 className="text-white">Demographics & Background</h3>
+      <div style={cardStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <MapPin size={16} style={{ color: accentColor }} />
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: '#F2F2F2', letterSpacing: 0.5 }}>Background</span>
           </div>
-          {!isEditingDemographics && (
-            <Button onClick={startEditDemographics} variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-              <Edit3 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          )}
+          {editingSection !== 'demographics' && <EditBtn onClick={() => startEdit('demographics')} />}
         </div>
 
-        <div className="space-y-6">
-          {/* Gender */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-2">Gender</label>
-            <p className="text-slate-500 text-xs mb-3">ISO matches coaches with players of the same gender.</p>
-            {isEditingDemographics ? (
-              <div className="flex gap-3">
-                {(['male', 'female'] as const).map(g => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setTempProfile({ ...tempProfile, gender: g })}
-                    className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-colors ${
-                      tempProfile.gender === g
-                        ? 'bg-orange-500 text-white border-orange-500'
-                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-orange-500/50'
-                    }`}
-                  >
-                    {g === 'male' ? 'Male' : 'Female'}
-                  </button>
-                ))}
-              </div>
-            ) : profile.gender ? (
-              <p className="text-white capitalize">{profile.gender}</p>
-            ) : (
-              <p className="text-orange-400 text-sm">Not set — edit to select your gender for coach matching</p>
-            )}
-          </div>
-
-          {/* Age and School Year */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-slate-400 text-sm mb-2">Age</label>
-              {isEditingDemographics ? (
-                <input
-                  type="number"
-                  value={tempProfile.age}
-                  onChange={(e) => setTempProfile({ ...tempProfile, age: e.target.value })}
-                  className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
-                  min="13"
-                  max="100"
-                />
-              ) : (
-                <p className="text-white">{profile.age}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-slate-400 text-sm mb-2">Year in School</label>
-              {isEditingDemographics ? (
-                <select
-                  value={tempProfile.schoolYear}
-                  onChange={(e) => setTempProfile({ ...tempProfile, schoolYear: e.target.value })}
-                  className="w-full bg-slate-800 text-white rounded-xl p-3 border border-slate-700 focus:border-orange-500 focus:outline-none"
-                >
-                  {Object.entries(schoolYearLabels).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
-                  ))}
-                </select>
-              ) : (
-                <p className="text-white">{schoolYearLabels[profile.schoolYear] || profile.schoolYear}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Locations */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-3">Cultural Background (Locations)</label>
-            {isEditingDemographics ? (
-              <div className="mb-4">
-                <InteractiveGlobe
-                  locations={tempProfile.locations}
-                  onAddLocation={(loc) => setTempProfile({ ...tempProfile, locations: [...tempProfile.locations, loc] })}
-                  onRemoveLocation={(index) => setTempProfile({ ...tempProfile, locations: tempProfile.locations.filter((_, i) => i !== index) })}
-                  maxLocations={3}
-                />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {profile.locations.map((loc, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-slate-800 p-3 rounded-xl border border-slate-700">
-                    <MapPin className="w-4 h-4 text-orange-500" />
-                    <span className="text-white">{loc.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Background Preference */}
-          {(isEditingDemographics ? tempProfile.locations.length > 0 : profile.locations.length > 0) && (
-            <div>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isEditingDemographics ? tempProfile.prefersSameBackground : profile.prefersSameBackground}
-                  onChange={(e) => isEditingDemographics && setTempProfile({ ...tempProfile, prefersSameBackground: e.target.checked })}
-                  disabled={!isEditingDemographics}
-                  className="mt-1 w-5 h-5 rounded border-slate-600 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
-                />
-                <div>
-                  <span className="text-white block mb-1">I prefer coaches from similar cultural backgrounds</span>
-                  <span className="text-slate-400 text-sm">
-                    We'll prioritize matching you with coaches who share your cultural heritage or have lived in similar regions
-                  </span>
-                </div>
-              </label>
-            </div>
-          )}
-
-          {isEditingDemographics && (
-            <div className="flex gap-3 pt-4">
-              <Button onClick={saveDemographics} className="bg-orange-500 text-white hover:bg-orange-600">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button onClick={cancelEditDemographics} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                <X className="w-4 h-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Preferences */}
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-orange-500" />
-            <h3 className="text-white">Coaching Preferences</h3>
-          </div>
-          {!isEditingPreferences && (
-            <Button onClick={startEditPreferences} variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-              <Edit3 className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          {/* Communication Style */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-3 flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              Communication Style
-            </label>
-            {isEditingPreferences ? (
-              <div className="space-y-2">
-                {Object.entries(communicationLabels).map(([value, label]) => (
-                  <label key={value} className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl border border-slate-700 cursor-pointer hover:border-orange-500/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="communication"
-                      value={value}
-                      checked={tempProfile.communicationPreference === value}
-                      onChange={(e) => setTempProfile({ ...tempProfile, communicationPreference: e.target.value as any })}
-                      className="w-4 h-4 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
-                    />
-                    <span className="text-white">{label}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                {communicationLabels[profile.communicationPreference as keyof typeof communicationLabels]}
-              </Badge>
-            )}
-          </div>
-
-          {/* Structure Preference */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-3 flex items-center gap-2">
-              <Layout className="w-4 h-4" />
-              Coaching Structure
-            </label>
-            {isEditingPreferences ? (
-              <div className="space-y-2">
-                {Object.entries(structureLabels).map(([value, label]) => (
-                  <label key={value} className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl border border-slate-700 cursor-pointer hover:border-orange-500/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="structure"
-                      value={value}
-                      checked={tempProfile.structurePreference === value}
-                      onChange={(e) => setTempProfile({ ...tempProfile, structurePreference: e.target.value as any })}
-                      className="w-4 h-4 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
-                    />
-                    <span className="text-white">{label}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                {structureLabels[profile.structurePreference as keyof typeof structureLabels]}
-              </Badge>
-            )}
-          </div>
-
-          {/* Motivation Level */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-3 flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Motivation Level
-            </label>
-            {isEditingPreferences ? (
-              <div className="space-y-2">
-                {Object.entries(motivationLabels).map(([value, label]) => (
-                  <label key={value} className="flex items-center gap-3 p-3 bg-slate-800 rounded-xl border border-slate-700 cursor-pointer hover:border-orange-500/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="motivation"
-                      value={value}
-                      checked={tempProfile.motivationLevel === value}
-                      onChange={(e) => setTempProfile({ ...tempProfile, motivationLevel: e.target.value as any })}
-                      className="w-4 h-4 text-orange-500 focus:ring-orange-500 focus:ring-offset-slate-900"
-                    />
-                    <span className="text-white">{label}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                {motivationLabels[profile.motivationLevel as keyof typeof motivationLabels]}
-              </Badge>
-            )}
-          </div>
-
-          {/* Top Values */}
-          <div>
-            <label className="block text-slate-400 text-sm mb-3">Top Values (What Matters Most)</label>
-            <div className="flex flex-wrap gap-2">
-              {profile.topValues.map((value, index) => (
-                <Badge key={index} className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  {value}
-                </Badge>
+        <div style={{ marginBottom: 16 }}>
+          <FieldLabel>Gender</FieldLabel>
+          <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: '0 0 10px' }}>
+            Matched with coaches of the same gender
+          </p>
+          {editingSection === 'demographics' ? (
+            <div style={{ display: 'flex', gap: 10 }}>
+              {(['male', 'female'] as const).map(g => (
+                <button key={g} type="button" onClick={() => setTempProfile({ ...tempProfile, gender: g })} style={{
+                  flex: 1, padding: '12px 0', borderRadius: 10, cursor: 'pointer',
+                  fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+                  background: tempProfile.gender === g ? accentColor : 'rgba(255,255,255,0.05)',
+                  color: tempProfile.gender === g ? '#fff' : 'rgba(255,255,255,0.45)',
+                  border: tempProfile.gender === g ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                }}>
+                  {g}
+                </button>
               ))}
             </div>
-          </div>
-
-          {isEditingPreferences && (
-            <div className="flex gap-3 pt-4">
-              <Button onClick={savePreferences} className="bg-orange-500 text-white hover:bg-orange-600">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button onClick={cancelEditPreferences} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                <X className="w-4 h-4 mr-2" />
-                Cancel
-              </Button>
-            </div>
-          )}
+          ) : profile.gender
+            ? <Pill>{profile.gender}</Pill>
+            : <FieldValue empty>Set your gender for coach matching</FieldValue>}
         </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div>
+            <FieldLabel>Age</FieldLabel>
+            {editingSection === 'demographics'
+              ? <input style={inputStyle} type="number" min={13} max={100} value={tempProfile.age} onChange={e => setTempProfile({ ...tempProfile, age: e.target.value })} />
+              : <FieldValue empty={!profile.age}>{profile.age || '—'}</FieldValue>}
+          </div>
+          <div>
+            <FieldLabel>Life Stage</FieldLabel>
+            {editingSection === 'demographics' ? (
+              <select style={inputStyle} value={tempProfile.schoolYear} onChange={e => setTempProfile({ ...tempProfile, schoolYear: e.target.value })}>
+                <option value="">Select...</option>
+                {Object.entries(schoolYearLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                {profile.schoolYear && !schoolYearLabels[profile.schoolYear] && (
+                  <option value={profile.schoolYear}>{profile.schoolYear}</option>
+                )}
+              </select>
+            ) : <FieldValue empty={!schoolLabel}>{schoolLabel || '—'}</FieldValue>}
+          </div>
+        </div>
+
+        <FieldLabel>Cultural Background</FieldLabel>
+        {editingSection === 'demographics' ? (
+          <InteractiveGlobe
+            locations={tempProfile.locations}
+            onAddLocation={loc => setTempProfile({ ...tempProfile, locations: [...tempProfile.locations, loc] })}
+            onRemoveLocation={index => setTempProfile({ ...tempProfile, locations: tempProfile.locations.filter((_, i) => i !== index) })}
+            maxLocations={3}
+          />
+        ) : profile.locations.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {profile.locations.map((loc, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10 }}>
+                <MapPin size={13} style={{ color: accentColor, flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{loc.label}</span>
+              </div>
+            ))}
+          </div>
+        ) : <FieldValue empty>No locations added</FieldValue>}
+
+        {(editingSection === 'demographics' ? tempProfile.locations.length > 0 : profile.locations.length > 0) && (
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginTop: 16, cursor: editingSection === 'demographics' ? 'pointer' : 'default' }}>
+            <input
+              type="checkbox"
+              checked={display.prefersSameBackground}
+              onChange={e => editingSection === 'demographics' && setTempProfile({ ...tempProfile, prefersSameBackground: e.target.checked })}
+              disabled={editingSection !== 'demographics'}
+              style={{ marginTop: 3, accentColor }}
+            />
+            <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
+              Prefer coaches from similar cultural backgrounds
+            </span>
+          </label>
+        )}
+        {editingSection === 'demographics' && <SaveCancel onSave={saveSection} onCancel={cancelEdit} accentColor={accentColor} />}
+      </div>
+
+      {/* Coaching preferences */}
+      <div style={cardStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Heart size={16} style={{ color: accentColor }} />
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: '#F2F2F2', letterSpacing: 0.5 }}>Coaching Style</span>
+          </div>
+          {editingSection !== 'preferences' && <EditBtn onClick={() => startEdit('preferences')} />}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20 }}>
+          <div>
+            <FieldLabel><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><MessageCircle size={11} /> Communication</span></FieldLabel>
+            {editingSection === 'preferences'
+              ? Object.entries(communicationLabels).map(([v, l]) => <RadioOption key={v} name="comm" value={v} label={l} field="communicationPreference" />)
+              : profile.communicationPreference
+                ? <Pill color="#3b82f6">{communicationLabels[profile.communicationPreference]}</Pill>
+                : <FieldValue empty>Not set</FieldValue>}
+          </div>
+          <div>
+            <FieldLabel><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Layout size={11} /> Structure</span></FieldLabel>
+            {editingSection === 'preferences'
+              ? Object.entries(structureLabels).map(([v, l]) => <RadioOption key={v} name="struct" value={v} label={l} field="structurePreference" />)
+              : profile.structurePreference
+                ? <Pill color="#06b6d4">{structureLabels[profile.structurePreference]}</Pill>
+                : <FieldValue empty>Not set</FieldValue>}
+          </div>
+          <div>
+            <FieldLabel><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Zap size={11} /> Motivation</span></FieldLabel>
+            {editingSection === 'preferences'
+              ? Object.entries(motivationLabels).map(([v, l]) => <RadioOption key={v} name="mot" value={v} label={l} field="motivationLevel" />)
+              : profile.motivationLevel
+                ? <Pill color="#22c55e">{motivationLabels[profile.motivationLevel]}</Pill>
+                : <FieldValue empty>Not set</FieldValue>}
+          </div>
+        </div>
+
+        {profile.topValues.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <FieldLabel><span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Compass size={11} /> Top Values</span></FieldLabel>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {profile.topValues.map((v, i) => <Pill key={i} color="#a855f7">{v}</Pill>)}
+            </div>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: '8px 0 0' }}>
+              From your assessment — retake assessment to update
+            </p>
+          </div>
+        )}
+
+        {editingSection === 'preferences' && <SaveCancel onSave={saveSection} onCancel={cancelEdit} accentColor={accentColor} />}
+      </div>
+
+      {/* Matching note */}
+      <div style={{ padding: '14px 18px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+        <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: 0, lineHeight: 1.6 }}>
+          <Trophy size={12} style={{ display: 'inline', marginRight: 6, color: accentColor, verticalAlign: 'middle' }} />
+          Your profile powers coach matching — gender, background, goals, and coaching style preferences all factor in when you Call an ISO.
+        </p>
       </div>
     </div>
   );

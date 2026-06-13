@@ -8,7 +8,6 @@ import {
   ToastMessage,
   EarnedReward,
 } from '../../types/store';
-import { mockUser, mockUserNoPass } from '../../mockData/store';
 
 // Dashboard Components
 import { ProfileCard } from '../dashboard/ProfileCard';
@@ -26,21 +25,23 @@ import { LevelStore } from './LevelStore';
 import { CartDrawer } from '../common/CartDrawer';
 import { ToastContainer } from '../common/Toast';
 
-import { ArrowLeft, Settings, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { buildStoreUserFromPortal } from '../../utils/storeUser';
 
 type View = 'dashboard' | 'general-store' | 'level-store';
 
 interface StoreDashboardProps {
   onBack?: () => void;
+  onUpgradeToVarsity?: () => void;
 }
 
 /**
  * Main Store Dashboard - Hub for the entire store system
  */
-export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
-  // Toggle between mock users (with/without pass) for demo
-  const [usePassUser, setUsePassUser] = useState(true);
-  const [user, setUser] = useState<User>(usePassUser ? mockUser : mockUserNoPass);
+export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack, onUpgradeToVarsity }) => {
+  const [storeCtx] = useState(() => buildStoreUserFromPortal());
+  const [user, setUser] = useState<User>(storeCtx.user);
+  const levelStorePreview = storeCtx.levelStorePreview;
 
   // Navigation state
   const [currentView, setCurrentView] = useState<View>('dashboard');
@@ -64,19 +65,10 @@ export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  // Toggle user type for demo
-  const toggleUserType = () => {
-    const newUsePassUser = !usePassUser;
-    setUsePassUser(newUsePassUser);
-    setUser(newUsePassUser ? mockUser : mockUserNoPass);
-    setCart([]);
-    addToast('info', `Switched to ${newUsePassUser ? 'Locker Room Pass' : 'Free'} user`);
-  };
 
-  // Handle getting Locker Room Pass (mock)
   const handleGetPass = () => {
-    setUser(prev => ({ ...prev, hasLockerRoomPass: true }));
-    addToast('success', 'Welcome to the Locker Room! You now have full store access.');
+    onUpgradeToVarsity?.();
+    onBack?.();
   };
 
   // Handle store selection
@@ -234,6 +226,8 @@ export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
             setSelectedLevelFromDashboard(null);
           }}
           onClaimRewards={handleClaimRewards}
+          previewMode={levelStorePreview}
+          onUpgradeToVarsity={onUpgradeToVarsity}
         />
         <CartDrawer
           isOpen={isCartOpen}
@@ -271,27 +265,16 @@ export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
                   <span className="text-xl">🏀</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">ISO Locker Room</h1>
-                  <p className="text-sm text-slate-400">Level up your game & your wardrobe</p>
+                  <h1 className="text-xl font-bold text-white">ISO Store</h1>
+                  <p className="text-sm text-slate-400">
+                    {levelStorePreview ? 'Locker Room gear + Varsity preview' : 'Level up your game & your wardrobe'}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              {/* Demo Toggle */}
-              <button
-                onClick={toggleUserType}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
-                title="Toggle user type for demo"
-              >
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">
-                  {user.hasLockerRoomPass ? 'Has Pass' : 'No Pass'}
-                </span>
-              </button>
-
-              {/* Cart Button */}
               {user.hasLockerRoomPass && (
                 <button
                   onClick={() => setIsCartOpen(true)}
@@ -332,9 +315,28 @@ export const StoreDashboard: React.FC<StoreDashboardProps> = ({ onBack }) => {
           <div className="lg:col-span-2 space-y-6">
             {user.hasLockerRoomPass && <LimitCard user={user} />}
             
-            <StoreTiles user={user} onSelectStore={handleSelectStore} />
+            <StoreTiles user={user} onSelectStore={handleSelectStore} levelStorePreview={levelStorePreview} />
             
-            <TierPreview user={user} onSelectLevel={handleSelectLevel} />
+            <TierPreview user={user} onSelectLevel={handleSelectLevel} previewMode={levelStorePreview} />
+
+            {levelStorePreview && (
+              <div className="p-6 bg-gradient-to-r from-purple-500/10 to-orange-500/10 border border-purple-500/25 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Want to earn this gear?</h3>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Varsity players unlock milestone merch through real progress with a dedicated coach — not just purchases.
+                  </p>
+                </div>
+                {onUpgradeToVarsity && (
+                  <button
+                    onClick={onUpgradeToVarsity}
+                    className="flex-shrink-0 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors"
+                  >
+                    Upgrade to Varsity
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

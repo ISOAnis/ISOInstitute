@@ -19,7 +19,6 @@ const WhyISO = lazy(() => import('./components/WhyISO').then(m => ({ default: m.
 const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
 const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
 const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
-const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
 const ForCoaches = lazy(() => import('./pages/ForCoaches').then(m => ({ default: m.default })));
 const JoinISOPage = lazy(() => import('./pages/JoinISOPage').then(m => ({ default: m.JoinISOPage })));
 
@@ -90,6 +89,14 @@ export default function App() {
       }),
     );
   }, [currentPage, selectedCoachName, selectedCategoryId]);
+
+  // Legacy /store route → portal store section
+  useEffect(() => {
+    if (currentPage === 'store') {
+      try { localStorage.setItem('iso_portal_initial_section', 'store'); } catch {}
+      setCurrentPage('player-portal');
+    }
+  }, [currentPage]);
 
   // Handle navigation - clear states when navigating to home from logo/nav
   const handleNavigate = (page: Page) => {
@@ -368,32 +375,7 @@ export default function App() {
     return <PlayerPortalPage onNavigate={handleNavigate} />;
   }
 
-  if (currentPage === 'store') {
-    const plan = (() => { try { return localStorage.getItem('iso_demo_plan'); } catch { return null; } })();
-    const canAccess = plan === 'locker-room' || plan === 'varsity';
-    if (!canAccess) {
-      return (
-        <div style={{ minHeight: '100vh', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <div style={{ maxWidth: 440, textAlign: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 40 }}>
-            <h2 style={{ color: '#fff', fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, marginBottom: 12 }}>Store Access</h2>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: "'Barlow', sans-serif", fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
-              Walk-On members can grab ISO gear at in-person pop-ups and events. Upgrade to Locker Room for online store access.
-            </p>
-            <button onClick={() => handleNavigate('player-portal')} style={{ background: '#f97316', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 28px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 2, cursor: 'pointer' }}>
-              GO TO PORTAL
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <Suspense fallback={<LoadingSpinner />}>
-        <StoreDashboard onBack={() => handleNavigate('home')} />
-      </Suspense>
-    );
-  }
-
-  // Store hidden on onboarding branch — now gated by plan above
+  // store route handled by useEffect redirect above
 
   return (
     <div 

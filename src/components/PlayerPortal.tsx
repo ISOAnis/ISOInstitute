@@ -11,18 +11,35 @@ import {
 import { PlayerProfileSection } from './PlayerProfileSection';
 import { LockerRoomChat } from './LockerRoomChat';
 import { LockerRoomGoals } from './LockerRoomGoals';
+import { ISOStoreSection } from './portal-store';
 import { PathwayLockConfirmModal } from './PathwayLockConfirmModal';
 import { PathwayChangeRequestModal } from './PathwayChangeRequestModal';
 import { CoachPlayerChat } from './CoachPlayerChat';
 import { PortalTutorial } from './PortalTutorial';
 import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
+import { LockerRoomCheckoutModal } from './LockerRoomCheckoutModal';
+import { VarsityInterestModal } from './VarsityInterestModal';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import {
   getUserGender, getUserPlan, setUserPlan, filterByGender, usesExplorerPortal,
   type MembershipPlan, type UserGender, PLAN_LABELS, canAccessLockerRoomChat,
-  isPathwayLocked, getActivePathway, getLockedPathway, setExploringPathway,
+  isPathwayLocked, getActivePathway, getLockedPathway, getExploringPathway, lockPathway,
+  setExploringPathway,
 } from '../utils/membership';
+import {
+  type ExplorerUsage,
+  getExplorerUsage,
+  saveExplorerUsage,
+  canScheduleCoachCall,
+  recordCoachCall,
+  chatUsedWithCoach,
+  chatUsedForPathway,
+  discoveryCallsRemaining,
+  LOCKER_ROOM_MONTHLY_CALLS,
+  LOCKER_ROOM_PRICE_USD,
+  TRYOUT_MINUTES,
+} from '../utils/explorerUsage';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 interface Bucket {
@@ -37,13 +54,8 @@ interface SkillNodeDef {
   id: string; label: string; sublabel: string;
   row: number; col: number; unlocksAt: number;
 }
-interface ExplorerUsage {
-  pathwayChats: Record<string, boolean>;
-  shadowUsedThisMonth: boolean;
-  lastReset: string;
-}
-type WalkOnSection = 'explore' | 'goals' | 'locker-room' | 'profile';
-type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'profile';
+type WalkOnSection = 'explore' | 'goals' | 'locker-room' | 'store' | 'profile';
+type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'store' | 'profile';
 
 interface PlayerPortalProps {
   onNavigate?: (page: any) => void;
@@ -191,6 +203,7 @@ const SIDEBAR_ITEMS: { id: PlayerSection; label: string; Icon: React.ComponentTy
   { id: 'dashboard',  label: 'Dashboard',   Icon: Home },
   { id: 'skill-tree', label: 'Skill Tree',  Icon: GitBranch },
   { id: 'progress',   label: 'My Progress', Icon: Trophy },
+  { id: 'store',      label: 'ISO Store',   Icon: ShoppingBag },
   { id: 'messages',   label: 'Messages',    Icon: MessageSquare },
   { id: 'profile',    label: 'My Profile',  Icon: UserCircle },
 ];
@@ -198,7 +211,7 @@ const SIDEBAR_ITEMS: { id: PlayerSection; label: string; Icon: React.ComponentTy
 const SECTIONS_BY_PLAN: Record<MembershipPlan, PlayerSection[]> = {
   'walk-on': ['dashboard', 'profile'],
   'locker-room': ['dashboard', 'progress', 'profile'],
-  varsity: ['dashboard', 'skill-tree', 'progress', 'messages', 'profile'],
+  varsity: ['dashboard', 'skill-tree', 'progress', 'store', 'messages', 'profile'],
 };
 
 const NAV_H = 72; // px — nav bar bottom clearance
@@ -327,13 +340,13 @@ function PortalSidebar({
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>
               {membershipPlan === 'walk-on'
                 ? 'Upgrade for Locker Room chat, goals & priority shadowing'
-                : 'Upgrade to Varsity for dedicated coaching & skill tree'}
+                : 'Upgrade to ISO Pass for dedicated coaching & skill tree'}
             </p>
             <button
               onClick={() => onUpgrade(membershipPlan === 'walk-on' ? 'locker-room' : 'varsity')}
               style={{ width: '100%', background: accentColor, color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}
             >
-              {membershipPlan === 'walk-on' ? 'LOCKER ROOM · $10/MO' : 'VARSITY PROGRAM'}
+              {membershipPlan === 'walk-on' ? `LOCKER ROOM · $${LOCKER_ROOM_PRICE_USD}/MO` : 'ISO PASS'}
             </button>
           </div>
         </div>
@@ -517,7 +530,16 @@ interface ExplorerCoach {
   gender: UserGender;
   acceptsShadowing: boolean;
   shadowingCadenceMonths: number;
+  varsityMonthlyPrice: number;
 }
+
+const varsityPriceFromRating = (rating: number): number => {
+  if (rating >= 95) return 120;
+  if (rating >= 90) return 100;
+  if (rating >= 85) return 85;
+  if (rating >= 80) return 75;
+  return 60;
+};
 
 // Tier thresholds: 60-69 Bronze, 70-79 Silver, 80-89 Gold, 90-99 Platinum
 const getRatingTier = (r: number): ExplorerCoach['tier'] => {
@@ -565,6 +587,7 @@ const EXPLORER_COACHES: ExplorerCoach[] = RAW_COACHES.map(c => ({
   ...c,
   acceptsShadowing: COACH_AVAIL_OVERRIDES[c.id]?.acceptsShadowing ?? true,
   shadowingCadenceMonths: COACH_AVAIL_OVERRIDES[c.id]?.shadowingCadenceMonths ?? 1,
+  varsityMonthlyPrice: varsityPriceFromRating(c.rating),
 }));
 
 const TIER_COLORS: Record<string, string> = { Bronze: '#cd7f32', Silver: '#A8A8A8', Gold: '#F5C842', Platinum: '#a855f7' };
@@ -594,16 +617,21 @@ const TIER_BORDER: Record<string, { gradient: string; glow: string; animation: s
 };
 
 function CoachCardModal({
-  coach, chatUsed, canShadow, shadowBlockedReason, hasLockerRoomPriority,
-  onScheduleChat, onScheduleShadow, onClose,
+  coach, membershipPlan, chatUsed, callsRemaining, callBlockedReason,
+  canShadow, shadowBlockedReason, hasLockerRoomPriority,
+  onScheduleChat, onScheduleShadow, onRequestVarsity, onClose,
 }: {
   coach: ExplorerCoach;
+  membershipPlan: MembershipPlan;
   chatUsed: boolean;
+  callsRemaining?: number;
+  callBlockedReason?: string;
   canShadow: boolean;
   shadowBlockedReason?: string;
   hasLockerRoomPriority: boolean;
   onScheduleChat: () => void;
   onScheduleShadow: () => void;
+  onRequestVarsity: () => void;
   onClose: () => void;
 }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -729,7 +757,12 @@ function CoachCardModal({
                         {coach.acceptsShadowing
                           ? `Open to shadowing · ~every ${coach.shadowingCadenceMonths} mo per player`
                           : 'Not currently offering shadowing'}
-                        <br />1 Call an ISO per player per month (coach sets their own limits)
+                        <br />
+                        {membershipPlan === 'locker-room'
+                          ? `${TRYOUT_MINUTES}-min try outs · different coaches each month`
+                          : '1 try out per pathway per month on Walk-On'}
+                        <br />
+                        ISO Pass with {coach.name.split(' ')[0]}: ${coach.varsityMonthlyPrice}/mo (coach sets rate)
                       </p>
                     </div>
                     <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' as const, marginTop: 8 }}>Click to flip back</p>
@@ -743,15 +776,29 @@ function CoachCardModal({
 
         {/* Action buttons */}
         <div style={{ width: 290, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {!chatUsed ? (
+          {membershipPlan === 'locker-room' && callsRemaining !== undefined && (
+            <div style={{ textAlign: 'center', fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+              {callsRemaining} of {LOCKER_ROOM_MONTHLY_CALLS} try outs left this month
+            </div>
+          )}
+          {!chatUsed && callBlockedReason ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, color: 'rgba(255,255,255,0.35)', fontSize: 12, fontFamily: "'Barlow', sans-serif", textAlign: 'center' }}>
+              <Lock size={13} /> {callBlockedReason}
+            </div>
+          ) : !chatUsed ? (
             <button onClick={e => { e.stopPropagation(); onScheduleChat(); }} style={{ width: '100%', padding: '13px 0', background: `${hex}20`, border: `1px solid ${hex}50`, borderRadius: 12, color: hex, fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <MessageSquare size={14} /> CALL AN ISO — 1 FREE
+              <MessageSquare size={14} /> BOOK TRY OUT
             </button>
           ) : (
             <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 14px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 10, color: 'rgba(34,197,94,0.8)', fontSize: 13, fontFamily: "'Barlow', sans-serif" }}>
-                <CheckCheck size={14} /> Chat scheduled this month
+                <CheckCheck size={14} /> Try out booked this month
               </div>
+              {membershipPlan === 'locker-room' && (
+                <button onClick={e => { e.stopPropagation(); onRequestVarsity(); }} style={{ width: '100%', padding: '13px 0', background: 'rgba(168,85,247,0.15)', border: '1px solid rgba(168,85,247,0.4)', borderRadius: 12, color: '#a855f7', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  CALL AN ISO · ${coach.varsityMonthlyPrice}/MO
+                </button>
+              )}
               <button disabled={!canShadow} onClick={e => { e.stopPropagation(); canShadow && onScheduleShadow(); }} style={{ width: '100%', padding: '13px 0', background: canShadow ? `${hex}20` : 'rgba(255,255,255,0.03)', border: `1px solid ${canShadow ? hex + '50' : 'rgba(255,255,255,0.07)'}`, borderRadius: 12, color: canShadow ? hex : 'rgba(255,255,255,0.2)', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: canShadow ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexDirection: 'column' }}>
                 {canShadow ? <><Calendar size={14} /> SCHEDULE SHADOWING{hasLockerRoomPriority ? ' · PRIORITY' : ''}</> : <><Lock size={13} /> {shadowBlockedReason ?? 'SHADOWING UNAVAILABLE'}</>}
                 {canShadow && !hasLockerRoomPriority && (
@@ -767,28 +814,6 @@ function CoachCardModal({
   );
 }
 
-function getExplorerUsage(): ExplorerUsage {
-  try {
-    const saved = localStorage.getItem('iso_explorer_usage');
-    const thisMonth = new Date().toISOString().slice(0, 7);
-    if (!saved) return { pathwayChats: {}, shadowUsedThisMonth: false, lastReset: thisMonth };
-    const parsed = JSON.parse(saved) as ExplorerUsage & { chats?: Record<string, number>; shadowingUsed?: number };
-    if (parsed.lastReset !== thisMonth) {
-      return { pathwayChats: {}, shadowUsedThisMonth: false, lastReset: thisMonth };
-    }
-    if (!parsed.pathwayChats && parsed.chats) {
-      return { pathwayChats: {}, shadowUsedThisMonth: (parsed.shadowingUsed ?? 0) >= 1, lastReset: thisMonth };
-    }
-    return {
-      pathwayChats: parsed.pathwayChats ?? {},
-      shadowUsedThisMonth: parsed.shadowUsedThisMonth ?? false,
-      lastReset: parsed.lastReset ?? thisMonth,
-    };
-  } catch {
-    return { pathwayChats: {}, shadowUsedThisMonth: false, lastReset: new Date().toISOString().slice(0, 7) };
-  }
-}
-
 function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any) => void; onPlanChange?: (plan: MembershipPlan) => void }) {
   const [usage, setUsage] = useState<ExplorerUsage>(getExplorerUsage);
   const [activeSection, setActiveSection] = useState<WalkOnSection>('explore');
@@ -801,10 +826,41 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const [showPathwayPicker, setShowPathwayPicker] = useState(false);
   const [showLockConfirm, setShowLockConfirm] = useState(false);
   const [showChangeRequest, setShowChangeRequest] = useState(false);
+  const [showLockerCheckout, setShowLockerCheckout] = useState(false);
+  const [showVarsityInterest, setShowVarsityInterest] = useState(false);
+  const [varsityInterestCoach, setVarsityInterestCoach] = useState<ExplorerCoach | null>(null);
   const [pendingUpgradePlan, setPendingUpgradePlan] = useState<MembershipPlan>('locker-room');
 
+  useEffect(() => {
+    const initial = localStorage.getItem('iso_portal_initial_section');
+    if (initial === 'store') {
+      setActiveSection('store');
+      localStorage.removeItem('iso_portal_initial_section');
+    }
+  }, []);
+
+  // Heal locker-room/varsity state: ensure a locked pathway exists so My Coaches isn't blank
+  useEffect(() => {
+    if (!isPathwayLocked(membershipPlan)) return;
+    const locked = getLockedPathway();
+    if (locked) {
+      setCurrentPathwayId(locked);
+      setSelectedPathway(locked);
+      return;
+    }
+    const exploring = getExploringPathway();
+    if (exploring) {
+      lockPathway(exploring);
+      setCurrentPathwayId(exploring);
+      setSelectedPathway(exploring);
+      return;
+    }
+    setShowLockConfirm(true);
+    setPendingUpgradePlan(membershipPlan);
+  }, [membershipPlan]);
+
   const pathwayIsLocked = isPathwayLocked(membershipPlan);
-  const lockedPathwayId = getLockedPathway() || currentPathwayId;
+  const lockedPathwayId = getLockedPathway() || currentPathwayId || getExploringPathway() || null;
   const hasLockerRoomPriority = membershipPlan === 'locker-room';
   const hasLockerRoomAccess = canAccessLockerRoomChat(membershipPlan);
 
@@ -822,6 +878,11 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
 
   const handleUpgradeClick = (plan: MembershipPlan) => {
     if (plan === 'walk-on') return;
+    if (plan === 'locker-room' && membershipPlan === 'walk-on') {
+      setPendingUpgradePlan(plan);
+      setShowLockerCheckout(true);
+      return;
+    }
     if ((plan === 'locker-room' || plan === 'varsity') && !getLockedPathway()) {
       setPendingUpgradePlan(plan);
       setShowLockConfirm(true);
@@ -830,21 +891,38 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     handleUpgrade(plan);
   };
 
+  const handleLockerCheckoutSuccess = () => {
+    setShowLockerCheckout(false);
+    if (!getLockedPathway()) {
+      setPendingUpgradePlan('locker-room');
+      setShowLockConfirm(true);
+      return;
+    }
+    handleUpgrade('locker-room');
+  };
+
   const handleLockConfirmed = (plan: MembershipPlan) => {
     setShowLockConfirm(false);
     setPendingUpgradePlan('locker-room');
     const locked = getLockedPathway() || '';
-    if (locked) setCurrentPathwayId(locked);
+    if (locked) {
+      setCurrentPathwayId(locked);
+      setSelectedPathway(locked);
+    }
     setMembershipPlan(plan);
     onPlanChange?.(plan);
-    if (plan === 'locker-room') setActiveSection('locker-room');
+    if (plan === 'locker-room') setActiveSection('explore');
   };
 
-  const saveUsage = (u: ExplorerUsage) => { setUsage(u); localStorage.setItem('iso_explorer_usage', JSON.stringify(u)); };
-  const chatUsedForPathway = (pathwayId: string) => !!usage.pathwayChats[pathwayId];
+  const saveUsage = (u: ExplorerUsage) => { setUsage(u); saveExplorerUsage(u); };
+
+  const coachChatUsed = (coach: ExplorerCoach) =>
+    membershipPlan === 'locker-room'
+      ? chatUsedWithCoach(usage, coach.id)
+      : chatUsedForPathway(usage, coach.pathwayId);
 
   const getShadowState = (coach: ExplorerCoach) => {
-    if (!chatUsedForPathway(coach.pathwayId)) return { canShadow: false, reason: 'CALL AN ISO FIRST' };
+    if (!coachChatUsed(coach)) return { canShadow: false, reason: 'BOOK TRY OUT FIRST' };
     if (!coach.acceptsShadowing) return { canShadow: false, reason: 'COACH NOT OFFERING SHADOWING' };
     if (usage.shadowUsedThisMonth) return { canShadow: false, reason: 'SHADOWING USED THIS MONTH' };
     return { canShadow: true, reason: '' };
@@ -864,18 +942,30 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     setShowPathwayPicker(false);
   };
 
+  useEffect(() => {
+    if (pathwayIsLocked && lockedPathwayId) {
+      setSelectedPathway(lockedPathwayId);
+    }
+  }, [pathwayIsLocked, lockedPathwayId]);
+
+  const explorePathwayId = pathwayIsLocked ? lockedPathwayId : selectedPathway;
+  const w = sidebarExpanded ? SIDEBAR_W_EXPANDED : SIDEBAR_W_COLLAPSED;
+  const activeHex = selectedPathway ? (PATHWAY_HEX[selectedPathway] ?? '#888') : (currentPathwayId ? (PATHWAY_HEX[currentPathwayId] ?? '#f97316') : '#f97316');
+  const explorePathway = explorePathwayId ? PATHWAYS.find(p => p.id === explorePathwayId) : null;
+  const explorePathwayCoaches = explorePathwayId ? matchedCoaches.filter(c => c.pathwayId === explorePathwayId) : [];
+  const exploreHex = explorePathwayId ? (PATHWAY_HEX[explorePathwayId] ?? '#f97316') : activeHex;
+  const currentPathwayName = currentPathwayId ? PATHWAY_BY_ID[currentPathwayId as keyof typeof PATHWAY_BY_ID]?.name : null;
+
   const sidebarItems: { id: WalkOnSection; label: string; Icon: React.ComponentType<{ size: number }>; locked?: boolean }[] = [
-    { id: 'explore', label: 'Explore Coaches', Icon: Compass },
+    { id: 'explore', label: pathwayIsLocked ? 'My Coaches' : 'Explore Coaches', Icon: Compass },
     { id: 'goals', label: 'My Goals', Icon: Target, locked: membershipPlan === 'walk-on' },
     { id: 'locker-room', label: 'Locker Room', Icon: Users, locked: !hasLockerRoomAccess },
+    { id: 'store', label: 'ISO Store', Icon: ShoppingBag },
     { id: 'profile', label: 'My Profile', Icon: UserCircle },
   ];
 
-  const w = sidebarExpanded ? SIDEBAR_W_EXPANDED : SIDEBAR_W_COLLAPSED;
   const activePathway = selectedPathway ? PATHWAYS.find(p => p.id === selectedPathway) : null;
   const activePathwayCoaches = selectedPathway ? matchedCoaches.filter(c => c.pathwayId === selectedPathway) : [];
-  const activeHex = selectedPathway ? (PATHWAY_HEX[selectedPathway] ?? '#888') : (currentPathwayId ? (PATHWAY_HEX[currentPathwayId] ?? '#f97316') : '#f97316');
-  const currentPathwayName = currentPathwayId ? PATHWAY_BY_ID[currentPathwayId as keyof typeof PATHWAY_BY_ID]?.name : null;
 
   return (
     <div style={{ display: 'flex', minHeight: `calc(100vh - ${NAV_H}px)`, paddingTop: NAV_H, background: '#0C0C0C' }}>
@@ -897,24 +987,24 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
               </button>
             );
           })}
-        </div>
+              </div>
         {sidebarExpanded && (
           <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase' as const }}>{PLAN_LABELS[membershipPlan]} Plan</div>
             {membershipPlan === 'walk-on' && (
               <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 10, padding: '12px 14px' }}>
-                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>Locker Room: community chat, store, goals & priority shadowing · $10/mo</p>
-                <button onClick={() => handleUpgradeClick('locker-room')} style={{ width: '100%', background: '#f97316', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>LOCKER ROOM · $10/MO</button>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>Locker Room: 3 try outs/mo, community, store & goals · ${LOCKER_ROOM_PRICE_USD}/mo</p>
+                <button onClick={() => handleUpgradeClick('locker-room')} style={{ width: '100%', background: '#f97316', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>LOCKER ROOM · ${LOCKER_ROOM_PRICE_USD}/MO</button>
               </div>
             )}
             {membershipPlan !== 'varsity' && (
               <div style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', borderRadius: 10, padding: '12px 14px' }}>
-                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>Varsity: dedicated coach, skill tree, real progress bar</p>
-                <button onClick={() => handleUpgradeClick('varsity')} style={{ width: '100%', background: 'rgba(168,85,247,0.8)', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>VARSITY PROGRAM</button>
-              </div>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>ISO Pass: dedicated coach, skill tree, real progress bar</p>
+                <button onClick={() => handleUpgradeClick('varsity')} style={{ width: '100%', background: 'rgba(168,85,247,0.8)', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>ISO PASS</button>
+            </div>
             )}
             {hasLockerRoomAccess && onNavigate && (
-              <button onClick={() => onNavigate('store')} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, cursor: 'pointer', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <button onClick={() => setActiveSection('store')} style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1, cursor: 'pointer', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                 <ShoppingBag size={13} /> ISO STORE
               </button>
             )}
@@ -925,8 +1015,22 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
       {/* Main content */}
       <main style={{ flex: 1, marginLeft: w, transition: 'margin-left 0.25s ease', padding: '32px 32px 60px', overflowY: 'auto' as const }}>
 
-        {/* ── EXPLORE ── */}
-        {activeSection === 'explore' && !selectedPathway && (
+        {/* ── MY COACHES — locked plan, pathway missing or invalid ── */}
+        {activeSection === 'explore' && pathwayIsLocked && (!explorePathwayId || !explorePathway) && (
+          <div style={{ padding: 48, textAlign: 'center' as const, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16 }}>
+            <Compass size={32} style={{ color: 'rgba(255,255,255,0.2)', marginBottom: 12 }} />
+            <h3 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, margin: '0 0 8px' }}>Lock Your Pathway</h3>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px', lineHeight: 1.6 }}>
+              Locker Room requires a committed pathway before coaches appear. Choose yours to see matched coaches.
+            </p>
+            <button onClick={() => { setPendingUpgradePlan(membershipPlan); setShowLockConfirm(true); }} style={{ background: '#f97316', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 28px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: 'pointer' }}>
+              CHOOSE PATHWAY
+            </button>
+          </div>
+        )}
+
+        {/* ── EXPLORE (walk-on pathway grid) ── */}
+        {activeSection === 'explore' && !pathwayIsLocked && !selectedPathway && (
           <>
             {currentPathwayName && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20, padding: '12px 18px', background: `${activeHex}10`, border: `1px solid ${activeHex}25`, borderRadius: 12 }}>
@@ -955,15 +1059,19 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                     {p.name}
                   </button>
                 ))}
-              </div>
+            </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 12, padding: '14px 20px', marginBottom: 24 }}>
               <Zap size={16} style={{ color: '#f97316', flexShrink: 0 }} />
               <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-                <strong style={{ color: 'white' }}>{PLAN_LABELS[membershipPlan]}:</strong> 1 free Call an ISO per pathway per month.
+                <strong style={{ color: 'white' }}>{PLAN_LABELS[membershipPlan]}:</strong>{' '}
+                {membershipPlan === 'locker-room'
+                  ? `${discoveryCallsRemaining(membershipPlan, usage)} of ${LOCKER_ROOM_MONTHLY_CALLS} try outs left · different coaches only · ${TRYOUT_MINUTES} min each.`
+                  : pathwayIsLocked
+                    ? '1 try out per month in your pathway.'
+                    : '1 try out per pathway per month.'}
                 {membershipPlan === 'walk-on' && ' No online merch — grab gear at in-person ISO events.'}
-                {hasLockerRoomPriority && ' Priority shadowing active.'}
-                {membershipPlan === 'walk-on' && ' Locker Room members get priority shadowing.'}
+                {hasLockerRoomPriority && ' Loved your try out? Call an ISO to upgrade to the ISO Pass.'}
               </p>
             </div>
             {!playerGender && (
@@ -974,7 +1082,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             )}
             <div style={{ marginBottom: 32 }}>
               <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 34, margin: '0 0 6px', letterSpacing: 1 }}>Explore Pathways</h2>
-              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: 0 }}>1 free chat per pathway · Shadowing unlocks after your Call an ISO (if coach allows)</p>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: 0 }}>1 try out per pathway · Shadowing unlocks after your try out (if coach allows)</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 18 }}>
               {PATHWAYS.map(pathway => {
@@ -1003,53 +1111,69 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 0', background: hex + '18', border: '1px solid ' + hex + '35', borderRadius: 10, color: hex, fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1.5 }}>
                       <Users size={13} /> VIEW COACHES <ChevronRight size={13} />
                     </div>
-                  </button>
+          </button>
                 );
               })}
-            </div>
+        </div>
             <div style={{ marginTop: 52, padding: 36, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, textAlign: 'center' as const }}>
               <h3 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 30, margin: '0 0 10px', letterSpacing: 0.5 }}>Ready to Go Deeper?</h3>
-              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px', lineHeight: 1.7 }}>Take the full assessment to get placed and unlock your Varsity journey with a dedicated coach.</p>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px', lineHeight: 1.7 }}>Take the full assessment to get placed and unlock your ISO Pass journey with a dedicated coach.</p>
               <button onClick={() => onNavigate?.('join')} style={{ background: 'rgba(255,255,255,0.92)', color: '#111', border: 'none', borderRadius: 100, padding: '13px 36px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2.5, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                 TAKE ASSESSMENT <ArrowRight size={15} />
-              </button>
-            </div>
+            </button>
+          </div>
           </>
         )}
 
         {/* ── COACH LIST ── */}
-        {activeSection === 'explore' && selectedPathway && activePathway && (
+        {activeSection === 'explore' && explorePathwayId && explorePathway && (
           <>
+            {pathwayIsLocked && currentPathwayName && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20, padding: '12px 18px', background: `${exploreHex}10`, border: `1px solid ${exploreHex}25`, borderRadius: 12 }}>
+                <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Lock size={14} style={{ color: exploreHex }} /> Coaches in your <strong style={{ color: exploreHex }}>{currentPathwayName}</strong> pathway
+              </div>
+                <button onClick={() => setShowChangeRequest(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 14px', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
+                  <Lock size={12} /> REQUEST PATHWAY CHANGE
+                </button>
+            </div>
+          )}
             <div style={{ marginBottom: 28 }}>
-              <button onClick={() => setSelectedPathway(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "'Barlow', sans-serif", fontSize: 13, padding: '0 0 18px' }}>← Back to Pathways</button>
+              {!pathwayIsLocked && (
+                <button onClick={() => setSelectedPathway(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontFamily: "'Barlow', sans-serif", fontSize: 13, padding: '0 0 18px' }}>← Back to Pathways</button>
+              )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: activeHex + '20', border: '1px solid ' + activeHex + '40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {(() => { const I = pathwayIconMap[selectedPathway]; return I ? <I size={22} style={{ color: activeHex }} /> : null; })()}
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: exploreHex + '20', border: '1px solid ' + exploreHex + '40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {(() => { const I = pathwayIconMap[explorePathwayId]; return I ? <I size={22} style={{ color: exploreHex }} /> : null; })()}
                 </div>
                 <div>
-                  <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: 0, letterSpacing: 0.5 }}>{activePathway.name} Coaches</h2>
+                  <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: 0, letterSpacing: 0.5 }}>{explorePathway.name} Coaches</h2>
                   <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
-                    {chatUsedForPathway(selectedPathway) ? 'Chat used this month for this pathway' : '1 free Call an ISO available this month'}
+                    {membershipPlan === 'locker-room'
+                      ? `${discoveryCallsRemaining(membershipPlan, usage)} of ${LOCKER_ROOM_MONTHLY_CALLS} try outs left · different coaches only`
+                      : chatUsedForPathway(explorePathwayId)
+                        ? 'Try out used for this pathway'
+                        : '1 try out available for this pathway'}
                   </p>
                 </div>
               </div>
             </div>
-            {activePathwayCoaches.length === 0 ? (
+            {explorePathwayCoaches.length === 0 ? (
               <div style={{ padding: 48, textAlign: 'center' as const, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16 }}>
                 <Users size={32} style={{ color: 'rgba(255,255,255,0.2)', marginBottom: 12 }} />
                 <h3 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, margin: '0 0 8px' }}>No Coaches Available</h3>
                 <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>
                   {!playerGender ? 'Complete your profile with your gender to see matched coaches.' : 'No coaches match your profile for this pathway.'}
                 </p>
-                {!playerGender && <button onClick={() => setActiveSection('profile')} style={{ background: activeHex, color: '#fff', border: 'none', borderRadius: 100, padding: '10px 24px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 2, cursor: 'pointer' }}>COMPLETE PROFILE</button>}
+                {!playerGender && <button onClick={() => setActiveSection('profile')} style={{ background: exploreHex, color: '#fff', border: 'none', borderRadius: 100, padding: '10px 24px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 2, cursor: 'pointer' }}>COMPLETE PROFILE</button>}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {activePathwayCoaches.map(coach => {
+                {explorePathwayCoaches.map(coach => {
                   const hex = PATHWAY_HEX[coach.pathwayId] ?? '#888';
                   const tierColor = TIER_COLORS[coach.tier] ?? '#888';
-                  const used = chatUsedForPathway(coach.pathwayId);
-                  return (
+                  const used = coachChatUsed(coach);
+                    return (
                     <div key={coach.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' as const }}>
                       <div style={{ width: 50, height: 50, borderRadius: '50%', background: hex + '20', border: '2px solid ' + hex + '40', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: hex, flexShrink: 0 }}>
                         {coach.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
@@ -1065,8 +1189,8 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                       {used && <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: 100, color: 'rgba(34,197,94,0.8)', fontSize: 11, fontFamily: "'Barlow', sans-serif" }}><CheckCheck size={11} /> Chatted</div>}
                       <button onClick={() => setSelectedCoach(coach)} style={{ padding: '9px 18px', background: hex + '18', border: '1px solid ' + hex + '40', borderRadius: 10, color: hex, fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1.5, cursor: 'pointer', whiteSpace: 'nowrap' as const }}>VIEW COACH CARD</button>
                     </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
           </>
@@ -1104,29 +1228,78 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           </div>
         )}
 
+        {/* ── ISO STORE ── */}
+        {activeSection === 'store' && (
+          <ISOStoreSection
+            membershipPlan={membershipPlan}
+            accentColor={activeHex}
+            onUpgrade={handleUpgradeClick}
+          />
+        )}
+
         {/* ── PROFILE ── */}
         {activeSection === 'profile' && (
-          <div style={{ maxWidth: 900 }}>
-            <PlayerProfileSection onProfileCompletionChange={() => {}} onGenderChange={g => setPlayerGender(g)} />
-          </div>
+          <PlayerProfileSection
+            accentColor={activeHex}
+            onProfileCompletionChange={() => {}}
+            onGenderChange={g => setPlayerGender(g)}
+          />
         )}
       </main>
 
       {selectedCoach && (() => {
         const shadow = getShadowState(selectedCoach);
+        const callState = canScheduleCoachCall(membershipPlan, usage, selectedCoach.id, selectedCoach.pathwayId);
+        const used = coachChatUsed(selectedCoach);
         return (
           <CoachCardModal
             coach={selectedCoach}
-            chatUsed={chatUsedForPathway(selectedCoach.pathwayId)}
+            membershipPlan={membershipPlan}
+            chatUsed={used}
+            callsRemaining={membershipPlan === 'locker-room' ? discoveryCallsRemaining(membershipPlan, usage) : undefined}
+            callBlockedReason={!used && !callState.allowed ? callState.reason : undefined}
             canShadow={shadow.canShadow}
             shadowBlockedReason={shadow.reason}
             hasLockerRoomPriority={hasLockerRoomPriority}
-            onScheduleChat={() => { saveUsage({ ...usage, pathwayChats: { ...usage.pathwayChats, [selectedCoach.pathwayId]: true } }); }}
+            onScheduleChat={() => {
+              saveUsage(recordCoachCall(usage, membershipPlan, selectedCoach.id, selectedCoach.pathwayId));
+            }}
             onScheduleShadow={() => { saveUsage({ ...usage, shadowUsedThisMonth: true }); }}
+            onRequestVarsity={() => {
+              setVarsityInterestCoach(selectedCoach);
+              setShowVarsityInterest(true);
+              setSelectedCoach(null);
+            }}
             onClose={() => setSelectedCoach(null)}
           />
         );
       })()}
+
+      {showLockerCheckout && (
+        <LockerRoomCheckoutModal
+          onClose={() => setShowLockerCheckout(false)}
+          onSuccess={handleLockerCheckoutSuccess}
+        />
+      )}
+
+      {showVarsityInterest && varsityInterestCoach && (
+        <VarsityInterestModal
+          coachName={varsityInterestCoach.name}
+          coachMonthlyPrice={varsityInterestCoach.varsityMonthlyPrice}
+          onClose={() => { setShowVarsityInterest(false); setVarsityInterestCoach(null); }}
+          onRequestVarsity={() => {
+            setShowVarsityInterest(false);
+            setVarsityInterestCoach(null);
+            if (getLockedPathway()) {
+              handleUpgrade('varsity');
+            } else {
+              setPendingUpgradePlan('varsity');
+              setShowLockConfirm(true);
+            }
+          }}
+          onScholarshipInfo={() => alert('ISO Foundation scholarships: apply at iso.foundation/scholarships. Coaches may sponsor pro bono ISO Pass spots — never off-platform.')}
+        />
+      )}
 
       {showLockConfirm && (
         <PathwayLockConfirmModal
@@ -1141,7 +1314,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           onPathwayChanged={newId => { setCurrentPathwayId(newId); setShowChangeRequest(false); }}
         />
       )}
-    </div>
+                </div>
   );
 }
 
@@ -1159,8 +1332,8 @@ function DashboardView({
   const showDedicatedCoach = membershipPlan === 'varsity';
   const currentTier = TIERS.slice().reverse().find(t => gamesWon >= t.minGames) || TIERS[0];
   const TierIcon = currentTier.Icon;
-
-  return (
+                  
+                  return (
     <div style={{ padding: '32px 32px 60px' }}>
       {/* Player card */}
       <div style={{
@@ -1179,16 +1352,16 @@ function DashboardView({
             {pathway}
           </h2>
           <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-            {showDedicatedCoach ? `With ${coachName}` : 'Self-guided goals · Upgrade to Varsity for dedicated coaching'}
+            {showDedicatedCoach ? `With ${coachName}` : 'Self-guided goals · Call an ISO to upgrade to the ISO Pass'}
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: `${accentColor}20`, border: `1px solid ${accentColor}40`, borderRadius: 100, padding: '8px 18px' }}>
           <TierIcon size={16} style={{ color: accentColor }} />
           <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: accentColor, letterSpacing: 1 }}>
             {currentTier.name}
-          </span>
-        </div>
-      </div>
+                        </span>
+                      </div>
+                    </div>
 
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 32 }}>
@@ -1240,11 +1413,11 @@ function DashboardView({
             <div>
               <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginBottom: 2 }}>{card.label}</div>
               <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{card.sub}</div>
-            </div>
+                        </div>
             <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.2)', marginLeft: 'auto' }} />
           </button>
         ))}
-      </div>
+                        </div>
 
       {/* Upcoming session — Varsity only */}
       {showDedicatedCoach && (
@@ -1254,8 +1427,8 @@ function DashboardView({
           <div>
             <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, fontWeight: 600, color: '#F2F2F2' }}>Weekly Check-in</div>
             <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>with {coachName} · Nov 15, 2:00 PM</div>
-          </div>
-        </div>
+                          </div>
+                          </div>
         <button
           onClick={() => onGoTo('messages')}
           style={{
@@ -1266,10 +1439,10 @@ function DashboardView({
         >
           MESSAGE COACH
         </button>
-      </div>
-      )}
-    </div>
-  );
+                          </div>
+                        )}
+                      </div>
+                    );
 }
 
 // ─── PROGRESS VIEW ────────────────────────────────────────────────────────────
@@ -1321,7 +1494,7 @@ function ProgressView({
               }
               return null;
             })}
-            {(() => {
+                  {(() => {
               const t = TIERS.find(t2 => t2.id === currentTier.tier);
               if (!t) return null;
               const idx = currentTier.level - 1;
@@ -1336,7 +1509,7 @@ function ProgressView({
               );
             })()}
             {TIERS.map((_, i) => i > 0 ? <div key={`d-${i}`} className="absolute top-0 h-full bg-white" style={{ left: `${i * 20}%`, width: 2, zIndex: 30 }} /> : null)}
-          </div>
+                </div>
           <div className="flex justify-between mt-3">
             {TIERS.map((tier, i) => {
               const TierIcon = tier.Icon;
@@ -1348,31 +1521,31 @@ function ProgressView({
                   <TierIcon className={`w-5 h-5 mb-1 ${isCur ? 'scale-125' : ''}`} style={{ color: isCur ? accentColor : done ? 'white' : 'rgba(255,255,255,0.25)' }} />
                   <span className="text-xs font-semibold text-center" style={{ color: isCur ? accentColor : done ? 'white' : 'rgba(255,255,255,0.3)' }}>{tier.name}</span>
                   {isCur && next && <span className="text-xs mt-0.5" style={{ color: accentColor }}>{next.minGames - gamesWon} more</span>}
-                </div>
+              </div>
               );
             })}
-          </div>
-        </div>
-      </div>
+            </div>
+                </div>
+              </div>
       )}
 
       {!showTierBar && (
         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 24, marginBottom: 32 }}>
           <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, margin: '0 0 4px' }}>My Goals</h2>
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, fontFamily: "'Barlow', sans-serif", margin: 0 }}>
-            Self-guided goal keeping · Upgrade to Varsity for coach-tracked ISO progress
+            Self-guided goal keeping · Call an ISO for coach-tracked ISO progress
           </p>
-        </div>
+                </div>
       )}
 
       {/* Championship banner */}
-      {isChampion && (
-        <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 border-2 border-yellow-500/50 rounded-2xl p-8 mb-8 text-center">
+            {isChampion && (
+              <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 border-2 border-yellow-500/50 rounded-2xl p-8 mb-8 text-center">
           <Trophy className="w-14 h-14 text-yellow-400 mx-auto mb-3" />
           <h2 className="text-white mb-2">Championship Ring Earned!</h2>
           <p className="text-slate-300 max-w-xl mx-auto">You've demonstrated exceptional growth and commitment. Your coach considers you ready to advance.</p>
-        </div>
-      )}
+              </div>
+            )}
 
       {/* Games list */}
       <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: '#F2F2F2', marginBottom: 16 }}>Your Games</h3>
@@ -1381,75 +1554,75 @@ function ProgressView({
           const done = game.buckets.filter(b => b.completed).length;
           const total = game.buckets.length;
           const pct = Math.round((done / total) * 100);
-          return (
-            <div key={game.id} className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+                return (
+                  <div key={game.id} className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
               <div
                 className={`p-6 cursor-pointer transition-colors ${game.completed ? 'bg-gradient-to-r from-green-900/30 to-green-800/20' : 'bg-slate-800/50 hover:bg-slate-800'}`}
-                onClick={() => setSelectedGame(selectedGame?.id === game.id ? null : game)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                      onClick={() => setSelectedGame(selectedGame?.id === game.id ? null : game)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
                     <div className={`w-11 h-11 rounded-full flex items-center justify-center ${game.completed ? 'bg-green-500/20' : 'bg-orange-500/20'}`}>
                       {game.completed ? <Trophy className="w-5 h-5 text-green-500" /> : <Target className="w-5 h-5 text-orange-500" />}
-                    </div>
-                    <div>
-                      <h4 className="text-white mb-1">{game.title}</h4>
+                            </div>
+                          <div>
+                            <h4 className="text-white mb-1">{game.title}</h4>
                       <p className="text-slate-400 text-sm">{done}/{total} buckets scored</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {game.completed ? <span className="text-green-400 text-sm">Game Won!</span> : <span className="text-orange-400 text-sm">{pct}% Complete</span>}
-                  </div>
-                </div>
-                {!game.completed && (
-                  <div className="mt-4 bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-400 h-full transition-all" style={{ width: `${pct}%` }} />
-                  </div>
-                )}
-              </div>
-              {selectedGame?.id === game.id && (
-                <div className="p-6 border-t border-slate-800">
-                  <h5 className="text-white mb-4">Get These Buckets:</h5>
-                  <div className="space-y-3">
-                    {game.buckets.map(bucket => (
-                      <div key={bucket.id} className={`p-4 rounded-xl border transition-all ${bucket.completed ? 'bg-green-900/20 border-green-700/50' : 'bg-slate-800 border-slate-700 hover:border-orange-500/50'}`}>
-                        <div className="flex items-start gap-3">
-                          <button onClick={() => toggleBucket(game.id, bucket.id)} className="flex-shrink-0 mt-1">
-                            {bucket.completed ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <Circle className="w-6 h-6 text-slate-500 hover:text-orange-500 transition-colors" />}
-                          </button>
-                          <div className="flex-1">
-                            <h6 className={`mb-1 ${bucket.completed ? 'text-slate-400 line-through' : 'text-white'}`}>{bucket.title}</h6>
-                            <p className="text-slate-500 text-sm">{bucket.description}</p>
-                            {bucket.dueDate && !bucket.completed && (
-                              <div className="flex items-center gap-2 mt-2 text-orange-400 text-sm">
-                                <Calendar className="w-4 h-4" />Due: {new Date(bucket.dueDate).toLocaleDateString()}
-                              </div>
-                            )}
                           </div>
                         </div>
+                        <div className="text-right">
+                    {game.completed ? <span className="text-green-400 text-sm">Game Won!</span> : <span className="text-orange-400 text-sm">{pct}% Complete</span>}
+                            </div>
+                        </div>
+                      {!game.completed && (
+                        <div className="mt-4 bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-400 h-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      )}
+                    </div>
+                    {selectedGame?.id === game.id && (
+                <div className="p-6 border-t border-slate-800">
+                        <h5 className="text-white mb-4">Get These Buckets:</h5>
+                        <div className="space-y-3">
+                    {game.buckets.map(bucket => (
+                      <div key={bucket.id} className={`p-4 rounded-xl border transition-all ${bucket.completed ? 'bg-green-900/20 border-green-700/50' : 'bg-slate-800 border-slate-700 hover:border-orange-500/50'}`}>
+                              <div className="flex items-start gap-3">
+                          <button onClick={() => toggleBucket(game.id, bucket.id)} className="flex-shrink-0 mt-1">
+                            {bucket.completed ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : <Circle className="w-6 h-6 text-slate-500 hover:text-orange-500 transition-colors" />}
+                                </button>
+                                <div className="flex-1">
+                            <h6 className={`mb-1 ${bucket.completed ? 'text-slate-400 line-through' : 'text-white'}`}>{bucket.title}</h6>
+                                  <p className="text-slate-500 text-sm">{bucket.description}</p>
+                                  {bucket.dueDate && !bucket.completed && (
+                                    <div className="flex items-center gap-2 mt-2 text-orange-400 text-sm">
+                                <Calendar className="w-4 h-4" />Due: {new Date(bucket.dueDate).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
 
       {/* Commitment tracker — Varsity portal only */}
       <div className="mt-8 bg-slate-900 border border-slate-800 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-2">
           <Clock className="w-5 h-5 text-orange-500" />
           <h4 className="text-white">30-Day Commitment</h4>
-        </div>
+                      </div>
         <p className="text-slate-400 text-sm mb-4">Maintain your 30-day commitment with your dedicated coach before exploring other pathways.</p>
         <div className="bg-slate-700 rounded-full h-2 overflow-hidden">
           <div className="bg-gradient-to-r from-orange-500 to-orange-400 h-full" style={{ width: '100%' }} />
-        </div>
+                    </div>
         <p className="text-green-400 text-sm mt-2">✓ Commitment period complete</p>
-      </div>
-    </div>
+                  </div>
+                </div>
   );
 }
 
@@ -1467,12 +1640,12 @@ function UpgradePrompt({
     <div style={{ padding: '48px 32px', maxWidth: 560, margin: '0 auto', textAlign: 'center' as const }}>
       <Lock size={40} style={{ color: accentColor, marginBottom: 20, opacity: 0.7 }} />
       <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 12px' }}>
-        {isVarsity ? 'Varsity Program Required' : 'Locker Room Required'}
+        {isVarsity ? 'ISO Pass Required' : 'Locker Room Required'}
       </h2>
       <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7, margin: '0 0 28px' }}>
         {isVarsity
-          ? 'Dedicated coaching, skill tree, coach messages, and ISO progress tracking are part of the Varsity Program.'
-          : 'Locker Room chat, self-guided goals, and priority shadowing require a Locker Room membership ($10/mo).'}
+          ? 'Dedicated coaching, skill tree, coach messages, and ISO progress tracking are part of the ISO Pass.'
+          : `Locker Room chat, self-guided goals, and ${LOCKER_ROOM_MONTHLY_CALLS} try outs require Locker Room ($${LOCKER_ROOM_PRICE_USD}/mo).`}
       </p>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' as const }}>
         <button onClick={onUpgrade} style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 100, padding: '12px 28px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: 'pointer' }}>
@@ -1480,9 +1653,9 @@ function UpgradePrompt({
         </button>
         <button onClick={onBack} style={{ background: 'transparent', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 100, padding: '12px 28px', fontFamily: "'Barlow', sans-serif", fontSize: 14, cursor: 'pointer' }}>
           Back to Dashboard
-        </button>
-      </div>
-    </div>
+                </button>
+              </div>
+            </div>
   );
 }
 
@@ -1501,10 +1674,17 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
     return s ? Number(s) : 0;
   });
 
+  useEffect(() => {
+    const initial = localStorage.getItem('iso_portal_initial_section');
+    if (initial === 'store') {
+      setActiveSection('store');
+      localStorage.removeItem('iso_portal_initial_section');
+    }
+  }, []);
+
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
     setMembershipPlan(plan);
-    onPlanChange?.(plan);
   };
 
   const canAccessSection = (section: PlayerSection) => SECTIONS_BY_PLAN[membershipPlan].includes(section);
@@ -1580,12 +1760,12 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
           <div className="relative w-full h-full max-w-7xl max-h-[90vh] rounded-2xl overflow-hidden" style={{ background: '#0C0C0C' }}>
             <div style={{ padding: '24px 32px 0' }}>
               <LockerRoomChat lockedPathwayId={getLockedPathway() || selectedPathwayId} />
-            </div>
+                </div>
             <button onClick={() => setShowLockerRoom(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <X size={16} />
             </button>
-          </div>
-        </div>
+                      </div>
+                  </div>
       )}
 
       {/* Sidebar */}
@@ -1609,14 +1789,14 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         {/* Profile completion banner */}
         {playerProfileCompletion < 100 && (
           <div className="mx-8 mt-6 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-2 border-orange-500/50 rounded-2xl p-5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4">
               <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0" />
               <p className="text-white text-sm">Complete your player profile to get the most out of ISO.</p>
             </div>
             <button onClick={() => { setActiveSection('profile'); setShowProfileCompletionModal(true); }} className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap">
               Complete Profile
-            </button>
-          </div>
+                    </button>
+                  </div>
         )}
 
         {/* Section views */}
@@ -1648,17 +1828,25 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         {activeSection === 'messages' && (
           canAccessSection('messages')
             ? <div style={{ padding: '32px', height: 'calc(100vh - 72px)' }}>
-                <CoachPlayerChat
+              <CoachPlayerChat
                   currentUserId="player-1" currentUserName="You" currentUserRole="player"
                   otherUserId="coach-1" otherUserName={currentCoachName} otherUserRole="coach"
                   category={pathway?.name || 'Your Pathway'} categoryIcon={pathwayIconMap[selectedPathwayId] || Moon}
-                />
+              />
+            </div>
+            : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
+        )}
+        {activeSection === 'store' && (
+          canAccessSection('store')
+            ? <div style={{ padding: '32px 32px 60px' }}>
+                <ISOStoreSection membershipPlan={membershipPlan} accentColor={accentColor} onUpgrade={handleUpgrade} />
               </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}
         {activeSection === 'profile' && (
-          <div style={{ padding: '32px', maxWidth: 900 }}>
+          <div style={{ padding: '32px 32px 60px', maxWidth: 960 }}>
             <PlayerProfileSection
+              accentColor={accentColor}
               onProfileCompletionChange={setPlayerProfileCompletion}
               onGenderChange={() => {}}
             />

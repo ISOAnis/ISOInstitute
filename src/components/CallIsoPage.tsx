@@ -1178,7 +1178,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 marginBottom: '6px',
                 fontFamily: "'Bebas Neue', sans-serif",
               }}>
-                Varsity Program
+                ISO Pass
               </h3>
               <div style={{
                 fontSize: '1.25rem',
@@ -1300,7 +1300,7 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Start Varsity with {coach.name}
+              Call an ISO with {coach.name}
             </button>
 
             {/* Payment note */}
