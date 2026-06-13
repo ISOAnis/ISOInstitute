@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 import './JoinISOPage.css';
+import { setAssessedLevel, setExploringPathway } from '../utils/membership';
 
 // ====================================================================
 // TYPES
@@ -390,6 +391,15 @@ const COACH_QS: Question[] = [
     question: 'Upload your professional headshot.',
     sub: 'This photo will appear on your coach card. Use a clear, professional photo with good lighting.',
     sectionLabel: 'Getting Started',
+    required: true,
+  },
+  {
+    id: 'c_gender',
+    type: 'mc',
+    question: 'I am a...',
+    sub: 'ISO matches coaches with players of the same gender.',
+    sectionLabel: 'Getting Started',
+    options: ['Male', 'Female'],
     required: true,
   },
   {
@@ -1900,6 +1910,7 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   });
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
+  const [authGender, setAuthGender] = useState<'male' | 'female' | ''>('');
   const [authError, setAuthError] = useState('');
 
   // --- Build the active questions list based on role + pathway ---
@@ -2090,9 +2101,11 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   const handleCreateAccount = () => {
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
     if (authPassword.length < 6) { setAuthError('Password must be at least 6 characters.'); return; }
+    if (!authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
     setAuthError('');
-    const userData = { email: authEmail, roles: [] as string[] };
+    const userData = { email: authEmail, roles: [] as string[], gender: authGender };
     localStorage.setItem('iso_demo_user', JSON.stringify(userData));
+    localStorage.setItem('iso_demo_plan', 'walk-on');
     goto('join');
   };
 
@@ -2100,7 +2113,14 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   const handleSignIn = () => {
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
     setAuthError('');
-    const userData = { email: authEmail, roles: [] as string[] };
+    const existing = localStorage.getItem('iso_demo_user');
+    let userData = { email: authEmail, roles: [] as string[], gender: authGender || undefined as 'male' | 'female' | undefined };
+    if (existing) {
+      try {
+        const parsed = JSON.parse(existing);
+        userData = { ...parsed, email: authEmail };
+      } catch {}
+    }
     localStorage.setItem('iso_demo_user', JSON.stringify(userData));
     const onboardingDone = localStorage.getItem('iso_onboarding_complete');
     if (onboardingDone) {
@@ -2116,10 +2136,15 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
     if (role === 'player') {
       localStorage.setItem('iso_onboarding_complete', 'true');
       localStorage.setItem('iso_demo_portal', 'player');
+      localStorage.setItem('iso_demo_plan', 'walk-on');
+      localStorage.removeItem('iso_explorer');
+      if (playerResult) setAssessedLevel(playerResult.level);
+      if (answers.pathway) setExploringPathway(answers.pathway as string);
     } else if (role === 'explorer') {
       localStorage.setItem('iso_onboarding_complete', 'true');
       localStorage.setItem('iso_demo_portal', 'player');
-      localStorage.setItem('iso_explorer', 'true'); // flag so portal knows they're exploring
+      localStorage.setItem('iso_explorer', 'true');
+      localStorage.setItem('iso_demo_plan', 'walk-on');
     } else {
       // Coach: application submitted — portal access pending Advisory Board approval
       localStorage.setItem('iso_coach_pending', 'true');
@@ -2131,6 +2156,9 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
       try {
         const u = JSON.parse(existing);
         u.roles = [role];
+        if (role === 'coach' && answers.c_gender) {
+          u.gender = (answers.c_gender as string).toLowerCase() === 'female' ? 'female' : 'male';
+        }
         localStorage.setItem('iso_demo_user', JSON.stringify(u));
       } catch {}
     }
@@ -2167,11 +2195,23 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
               </p>
 
               {/* Social buttons */}
-              <button className="iso-join__social-btn" onClick={() => { localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'google@user.com', roles: [] })); goto('join'); }}>
+              <button className="iso-join__social-btn" onClick={() => {
+                if (authMode === 'create' && !authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
+                setAuthError('');
+                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'google@user.com', roles: [], gender: authGender || undefined }));
+                localStorage.setItem('iso_demo_plan', 'walk-on');
+                goto('join');
+              }}>
                 <span className="iso-join__social-icon">G</span>
                 Continue with Google
               </button>
-              <button className="iso-join__social-btn" onClick={() => { localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'apple@user.com', roles: [] })); goto('join'); }}>
+              <button className="iso-join__social-btn" onClick={() => {
+                if (authMode === 'create' && !authGender) { setAuthError('Please select your gender so we can match you with the right coaches.'); return; }
+                setAuthError('');
+                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'apple@user.com', roles: [], gender: authGender || undefined }));
+                localStorage.setItem('iso_demo_plan', 'walk-on');
+                goto('join');
+              }}>
                 <span className="iso-join__social-icon">🍎</span>
                 Continue with Apple
               </button>
@@ -2193,6 +2233,29 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
                   onKeyDown={e => e.key === 'Enter' && (authMode === 'create' ? handleCreateAccount() : handleSignIn())}
                   autoFocus
                 />
+                {authMode === 'create' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <span style={{ fontFamily: 'var(--ff-barlow)', fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>I am a... (required for coach matching)</span>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      {(['male', 'female'] as const).map(g => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => { setAuthGender(g); setAuthError(''); }}
+                          style={{
+                            flex: 1, padding: '12px 0', borderRadius: 10, cursor: 'pointer',
+                            fontFamily: 'var(--ff-condensed)', fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+                            background: authGender === g ? 'var(--silver-mid)' : 'transparent',
+                            color: authGender === g ? '#0C0C0C' : 'rgba(255,255,255,0.5)',
+                            border: authGender === g ? 'none' : '1px solid var(--border)',
+                          }}
+                        >
+                          {g === 'male' ? 'Male' : 'Female'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <input
                   className="iso-join__text-input"
                   type="password"

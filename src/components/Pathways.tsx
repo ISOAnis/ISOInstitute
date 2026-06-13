@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { CoachModal } from './CoachModal';
 import { SignupModal } from './SignupModal';
 import { PATHWAYS } from '../data/pathways';
+import { getUserPlan } from '../utils/membership';
 
 // =============================================================================
 // UNIFIED PATHWAY CARD COMPONENT - Single consistent style for all cards
@@ -218,7 +219,8 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
   }));
 
   const handlePathwayClick = (pathwayId: string) => {
-    if (commitmentStatus?.isCommitted) {
+    const varsityCommitted = commitmentStatus?.isCommitted && getUserPlan() === 'varsity';
+    if (varsityCommitted) {
       setShowCommitmentWarning(true);
     } else if (!isLoggedIn) {
       setShowSignupModal(true);

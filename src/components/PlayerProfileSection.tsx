@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { InteractiveGlobe } from './InteractiveGlobe';
+import { getUserGender, saveUserGender, type UserGender } from '../utils/membership';
 
 interface Location {
   lat: number;
@@ -15,6 +16,7 @@ interface Location {
 interface PlayerProfile {
   name: string;
   email: string;
+  gender: UserGender | '';
   age: string;
   schoolYear: string;
   locations: Location[];
@@ -30,6 +32,7 @@ interface PlayerProfile {
 const defaultProfile: PlayerProfile = {
   name: '',
   email: '',
+  gender: '',
   age: '',
   schoolYear: '',
   locations: [],
@@ -78,14 +81,20 @@ const motivationLabels = {
 
 interface PlayerProfileSectionProps {
   onProfileCompletionChange?: (percentage: number) => void;
+  onGenderChange?: (gender: UserGender | null) => void;
 }
 
-export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfileSectionProps) {
+export function PlayerProfileSection({ onProfileCompletionChange, onGenderChange }: PlayerProfileSectionProps) {
   const [profile, setProfile] = useState<PlayerProfile>(() => {
     try {
       const saved = localStorage.getItem('player_profile_data');
+      const savedGender = getUserGender();
       if (saved) {
-        return { ...defaultProfile, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        return { ...defaultProfile, ...parsed, gender: parsed.gender || savedGender || '' };
+      }
+      if (savedGender) {
+        return { ...defaultProfile, gender: savedGender };
       }
     } catch (error) {
       console.warn('Failed to load player profile data:', error);
@@ -104,6 +113,7 @@ export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfil
   const completionPercentage = useMemo(() => {
     // Check if profile was completed via the modal (has all modal fields but may not have name/email)
     const hasAllModalFields = 
+      Boolean(profile.gender) &&
       Boolean(profile.age?.trim()) &&
       Boolean(profile.schoolYear?.trim()) &&
       profile.locations.length > 0 &&
@@ -124,6 +134,7 @@ export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfil
     const checks: Array<boolean> = [
       Boolean(profile.name?.trim()),
       Boolean(profile.email?.trim()),
+      Boolean(profile.gender),
       Boolean(profile.age?.trim()),
       Boolean(profile.schoolYear?.trim()),
       profile.locations.length > 0,
@@ -165,6 +176,10 @@ export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfil
 
   const saveDemographics = () => {
     setProfile({ ...tempProfile });
+    if (tempProfile.gender === 'male' || tempProfile.gender === 'female') {
+      saveUserGender(tempProfile.gender);
+      onGenderChange?.(tempProfile.gender);
+    }
     setIsEditingDemographics(false);
   };
 
@@ -202,6 +217,10 @@ export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfil
               Your profile information helps our AI matching system pair you with the best coaches:
             </p>
             <ul className="text-slate-300 text-sm space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-orange-400 mt-1">•</span>
+                <span><strong>Gender</strong> ensures you're matched with coaches of the same gender</span>
+              </li>
               <li className="flex items-start gap-2">
                 <span className="text-orange-400 mt-1">•</span>
                 <span><strong>Demographics</strong> help us match you with coaches who understand your cultural background and life stage</span>
@@ -330,6 +349,34 @@ export function PlayerProfileSection({ onProfileCompletionChange }: PlayerProfil
         </div>
 
         <div className="space-y-6">
+          {/* Gender */}
+          <div>
+            <label className="block text-slate-400 text-sm mb-2">Gender</label>
+            <p className="text-slate-500 text-xs mb-3">ISO matches coaches with players of the same gender.</p>
+            {isEditingDemographics ? (
+              <div className="flex gap-3">
+                {(['male', 'female'] as const).map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setTempProfile({ ...tempProfile, gender: g })}
+                    className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-colors ${
+                      tempProfile.gender === g
+                        ? 'bg-orange-500 text-white border-orange-500'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-orange-500/50'
+                    }`}
+                  >
+                    {g === 'male' ? 'Male' : 'Female'}
+                  </button>
+                ))}
+              </div>
+            ) : profile.gender ? (
+              <p className="text-white capitalize">{profile.gender}</p>
+            ) : (
+              <p className="text-orange-400 text-sm">Not set — edit to select your gender for coach matching</p>
+            )}
+          </div>
+
           {/* Age and School Year */}
           <div className="grid grid-cols-2 gap-4">
             <div>
