@@ -53,6 +53,7 @@ export function chatUsedWithCoach(usage: ExplorerUsage, coachId: string): boolea
 }
 
 export function chatUsedForPathway(usage: ExplorerUsage, pathwayId: string): boolean {
+  if (!usage?.pathwayChats || !pathwayId) return false;
   return !!usage.pathwayChats[pathwayId];
 }
 

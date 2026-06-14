@@ -6,11 +6,12 @@ import {
   MessageSquare, Plus, Lock, Clock, UserCircle, Users, X, Moon,
   Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle,
   ArrowRight, Dumbbell, Activity, Settings, Rocket, Globe, LucideIcon,
-  Home, GitBranch, Menu, Compass, CheckCheck, Zap, ChevronRight, ShoppingBag, RefreshCw,
+  Home, GitBranch, Menu, Compass, CheckCheck, Zap, ChevronRight, ShoppingBag, MessageCircle,
 } from 'lucide-react';
 import { PlayerProfileSection } from './PlayerProfileSection';
 import { LockerRoomChat } from './LockerRoomChat';
 import { LockerRoomGoals } from './LockerRoomGoals';
+import { ISOCommunityForum, CommunityUpgradeGate } from './ISOCommunityForum';
 import { ISOStoreSection } from './portal-store';
 import { PathwayLockConfirmModal } from './PathwayLockConfirmModal';
 import { PathwayChangeRequestModal } from './PathwayChangeRequestModal';
@@ -20,6 +21,7 @@ import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
 import { LockerRoomCheckoutModal } from './LockerRoomCheckoutModal';
 import { VarsityInterestModal } from './VarsityInterestModal';
+import { PortalGreeting } from './PortalGreeting';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import {
   getUserGender, getUserPlan, setUserPlan, filterByGender, usesExplorerPortal,
@@ -54,7 +56,7 @@ interface SkillNodeDef {
   id: string; label: string; sublabel: string;
   row: number; col: number; unlocksAt: number;
 }
-type WalkOnSection = 'explore' | 'goals' | 'locker-room' | 'store' | 'profile';
+type WalkOnSection = 'explore' | 'goals' | 'community' | 'locker-room' | 'store' | 'profile';
 type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'store' | 'profile';
 
 interface PlayerPortalProps {
@@ -823,7 +825,6 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const [membershipPlan, setMembershipPlan] = useState<MembershipPlan>(getUserPlan);
   const [playerGender, setPlayerGender] = useState<UserGender | null>(getUserGender);
   const [currentPathwayId, setCurrentPathwayId] = useState(() => getActivePathway(getUserPlan()));
-  const [showPathwayPicker, setShowPathwayPicker] = useState(false);
   const [showLockConfirm, setShowLockConfirm] = useState(false);
   const [showChangeRequest, setShowChangeRequest] = useState(false);
   const [showLockerCheckout, setShowLockerCheckout] = useState(false);
@@ -935,11 +936,12 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     if (section !== 'explore') setSelectedPathway(null);
   };
 
-  const changePathway = (pathwayId: string) => {
-    if (pathwayIsLocked) return;
-    setCurrentPathwayId(pathwayId);
-    setExploringPathway(pathwayId);
-    setShowPathwayPicker(false);
+  const selectExplorePathway = (pathwayId: string) => {
+    if (!pathwayIsLocked) {
+      setCurrentPathwayId(pathwayId);
+      setExploringPathway(pathwayId);
+    }
+    setSelectedPathway(pathwayId);
   };
 
   useEffect(() => {
@@ -959,6 +961,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const sidebarItems: { id: WalkOnSection; label: string; Icon: React.ComponentType<{ size: number }>; locked?: boolean }[] = [
     { id: 'explore', label: pathwayIsLocked ? 'My Coaches' : 'Explore Coaches', Icon: Compass },
     { id: 'goals', label: 'My Goals', Icon: Target, locked: membershipPlan === 'walk-on' },
+    { id: 'community', label: 'ISO Community', Icon: MessageCircle },
     { id: 'locker-room', label: 'Locker Room', Icon: Users, locked: !hasLockerRoomAccess },
     { id: 'store', label: 'ISO Store', Icon: ShoppingBag },
     { id: 'profile', label: 'My Profile', Icon: UserCircle },
@@ -1015,6 +1018,24 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
       {/* Main content */}
       <main style={{ flex: 1, marginLeft: w, transition: 'margin-left 0.25s ease', padding: '32px 32px 60px', overflowY: 'auto' as const }}>
 
+        {activeSection === 'explore' && (
+          <PortalGreeting
+            role="player"
+            accentColor={exploreHex}
+            subline={`${PLAN_LABELS[membershipPlan]} · ${currentPathwayName ?? 'Explore pathways'}`}
+          />
+        )}
+        {activeSection === 'community' && hasLockerRoomAccess && (
+          <PortalGreeting
+            role="player"
+            accentColor={activeHex}
+            subline={`ISO Community · ${currentPathwayName ?? 'All pathways'}`}
+          />
+        )}
+        {activeSection === 'community' && !hasLockerRoomAccess && (
+          <PortalGreeting role="player" accentColor="#f97316" subline="Locker Room exclusive" />
+        )}
+
         {/* ── MY COACHES — locked plan, pathway missing or invalid ── */}
         {activeSection === 'explore' && pathwayIsLocked && (!explorePathwayId || !explorePathway) && (
           <div style={{ padding: 48, textAlign: 'center' as const, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16 }}>
@@ -1032,35 +1053,6 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
         {/* ── EXPLORE (walk-on pathway grid) ── */}
         {activeSection === 'explore' && !pathwayIsLocked && !selectedPathway && (
           <>
-            {currentPathwayName && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20, padding: '12px 18px', background: `${activeHex}10`, border: `1px solid ${activeHex}25`, borderRadius: 12 }}>
-                <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {pathwayIsLocked ? (
-                    <><Lock size={14} style={{ color: activeHex }} /> Locked to <strong style={{ color: activeHex }}>{currentPathwayName}</strong> · shown on your name in chat</>
-                  ) : (
-                    <>Exploring as <strong style={{ color: activeHex }}>{currentPathwayName}</strong> · switch anytime</>
-                  )}
-                </div>
-                {pathwayIsLocked ? (
-                  <button onClick={() => setShowChangeRequest(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 14px', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
-                    <Lock size={12} /> REQUEST PATHWAY CHANGE
-                  </button>
-                ) : (
-                  <button onClick={() => setShowPathwayPicker(p => !p)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '6px 14px', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
-                    <RefreshCw size={12} /> CHANGE PATHWAY
-                  </button>
-                )}
-              </div>
-            )}
-            {showPathwayPicker && !pathwayIsLocked && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12 }}>
-                {PATHWAYS.map(p => (
-                  <button key={p.id} onClick={() => changePathway(p.id)} style={{ padding: '10px 12px', borderRadius: 10, border: currentPathwayId === p.id ? `1px solid ${PATHWAY_HEX[p.id]}60` : '1px solid rgba(255,255,255,0.08)', background: currentPathwayId === p.id ? `${PATHWAY_HEX[p.id]}15` : 'transparent', color: currentPathwayId === p.id ? PATHWAY_HEX[p.id] : 'rgba(255,255,255,0.5)', cursor: 'pointer', fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600 }}>
-                    {p.name}
-                  </button>
-                ))}
-            </div>
-            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 12, padding: '14px 20px', marginBottom: 24 }}>
               <Zap size={16} style={{ color: '#f97316', flexShrink: 0 }} />
               <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>
@@ -1089,9 +1081,9 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                 const IconComp = pathwayIconMap[pathway.id];
                 const hex = PATHWAY_HEX[pathway.id];
                 const pathwayCoaches = matchedCoaches.filter(c => c.pathwayId === pathway.id);
-                const chatUsed = chatUsedForPathway(pathway.id);
+                const chatUsed = chatUsedForPathway(usage, pathway.id);
                 return (
-                  <button key={pathway.id} onClick={() => setSelectedPathway(pathway.id)} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '22px 22px 20px', textAlign: 'left' as const, cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}
+                  <button key={pathway.id} onClick={() => selectExplorePathway(pathway.id)} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '22px 22px 20px', textAlign: 'left' as const, cursor: 'pointer', transition: 'all 0.2s', width: '100%' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = hex + '50'; (e.currentTarget as HTMLButtonElement).style.background = hex + '08'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.03)'; }}
                   >
@@ -1151,7 +1143,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                   <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
                     {membershipPlan === 'locker-room'
                       ? `${discoveryCallsRemaining(membershipPlan, usage)} of ${LOCKER_ROOM_MONTHLY_CALLS} try outs left · different coaches only`
-                      : chatUsedForPathway(explorePathwayId)
+                      : chatUsedForPathway(usage, explorePathwayId)
                         ? 'Try out used for this pathway'
                         : '1 try out available for this pathway'}
                   </p>
@@ -1219,11 +1211,24 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           </>
         )}
 
+        {/* ── ISO COMMUNITY FORUM ── */}
+        {activeSection === 'community' && (
+          hasLockerRoomAccess ? (
+            <div>
+              <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>ISO Community</h2>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>Share wins, celebrate goals, and encourage players & coaches across every pathway.</p>
+              <ISOCommunityForum lockedPathwayId={lockedPathwayId} lockedPathwayName={currentPathwayName ?? undefined} />
+            </div>
+          ) : (
+            <CommunityUpgradeGate onUpgrade={() => handleUpgradeClick('locker-room')} />
+          )
+        )}
+
         {/* ── LOCKER ROOM CHAT ── */}
         {activeSection === 'locker-room' && hasLockerRoomAccess && (
           <div>
             <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>Locker Room</h2>
-            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>Pathway community chat & exclusive video library · you post as {currentPathwayName}</p>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>Pathway channels & video library · you post as {currentPathwayName}</p>
             <LockerRoomChat lockedPathwayId={lockedPathwayId} />
           </div>
         )}
@@ -1335,6 +1340,11 @@ function DashboardView({
                   
                   return (
     <div style={{ padding: '32px 32px 60px' }}>
+      <PortalGreeting
+        role="player"
+        accentColor={accentColor}
+        subline={`${pathway}${showDedicatedCoach ? ` · with ${coachName}` : ''}`}
+      />
       {/* Player card */}
       <div style={{
         background: `linear-gradient(135deg, ${accentColor}18 0%, rgba(255,255,255,0.03) 100%)`,

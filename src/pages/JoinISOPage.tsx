@@ -1309,7 +1309,7 @@ const PLANS = [
     features: [
       '3 × 30-min try outs/month — different coaches only',
       'Locked pathway identity in community chat',
-      'Locker Room chat, goals & online ISO store',
+      'Locker Room chat, goals & ISO Community forum',
       'Priority shadowing in your pathway',
       'ISO Pass milestone gear preview',
     ],

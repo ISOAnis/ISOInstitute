@@ -8,6 +8,7 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { PortalGreeting } from './PortalGreeting';
 import { CoachProfileSection } from './CoachProfileSection';
 import { AIMatchingDashboard } from './AIMatchingDashboard';
 import { LockerRoom } from './LockerRoom';
@@ -428,14 +429,13 @@ export function CoachPortal() {
                 </AvatarFallback>
               )}
             </Avatar>
-            <div>
-              <h1 className="text-white mb-1">Coach Portal</h1>
-          <div className="flex items-center gap-2 text-slate-400">
-                {React.createElement(currentCoach.categoryIcon, { className: 'w-5 h-5 text-white' })}
-            <span className="text-orange-400">{currentCoach.category}</span>
-            <span> • {currentCoach.name}</span>
-              </div>
-            </div>
+            <PortalGreeting
+              role="coach"
+              name={currentCoach.name.split(' ')[0]}
+              accentColor="#f97316"
+              subline={`${currentCoach.category} · ${currentCoach.name}`}
+              className="!mb-0"
+            />
           </div>
           <button
             onClick={handleStartTutorial}
