@@ -144,7 +144,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
             <div className="about-eyebrow">What ISO Means</div>
             <div className="about-defined-term">
               <span className="about-defined-word">ISO</span>
-              <span className="about-defined-pos">— noun, basketball — isolation play</span>
+              <span className="about-defined-pos">— verb, basketball — isolation play</span>
             </div>
 
             <div className="about-reframe-split">
