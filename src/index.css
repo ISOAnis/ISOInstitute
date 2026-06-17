@@ -362,6 +362,35 @@ html {
     color: white !important;
   }
 
+  .splash-about-btn {
+    border: 1px solid #ffffff;
+  }
+
+  .splash-about-btn::before {
+    background: #0C0C0C;
+  }
+
+  .splash-about-btn span {
+    color: #0C0C0C;
+  }
+
+  .splash-home-btn {
+    background: #0C0C0C;
+    border: 1px solid #ffffff;
+  }
+
+  .splash-home-btn::before {
+    background: #ffffff;
+  }
+
+  .splash-home-btn span {
+    color: #ffffff;
+  }
+
+  .splash-home-btn:hover span {
+    color: #0C0C0C !important;
+  }
+
   hr {
     height: 0;
     color: inherit;

@@ -16,13 +16,36 @@
  */
 
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import EventSplashPage from './pages/EventSplashPage';
+import { About } from './components/About';
+
+const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
+
+type SplashView = 'splash' | 'about';
 
 // =============================================================================
 // SPLASH PAGE ONLY - This branch shows only the event splash page
 // =============================================================================
 export default function App() {
-  return <EventSplashPage />;
+  const [view, setView] = useState<SplashView>('splash');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
+  if (view === 'about') {
+    return (
+      <About
+        onBack={() => setView('splash')}
+        onWaitlistClick={() =>
+          window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
+        }
+      />
+    );
+  }
+
+  return <EventSplashPage onNavigateToAbout={() => setView('about')} />;
 }
 
 // =============================================================================

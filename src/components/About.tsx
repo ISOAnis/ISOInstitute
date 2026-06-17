@@ -1,125 +1,272 @@
-export function About() {
+import * as React from 'react';
+import { Moon, Dumbbell, Globe, Activity, Rocket, Settings, type LucideIcon } from 'lucide-react';
+import { SplashNavigation } from './SplashNavigation';
+import '../styles/about.css';
+
+type Page =
+  | 'home'
+  | 'pathways'
+  | 'about'
+  | 'community'
+  | 'store'
+  | 'coach-portal'
+  | 'player-portal'
+  | 'call-iso';
+
+interface AboutProps {
+  onNavigate?: (page: Page) => void;
+  onWaitlistClick?: () => void;
+  onBack?: () => void;
+}
+
+const PROBLEMS = [
+  {
+    num: '01',
+    title: (
+      <>
+        Talent is everywhere.
+        <br />
+        Access is not.
+      </>
+    ),
+    desc: "The most capable people often don't live in major hubs. They're hidden behind geography, networks, or circumstance.",
+  },
+  {
+    num: '02',
+    title: 'Development has become performative.',
+    desc: "Growth became something you post, not something you feel. It's been reduced to routines, slogans, and content for show.",
+  },
+  {
+    num: '03',
+    title: "Local talent isn't celebrated.",
+    desc: 'We celebrate celebrities for status, not impact. Meanwhile, the people doing real work in their communities go unseen.',
+  },
+] as const;
+
+const BELIEFS = [
+  'Iron sharpens iron',
+  'Growth requires resistance',
+  'Community accelerates mastery',
+  'Development deserves to be rewarded',
+] as const;
+
+const PATHWAY_ARCHETYPES: {
+  name: string;
+  tagline: string;
+  accent: string;
+  icon: LucideIcon;
+}[] = [
+  { name: 'The Seeker', tagline: 'Center faith before function.', accent: '#10b981', icon: Moon },
+  { name: 'The Warrior', tagline: 'Train the body. Strengthen the mind.', accent: '#ef4444', icon: Dumbbell },
+  { name: 'The Reformer', tagline: 'Lead globally. Move with purpose.', accent: '#6366f1', icon: Globe },
+  { name: 'The Healer', tagline: 'Serve through science and compassion.', accent: '#3b82f6', icon: Activity },
+  { name: 'The Founder', tagline: 'Build something that outlasts you.', accent: '#f97316', icon: Rocket },
+  { name: 'The Builder', tagline: 'Design, build, and solve for tomorrow.', accent: '#a855f7', icon: Settings },
+];
+
+const IMPACTS = [
+  'When access improves, communities strengthen.',
+  'When development becomes engaging, people commit.',
+  'When people grow together, progress compounds.',
+] as const;
+
+const VALUES = ['Humility', 'Service', 'Integrity', 'Community', 'Honesty', 'Stewardship'] as const;
+
+const TEAM = [
+  { initials: 'AB', name: 'Anis Benyoucef', role: 'Founder' },
+  { initials: 'YH', name: 'Yahya Hamu', role: 'Technical Lead' },
+  { initials: 'IE', name: 'Idris Elmi', role: 'Technical Lead' },
+] as const;
+
+const MISSION_STATEMENT =
+  'A gamified development platform and cultural movement built to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.';
+
+export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
+  const handlePrimaryCta = () => {
+    if (onWaitlistClick) {
+      onWaitlistClick();
+      return;
+    }
+    onNavigate?.('pathways');
+  };
+
   return (
-    <div className="about-page">
-      <div className="hero">
-        <div className="hero-content">
-          <div className="logo">ISO</div>
-          <div className="tagline">In Search Of. Isolation. Proximity to Success.</div>
-          <div className="manifesto-intro">This is more than coaching. This is a movement.</div>
-        </div>
+    <div className="about-splash">
+      <div className="about-splash-bg" aria-hidden="true">
+        <div className="about-splash-bg-vignette" />
+        <div className="about-splash-bg-glow" />
       </div>
 
-      <section>
-        <h2 className="section-title">The System Is Broken</h2>
-        <div className="manifesto">
-          <p>We're done with profit-driven, leeching corporations who take from our communities and sell us back poison.</p>
-          <p>We're done with brands that only sign people once they're famous, once they're up, once they can be exploited for clout.</p>
-          <p><strong>ISO flips the entire system.</strong></p>
-          <p>Most traditional brands endorse status. <strong>ISO endorses impact.</strong></p>
-          <p>We celebrate the ones who make grassroots change — the people choosing courage, purpose, community, and service before the spotlight.</p>
-        </div>
-      </section>
+      <SplashNavigation mode={onBack ? 'about' : 'splash'} onBack={onBack} />
 
-      <section className="pillars">
-        <h2 className="section-title">How ISO Works</h2>
-        <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
-          This is an exclusive movement, and the only way in is by <strong style={{ color: '#e2e8f0' }}>giving, growing, or guiding.</strong>
+      <div className="about-splash-content">
+        {/* Hero */}
+        <section className="about-hero">
+          <img src="/ISO OFFICIAL.png" alt="ISO" className="about-hero-logo" />
+          <h1 className="about-hero-title">It's not you vs you anymore.</h1>
+          <p className="about-hero-sub">
+            Fear makes role players. Courage makes stars. It's time to{' '}
+            <strong>Call an ISO</strong>.
+          </p>
+        </section>
+
+        {/* The Problem */}
+        <section className="about-section about-section-tight">
+          <div className="about-eyebrow">The Challenge</div>
+          <h2 className="about-heading about-heading-cards">Three Problems. One Mission.</h2>
+          <div className="about-problem-grid">
+            {PROBLEMS.map((problem) => (
+              <div key={problem.num} className="about-problem-card">
+                <div className="about-problem-num">Problem {problem.num}</div>
+                <div className="about-problem-title">{problem.title}</div>
+                <div className="about-problem-desc">{problem.desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <p className="about-why-line">
+          Access used to come through people who let you get close enough to learn.{' '}
+          <strong>ISO is building that back.</strong>
         </p>
-        
-        <ul className="pillar-list">
-          <li><strong>Players join by leveling up in real life.</strong></li>
-          <li><strong>Coaches join by serving their community.</strong></li>
-          <li><strong>And as they rise, ISO rises with them.</strong></li>
-        </ul>
 
-        <div className="manifesto" style={{ marginTop: '3rem' }}>
-          <p>Every pathway will have its own signature sneaker — and coaches who excel in service, leadership, and character will be signed to ISO with their own colorway and tracksuit.</p>
-          <p>Players who level up will be rewarded too.</p>
-          <p><strong>This is a real-life version of 2K, but built around courage and contribution, not clout.</strong></p>
-        </div>
-      </section>
+        {/* What ISO Means */}
+        <section className="about-section">
+          <div className="about-defined">
+            <div className="about-eyebrow">What ISO Means</div>
+            <div className="about-defined-term">
+              <span className="about-defined-word">ISO</span>
+              <span className="about-defined-pos">— noun, basketball — isolation play</span>
+            </div>
 
-      <section>
-        <h2 className="section-title">What ISO Stands For</h2>
-        <div className="value-grid">
-          <div className="value-card">
-            <h3>Hope</h3>
-            <p>A belief that your circumstances don't define your ceiling.</p>
-          </div>
-          <div className="value-card">
-            <h3>Courage</h3>
-            <p>The willingness to step out of comfort and into purpose.</p>
-          </div>
-          <div className="value-card">
-            <h3>Bravery</h3>
-            <p>Taking action when the path isn't clear.</p>
-          </div>
-          <div className="value-card">
-            <h3>Belief</h3>
-            <p>Trusting your own potential before anyone else does.</p>
-          </div>
-          <div className="value-card">
-            <h3>Fearlessness</h3>
-            <p>Moving forward despite the obstacles.</p>
-          </div>
-          <div className="value-card">
-            <h3>Service</h3>
-            <p>Our status. Our standard. Our signature.</p>
-          </div>
-        </div>
-      </section>
+            <div className="about-reframe-split">
+              <div className="about-reframe-col">
+                <div className="about-reframe-label">What people assume</div>
+                <div className="about-reframe-text struck">You vs you. Alone in the gym.</div>
+              </div>
+              <div className="about-reframe-vs">VS</div>
+              <div className="about-reframe-col">
+                <div className="about-reframe-label gold">What an ISO actually is</div>
+                <div className="about-reframe-text">You vs a defender built to challenge you.</div>
+              </div>
+            </div>
 
-      <section>
-        <h2 className="section-title">The New Rules</h2>
-        <div className="manifesto">
-          <p><strong>ISO creates heroes, not egos.</strong></p>
-          <p><strong>Service is our status.</strong></p>
-          <p><strong>Impact is our influence.</strong></p>
-          <p><strong>Growth is our currency.</strong></p>
-          <p style={{ marginTop: '2rem' }}>Entry into ISO can only be earned through service, growth, and value. Coaches reach signature status through impact. Players rise through levels of discipline and development.</p>
-          <p>Signature shoes, colorways, and tracksuits symbolize identity earned — <strong>not purchased.</strong></p>
-          <p style={{ fontSize: '1.4rem', marginTop: '2rem', color: '#ff7b00' }}>This is the first real-life progression system built around character, courage, and contribution.</p>
-        </div>
-      </section>
+            <p className="about-reframe-close">
+              In basketball, an ISO isn't isolation — it's a one-on-one against someone who sharpens you in real
+              time. <strong>We took that definition and applied it to real-world pathways.</strong> Every coach
+              on ISO is that defender. You don't get better in isolation. You get better in proximity to someone
+              who won't let you stay the same.
+            </p>
 
-      <section>
-        <h2 className="section-title">What ISO Really Is</h2>
-        <div className="definitions">
-          <div className="definition-item">
-            <strong>ISO is not a coaching platform.</strong>
-            ISO is a movement. The platform is just the infrastructure.
+            <div className="about-beliefs">
+              {BELIEFS.map((belief) => (
+                <div key={belief} className="about-belief">
+                  <span className="about-belief-dash" />
+                  {belief}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="definition-item">
-            <strong>The brand is the identity.</strong>
-            We're building the first cultural brand for the people who actually build our communities.
-          </div>
-          <div className="definition-item">
-            <strong>The movement is the mission.</strong>
-            ISO signs community professionals. ISO gives everyday professionals the same hype athletes, musicians, and "famous" individuals get.
-          </div>
-          <div className="definition-item">
-            <strong>ISO = Inspirational Infrastructure</strong>
-            We're building systems that elevate people based on what they do, not who they know.
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section>
-        <h2 className="section-title">The Pitch</h2>
-        <div className="manifesto">
-          <p>Celebrities and athletes get all the attention and brand deals.</p>
-          <p><strong>ISO is the first platform giving everyday high performers that same spotlight</strong> — the engineers, the doctors, the creatives, the small-business hustlers.</p>
-          <p style={{ marginTop: '2rem', fontSize: '1.3rem' }}>People join for coaching.</p>
-          <p style={{ fontSize: '1.3rem' }}><strong>But they stay because of identity, community, and culture.</strong></p>
-        </div>
-      </section>
+        {/* Six Pathways */}
+        <section className="about-section about-pathways-section">
+          <div className="about-eyebrow">The Pathways</div>
+          <h2 className="about-heading about-heading-cards">Six paths. One standard.</h2>
+          <p className="about-pathways-lede">
+            Six archetypes for players and coaches — choose where you want to grow or lead.
+          </p>
+          <div className="about-pathway-grid">
+            {PATHWAY_ARCHETYPES.map((pathway, index) => {
+              const Icon = pathway.icon;
+              return (
+                <div
+                  key={pathway.name}
+                  className="about-pathway-card"
+                  style={{ '--pathway-accent': pathway.accent } as React.CSSProperties}
+                >
+                  <div className="about-pathway-top">
+                    <div className="about-pathway-icon" aria-hidden="true">
+                      <Icon className="about-pathway-icon-svg" strokeWidth={1.75} />
+                    </div>
+                    <div className="about-pathway-num">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+                  <div className="about-pathway-name">{pathway.name}</div>
+                  <div className="about-pathway-tagline">{pathway.tagline}</div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
-      <div className="cta-section">
-        <h2>This is a movement — and only the bold get in.</h2>
-        <p>Service is our status.</p>
-        <p>Impact is our influence.</p>
-        <p>Growth is our currency.</p>
-        <p style={{ marginTop: '2rem', fontSize: '2rem', fontWeight: 900 }}>ARE YOU IN SEARCH OF MORE?</p>
+        {/* Mission */}
+        <section className="about-section about-mission-section">
+          <div className="about-eyebrow">Mission</div>
+          <p className="about-mission-text">{MISSION_STATEMENT}</p>
+        </section>
+
+        {/* What We Stand On */}
+        <section className="about-section about-stand-on-section">
+          <div className="about-eyebrow">What We Stand On</div>
+          <p className="about-close-faith">
+            ISO is faith-driven — not in what it requires of you, but in how it was built.{' '}
+            <strong>ISO was built by people of faith</strong>, and that shapes the standard we hold coaches to and
+            the values baked into every part of this platform.
+          </p>
+          <div className="about-values">
+            {VALUES.map((value) => (
+              <span key={value} className="about-value">
+                {value}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* Why ISO Matters */}
+        <section className="about-section">
+          <div className="about-eyebrow">The Impact</div>
+          <h2 className="about-heading about-heading-cards">Why ISO Matters</h2>
+          <div className="about-impact-grid">
+            {IMPACTS.map((impact, index) => (
+              <div
+                key={impact}
+                className={`about-impact-bubble${index === 2 ? ' full' : ''}`}
+              >
+                {impact}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* The Team */}
+        <section className="about-section">
+          <div className="about-eyebrow">Behind ISO</div>
+          <h2 className="about-heading about-heading-cards">The Team</h2>
+          <div className="about-team-grid">
+            {TEAM.map((member) => (
+              <div key={member.name} className="about-team-card">
+                <div className="about-team-avatar">{member.initials}</div>
+                <div className="about-team-name">{member.name}</div>
+                <div className="about-team-role">{member.role}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Close */}
+        <section className="about-section about-close">
+          <h2 className="about-close-title">
+            ISO is built by courage.
+            <br />
+            And sustained by humility.
+          </h2>
+          <button type="button" className="about-close-btn" onClick={handlePrimaryCta}>
+            {onWaitlistClick ? 'Join the Waitlist' : 'Call an ISO'}
+          </button>
+          <div className="about-close-sub">{onWaitlistClick ? 'Early Access' : 'Players'}</div>
+        </section>
       </div>
     </div>
   );

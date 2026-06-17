@@ -17,6 +17,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Linkedin, X } from 'lucide-react';
+import { SplashNavigation } from '../components/SplashNavigation';
 // =============================================================================
 // CONSTANTS
 // =============================================================================
@@ -159,55 +160,6 @@ function getAssistSchedule(now: Date) {
 // =============================================================================
 
 /**
- * Simplified Navigation Bar for Splash Page
- */
-function SplashNavigation() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
-      <div className="w-full max-w-5xl">
-        <div
-          className={`flex items-center justify-between rounded-full pl-4 pr-3 h-12 shadow-lg transition-all duration-300 ${
-            isScrolled
-              ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
-              : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
-          }`}
-          style={{ border: '1px solid rgba(255, 255, 255, 0.3)' }}
-        >
-          {/* Brand */}
-          <div className="flex items-center">
-            <span 
-              className="text-white text-lg font-semibold tracking-wide" 
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            >
-              ISO Institute
-            </span>
-          </div>
-          
-          {/* Coming Soon Button */}
-          <button 
-            className="flex items-center justify-center rounded-full bg-white px-6 h-8 text-black font-medium transition-all hover:bg-white/90 leading-none mr-2"
-            style={{ fontFamily: "'Bebas Neue', sans-serif", height: '36px' }}
-          >
-            Coming Soon
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
-/**
  * TikTok Icon Component (not available in Lucide by default)
  */
 function TikTokIcon({ size = 24, className = '' }: { size?: number; className?: string }) {
@@ -338,7 +290,7 @@ function AssistCountdownSection() {
           marginTop: '14px',
         }}
       >
-        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
+        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C08038', display: 'inline-block' }} />
         <span
           style={{
             fontFamily: "'Bebas Neue', sans-serif",
@@ -351,7 +303,7 @@ function AssistCountdownSection() {
         >
           Every Sunday · 6-7 PM MST
         </span>
-        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C8873A', display: 'inline-block' }} />
+        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#C08038', display: 'inline-block' }} />
       </div>
 
       <p
@@ -421,7 +373,7 @@ function PilotInfoModal({
 
             {/* Modal Content */}
             <motion.div
-              className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0c] p-8 shadow-2xl"
+              className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -689,7 +641,7 @@ function CTAButtonsRow({
 // MAIN SPLASH PAGE COMPONENT
 // =============================================================================
 
-export function EventSplashPage() {
+export function EventSplashPage({ onNavigateToAbout }: { onNavigateToAbout?: () => void }) {
   const [showPilotModal, setShowPilotModal] = useState(false);
 
   const openWaitlistForm = () => {
@@ -703,10 +655,10 @@ export function EventSplashPage() {
   return (
     <div
       className="relative min-h-screen"
-      style={{ background: '#030305' }}
+      style={{ background: '#0C0C0C' }}
     >
       {/* Navigation Bar */}
-      <SplashNavigation />
+      <SplashNavigation onNavigateToAbout={onNavigateToAbout} />
 
       {/* Background Effects */}
       <div className="pointer-events-none absolute inset-0">
@@ -715,7 +667,7 @@ export function EventSplashPage() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at center, transparent 0%, #030305 70%)',
+              'radial-gradient(ellipse at center, transparent 0%, #0C0C0C 70%)',
           }}
         />
         {/* Subtle center glow */}
@@ -783,20 +735,9 @@ export function EventSplashPage() {
             A movement, a system, a community.
           </motion.p>
 
-          {/* Event Reference */}
-          <motion.p
-            className="mb-4 text-lg uppercase tracking-[0.3em] text-white font-bold"
-            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            ISO • 2026
-          </motion.p>
-
           {/* Mission Statement */}
           <motion.p
-            className="mb-2 text-lg sm:text-xl md:text-2xl tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center"
+            className="mb-2 mx-auto max-w-5xl text-lg sm:text-xl md:text-2xl tracking-[0.2em] sm:tracking-[0.3em] font-bold px-4 text-center leading-snug"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               background: 'linear-gradient(135deg, #ffffff 0%, #959595 40%, #b5b5b5 60%, #ffffff 100%)',
@@ -808,9 +749,9 @@ export function EventSplashPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A faith-driven development platform and cultural movement built
+            A gamified development platform and cultural movement built to inspire ambition,
             <br />
-            to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
+            elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
 
           <AssistCountdownSection />
