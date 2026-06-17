@@ -78,9 +78,6 @@ const TEAM = [
   { initials: 'IE', name: 'Idris Elmi', role: 'Technical Lead' },
 ] as const;
 
-const MISSION_STATEMENT =
-  'A gamified development platform and cultural movement built to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.';
-
 export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
   const handlePrimaryCta = () => {
     if (onWaitlistClick) {
@@ -123,6 +120,17 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Mission */}
+        <section className="about-section about-mission-section">
+          <div className="about-eyebrow">Mission</div>
+          <h2 className="about-heading about-mission-heading">
+            <span className="about-mission-line">ISO is built to inspire ambition, elevate overlooked</span>
+            <span className="about-mission-line">
+              talent, and rebuild community pathways to success.
+            </span>
+          </h2>
         </section>
 
         <p className="about-why-line">
@@ -172,8 +180,8 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
         {/* Six Pathways */}
         <section className="about-section about-pathways-section">
           <div className="about-eyebrow">The Pathways</div>
-          <h2 className="about-heading about-heading-cards">Six paths. One standard.</h2>
-          <p className="about-pathways-lede">
+          <h2 className="about-heading about-heading-cards">Six paths. One mission.</h2>
+          <p className="about-section-lede">
             Six archetypes for players and coaches — choose where you want to grow or lead.
           </p>
           <div className="about-pathway-grid">
@@ -201,19 +209,14 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
           </div>
         </section>
 
-        {/* Mission */}
-        <section className="about-section about-mission-section">
-          <div className="about-eyebrow">Mission</div>
-          <p className="about-mission-text">{MISSION_STATEMENT}</p>
-        </section>
-
         {/* What We Stand On */}
         <section className="about-section about-stand-on-section">
           <div className="about-eyebrow">What We Stand On</div>
-          <p className="about-close-faith">
+          <h2 className="about-heading about-heading-cards">Faith-driven development and leadership</h2>
+          <p className="about-section-lede">
             ISO is faith-driven — not in what it requires of you, but in how it was built.{' '}
-            <strong>ISO was built by people of faith</strong>, and that shapes the standard we hold coaches to and
-            the values baked into every part of this platform.
+            <strong>ISO is built by Muslims</strong>, and that shapes the standard we hold coaches and players to, the
+            values baked into every part of this platform, and our commitment to development rooted in service.
           </p>
           <div className="about-values">
             {VALUES.map((value) => (
