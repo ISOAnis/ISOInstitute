@@ -215,9 +215,8 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
           <div className="about-eyebrow">What We Stand On</div>
           <h2 className="about-heading about-heading-cards">Faith-driven development and leadership</h2>
           <p className="about-section-lede">
-            ISO is faith-driven — not in what it requires of you, but in how it was built.{' '}
-            <strong>ISO is built by Muslims</strong>, and that shapes the standard we hold coaches and players to, the
-            values baked into every part of this platform, and our commitment to development rooted in service.
+            ISO is faith-driven — not in what it asks of you, but in how it was built. ISO is open to
+            everyone willing to grow with discipline, humility, and respect for the values we stand on.
           </p>
           <div className="about-values">
             {VALUES.map((value) => (
