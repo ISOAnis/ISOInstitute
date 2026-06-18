@@ -70,7 +70,7 @@ const IMPACTS = [
   'When people grow together, progress compounds.',
 ] as const;
 
-const VALUES = ['Humility', 'Service', 'Integrity', 'Community', 'Honesty', 'Stewardship'] as const;
+const VALUES = ['Courage', 'Humility', 'Service', 'Integrity', 'Community', 'Honesty', 'Sincerity'] as const;
 
 const TEAM = [
   { initials: 'AB', name: 'Anis Benyoucef', role: 'Founder' },
