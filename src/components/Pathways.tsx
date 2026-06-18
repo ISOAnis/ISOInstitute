@@ -528,13 +528,13 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             <div className="text-center mb-10">
-              <div className="inline-block mb-4">
+              <div className="inline-block mb-8">
                 <span className="px-4 py-2 text-white rounded-full backdrop-blur-[10px]" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
                   Real Coaching. Not Just Content.
                 </span>
               </div>
               <h2
-                className="text-white text-5xl md:text-6xl"
+                className="text-white text-5xl md:text-6xl mb-8"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
                 What a Session Actually Looks Like
