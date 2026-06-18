@@ -610,7 +610,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
             ].map((item, i) => (
               <div
                 key={i}
-                className="text-center py-10 px-8"
+                className="text-center py-4 px-8"
                 style={{ background: '#111111' }}
               >
                 <div
