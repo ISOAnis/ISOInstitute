@@ -11,7 +11,9 @@ interface PortalChromeBarProps {
 
 export function PortalChromeBar({ role, portalLabel, accentColor = '#10b981' }: PortalChromeBarProps) {
   return (
-    <div style={{
+    <div
+      data-tutorial-id={role === 'coach' ? 'coach-chrome-bar' : 'player-chrome-bar'}
+      style={{
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -55,7 +57,9 @@ export function PortalChromeBar({ role, portalLabel, accentColor = '#10b981' }: 
         </div>
       </div>
 
-      <PortalDailyStreak role={role} accentColor={accentColor} />
+      <div data-tutorial-id={role === 'coach' ? 'coach-daily-streak' : 'player-daily-streak'}>
+        <PortalDailyStreak role={role} accentColor={accentColor} />
+      </div>
     </div>
   );
 }

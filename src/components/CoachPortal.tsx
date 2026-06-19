@@ -6,6 +6,11 @@ import {
   UserCircle, Moon, ArrowRight, Home, Menu, ChevronRight, ShoppingBag, MessageCircle, Video,
 } from 'lucide-react';
 import { PORTAL_ACCENT } from '../utils/portalTheme';
+import {
+  getCoachTutorialSteps,
+  isTutorialComplete,
+  markTutorialComplete,
+} from '../utils/portalTutorial';
 import { PortalTutorial } from './PortalTutorial';
 import { CoachProfileSection } from './CoachProfileSection';
 import { AIMatchingDashboard } from './AIMatchingDashboard';
@@ -157,7 +162,6 @@ const mockPlayers: Player[] = [
   },
 ];
 
-const COACH_TUTORIAL_KEY = 'iso_tutorial_completed_coach_page';
 const NAV_H = 72;
 const SIDEBAR_W_EXPANDED = 220;
 const SIDEBAR_W_COLLAPSED = 64;
@@ -295,28 +299,13 @@ function CoachSidebar({
         }}
       >
         {expanded ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <img
-              src="/ISO OFFICIAL.png"
-              alt=""
-              style={{ height: 22, width: 'auto', objectFit: 'contain', flexShrink: 0, opacity: 0.9 }}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-            />
-            <span style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700,
-              letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)',
-            }}>
-              Coach Portal
-            </span>
-          </div>
-        ) : (
-          <img
-            src="/ISO OFFICIAL.png"
-            alt="ISO"
-            style={{ height: 24, width: 'auto', objectFit: 'contain', opacity: 0.85 }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-          />
-        )}
+          <span style={{
+            fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700,
+            letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)',
+          }}>
+            Coach Portal
+          </span>
+        ) : null}
         <Menu size={16} style={{ flexShrink: 0 }} />
       </button>
 
@@ -326,6 +315,7 @@ function CoachSidebar({
           return (
             <button
               key={item.id}
+              data-tutorial-id={`coach-nav-${item.id}`}
               onClick={() => onSelect(item.id)}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
@@ -833,21 +823,11 @@ export function CoachPortal() {
     profilePicture: coachProfilePicture,
   };
 
-  const coachTutorialSteps = [
-    { title: 'Welcome to Your Coach Portal!', description: 'Your coaching dashboard — manage players, track progress, and build your brand. Use the sidebar to navigate.' },
-    { title: 'Dashboard', description: 'See your roster at a glance — pending reviews, active games, and quick access to every section.' },
-    { title: 'My Players', description: 'Click a player to view their games and buckets. Approve completions and leave feedback.' },
-    { title: 'Messages', description: 'Chat directly with your players from the Messages section.' },
-    { title: 'AI Matching', description: 'Review match scores and accept new player requests that fit your expertise.' },
-    { title: 'ISO Community', description: 'Share wins, encourage players across pathways, and build your coaching brand.' },
-    { title: 'Locker Room', description: 'Join pathway channels, contribute videos, and connect with the ISO ecosystem.' },
-    { title: 'Coach Store', description: 'Unlock tier-gated coaching gear as your OVR rises.' },
-    { title: 'Complete Your Profile', description: 'Finish your coach profile to get published on ISO and start attracting players.' },
-  ];
+  const coachTutorialSteps = getCoachTutorialSteps('base');
 
   useEffect(() => {
-    if (!localStorage.getItem(COACH_TUTORIAL_KEY)) {
-      setTimeout(() => setShowTutorial(true), 150);
+    if (!isTutorialComplete('coach', 'base')) {
+      setTimeout(() => setShowTutorial(true), 300);
     }
   }, []);
 
@@ -942,8 +922,14 @@ export function CoachPortal() {
       {showTutorial && (
         <PortalTutorial
           steps={coachTutorialSteps}
-          onComplete={() => { localStorage.setItem(COACH_TUTORIAL_KEY, 'true'); setShowTutorial(false); }}
+          tutorialScope="base"
           role="coach"
+          onNavigate={(section) => setActiveSection(section as CoachSection)}
+          onExpandSidebar={setSidebarExpanded}
+          onComplete={() => {
+            markTutorialComplete('coach', 'base');
+            setShowTutorial(false);
+          }}
         />
       )}
 

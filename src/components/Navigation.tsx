@@ -144,61 +144,26 @@ export function Navigation({
             <div className="flex items-center pl-4">
               <button
                 onClick={() => onNavigate("home")}
-                className="transition-opacity cursor-pointer flex items-center gap-2"
+                className="transition-opacity cursor-pointer"
                 onMouseEnter={() => setHoveredItem("logo")}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                {currentPage === "coach-portal" ||
-                currentPage === "player-portal" ? (
-                  <>
-                    <img
-                      src="/ISO OFFICIAL.png"
-                      alt="ISO Institute"
-                      className="h-8 w-auto object-contain"
-                      style={{
-                        opacity: hoveredItem === "logo" ? 1 : 0.92,
-                        transition: "opacity 0.3s ease",
-                      }}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display =
-                          "none";
-                      }}
-                    />
-                    <span
-                      className="text-white text-sm font-semibold tracking-wide transition-all hidden sm:inline"
-                      style={{
-                        fontFamily: "'Bebas Neue', sans-serif",
-                        textShadow:
-                          hoveredItem === "logo"
-                            ? "0 0 12px rgba(255, 255, 255, 0.8)"
-                            : "none",
-                        color:
-                          hoveredItem === "logo"
-                            ? "#ffffff"
-                            : "rgba(255, 255, 255, 0.85)",
-                      }}
-                    >
-                      ISO Institute
-                    </span>
-                  </>
-                ) : (
-                  <span
-                    className="text-white text-lg font-semibold tracking-wide transition-all"
-                    style={{
-                      fontFamily: "'Bebas Neue', sans-serif",
-                      textShadow:
-                        hoveredItem === "logo"
-                          ? "0 0 12px rgba(255, 255, 255, 0.8)"
-                          : "none",
-                      color:
-                        hoveredItem === "logo"
-                          ? "#ffffff"
-                          : "rgba(255, 255, 255, 0.9)",
-                    }}
-                  >
-                    ISO Institute
-                  </span>
-                )}
+                <span
+                  className="text-white text-lg font-semibold tracking-wide transition-all"
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    textShadow:
+                      hoveredItem === "logo"
+                        ? "0 0 12px rgba(255, 255, 255, 0.8)"
+                        : "none",
+                    color:
+                      hoveredItem === "logo"
+                        ? "#ffffff"
+                        : "rgba(255, 255, 255, 0.9)",
+                  }}
+                >
+                  ISO Institute
+                </span>
               </button>
             </div>
 

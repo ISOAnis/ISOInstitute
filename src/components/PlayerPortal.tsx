@@ -6,27 +6,36 @@ import {
   MessageSquare, Plus, Lock, Clock, UserCircle, Users, X, Moon,
   Sprout, BookOpen, Star as StarIcon, Gem, Sparkles, AlertCircle,
   ArrowRight, Dumbbell, Activity, Settings, Rocket, Globe, LucideIcon,
-  Home, GitBranch, Menu, Compass, CheckCheck, Zap, ChevronRight, ShoppingBag, MessageCircle,
+  Home, GitBranch, Menu, Compass, CheckCheck, Zap, ChevronRight, ShoppingBag, MessageCircle, Video,
 } from 'lucide-react';
 import { PlayerProfileSection } from './PlayerProfileSection';
 import { LockerRoomChat } from './LockerRoomChat';
 import { LockerRoomGoals } from './LockerRoomGoals';
 import { ISOCommunityForum, CommunityUpgradeGate } from './ISOCommunityForum';
+import { ExplorerUpgradeGate } from './ExplorerUpgradeGate';
 import { ISOStoreSection } from './portal-store';
 import { PathwayLockConfirmModal } from './PathwayLockConfirmModal';
 import { PathwayChangeRequestModal } from './PathwayChangeRequestModal';
 import { CoachPlayerChat } from './CoachPlayerChat';
 import { PortalTutorial } from './PortalTutorial';
+import {
+  getPlayerTutorialScope,
+  getPlayerTutorialSteps,
+  isTutorialComplete,
+  markTutorialComplete,
+  type PlayerTutorialScope,
+} from '../utils/portalTutorial';
 import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
 import { LockerRoomCheckoutModal } from './LockerRoomCheckoutModal';
 import { VarsityInterestModal } from './VarsityInterestModal';
 import { PortalGreeting } from './PortalGreeting';
 import { PortalChromeBar } from './PortalChromeBar';
+import { PlayerISODashboard } from './PlayerISODashboard';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import {
   getUserGender, getUserPlan, setUserPlan, filterByGender, usesExplorerPortal,
-  type MembershipPlan, type UserGender, PLAN_LABELS, canAccessLockerRoomChat,
+  type MembershipPlan, type UserGender, PLAN_LABELS, canAccessLockerRoomChat, canAccessOnlineStore,
   isPathwayLocked, getActivePathway, getLockedPathway, getExploringPathway, lockPathway,
   setExploringPathway,
 } from '../utils/membership';
@@ -58,14 +67,13 @@ interface SkillNodeDef {
   row: number; col: number; unlocksAt: number;
 }
 type WalkOnSection = 'explore' | 'goals' | 'community' | 'locker-room' | 'store' | 'profile';
-type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'store' | 'profile';
+type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'store' | 'profile' | 'locker-room';
 
 interface PlayerPortalProps {
   onNavigate?: (page: any) => void;
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const PLAYER_TUTORIAL_KEY = 'iso_tutorial_completed_player_page';
 const PATHWAY_SELECTION_KEY = 'iso_pathway_selection_completed';
 
 const PATHWAY_HEX: Record<string, string> = {
@@ -208,13 +216,14 @@ const SIDEBAR_ITEMS: { id: PlayerSection; label: string; Icon: React.ComponentTy
   { id: 'progress',   label: 'My Progress', Icon: Trophy },
   { id: 'store',      label: 'ISO Store',   Icon: ShoppingBag },
   { id: 'messages',   label: 'Messages',    Icon: MessageSquare },
+  { id: 'locker-room', label: 'Locker Room', Icon: Video },
   { id: 'profile',    label: 'My Profile',  Icon: UserCircle },
 ];
 
 const SECTIONS_BY_PLAN: Record<MembershipPlan, PlayerSection[]> = {
   'walk-on': ['dashboard', 'profile'],
   'locker-room': ['dashboard', 'progress', 'profile'],
-  varsity: ['dashboard', 'skill-tree', 'progress', 'store', 'messages', 'profile'],
+  varsity: ['dashboard', 'skill-tree', 'progress', 'store', 'messages', 'locker-room', 'profile'],
 };
 
 const NAV_H = 72; // px — nav bar bottom clearance
@@ -222,7 +231,7 @@ const SIDEBAR_W_EXPANDED = 220;
 const SIDEBAR_W_COLLAPSED = 64;
 
 function PortalSidebar({
-  active, onSelect, accentColor, expanded, onToggle, onLockerRoom,
+  active, onSelect, accentColor, expanded, onToggle,
   membershipPlan, onUpgrade,
 }: {
   active: PlayerSection;
@@ -230,13 +239,11 @@ function PortalSidebar({
   accentColor: string;
   expanded: boolean;
   onToggle: () => void;
-  onLockerRoom: () => void;
   membershipPlan: MembershipPlan;
   onUpgrade: (plan: MembershipPlan) => void;
 }) {
   const w = expanded ? SIDEBAR_W_EXPANDED : SIDEBAR_W_COLLAPSED;
   const visibleSections = SECTIONS_BY_PLAN[membershipPlan];
-  const showLockerRoom = membershipPlan !== 'walk-on';
 
   return (
     <div
@@ -282,6 +289,7 @@ function PortalSidebar({
           return (
             <button
               key={item.id}
+              data-tutorial-id={`player-nav-${item.id}`}
               onClick={() => isVisible ? onSelect(item.id) : onUpgrade(item.id === 'skill-tree' || item.id === 'messages' ? 'varsity' : 'locker-room')}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center',
@@ -314,29 +322,6 @@ function PortalSidebar({
         })}
       </div>
 
-      {/* Locker Room */}
-      {showLockerRoom && (
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: expanded ? '12px 12px' : '12px 0', display: 'flex', justifyContent: expanded ? 'flex-start' : 'center' }}>
-        <button
-          onClick={onLockerRoom}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: expanded ? '10px 14px' : '10px',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 10, color: 'rgba(255,255,255,0.5)',
-            cursor: 'pointer', width: expanded ? '100%' : 'auto',
-            whiteSpace: 'nowrap', transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-        >
-          <Users size={16} style={{ flexShrink: 0 }} />
-          {expanded && <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 500 }}>Locker Room</span>}
-        </button>
-      </div>
-      )}
-
       {expanded && membershipPlan !== 'varsity' && (
         <div style={{ padding: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ background: `${accentColor}12`, border: `1px solid ${accentColor}30`, borderRadius: 10, padding: '12px 14px' }}>
@@ -346,6 +331,7 @@ function PortalSidebar({
                 : 'Upgrade to ISO Pass for dedicated coaching & skill tree'}
             </p>
             <button
+              data-tutorial-id={membershipPlan === 'walk-on' ? 'explorer-upgrade-locker-room' : 'player-upgrade-varsity'}
               onClick={() => onUpgrade(membershipPlan === 'walk-on' ? 'locker-room' : 'varsity')}
               style={{ width: '100%', background: accentColor, color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}
             >
@@ -832,6 +818,21 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const [showVarsityInterest, setShowVarsityInterest] = useState(false);
   const [varsityInterestCoach, setVarsityInterestCoach] = useState<ExplorerCoach | null>(null);
   const [pendingUpgradePlan, setPendingUpgradePlan] = useState<MembershipPlan>('locker-room');
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialScope, setTutorialScope] = useState<PlayerTutorialScope>('walk-on');
+
+  const explorerTutorialSteps = getPlayerTutorialSteps(tutorialScope);
+
+  useEffect(() => {
+    const scope = getPlayerTutorialScope(membershipPlan);
+    if (isTutorialComplete('player', scope)) {
+      setShowTutorial(false);
+      return;
+    }
+    setTutorialScope(scope);
+    const timer = window.setTimeout(() => setShowTutorial(true), 300);
+    return () => window.clearTimeout(timer);
+  }, [membershipPlan]);
 
   useEffect(() => {
     const initial = localStorage.getItem('iso_portal_initial_section');
@@ -931,8 +932,6 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   };
 
   const handleSectionSelect = (section: WalkOnSection) => {
-    if (section === 'goals' && membershipPlan === 'walk-on') return;
-    if (section === 'locker-room' && !hasLockerRoomAccess) return;
     setActiveSection(section);
     if (section !== 'explore') setSelectedPathway(null);
   };
@@ -962,9 +961,9 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const sidebarItems: { id: WalkOnSection; label: string; Icon: React.ComponentType<{ size: number }>; locked?: boolean }[] = [
     { id: 'explore', label: pathwayIsLocked ? 'My Coaches' : 'Explore Coaches', Icon: Compass },
     { id: 'goals', label: 'My Goals', Icon: Target, locked: membershipPlan === 'walk-on' },
-    { id: 'community', label: 'ISO Community', Icon: MessageCircle },
+    { id: 'community', label: 'ISO Community', Icon: MessageCircle, locked: !hasLockerRoomAccess },
     { id: 'locker-room', label: 'Locker Room', Icon: Users, locked: !hasLockerRoomAccess },
-    { id: 'store', label: 'ISO Store', Icon: ShoppingBag },
+    { id: 'store', label: 'ISO Store', Icon: ShoppingBag, locked: !canAccessOnlineStore(membershipPlan) },
     { id: 'profile', label: 'My Profile', Icon: UserCircle },
   ];
 
@@ -973,6 +972,19 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
 
   return (
     <div style={{ display: 'flex', minHeight: `calc(100vh - ${NAV_H}px)`, paddingTop: NAV_H, background: '#0C0C0C' }}>
+      {showTutorial && (
+        <PortalTutorial
+          steps={explorerTutorialSteps}
+          tutorialScope={tutorialScope}
+          role="player"
+          onNavigate={(section) => handleSectionSelect(section as WalkOnSection)}
+          onExpandSidebar={setSidebarExpanded}
+          onComplete={() => {
+            markTutorialComplete('player', tutorialScope);
+            setShowTutorial(false);
+          }}
+        />
+      )}
       {/* Sidebar */}
       <div style={{ position: 'fixed', top: NAV_H, left: 0, bottom: 0, width: w, background: '#0A0A0A', borderRight: '1px solid rgba(255,255,255,0.07)', transition: 'width 0.25s ease', display: 'flex', flexDirection: 'column', zIndex: 40, overflow: 'hidden' }}>
         <button onClick={() => setSidebarExpanded(e => !e)} style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: sidebarExpanded ? 'space-between' : 'center', padding: sidebarExpanded ? '0 18px' : '0', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', color: 'rgba(255,255,255,0.4)' }}>
@@ -984,7 +996,11 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             const isActive = activeSection === item.id;
             const isLocked = item.locked;
             return (
-              <button key={item.id} onClick={() => isLocked ? (item.id === 'goals' ? handleUpgradeClick('locker-room') : handleUpgradeClick('locker-room')) : handleSectionSelect(item.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: sidebarExpanded ? '13px 18px' : '13px 0', justifyContent: sidebarExpanded ? 'flex-start' : 'center', background: isActive ? 'rgba(249,115,22,0.12)' : 'transparent', color: isActive ? '#fff' : isLocked ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', border: 'none', outline: 'none', position: 'relative', transition: 'color 0.15s', whiteSpace: 'nowrap' as const, opacity: isLocked ? 0.6 : 1 }}>
+              <button
+                key={item.id}
+                data-tutorial-id={`explorer-nav-${item.id}`}
+                onClick={() => handleSectionSelect(item.id)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: sidebarExpanded ? '13px 18px' : '13px 0', justifyContent: sidebarExpanded ? 'flex-start' : 'center', background: isActive ? 'rgba(249,115,22,0.12)' : 'transparent', color: isActive ? '#fff' : isLocked ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', border: 'none', outline: 'none', position: 'relative', transition: 'color 0.15s', whiteSpace: 'nowrap' as const, opacity: isLocked && !isActive ? 0.75 : 1 }}>
                 <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: isActive ? '#f97316' : 'transparent', borderRadius: '0 2px 2px 0' }} />
                 <item.Icon size={17} style={{ flexShrink: 0 }} />
                 {sidebarExpanded && <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>{item.label}{isLocked && <Lock size={11} />}</span>}
@@ -998,7 +1014,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             {membershipPlan === 'walk-on' && (
               <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 10, padding: '12px 14px' }}>
                 <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 8px' }}>Locker Room: 3 try outs/mo, community, store & goals · ${LOCKER_ROOM_PRICE_USD}/mo</p>
-                <button onClick={() => handleUpgradeClick('locker-room')} style={{ width: '100%', background: '#f97316', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>LOCKER ROOM · ${LOCKER_ROOM_PRICE_USD}/MO</button>
+                <button data-tutorial-id="explorer-upgrade-locker-room" onClick={() => handleUpgradeClick('locker-room')} style={{ width: '100%', background: '#f97316', color: 'white', border: 'none', borderRadius: 8, padding: '8px 0', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer' }}>LOCKER ROOM · ${LOCKER_ROOM_PRICE_USD}/MO</button>
               </div>
             )}
             {membershipPlan !== 'varsity' && (
@@ -1034,9 +1050,6 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             accentColor={activeHex}
             subline={`ISO Community · ${currentPathwayName ?? 'All pathways'}`}
           />
-        )}
-        {activeSection === 'community' && !hasLockerRoomAccess && (
-          <PortalGreeting role="player" accentColor="#f97316" subline="Locker Room exclusive" />
         )}
 
         {/* ── MY COACHES — locked plan, pathway missing or invalid ── */}
@@ -1192,7 +1205,8 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
         )}
 
         {/* ── MY GOALS (Locker Room) ── */}
-        {activeSection === 'goals' && hasLockerRoomAccess && (
+        {activeSection === 'goals' && (
+          hasLockerRoomAccess ? (
           <>
             {pathwayIsLocked && currentPathwayName && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20, padding: '12px 18px', background: `${activeHex}10`, border: `1px solid ${activeHex}25`, borderRadius: 12 }}>
@@ -1212,6 +1226,25 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             lockedPathwayName={currentPathwayName ?? undefined}
           />
           </>
+          ) : (
+            <>
+              <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>My Goals</h2>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                Self-guided goal keeping on your pathway — track milestones and build momentum before ISO Pass coaching.
+              </p>
+              <ExplorerUpgradeGate
+                title="My Goals"
+                description="Locker Room unlocks self-guided goal keeping on your locked pathway. Set milestones, check off wins, and stay accountable between try outs."
+                benefits={[
+                  'Pathway-locked goal lists you control',
+                  'Track milestones & celebrate completions',
+                  'Build habits before coach-assigned ISO Pass goals',
+                  'Share wins in ISO Community when you upgrade',
+                ]}
+                onUpgrade={() => handleUpgradeClick('locker-room')}
+              />
+            </>
+          )
         )}
 
         {/* ── ISO COMMUNITY FORUM ── */}
@@ -1219,21 +1252,49 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           hasLockerRoomAccess ? (
             <div>
               <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>ISO Community</h2>
-              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>Share wins, celebrate goals, and encourage players & coaches across every pathway.</p>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                Share wins, celebrate goals, and encourage players & coaches across every pathway.
+              </p>
               <ISOCommunityForum lockedPathwayId={lockedPathwayId} lockedPathwayName={currentPathwayName ?? undefined} />
             </div>
           ) : (
-            <CommunityUpgradeGate onUpgrade={() => handleUpgradeClick('locker-room')} />
+            <>
+              <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>ISO Community</h2>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                Share wins, celebrate goals, and encourage players & coaches across every pathway.
+              </p>
+              <CommunityUpgradeGate onUpgrade={() => handleUpgradeClick('locker-room')} />
+            </>
           )
         )}
 
         {/* ── LOCKER ROOM CHAT ── */}
-        {activeSection === 'locker-room' && hasLockerRoomAccess && (
+        {activeSection === 'locker-room' && (
+          hasLockerRoomAccess ? (
           <div>
             <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>Locker Room</h2>
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>Pathway channels & video library · you post as {currentPathwayName}</p>
             <LockerRoomChat lockedPathwayId={lockedPathwayId} />
           </div>
+          ) : (
+            <>
+              <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>Locker Room</h2>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                Pathway channels, video library, and group chat with players on your pathway.
+              </p>
+              <ExplorerUpgradeGate
+                title="Locker Room"
+                description="Locker Room is your pathway hangout — group chat, coach video drops, and monthly try outs to find your ISO."
+                benefits={[
+                  `${LOCKER_ROOM_MONTHLY_CALLS} coach try outs every month`,
+                  'Pathway group chat & video library',
+                  'Connect with players on your locked pathway',
+                  'ISO Community forum & self-guided goals included',
+                ]}
+                onUpgrade={() => handleUpgradeClick('locker-room')}
+              />
+            </>
+          )
         )}
 
         {/* ── ISO STORE ── */}
@@ -1678,8 +1739,8 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   const [games, setGames] = useState<Game[]>(mockGames);
   const [activeSection, setActiveSection] = useState<PlayerSection>('dashboard');
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialScope, setTutorialScope] = useState<PlayerTutorialScope>('varsity');
   const [showProfileCompletionModal, setShowProfileCompletionModal] = useState(false);
   const [showPathwaySelectionModal, setShowPathwaySelectionModal] = useState(false);
   const [membershipPlan, setMembershipPlan] = useState<MembershipPlan>(getUserPlan);
@@ -1731,17 +1792,23 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
 
   const currentCoachName = 'Imam Abdullah Rahman';
 
-  const playerTutorialSteps = [
-    { title: 'Welcome to Your Player Portal!', description: 'Your personal dashboard — skill tree, progress, messages, and more, all in the sidebar.' },
-    { title: 'Sidebar Navigation', description: 'Use the left sidebar to switch between Dashboard, Skill Tree, Progress, Messages, and Profile.' },
-    { title: 'Skill Tree', description: 'Unlock skills in your pathway by winning games. Each game unlocks new nodes on your tree.' },
-    { title: 'Locker Room', description: 'Hit the Locker Room button at the bottom of the sidebar to connect with other players.' },
-  ];
+  const skillTreeNodes = SKILL_TREES[selectedPathwayId] || SKILL_TREES.deen;
+  const skillNodesUnlocked = skillTreeNodes.filter(n => gamesWon >= n.unlocksAt).length;
+  const activeGame = games.find(g => !g.completed) ?? null;
+  const openBuckets = activeGame ? activeGame.buckets.filter(b => !b.completed).length : 0;
+
+  const playerTutorialSteps = getPlayerTutorialSteps(tutorialScope);
 
   useEffect(() => {
-    const done = localStorage.getItem(PLAYER_TUTORIAL_KEY);
-    if (!done) setTimeout(() => setShowTutorial(true), 200);
-  }, []);
+    const scope = getPlayerTutorialScope(membershipPlan);
+    if (isTutorialComplete('player', scope)) {
+      setShowTutorial(false);
+      return;
+    }
+    setTutorialScope(scope);
+    const timer = window.setTimeout(() => setShowTutorial(true), 300);
+    return () => window.clearTimeout(timer);
+  }, [membershipPlan]);
 
   useEffect(() => {
     localStorage.setItem('player_profile_completion', String(playerProfileCompletion));
@@ -1759,8 +1826,17 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
       {showTutorial && (
         <PortalTutorial
           steps={playerTutorialSteps}
-          onComplete={() => { setShowTutorial(false); localStorage.setItem(PLAYER_TUTORIAL_KEY, 'true'); if (!localStorage.getItem(PATHWAY_SELECTION_KEY)) setTimeout(() => setShowPathwaySelectionModal(true), 300); }}
+          tutorialScope={tutorialScope}
           role="player"
+          onNavigate={(section) => setActiveSection(section as PlayerSection)}
+          onExpandSidebar={setSidebarExpanded}
+          onComplete={() => {
+            markTutorialComplete('player', tutorialScope);
+            setShowTutorial(false);
+            if (tutorialScope === 'varsity' && !localStorage.getItem(PATHWAY_SELECTION_KEY)) {
+              setTimeout(() => setShowPathwaySelectionModal(true), 300);
+            }
+          }}
         />
       )}
       {showPathwaySelectionModal && (
@@ -1768,18 +1844,6 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
       )}
       {showProfileCompletionModal && (
         <ProfileCompletionModal onClose={() => setShowProfileCompletionModal(false)} onComplete={() => { setShowProfileCompletionModal(false); setPlayerProfileCompletion(100); }} />
-      )}
-      {showLockerRoom && (
-        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative w-full h-full max-w-7xl max-h-[90vh] rounded-2xl overflow-hidden" style={{ background: '#0C0C0C' }}>
-            <div style={{ padding: '24px 32px 0' }}>
-              <LockerRoomChat lockedPathwayId={getLockedPathway() || selectedPathwayId} />
-                </div>
-            <button onClick={() => setShowLockerRoom(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: 36, height: 36, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <X size={16} />
-            </button>
-                      </div>
-                  </div>
       )}
 
       {/* Sidebar */}
@@ -1789,7 +1853,6 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         accentColor={accentColor}
         expanded={sidebarExpanded}
         onToggle={() => setSidebarExpanded(e => !e)}
-        onLockerRoom={() => setShowLockerRoom(true)}
         membershipPlan={membershipPlan}
         onUpgrade={handleUpgrade}
       />
@@ -1817,13 +1880,21 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
 
         {/* Section views */}
         {activeSection === 'dashboard' && (
-          <DashboardView
-            gamesWon={gamesWon} totalGames={totalGames}
-            bucketsScored={bucketsScored} totalBuckets={totalBuckets}
-            winPercentage={winPercentage} coachName={currentCoachName}
-            pathway={pathway?.name || 'Your Pathway'} pathwayId={selectedPathwayId}
-            accentColor={accentColor} onNavigate={setActiveSection}
-            membershipPlan={membershipPlan}
+          <PlayerISODashboard
+            gamesWon={gamesWon}
+            totalGames={totalGames}
+            bucketsScored={bucketsScored}
+            totalBuckets={totalBuckets}
+            winPercentage={winPercentage}
+            coachName={currentCoachName}
+            pathway={pathway?.name || 'Your Pathway'}
+            pathwayId={selectedPathwayId}
+            accentColor={accentColor}
+            skillNodesUnlocked={skillNodesUnlocked}
+            totalSkillNodes={skillTreeNodes.length}
+            activeGameTitle={activeGame?.title}
+            openBuckets={openBuckets}
+            onNavigate={(section) => setActiveSection(section as PlayerSection)}
           />
         )}
         {activeSection === 'skill-tree' && (
@@ -1856,6 +1927,17 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
           canAccessSection('store')
             ? <div style={{ padding: '32px 32px 60px' }}>
                 <ISOStoreSection membershipPlan={membershipPlan} accentColor={accentColor} onUpgrade={handleUpgrade} />
+              </div>
+            : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
+        )}
+        {activeSection === 'locker-room' && (
+          canAccessSection('locker-room')
+            ? <div style={{ padding: '32px 32px 60px' }}>
+                <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>Locker Room</h2>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                  Pathway channels & video library · connect with other ISO Pass players
+                </p>
+                <LockerRoomChat lockedPathwayId={getLockedPathway() || selectedPathwayId} />
               </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}

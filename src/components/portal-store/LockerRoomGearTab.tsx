@@ -22,6 +22,7 @@ interface LockerRoomGearTabProps {
   remainingPurchases: number;
   cartIds: Set<string>;
   onAddToCart: (item: StoreItem) => void;
+  previewOnly?: boolean;
 }
 
 export function LockerRoomGearTab({
@@ -31,6 +32,7 @@ export function LockerRoomGearTab({
   remainingPurchases,
   cartIds,
   onAddToCart,
+  previewOnly = false,
 }: LockerRoomGearTabProps) {
   const [category, setCategory] = useState<ItemCategory | 'all'>('all');
   const [search, setSearch] = useState('');
@@ -46,7 +48,9 @@ export function LockerRoomGearTab({
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-          Locker Room lifestyle drops · <strong style={{ color: accentColor }}>{purchaseCount}/{monthlyLimit}</strong> purchases used this month
+          {previewOnly
+            ? 'Preview Locker Room gear — grab merch at ISO events or upgrade to shop online'
+            : <>Locker Room lifestyle drops · <strong style={{ color: accentColor }}>{purchaseCount}/{monthlyLimit}</strong> purchases used this month</>}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 14px' }}>
           <Search size={14} style={{ color: 'rgba(255,255,255,0.3)' }} />
@@ -90,9 +94,10 @@ export function LockerRoomGearTab({
             item={item}
             accentColor={accentColor}
             onAdd={() => onAddToCart(item)}
-            disabled={remainingPurchases <= 0}
+            disabled={!previewOnly && remainingPurchases <= 0}
             disabledLabel="LIMIT"
-            inCart={cartIds.has(item.id)}
+            previewOnly={previewOnly}
+            inCart={!previewOnly && cartIds.has(item.id)}
             badge={item.price >= 50 ? 'DROP' : undefined}
           />
         ))}

@@ -216,7 +216,7 @@ export function CoachISODashboard({
       />
 
       {/* Full-width OVR bar — first glance rating */}
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 24 }} data-tutorial-id="coach-ovr-bar">
         <CoachOverallProgressBar accentColor={accentColor} expandable />
       </div>
 

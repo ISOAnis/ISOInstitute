@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useState } from 'react';
 import {
   Heart, MessageCircle, Target, Trophy, Sparkles, Send,
-  Lock, ArrowRight, Flame, Users,
+  Lock, Flame, Users,
 } from 'lucide-react';
 import { PATHWAY_BY_ID, type PathwayId } from '../data/pathways';
-import { LOCKER_ROOM_PRICE_USD } from '../utils/explorerUsage';
+import { ExplorerUpgradeGate } from './ExplorerUpgradeGate';
 import { getPortalFirstName } from '../utils/portalGreeting';
 
 const PATHWAY_HEX: Record<string, string> = {
@@ -251,21 +251,16 @@ interface CommunityUpgradeGateProps {
 
 export function CommunityUpgradeGate({ onUpgrade }: CommunityUpgradeGateProps) {
   return (
-    <div style={{ padding: 48, textAlign: 'center', background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 20 }}>
-      <Lock size={36} style={{ color: '#f97316', marginBottom: 16, opacity: 0.7 }} />
-      <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: '#F2F2F2', margin: '0 0 10px' }}>ISO Community</h3>
-      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.45)', margin: '0 auto 24px', maxWidth: 420, lineHeight: 1.7 }}>
-        Locker Room members get the ISO forum — share goals you finished, encourage players across pathways, and build real momentum with coaches in the mix.
-      </p>
-      <ul style={{ textAlign: 'left', maxWidth: 360, margin: '0 auto 28px', padding: '0 0 0 20px', fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
-        <li>Post goal completions & wins</li>
-        <li>Encourage players in other pathways</li>
-        <li>Coach shoutouts & milestone celebrations</li>
-        <li>Cross-pathway community — not just chat</li>
-      </ul>
-      <button onClick={onUpgrade} style={{ background: '#f97316', color: '#fff', border: 'none', borderRadius: 100, padding: '13px 32px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-        JOIN LOCKER ROOM · ${LOCKER_ROOM_PRICE_USD}/MO <ArrowRight size={14} />
-      </button>
-    </div>
+    <ExplorerUpgradeGate
+      title="ISO Community"
+      description="Locker Room members get the ISO forum — share goals you finished, encourage players across pathways, and build real momentum with coaches in the mix."
+      benefits={[
+        'Post goal completions & wins',
+        'Encourage players in other pathways',
+        'Coach shoutouts & milestone celebrations',
+        'Cross-pathway community — not just chat',
+      ]}
+      onUpgrade={onUpgrade}
+    />
   );
 }
