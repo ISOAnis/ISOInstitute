@@ -22,6 +22,7 @@ import { PathwaySelectionModal } from './PathwaySelectionModal';
 import { LockerRoomCheckoutModal } from './LockerRoomCheckoutModal';
 import { VarsityInterestModal } from './VarsityInterestModal';
 import { PortalGreeting } from './PortalGreeting';
+import { PortalChromeBar } from './PortalChromeBar';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import {
   getUserGender, getUserPlan, setUserPlan, filterByGender, usesExplorerPortal,
@@ -1016,7 +1017,9 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
       </div>
 
       {/* Main content */}
-      <main style={{ flex: 1, marginLeft: w, transition: 'margin-left 0.25s ease', padding: '32px 32px 60px', overflowY: 'auto' as const }}>
+      <main style={{ flex: 1, marginLeft: w, transition: 'margin-left 0.25s ease', overflowY: 'auto' as const }}>
+        <PortalChromeBar role="player" portalLabel="Explorer Portal" accentColor={activeHex} />
+        <div style={{ padding: '32px 32px 60px' }}>
 
         {activeSection === 'explore' && (
           <PortalGreeting
@@ -1250,6 +1253,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             onGenderChange={g => setPlayerGender(g)}
           />
         )}
+        </div>
       </main>
 
       {selectedCoach && (() => {
@@ -1796,6 +1800,8 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         minHeight: `calc(100vh - ${NAV_H}px)`, overflowY: 'auto',
         background: '#111111',
       }}>
+        <PortalChromeBar role="player" portalLabel="Player Portal" accentColor={accentColor} />
+
         {/* Profile completion banner */}
         {playerProfileCompletion < 100 && (
           <div className="mx-8 mt-6 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-2 border-orange-500/50 rounded-2xl p-5 flex items-center justify-between gap-4">

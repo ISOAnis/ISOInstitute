@@ -7,9 +7,16 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 import './JoinISOPage.css';
 import { LockerRoomCheckoutModal } from '../components/LockerRoomCheckoutModal';
-import { setAssessedLevel, setExploringPathway, lockPathway, setUserPlan, type MembershipPlan } from '../utils/membership';
+import { setAssessedLevel, setExploringPathway, lockPathway, setUserPlan, approveCoachApplicationForDemo, type MembershipPlan } from '../utils/membership';
 import { LOCKER_ROOM_PRICE_USD } from '../utils/explorerUsage';
 import { savePlayerProfileFromAssessment } from '../utils/playerProfile';
+import { saveCoachProfileFromAssessment, hydrateCoachProfileFromAssessment } from '../utils/coachProfile';
+import {
+  compressImageFile, persistOnboardingPhoto, loadOnboardingPhoto, ONBOARDING_PHOTO_KEY,
+} from '../utils/imageUpload';
+import { CoachISOCard } from '../components/CoachISOCard';
+import { CoachPhotoEditorModal } from '../components/CoachPhotoEditorModal';
+import { DEFAULT_PHOTO_FRAME, type CoachPhotoFrame } from '../utils/coachPhotoStorage';
 
 // ====================================================================
 // TYPES
@@ -931,47 +938,114 @@ interface InputProps {
   onOther: (id: string, val: string) => void;
 }
 
+function CoachPhotoQuestionInput({ q, answers, onAnswer }: InputProps) {
+  const val = answers[q.id];
+  const photoVal = val as string | null;
+  const frameVal = (answers.c_photo_frame as CoachPhotoFrame | undefined) ?? DEFAULT_PHOTO_FRAME;
+  const [photoUploading, setPhotoUploading] = React.useState(false);
+  const [photoError, setPhotoError] = React.useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = React.useState(false);
+  const [editorMode, setEditorMode] = React.useState<'framing' | 'position'>('framing');
+  const [pendingSource, setPendingSource] = React.useState<string | null>(null);
+
+  return (
+    <div className="iso-join__photo-wrap">
+      <label className="iso-join__photo-label">
+        {photoUploading ? (
+          <div className="iso-join__photo-placeholder">
+            <span className="iso-join__photo-hint">Processing...</span>
+          </div>
+        ) : photoVal ? (
+          <img src={photoVal} alt="Headshot preview" className="iso-join__photo-preview" />
+        ) : (
+          <div className="iso-join__photo-placeholder">
+            <span className="iso-join__photo-icon">📷</span>
+            <span className="iso-join__photo-hint">Click to upload</span>
+            <span className="iso-join__photo-sub">JPG or PNG · Crop to fit your coach card</span>
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          disabled={photoUploading}
+          onChange={async e => {
+            const file = e.target.files?.[0];
+            e.target.value = '';
+            if (!file) return;
+            setPhotoError(null);
+            setPhotoUploading(true);
+            try {
+              const compressed = await compressImageFile(file);
+              setPendingSource(compressed);
+              setEditorMode('framing');
+              setEditorOpen(true);
+            } catch (err) {
+              setPhotoError(err instanceof Error ? err.message : 'Failed to upload photo.');
+            } finally {
+              setPhotoUploading(false);
+            }
+          }}
+        />
+      </label>
+      {photoError && (
+        <p className="iso-join__photo-error">{photoError}</p>
+      )}
+      {photoVal && !photoUploading && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+          <button
+            type="button"
+            className="iso-join__photo-retake"
+            onClick={() => {
+              setPhotoError(null);
+              onAnswer(q.id, null);
+              onAnswer('c_photo_frame', DEFAULT_PHOTO_FRAME);
+            }}
+          >
+            Use a different photo
+          </button>
+          <button
+            type="button"
+            className="iso-join__photo-retake"
+            onClick={() => {
+              setPendingSource(photoVal);
+              setEditorMode('position');
+              setEditorOpen(true);
+            }}
+          >
+            Adjust on card
+          </button>
+        </div>
+      )}
+      {pendingSource && (
+        <CoachPhotoEditorModal
+          open={editorOpen}
+          imageSrc={pendingSource}
+          mode={editorMode}
+          initialFrame={frameVal}
+          accentColor="#10b981"
+          onSave={({ photo, frame }) => {
+            onAnswer(q.id, photo);
+            onAnswer('c_photo_frame', frame);
+            setEditorOpen(false);
+            setPendingSource(null);
+          }}
+          onCancel={() => {
+            setEditorOpen(false);
+            setPendingSource(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 function QuestionInput({ q, answers, otherText, onAnswer, onOther }: InputProps) {
   const val = answers[q.id];
 
   // PHOTO UPLOAD
   if (q.type === 'photo') {
-    const photoVal = val as string | null;
-    return (
-      <div className="iso-join__photo-wrap">
-        <label className="iso-join__photo-label">
-          {photoVal ? (
-            <img src={photoVal} alt="Headshot preview" className="iso-join__photo-preview" />
-          ) : (
-            <div className="iso-join__photo-placeholder">
-              <span className="iso-join__photo-icon">📷</span>
-              <span className="iso-join__photo-hint">Click to upload</span>
-              <span className="iso-join__photo-sub">JPG or PNG · Professional photo required</span>
-            </div>
-          )}
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            style={{ display: 'none' }}
-            onChange={e => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = ev => onAnswer(q.id, ev.target?.result as string);
-              reader.readAsDataURL(file);
-            }}
-          />
-        </label>
-        {photoVal && (
-          <button
-            className="iso-join__photo-retake"
-            onClick={() => onAnswer(q.id, null)}
-          >
-            Use a different photo
-          </button>
-        )}
-      </div>
-    );
+    return <CoachPhotoQuestionInput q={q} answers={answers} otherText={otherText} onAnswer={onAnswer} onOther={onOther} />;
   }
 
   // NAME
@@ -1833,82 +1907,6 @@ function PlayerLevelBenefits({ assignedLevel }: { assignedLevel: PlayerLevel }) 
   );
 }
 
-function CoachCard({ result, answers }: { result: CoachResult; answers: Answers }) {
-  const fname = (answers.fname as string) ?? '';
-  const lname = (answers.lname as string) ?? (answers.c_name as string) ?? '';
-  const name = `${fname} ${lname}`.trim() || 'Coach';
-  const pathway = PATHWAYS.find(p => p.id === answers.c_pathway);
-  const specialty = pathway?.name ?? 'Coaching';
-  const role = (answers.c_role as string) ?? '';
-  const tierIcon = result.tier === 'silver' ? '⚙️' : '🏅';
-  const years = (answers.c_years as number) ?? 0;
-  const photo = (answers.c_photo as string) ?? null;
-  const outcomeCount = ((answers.c_outcomes as string[]) ?? []).length;
-
-  // Skills from user-entered c_skills (comma-separated), fallback to AI strengths
-  const rawSkills = (answers.c_skills as string) ?? '';
-  const skillTags = rawSkills
-    ? rawSkills.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3)
-    : result.strengths.slice(0, 3).map(s => s.split(' ').slice(0, 3).join(' '));
-
-  return (
-    <div className="iso-join__cc-wrap">
-      <div className="iso-join__cc">
-        <div className="iso-join__cc-topbar" />
-        <div className="iso-join__cc-scanlines" />
-        <div className="iso-join__cc-sheen" />
-
-        <div className="iso-join__cc-photo-area">
-          {photo ? (
-            <img src={photo} alt="Coach headshot" className="iso-join__cc-headshot" />
-          ) : (
-            <div className="iso-join__cc-bg-text">ISO</div>
-          )}
-          <div className="iso-join__cc-ovr">
-            <div className="iso-join__cc-ovr-num">{result.overall}</div>
-            <div className="iso-join__cc-ovr-lbl">Overall</div>
-          </div>
-          <div className="iso-join__cc-tier-wrap">
-            <div className="iso-join__cc-tier-box">{tierIcon}</div>
-            <div className="iso-join__cc-tier-name">{result.tierLabel}</div>
-          </div>
-          <div className="iso-join__cc-photo-fade" />
-        </div>
-
-        <div className="iso-join__cc-body">
-          <div className="iso-join__cc-name">{name.toUpperCase()}</div>
-          <div className="iso-join__cc-specialty">{specialty} {role ? `· ${role.split(' ').slice(0, 2).join(' ')}` : ''}</div>
-          <div className="iso-join__cc-divider" />
-          <div className="iso-join__cc-stats">
-            <div className="iso-join__cc-stat">
-              <span className="iso-join__cc-stat-val">{years}</span>
-              <span className="iso-join__cc-stat-key">Years</span>
-            </div>
-            <div className="iso-join__cc-stat">
-              <span className="iso-join__cc-stat-val">{skillTags.length}</span>
-              <span className="iso-join__cc-stat-key">Skills</span>
-            </div>
-            <div className="iso-join__cc-stat">
-              <span className="iso-join__cc-stat-val">{outcomeCount}</span>
-              <span className="iso-join__cc-stat-key">Outcomes</span>
-            </div>
-          </div>
-          <div className="iso-join__cc-tags">
-            {skillTags.map(s => (
-              <span key={s} className="iso-join__cc-tag">{s}</span>
-            ))}
-          </div>
-        </div>
-
-        <div className="iso-join__cc-footer">
-          <span className="iso-join__cc-footer-text">ISO Institute</span>
-          <span className="iso-join__cc-footer-text">{result.tierLabel} Coach</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ====================================================================
 // MAIN COMPONENT
 // ====================================================================
@@ -2015,7 +2013,15 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   useEffect(() => {
     const nonPersistScreens: Screen[] = ['create-account', 'success-player', 'success-coach', 'success-explorer'];
     if (!nonPersistScreens.includes(screen)) {
-      localStorage.setItem('iso-onboarding', JSON.stringify({ screen, currentQ, answers }));
+      try {
+        const { c_photo, ...restAnswers } = answers;
+        localStorage.setItem('iso-onboarding', JSON.stringify({
+          screen, currentQ, answers: restAnswers, hasPhoto: !!c_photo,
+        }));
+        persistOnboardingPhoto(c_photo as string | null | undefined);
+      } catch {
+        // Progress save failed (e.g. storage full) — session continues in memory
+      }
     }
   }, [screen, currentQ, answers]);
 
@@ -2036,8 +2042,15 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
       try {
         const saved = localStorage.getItem('iso-onboarding');
         if (saved) {
-          const { screen: s, currentQ: q, answers: a } = JSON.parse(saved);
+          const parsed = JSON.parse(saved) as {
+            screen: Screen; currentQ: number; answers: Answers; hasPhoto?: boolean;
+          };
+          const { screen: s, currentQ: q, answers: a, hasPhoto } = parsed;
           if (s === 'player' || s === 'coach' || s === 'explorer') {
+            if (hasPhoto) {
+              const photo = loadOnboardingPhoto();
+              if (photo) a.c_photo = photo;
+            }
             setScreen(s); setCurrentQ(q); setAnswers(a);
             return;
           }
@@ -2108,7 +2121,9 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
     const interval = setInterval(() => { i = (i + 1) % msgs.length; setProcMsg(msgs[i]); }, 1700);
     await new Promise(r => setTimeout(r, 4000));
     clearInterval(interval);
-    setCoachResult(scoreCoach(answers));
+    const result = scoreCoach(answers);
+    setCoachResult(result);
+    saveCoachProfileFromAssessment(answers, result, authEmail);
     setExiting(true);
     setTimeout(() => { setScreen('coach-result'); setExiting(false); window.scrollTo({ top: 0 }); }, 280);
   };
@@ -2123,6 +2138,7 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
   const clearProgress = () => {
     localStorage.removeItem('iso-onboarding');
+    localStorage.removeItem(ONBOARDING_PHOTO_KEY);
     setAnswers({});
     setOtherText({});
     setCurrentQ(0);
@@ -2191,6 +2207,9 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
       // Coach: application submitted — portal access pending Advisory Board approval
       localStorage.setItem('iso_coach_pending', 'true');
       localStorage.setItem('iso_demo_portal', 'coach');
+      if (coachResult) {
+        saveCoachProfileFromAssessment(answers, coachResult, authEmail);
+      }
       // Do NOT set iso_onboarding_complete — portal access blocked until approved
     }
     const existing = localStorage.getItem('iso_demo_user');
@@ -2208,6 +2227,7 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
       } catch {}
     }
     localStorage.removeItem('iso-onboarding');
+    localStorage.removeItem(ONBOARDING_PHOTO_KEY);
   };
 
   const fname = (answers.fname as string) ?? '';
@@ -2769,7 +2789,12 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
             </h1>
             <p className="iso-join__result-subtitle">{coachResult.tierLabel} Coach · ISO Institute</p>
 
-            <CoachCard result={coachResult} answers={answers} />
+            {(() => {
+              const hydrated = hydrateCoachProfileFromAssessment(answers, coachResult);
+              return (
+                <CoachISOCard card={hydrated.card} pathwayColor={hydrated.identity.pathwayColor} />
+              );
+            })()}
 
             <TierViz assignedTier={coachResult.tier} />
 
@@ -2864,6 +2889,17 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
               </p>
             </div>
 
+            <button
+              className="iso-join__btn-primary"
+              style={{ marginBottom: 10, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.4)', color: '#22c55e' }}
+              onClick={() => {
+                completeOnboarding('coach');
+                approveCoachApplicationForDemo();
+                onNavigate('coach-portal');
+              }}
+            >
+              Approved
+            </button>
             <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('coach'); onNavigate('home'); }}>
               Back to ISO
             </button>

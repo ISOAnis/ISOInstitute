@@ -44,9 +44,11 @@ function formatTime(date: Date) {
 
 interface LockerRoomChatProps {
   lockedPathwayId: string;
+  userRole?: 'player' | 'coach';
+  coachName?: string;
 }
 
-export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
+export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName }: LockerRoomChatProps) {
   const [selectedChannel, setSelectedChannel] = useState<PathwayId>((lockedPathwayId as PathwayId) || 'deen');
   const [activeTab, setActiveTab] = useState<'chat' | 'videos'>('chat');
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
@@ -55,7 +57,8 @@ export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
   const hex = PATHWAY_HEX[selectedChannel] ?? '#f97316';
   const lockedHex = PATHWAY_HEX[lockedPathwayId] ?? '#f97316';
   const lockedName = PATHWAY_BY_ID[lockedPathwayId as keyof typeof PATHWAY_BY_ID]?.name ?? lockedPathwayId;
-  const postingInOtherChannel = selectedChannel !== lockedPathwayId;
+  const isCoach = userRole === 'coach';
+  const postingInOtherChannel = !isCoach && selectedChannel !== lockedPathwayId;
 
   const filteredMessages = messages.filter(m => m.channelPathwayId === selectedChannel);
   const filteredVideos = MOCK_VIDEOS.filter(v => !v.pathwayId || v.pathwayId === selectedChannel);
@@ -65,7 +68,7 @@ export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
     if (!input.trim() || !lockedPathwayId) return;
     const msg: ChatMessage = {
       id: Date.now().toString(),
-      userName: 'You',
+      userName: isCoach ? (coachName ?? 'Coach') : 'You',
       userLocation: 'Your Location',
       lockedPathwayId: lockedPathwayId as PathwayId,
       content: input.trim(),
@@ -96,7 +99,11 @@ export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
       <div style={{ width: 200, flexShrink: 0, borderRight: '1px solid rgba(255,255,255,0.07)', background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '16px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: '#F2F2F2', letterSpacing: 1 }}>CHANNELS</div>
-          <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Browse all · you post as {lockedName}</div>
+          <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+            {isCoach
+              ? `All pathways · posting as ${coachName ?? 'Coach'}`
+              : `Browse all · you post as ${lockedName}`}
+          </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: 8 }}>
           {PATHWAYS.map(p => {
@@ -118,7 +125,8 @@ export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
               >
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: pHex, flexShrink: 0 }} />
                 <span style={{ flex: 1 }}>{p.name}</span>
-                {isHome && <span style={{ fontSize: 9, color: pHex, opacity: 0.7 }}>HOME</span>}
+                {isHome && !isCoach && <span style={{ fontSize: 9, color: pHex, opacity: 0.7 }}>HOME</span>}
+                {isCoach && p.id === lockedPathwayId && <span style={{ fontSize: 9, color: pHex, opacity: 0.7 }}>YOURS</span>}
               </button>
             );
           })}
@@ -185,7 +193,17 @@ export function LockerRoomChat({ lockedPathwayId }: LockerRoomChatProps) {
               <div ref={endRef} />
             </div>
             <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', gap: 10, alignItems: 'center' }}>
-              <PathwayBadge pathwayId={lockedPathwayId} />
+              {isCoach ? (
+                <span style={{
+                  fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 1,
+                  color: hex, background: `${hex}18`, border: `1px solid ${hex}40`,
+                  borderRadius: 100, padding: '2px 9px', textTransform: 'uppercase',
+                }}>
+                  Coach
+                </span>
+              ) : (
+                <PathwayBadge pathwayId={lockedPathwayId} />
+              )}
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}

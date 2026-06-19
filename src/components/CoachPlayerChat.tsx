@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Smile, Check, CheckCheck, Clock, User, MessageSquare } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Send, Paperclip, Smile, Check, CheckCheck, MessageSquare } from 'lucide-react';
+import {
+  PORTAL_ACCENT, PORTAL_PANEL_BG, PORTAL_PANEL_BORDER,
+  PORTAL_INPUT_BG, PORTAL_INPUT_BORDER, PORTAL_TEXT_PRIMARY, PORTAL_TEXT_MUTED, PORTAL_TEXT_DIM,
+} from '../utils/portalTheme';
 
 interface Message {
   id: string;
@@ -11,12 +14,6 @@ interface Message {
   senderRole: 'coach' | 'player';
   timestamp: Date;
   read: boolean;
-  attachments?: Array<{
-    id: string;
-    name: string;
-    url: string;
-    type: string;
-  }>;
 }
 
 type CategoryIconType = string | React.ComponentType<{ className?: string }>;
@@ -31,9 +28,9 @@ interface CoachPlayerChatProps {
   otherUserAvatar?: string;
   category?: string;
   categoryIcon?: CategoryIconType;
+  accentColor?: string;
 }
 
-// Mock messages - in production this would come from backend
 const mockMessages: Message[] = [
   {
     id: '1',
@@ -91,7 +88,7 @@ const mockMessages: Message[] = [
   },
   {
     id: '7',
-    content: 'Excellent progress on your prayer routine! I noticed you completed the first bucket. Keep up the great work! 🎉',
+    content: 'Excellent progress on your prayer routine! I noticed you completed the first bucket. Keep up the great work!',
     senderId: 'coach-1',
     senderName: 'Imam Abdullah Rahman',
     senderRole: 'coach',
@@ -99,6 +96,19 @@ const mockMessages: Message[] = [
     read: true,
   },
 ];
+
+function ChatAvatar({ name, src, size = 36 }: { name: string; src?: string; size?: number }) {
+  const initials = name.charAt(0).toUpperCase();
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+      background: `${PORTAL_ACCENT}20`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: "'Barlow Condensed', sans-serif", fontSize: size * 0.38, fontWeight: 700, color: PORTAL_ACCENT,
+    }}>
+      {src ? <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+    </div>
+  );
+}
 
 export function CoachPlayerChat({
   currentUserId,
@@ -110,41 +120,33 @@ export function CoachPlayerChat({
   otherUserAvatar,
   category,
   categoryIcon,
+  accentColor = PORTAL_ACCENT,
 }: CoachPlayerChatProps) {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [messageInput, setMessageInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const previousMessagesLengthRef = useRef(mockMessages.length);
   const hasInitializedRef = useRef(false);
 
-  // Auto-scroll to bottom only when new messages are added (not on mount or tab switch)
   useEffect(() => {
-    // Skip auto-scroll on initial mount
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
       previousMessagesLengthRef.current = messages.length;
       return;
     }
-
-    // Only scroll if message count increased (new message added)
     if (messages.length > previousMessagesLengthRef.current) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
-    
     previousMessagesLengthRef.current = messages.length;
   }, [messages]);
 
   const formatTime = (date: Date): string => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const diff = Date.now() - date.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
@@ -154,8 +156,7 @@ export function CoachPlayerChat({
 
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
-
-    const newMessage: Message = {
+    setMessages([...messages, {
       id: Date.now().toString(),
       content: messageInput.trim(),
       senderId: currentUserId,
@@ -163,16 +164,8 @@ export function CoachPlayerChat({
       senderRole: currentUserRole,
       timestamp: new Date(),
       read: false,
-    };
-
-    setMessages([...messages, newMessage]);
+    }]);
     setMessageInput('');
-
-    // Simulate typing indicator from other user (optional)
-    // In production, this would be handled by WebSocket or similar
-    setTimeout(() => {
-      setIsTyping(false);
-    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -186,170 +179,152 @@ export function CoachPlayerChat({
 
   const renderCategoryIcon = () => {
     if (!categoryIcon) return null;
-    if (typeof categoryIcon === 'string') {
-      return <span>{categoryIcon}</span>;
-    }
+    if (typeof categoryIcon === 'string') return <span>{categoryIcon}</span>;
     try {
       const IconComponent = categoryIcon;
-      return <IconComponent className="w-3 h-3 text-slate-400" />;
-    } catch (error) {
-      console.error('Failed to render category icon:', error);
+      return <IconComponent className="w-3 h-3" />;
+    } catch {
       return null;
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
-      {/* Chat Header */}
-      <div className="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar className="w-10 h-10">
-            <AvatarImage src={otherUserAvatar} alt={otherUserName} />
-            <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-              {otherUserName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+    <div style={{
+      display: 'flex', flexDirection: 'column', height: '100%',
+      background: PORTAL_PANEL_BG, border: `1px solid ${PORTAL_PANEL_BORDER}`, borderRadius: 14, overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '16px 20px', borderBottom: `1px solid ${PORTAL_PANEL_BORDER}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'rgba(255,255,255,0.02)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <ChatAvatar name={otherUserName} src={otherUserAvatar} size={40} />
           <div>
-            <h3 className="text-white font-semibold">{otherUserName}</h3>
-            <div className="flex items-center gap-2 text-slate-400 text-xs">
+            <h3 style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, fontWeight: 600, color: PORTAL_TEXT_PRIMARY, margin: 0 }}>
+              {otherUserName}
+            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Barlow', sans-serif", fontSize: 12, color: PORTAL_TEXT_DIM, marginTop: 2 }}>
               {renderCategoryIcon()}
               {category && <span>{category}</span>}
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>·</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: accentColor }} />
                 Active
               </span>
             </div>
           </div>
         </div>
-        <div className="text-slate-500 text-xs">
+        <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: PORTAL_TEXT_DIM, letterSpacing: 1 }}>
           Private Chat
-        </div>
+        </span>
       </div>
 
-      {/* Messages Area */}
-      <div
-        ref={chatContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950"
-        style={{ scrollBehavior: 'auto' }}
-      >
+      {/* Messages */}
+      <div ref={chatContainerRef} style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-              <MessageSquare className="w-8 h-8 text-slate-500" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center', padding: 40 }}>
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: PORTAL_PANEL_BG, border: `1px solid ${PORTAL_PANEL_BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+              <MessageSquare size={24} style={{ color: PORTAL_TEXT_DIM }} />
             </div>
-            <h3 className="text-white font-semibold mb-2">No messages yet</h3>
-            <p className="text-slate-400 text-sm max-w-md">
-              Start the conversation with {otherUserName}. This is a private, secure channel for your coaching communication.
+            <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, color: PORTAL_TEXT_PRIMARY, margin: '0 0 8px' }}>No messages yet</h3>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: PORTAL_TEXT_MUTED, maxWidth: 320, margin: 0 }}>
+              Start the conversation with {otherUserName}.
             </p>
           </div>
         ) : (
-          messages.map((message) => {
-            const isCurrent = isCurrentUser(message);
-            return (
-              <div
-                key={message.id}
-                className={`flex gap-3 ${isCurrent ? 'flex-row-reverse' : 'flex-row'}`}
-              >
-                {/* Avatar */}
-                {!isCurrent && (
-                  <Avatar className="w-8 h-8 flex-shrink-0">
-                    <AvatarImage src={otherUserAvatar} alt={otherUserName} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs">
-                      {otherUserName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-
-                {/* Message Content */}
-                <div className={`flex flex-col ${isCurrent ? 'items-end' : 'items-start'} max-w-[70%]`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-slate-400 text-xs">{message.senderName}</span>
-                    <span className="text-slate-600 text-xs">{formatTime(message.timestamp)}</span>
-                  </div>
-                  <div
-                    className={`rounded-2xl px-4 py-2 ${
-                      isCurrent
-                        ? 'bg-orange-500 text-white rounded-br-sm'
-                        : 'bg-slate-800 text-slate-100 rounded-bl-sm'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-                  </div>
-                  {isCurrent && (
-                    <div className="flex items-center gap-1 mt-1">
-                      {message.read ? (
-                        <CheckCheck className="w-3 h-3 text-blue-400" />
-                      ) : (
-                        <Check className="w-3 h-3 text-slate-500" />
-                      )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {messages.map(message => {
+              const isCurrent = isCurrentUser(message);
+              return (
+                <div key={message.id} style={{ display: 'flex', gap: 10, flexDirection: isCurrent ? 'row-reverse' : 'row' }}>
+                  {!isCurrent && <ChatAvatar name={otherUserName} src={otherUserAvatar} size={32} />}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: isCurrent ? 'flex-end' : 'flex-start', maxWidth: '72%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: PORTAL_TEXT_DIM }}>{message.senderName}</span>
+                      <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>{formatTime(message.timestamp)}</span>
                     </div>
-                  )}
+                    <div style={{
+                      borderRadius: 14, padding: '10px 14px',
+                      background: isCurrent ? `${accentColor}22` : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${isCurrent ? `${accentColor}35` : PORTAL_PANEL_BORDER}`,
+                      borderBottomRightRadius: isCurrent ? 4 : 14,
+                      borderBottomLeftRadius: isCurrent ? 14 : 4,
+                    }}>
+                      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: PORTAL_TEXT_PRIMARY, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                        {message.content}
+                      </p>
+                    </div>
+                    {isCurrent && (
+                      <div style={{ marginTop: 4 }}>
+                        {message.read
+                          ? <CheckCheck size={12} style={{ color: accentColor }} />
+                          : <Check size={12} style={{ color: PORTAL_TEXT_DIM }} />}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
 
-        {/* Typing Indicator */}
         {isTyping && (
-          <div className="flex gap-3">
-            <Avatar className="w-8 h-8 flex-shrink-0">
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs">
-                {otherUserName.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="bg-slate-800 rounded-2xl rounded-bl-sm px-4 py-2">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <ChatAvatar name={otherUserName} size={32} />
+            <div style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.05)', borderRadius: 14, borderBottomLeftRadius: 4 }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[0, 150, 300].map(delay => (
+                  <div key={delay} style={{ width: 6, height: 6, borderRadius: '50%', background: PORTAL_TEXT_DIM, animation: 'bounce 1s infinite', animationDelay: `${delay}ms` }} />
+                ))}
               </div>
             </div>
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <div className="border-t border-slate-800 bg-slate-900 p-4">
-        <div className="flex items-end gap-2">
-          <div className="flex-1 relative">
-            <textarea
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={`Message ${otherUserName}...`}
-              rows={1}
-              className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 border border-slate-700 focus:border-orange-500 focus:outline-none resize-none max-h-32 overflow-y-auto"
-              style={{ minHeight: '44px' }}
-            />
-          </div>
+      {/* Input */}
+      <div style={{ padding: '16px 20px', borderTop: `1px solid ${PORTAL_PANEL_BORDER}`, background: 'rgba(255,255,255,0.02)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
+          <textarea
+            value={messageInput}
+            onChange={e => setMessageInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={`Message ${otherUserName}...`}
+            rows={1}
+            style={{
+              flex: 1, background: PORTAL_INPUT_BG, border: `1px solid ${PORTAL_INPUT_BORDER}`,
+              borderRadius: 10, padding: '12px 14px', color: PORTAL_TEXT_PRIMARY,
+              fontFamily: "'Barlow', sans-serif", fontSize: 14, outline: 'none', resize: 'none',
+              minHeight: 44, maxHeight: 120, boxSizing: 'border-box',
+            }}
+          />
           <button
             onClick={handleSendMessage}
             disabled={!messageInput.trim()}
-            className="bg-orange-500 text-white p-3 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            style={{
+              background: messageInput.trim() ? accentColor : 'rgba(255,255,255,0.08)',
+              border: 'none', borderRadius: 10, padding: 12, cursor: messageInput.trim() ? 'pointer' : 'not-allowed',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: messageInput.trim() ? 1 : 0.5,
+            }}
             aria-label="Send message"
           >
-            <Send className="w-5 h-5" />
+            <Send size={18} style={{ color: messageInput.trim() ? '#fff' : PORTAL_TEXT_DIM }} />
           </button>
         </div>
-        <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-1 hover:text-slate-400 transition-colors">
-              <Paperclip className="w-4 h-4" />
-              <span>Attach</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-slate-400 transition-colors">
-              <Smile className="w-4 h-4" />
-              <span>Emoji</span>
-            </button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 16 }}>
+            {[{ Icon: Paperclip, label: 'Attach' }, { Icon: Smile, label: 'Emoji' }].map(({ Icon, label }) => (
+              <button key={label} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Barlow', sans-serif", fontSize: 11, color: PORTAL_TEXT_DIM }}>
+                <Icon size={13} /> {label}
+              </button>
+            ))}
           </div>
-          <span className="text-slate-600">End-to-end encrypted</span>
+          <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>End-to-end encrypted</span>
         </div>
       </div>
     </div>
   );
 }
-

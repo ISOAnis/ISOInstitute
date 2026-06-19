@@ -1,19 +1,30 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { Trophy, Target, CheckCircle2, Circle, Award, TrendingUp, Calendar, MessageSquare, Plus, Edit3, Save, X, User, Clock, AlertCircle, Users, Sparkles, UserCircle, Moon, ArrowRight } from 'lucide-react';
+import {
+  Trophy, Target, CheckCircle2, Circle, Award, Calendar,
+  MessageSquare, Plus, Edit3, Save, X, Clock, AlertCircle, Users, Sparkles,
+  UserCircle, Moon, ArrowRight, Home, Menu, ChevronRight, ShoppingBag, MessageCircle, Video,
+} from 'lucide-react';
+import { PORTAL_ACCENT } from '../utils/portalTheme';
 import { PortalTutorial } from './PortalTutorial';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Textarea } from './ui/textarea';
-import { Button } from './ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { PortalGreeting } from './PortalGreeting';
 import { CoachProfileSection } from './CoachProfileSection';
 import { AIMatchingDashboard } from './AIMatchingDashboard';
-import { LockerRoom } from './LockerRoom';
+import { LockerRoomChat } from './LockerRoomChat';
+import { ISOCommunityForum } from './ISOCommunityForum';
+import { CoachStoreSection } from './portal-store';
+import { CoachISODashboard } from './CoachISODashboard';
+import { CoachOverallProgressBar } from './CoachOverallProgressBar';
 import { CoachPlayerChat } from './CoachPlayerChat';
-import { CoachProfileCompletionModal } from './CoachProfileCompletionModal';
+import { CoachISOCard } from './CoachISOCard';
+import { PortalChromeBar } from './PortalChromeBar';
+import { getCoachPathwayChannelId } from '../utils/coachProgress';
+import {
+  resolveCoachIdentity, resolveCoachCard, isCoachCardPendingReview,
+  type CoachCardDisplay, type CoachIdentity,
+} from '../utils/coachProfile';
+import { loadPhotoFrame, type CoachPhotoFrame } from '../utils/coachPhotoStorage';
+
+// ─── TYPES & MOCK DATA ────────────────────────────────────────────────────────
 
 interface Comment {
   id: string;
@@ -53,7 +64,6 @@ interface Player {
   avatar?: string;
 }
 
-// Mock data - in production this would come from backend
 const mockPlayers: Player[] = [
   {
     id: '1',
@@ -70,25 +80,25 @@ const mockPlayers: Player[] = [
         completed: true,
         completedDate: '2024-10-15',
         buckets: [
-          { 
-            id: '1-1', 
-            title: 'Pray Fajr on time for 7 days', 
-            description: 'Build consistency with morning prayer', 
-            completed: true, 
+          {
+            id: '1-1',
+            title: 'Pray Fajr on time for 7 days',
+            description: 'Build consistency with morning prayer',
+            completed: true,
             coachApproved: true,
             comments: [
-              { id: 'c1', text: 'Excellent work! Your consistency is inspiring.', createdAt: '2024-10-14', coachName: 'Imam Abdullah' }
-            ]
+              { id: 'c1', text: 'Excellent work! Your consistency is inspiring.', createdAt: '2024-10-14', coachName: 'Imam Abdullah' },
+            ],
           },
-          { 
-            id: '1-2', 
-            title: 'Learn proper wudu technique', 
-            description: 'Master the ablution process', 
-            completed: true, 
+          {
+            id: '1-2',
+            title: 'Learn proper wudu technique',
+            description: 'Master the ablution process',
+            completed: true,
             coachApproved: true,
-            comments: []
+            comments: [],
           },
-        ]
+        ],
       },
       {
         id: '2',
@@ -96,27 +106,27 @@ const mockPlayers: Player[] = [
         description: 'Deepen understanding of faith',
         completed: false,
         buckets: [
-          { 
-            id: '2-1', 
-            title: 'Read 10 pages of Quran daily', 
-            description: 'Consistent engagement with scripture', 
-            completed: true, 
+          {
+            id: '2-1',
+            title: 'Read 10 pages of Quran daily',
+            description: 'Consistent engagement with scripture',
+            completed: true,
             coachApproved: false,
             pendingApproval: true,
-            comments: []
+            comments: [],
           },
-          { 
-            id: '2-2', 
-            title: 'Attend Friday Jummah for 4 weeks', 
-            description: 'Connect with community', 
-            completed: false, 
+          {
+            id: '2-2',
+            title: 'Attend Friday Jummah for 4 weeks',
+            description: 'Connect with community',
+            completed: false,
             coachApproved: false,
             dueDate: '2024-11-22',
-            comments: []
+            comments: [],
           },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   {
     id: '2',
@@ -132,847 +142,1001 @@ const mockPlayers: Player[] = [
         description: 'Begin memorizing key surahs',
         completed: false,
         buckets: [
-          { 
-            id: '1-1', 
-            title: 'Memorize Surah Al-Mulk', 
-            description: 'Complete memorization with tajweed', 
-            completed: false, 
+          {
+            id: '1-1',
+            title: 'Memorize Surah Al-Mulk',
+            description: 'Complete memorization with tajweed',
+            completed: false,
             coachApproved: false,
             dueDate: '2024-12-01',
-            comments: []
+            comments: [],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 ];
 
 const COACH_TUTORIAL_KEY = 'iso_tutorial_completed_coach_page';
+const NAV_H = 72;
+const SIDEBAR_W_EXPANDED = 220;
+const SIDEBAR_W_COLLAPSED = 64;
 
-type CoachTab = 'players' | 'messages' | 'matching' | 'profile';
+type CoachSection = 'dashboard' | 'players' | 'messages' | 'matching' | 'community' | 'locker-room' | 'store' | 'profile';
+
+const SIDEBAR_ITEMS: { id: CoachSection; label: string; Icon: React.ComponentType<{ size: number; style?: React.CSSProperties }> }[] = [
+  { id: 'dashboard', label: 'Dashboard', Icon: Home },
+  { id: 'players', label: 'My Players', Icon: Users },
+  { id: 'messages', label: 'Messages', Icon: MessageSquare },
+  { id: 'matching', label: 'AI Matching', Icon: Sparkles },
+  { id: 'community', label: 'ISO Community', Icon: MessageCircle },
+  { id: 'locker-room', label: 'Locker Room', Icon: Video },
+  { id: 'store', label: 'Coach Store', Icon: ShoppingBag },
+  { id: 'profile', label: 'My Profile', Icon: UserCircle },
+];
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+function PlayerAvatar({ name, src, size = 40, accentColor = PORTAL_ACCENT }: { name: string; src?: string; size?: number; accentColor?: string }) {
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0,
+      background: `${accentColor}25`, overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: "'Barlow Condensed', sans-serif", fontSize: size * 0.35, fontWeight: 700, color: accentColor,
+    }}>
+      {src ? <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, Icon, color }: {
+  label: string; value: string | number; sub: string;
+  Icon: React.ComponentType<{ size: number; style?: React.CSSProperties }>; color: string;
+}) {
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <Icon size={20} style={{ color }} />
+        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: 1.5, textTransform: 'uppercase' }}>{label}</span>
+      </div>
+      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, color: '#F2F2F2', lineHeight: 1, marginBottom: 4 }}>{value}</div>
+      <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>{sub}</div>
+    </div>
+  );
+}
+
+function Panel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+      borderRadius: 14, ...style,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function BtnPrimary({ children, onClick, small, accentColor = PORTAL_ACCENT }: { children: React.ReactNode; onClick?: () => void; small?: boolean; accentColor?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: `${accentColor}20`, border: `1px solid ${accentColor}40`, borderRadius: small ? 8 : 10,
+        padding: small ? '8px 16px' : '10px 20px', color: accentColor,
+        fontFamily: "'Barlow Condensed', sans-serif", fontSize: small ? 12 : 13,
+        fontWeight: 700, letterSpacing: 1, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BtnGhost({ children, onClick, small }: { children: React.ReactNode; onClick?: () => void; small?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: small ? 8 : 10,
+        padding: small ? '8px 16px' : '10px 20px', color: 'rgba(255,255,255,0.5)',
+        fontFamily: "'Barlow', sans-serif", fontSize: small ? 12 : 13, cursor: 'pointer',
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function calculatePlayerStats(player: Player) {
+  const totalGames = player.games.length;
+  const gamesWon = player.games.filter(g => g.completed).length;
+  const totalBuckets = player.games.reduce((sum, game) => sum + game.buckets.length, 0);
+  const bucketsScored = player.games.reduce(
+    (sum, game) => sum + game.buckets.filter(b => b.completed && b.coachApproved).length, 0,
+  );
+  const pendingApprovals = player.games.reduce(
+    (sum, game) => sum + game.buckets.filter(b => b.pendingApproval).length, 0,
+  );
+  return { totalGames, gamesWon, totalBuckets, bucketsScored, pendingApprovals, isChampion: gamesWon >= 6 };
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+
+function CoachSidebar({
+  active, onSelect, expanded, onToggle, accentColor,
+}: {
+  active: CoachSection;
+  onSelect: (s: CoachSection) => void;
+  expanded: boolean;
+  onToggle: () => void;
+  accentColor: string;
+}) {
+  const w = expanded ? SIDEBAR_W_EXPANDED : SIDEBAR_W_COLLAPSED;
+
+  return (
+    <div style={{
+      position: 'fixed', top: NAV_H, left: 0, bottom: 0, width: w,
+      background: '#0A0A0A', borderRight: '1px solid rgba(255,255,255,0.07)',
+      transition: 'width 0.25s ease', display: 'flex', flexDirection: 'column', zIndex: 40, overflow: 'hidden',
+    }}>
+      <button
+        onClick={onToggle}
+        style={{
+          height: 52, display: 'flex', alignItems: 'center',
+          justifyContent: expanded ? 'space-between' : 'center',
+          padding: expanded ? '0 18px' : '0',
+          background: 'transparent', border: 'none',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          cursor: 'pointer', width: '100%', color: 'rgba(255,255,255,0.4)',
+          gap: 8,
+        }}
+      >
+        {expanded ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <img
+              src="/ISO OFFICIAL.png"
+              alt=""
+              style={{ height: 22, width: 'auto', objectFit: 'contain', flexShrink: 0, opacity: 0.9 }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
+            <span style={{
+              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700,
+              letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)',
+            }}>
+              Coach Portal
+            </span>
+          </div>
+        ) : (
+          <img
+            src="/ISO OFFICIAL.png"
+            alt="ISO"
+            style={{ height: 24, width: 'auto', objectFit: 'contain', opacity: 0.85 }}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
+        )}
+        <Menu size={16} style={{ flexShrink: 0 }} />
+      </button>
+
+      <div style={{ flex: 1, paddingTop: 8, overflowY: 'auto' }}>
+        {SIDEBAR_ITEMS.map(item => {
+          const isActive = active === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onSelect(item.id)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: expanded ? '13px 18px' : '13px 0',
+                justifyContent: expanded ? 'flex-start' : 'center',
+                background: isActive ? `${accentColor}15` : 'transparent',
+                color: isActive ? '#fff' : 'rgba(255,255,255,0.4)',
+                cursor: 'pointer', border: 'none', position: 'relative',
+                transition: 'color 0.15s, background 0.15s', whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.75)'; }}
+              onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
+            >
+              <span style={{
+                position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+                background: isActive ? accentColor : 'transparent', borderRadius: '0 2px 2px 0',
+              }} />
+              <item.Icon size={17} style={{ flexShrink: 0 }} />
+              {expanded && (
+                <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 500 }}>{item.label}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+
+function CoachDashboardView({
+  allStats, coachIdentity, coachCard, pendingReview, accentColor, onNavigate,
+}: {
+  allStats: { totalPlayers: number; totalPendingApprovals: number; totalActiveGames: number; champions: number };
+  coachIdentity: CoachIdentity;
+  coachCard: CoachCardDisplay | null;
+  pendingReview: boolean;
+  accentColor: string;
+  onNavigate: (s: CoachSection) => void;
+}) {
+  return (
+    <CoachISODashboard
+      coachIdentity={coachIdentity}
+      coachCard={coachCard}
+      pendingReview={pendingReview}
+      accentColor={accentColor}
+      stats={allStats}
+      onNavigate={onNavigate}
+    />
+  );
+}
+
+// ─── PLAYERS VIEW ─────────────────────────────────────────────────────────────
+
+function CoachPlayersView({
+  players, selectedPlayer, selectedGame, onSelectPlayer, onSelectGame,
+  showNewGameForm, setShowNewGameForm, newGameTitle, setNewGameTitle,
+  newGameDescription, setNewGameDescription, onAddGame,
+  editingComment, setEditingComment, commentText, setCommentText,
+  onAddComment, onApprove,   onGoToMessages, accentColor,
+}: {
+  players: Player[];
+  selectedPlayer: Player | null;
+  selectedGame: Game | null;
+  onSelectPlayer: (p: Player) => void;
+  onSelectGame: (g: Game | null) => void;
+  showNewGameForm: boolean;
+  setShowNewGameForm: (v: boolean) => void;
+  newGameTitle: string;
+  setNewGameTitle: (v: string) => void;
+  newGameDescription: string;
+  setNewGameDescription: (v: string) => void;
+  onAddGame: () => void;
+  editingComment: string | null;
+  setEditingComment: (v: string | null) => void;
+  commentText: string;
+  setCommentText: (v: string) => void;
+  onAddComment: (playerId: string, gameId: string, bucketId: string) => void;
+  onApprove: (playerId: string, gameId: string, bucketId: string) => void;
+  onGoToMessages: (player: Player) => void;
+  accentColor: string;
+}) {
+  return (
+    <div style={{ padding: '32px 32px 60px' }}>
+      <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>
+        My Players
+      </h2>
+      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 28px' }}>
+        Track progress, approve buckets, and assign new games
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(240px, 1fr) minmax(0, 2fr)', gap: 24 }}>
+        {/* Player list */}
+        <Panel style={{ padding: 20 }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: 2, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: 16 }}>
+            Your Roster
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {players.map(player => {
+              const stats = calculatePlayerStats(player);
+              const isSelected = selectedPlayer?.id === player.id;
+              return (
+                <button
+                  key={player.id}
+                  onClick={() => { onSelectPlayer(player); onSelectGame(null); }}
+                  style={{
+                    width: '100%', textAlign: 'left', padding: 14, borderRadius: 12, cursor: 'pointer',
+                    background: isSelected ? `${accentColor}12` : 'rgba(255,255,255,0.02)',
+                    border: isSelected ? `1px solid ${accentColor}40` : '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.15s',
+                  }}
+                >
+                  <PlayerAvatar name={player.name} src={player.avatar} size={40} accentColor={accentColor} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 600, color: '#F2F2F2', marginBottom: 2 }}>{player.name}</div>
+                    <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                      {stats.gamesWon}/{stats.totalGames} games won
+                    </div>
+                    {stats.pendingApprovals > 0 && (
+                      <span style={{
+                        display: 'inline-block', marginTop: 6, padding: '2px 8px', borderRadius: 100,
+                        background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)',
+                        fontFamily: "'Barlow', sans-serif", fontSize: 11, color: '#f97316',
+                      }}>
+                        {stats.pendingApprovals} pending
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </Panel>
+
+        {/* Player detail */}
+        <div>
+          {selectedPlayer ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <Panel style={{ padding: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <PlayerAvatar name={selectedPlayer.name} src={selectedPlayer.avatar} size={56} />
+                    <div>
+                      <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, color: '#F2F2F2', margin: '0 0 4px' }}>{selectedPlayer.name}</h3>
+                      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{selectedPlayer.email}</p>
+                      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.25)', margin: '4px 0 0' }}>
+                        Joined {new Date(selectedPlayer.joinedDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <BtnPrimary onClick={() => onGoToMessages(selectedPlayer)} small accentColor={accentColor}>
+                    <MessageSquare size={14} /> Message
+                  </BtnPrimary>
+                </div>
+                {(() => {
+                  const stats = calculatePlayerStats(selectedPlayer);
+                  return (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      {[
+                        { label: 'Buckets', value: `${stats.bucketsScored}/${stats.totalBuckets}`, color: accentColor },
+                        { label: 'Games', value: `${stats.gamesWon}/${stats.totalGames}`, color: '#f97316' },
+                        { label: 'Champion', value: stats.isChampion ? '✓' : `${6 - stats.gamesWon} to go`, color: stats.isChampion ? '#a855f7' : 'rgba(255,255,255,0.3)' },
+                      ].map(s => (
+                        <div key={s.label} style={{ textAlign: 'center' }}>
+                          <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: s.color, marginBottom: 4 }}>{s.value}</div>
+                          <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </Panel>
+
+              <Panel style={{ padding: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, color: '#F2F2F2', margin: 0, letterSpacing: 0.5 }}>Games & Goals</h3>
+                  <BtnPrimary onClick={() => setShowNewGameForm(!showNewGameForm)} small accentColor={accentColor}>
+                    <Plus size={14} /> New Game
+                  </BtnPrimary>
+                </div>
+
+                {showNewGameForm && (
+                  <div style={{ marginBottom: 20, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 600, color: '#F2F2F2', marginBottom: 12 }}>Create New Game</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <input
+                        type="text"
+                        value={newGameTitle}
+                        onChange={e => setNewGameTitle(e.target.value)}
+                        placeholder="Game title"
+                        style={{
+                          width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: 8, padding: '10px 14px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 14, outline: 'none', boxSizing: 'border-box',
+                        }}
+                      />
+                      <input
+                        type="text"
+                        value={newGameDescription}
+                        onChange={e => setNewGameDescription(e.target.value)}
+                        placeholder="Brief description"
+                        style={{
+                          width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: 8, padding: '10px 14px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 14, outline: 'none', boxSizing: 'border-box',
+                        }}
+                      />
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <BtnPrimary onClick={onAddGame} small>Create Game</BtnPrimary>
+                        <BtnGhost onClick={() => { setShowNewGameForm(false); setNewGameTitle(''); setNewGameDescription(''); }} small>Cancel</BtnGhost>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {selectedPlayer.games.map(game => {
+                    const bucketsCompleted = game.buckets.filter(b => b.completed && b.coachApproved).length;
+                    const totalBucketsInGame = game.buckets.length;
+                    const progress = totalBucketsInGame > 0 ? Math.round((bucketsCompleted / totalBucketsInGame) * 100) : 0;
+                    const pendingInGame = game.buckets.filter(b => b.pendingApproval).length;
+                    const isExpanded = selectedGame?.id === game.id;
+
+                    return (
+                      <div key={game.id} style={{ borderRadius: 12, border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                        <div
+                          onClick={() => onSelectGame(isExpanded ? null : game)}
+                          style={{
+                            padding: 16, cursor: 'pointer',
+                            background: game.completed ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.02)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <div style={{
+                                width: 40, height: 40, borderRadius: '50%',
+                                background: game.completed ? 'rgba(34,197,94,0.2)' : `${accentColor}20`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                {game.completed ? <Trophy size={18} style={{ color: '#22c55e' }} /> : <Target size={18} style={{ color: accentColor }} />}
+                              </div>
+                              <div>
+                                <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, fontWeight: 600, color: '#F2F2F2' }}>{game.title}</div>
+                                {game.description && (
+                                  <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>{game.description}</div>
+                                )}
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+                                {bucketsCompleted}/{totalBucketsInGame} buckets
+                              </div>
+                              {pendingInGame > 0 && (
+                                <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: '#f97316' }}>{pendingInGame} pending</span>
+                              )}
+                            </div>
+                          </div>
+                          {!game.completed && totalBucketsInGame > 0 && (
+                            <div style={{ marginTop: 12, background: 'rgba(255,255,255,0.06)', borderRadius: 100, height: 4, overflow: 'hidden' }}>
+                              <div style={{ background: accentColor, height: '100%', width: `${progress}%`, transition: 'width 0.3s' }} />
+                            </div>
+                          )}
+                        </div>
+
+                        {isExpanded && (
+                          <div style={{ padding: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              {game.buckets.map(bucket => (
+                                <div
+                                  key={bucket.id}
+                                  style={{
+                                    padding: 14, borderRadius: 10,
+                                    background: bucket.coachApproved ? 'rgba(34,197,94,0.06)' : bucket.pendingApproval ? 'rgba(249,115,22,0.06)' : 'rgba(255,255,255,0.02)',
+                                    border: `1px solid ${bucket.coachApproved ? 'rgba(34,197,94,0.2)' : bucket.pendingApproval ? 'rgba(249,115,22,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', gap: 12 }}>
+                                    <div style={{ flexShrink: 0, paddingTop: 2 }}>
+                                      {bucket.coachApproved ? <CheckCircle2 size={20} style={{ color: '#22c55e' }} />
+                                        : bucket.completed ? <Clock size={20} style={{ color: '#f97316' }} />
+                                        : <Circle size={20} style={{ color: 'rgba(255,255,255,0.25)' }} />}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{
+                                        fontFamily: "'Barlow', sans-serif", fontSize: 14, fontWeight: 600,
+                                        color: bucket.coachApproved ? 'rgba(255,255,255,0.4)' : '#F2F2F2',
+                                        textDecoration: bucket.coachApproved ? 'line-through' : 'none', marginBottom: 4,
+                                      }}>
+                                        {bucket.title}
+                                      </div>
+                                      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: '0 0 8px' }}>{bucket.description}</p>
+
+                                      {bucket.dueDate && !bucket.completed && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Barlow', sans-serif", fontSize: 12, color: '#f97316', marginBottom: 8 }}>
+                                          <Calendar size={12} /> Due: {new Date(bucket.dueDate).toLocaleDateString()}
+                                        </div>
+                                      )}
+
+                                      {bucket.pendingApproval && (
+                                        <BtnPrimary onClick={() => onApprove(selectedPlayer.id, game.id, bucket.id)} small>
+                                          <CheckCircle2 size={14} /> Approve Completion
+                                        </BtnPrimary>
+                                      )}
+
+                                      {bucket.comments.length > 0 && (
+                                        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                          {bucket.comments.map(comment => (
+                                            <div key={comment.id} style={{ padding: 10, background: 'rgba(255,255,255,0.03)', borderRadius: 8 }}>
+                                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: accentColor }}>{comment.coachName}</span>
+                                                <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+                                                  {new Date(comment.createdAt).toLocaleDateString()}
+                                                </span>
+                                              </div>
+                                              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>{comment.text}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+
+                                      {editingComment === bucket.id ? (
+                                        <div style={{ marginTop: 12 }}>
+                                          <textarea
+                                            value={commentText}
+                                            onChange={e => setCommentText(e.target.value)}
+                                            placeholder="Write feedback or encouragement..."
+                                            rows={3}
+                                            style={{
+                                              width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                              borderRadius: 8, padding: '10px 14px', color: '#fff', fontFamily: "'Barlow', sans-serif",
+                                              fontSize: 13, resize: 'vertical', outline: 'none', boxSizing: 'border-box', marginBottom: 8,
+                                            }}
+                                          />
+                                          <div style={{ display: 'flex', gap: 8 }}>
+                                            <BtnPrimary onClick={() => onAddComment(selectedPlayer.id, game.id, bucket.id)} small>
+                                              <Save size={14} /> Post
+                                            </BtnPrimary>
+                                            <BtnGhost onClick={() => { setEditingComment(null); setCommentText(''); }} small>
+                                              <X size={14} /> Cancel
+                                            </BtnGhost>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => setEditingComment(bucket.id)}
+                                          style={{
+                                            marginTop: 10, background: 'transparent', border: 'none', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', gap: 6,
+                                            fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)',
+                                          }}
+                                        >
+                                          <Edit3 size={12} /> Add comment
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Panel>
+            </div>
+          ) : (
+            <Panel style={{ padding: 48, textAlign: 'center' }}>
+              <Users size={40} style={{ color: 'rgba(255,255,255,0.15)', marginBottom: 16 }} />
+              <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: '#F2F2F2', margin: '0 0 8px' }}>Select a Player</h3>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+                Choose a player from your roster to view progress and manage goals
+              </p>
+            </Panel>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MESSAGES VIEW ────────────────────────────────────────────────────────────
+
+function CoachMessagesView({
+  players, selectedPlayer, onSelectPlayer, coachName, accentColor,
+}: {
+  players: Player[];
+  selectedPlayer: Player | null;
+  onSelectPlayer: (p: Player) => void;
+  coachName: string;
+  accentColor: string;
+}) {
+  return (
+    <div style={{ padding: '32px 32px 60px' }}>
+      <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>
+        Messages
+      </h2>
+      <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 28px' }}>
+        Direct chat with your players
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) minmax(0, 3fr)', gap: 20, minHeight: 'calc(100vh - 280px)' }}>
+        <Panel style={{ padding: 16, overflowY: 'auto' }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: 2, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: 12 }}>
+            Your Players
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {players.map(player => {
+              const isSelected = selectedPlayer?.id === player.id;
+              return (
+                <button
+                  key={player.id}
+                  onClick={() => onSelectPlayer(player)}
+                  style={{
+                    width: '100%', textAlign: 'left', padding: 12, borderRadius: 10, cursor: 'pointer',
+                    background: isSelected ? `${accentColor}12` : 'transparent',
+                    border: isSelected ? `1px solid ${accentColor}35` : '1px solid transparent',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                  }}
+                >
+                  <PlayerAvatar name={player.name} src={player.avatar} size={36} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600, color: '#F2F2F2' }}>{player.name}</div>
+                    <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{player.category}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </Panel>
+
+        <Panel style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {selectedPlayer ? (
+            <div style={{ flex: 1, minHeight: 500 }}>
+              <CoachPlayerChat
+                currentUserId="coach-1"
+                currentUserName={coachName}
+                currentUserRole="coach"
+                otherUserId={selectedPlayer.id}
+                otherUserName={selectedPlayer.name}
+                otherUserRole="player"
+                otherUserAvatar={selectedPlayer.avatar}
+                category={selectedPlayer.category}
+                categoryIcon={selectedPlayer.categoryIcon}
+                accentColor={accentColor}
+              />
+            </div>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+              <div style={{ textAlign: 'center' }}>
+                <MessageSquare size={40} style={{ color: 'rgba(255,255,255,0.15)', marginBottom: 16 }} />
+                <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: '#F2F2F2', margin: '0 0 8px' }}>Select a Player</h3>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.35)', margin: 0 }}>Choose a player to start chatting</p>
+              </div>
+            </div>
+          )}
+        </Panel>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 export function CoachPortal() {
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(players[0]);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
-  const [commentText, setCommentText] = useState<string>('');
+  const [commentText, setCommentText] = useState('');
   const [newGameTitle, setNewGameTitle] = useState('');
   const [newGameDescription, setNewGameDescription] = useState('');
   const [showNewGameForm, setShowNewGameForm] = useState(false);
   const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(players[0]);
-  const [showLockerRoom, setShowLockerRoom] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [showCoachProfileCompletionModal, setShowCoachProfileCompletionModal] = useState(false);
+  const [highlightProfileGaps, setHighlightProfileGaps] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(() => {
     const saved = localStorage.getItem('coach_profile_completion');
     return saved ? Number(saved) : 0;
   });
-  const [coachProfilePicture, setCoachProfilePicture] = useState<string | null>(() => {
-    return localStorage.getItem('coach_profile_picture');
-  });
-  const [activeTab, setActiveTab] = useState<CoachTab>('players');
+  const [coachProfilePicture, setCoachProfilePicture] = useState<string | null>(() => localStorage.getItem('coach_profile_picture'));
+  const [coachPhotoFrame, setCoachPhotoFrame] = useState<CoachPhotoFrame>(() => loadPhotoFrame());
+  const [activeSection, setActiveSection] = useState<CoachSection>('dashboard');
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [coachIdentity] = useState(() => resolveCoachIdentity());
+  const [coachCard, setCoachCard] = useState(() => resolveCoachCard());
+  const [pendingReview] = useState(() => isCoachCardPendingReview());
+  const accentColor = coachIdentity.pathwayColor;
+  const pathwayChannelId = getCoachPathwayChannelId();
+  const pathwayChannelName = coachIdentity.pathwayName;
   const profileSectionRef = useRef<HTMLDivElement | null>(null);
-  const showProfileCompletion = profileCompletion < 100;
 
-  // Check if tutorial should be shown
+  const goToProfileWithHighlights = () => {
+    setActiveSection('profile');
+    setHighlightProfileGaps(true);
+    setTimeout(() => {
+      profileSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+
+  const currentCoach = {
+    name: coachIdentity.fullName,
+    category: `${coachIdentity.pathwayName} Pathway`,
+    categoryIcon: Moon,
+    profilePicture: coachProfilePicture,
+  };
+
+  const coachTutorialSteps = [
+    { title: 'Welcome to Your Coach Portal!', description: 'Your coaching dashboard — manage players, track progress, and build your brand. Use the sidebar to navigate.' },
+    { title: 'Dashboard', description: 'See your roster at a glance — pending reviews, active games, and quick access to every section.' },
+    { title: 'My Players', description: 'Click a player to view their games and buckets. Approve completions and leave feedback.' },
+    { title: 'Messages', description: 'Chat directly with your players from the Messages section.' },
+    { title: 'AI Matching', description: 'Review match scores and accept new player requests that fit your expertise.' },
+    { title: 'ISO Community', description: 'Share wins, encourage players across pathways, and build your coaching brand.' },
+    { title: 'Locker Room', description: 'Join pathway channels, contribute videos, and connect with the ISO ecosystem.' },
+    { title: 'Coach Store', description: 'Unlock tier-gated coaching gear as your OVR rises.' },
+    { title: 'Complete Your Profile', description: 'Finish your coach profile to get published on ISO and start attracting players.' },
+  ];
+
   useEffect(() => {
-    const tutorialCompleted = localStorage.getItem(COACH_TUTORIAL_KEY);
-    if (!tutorialCompleted) {
+    if (!localStorage.getItem(COACH_TUTORIAL_KEY)) {
       setTimeout(() => setShowTutorial(true), 150);
     }
   }, []);
-
-  const handleStartTutorial = () => {
-    localStorage.removeItem(COACH_TUTORIAL_KEY);
-    localStorage.removeItem('iso_tutorial_completed_coach');
-    setShowTutorial(true);
-  };
 
   useEffect(() => {
     localStorage.setItem('coach_profile_completion', String(profileCompletion));
   }, [profileCompletion]);
 
   useEffect(() => {
-    if (coachProfilePicture) {
-      localStorage.setItem('coach_profile_picture', coachProfilePicture);
-    } else {
-      localStorage.removeItem('coach_profile_picture');
+    if (coachProfilePicture) localStorage.setItem('coach_profile_picture', coachProfilePicture);
+    else localStorage.removeItem('coach_profile_picture');
+    if (coachCard) {
+      const updated = {
+        ...coachCard,
+        photo: coachProfilePicture,
+        photoFrame: coachPhotoFrame,
+      };
+      setCoachCard(updated);
+      localStorage.setItem('iso_coach_card', JSON.stringify(updated));
     }
-  }, [coachProfilePicture]);
-
-  const focusProfileSection = () => {
-    setActiveTab('profile');
-    setTimeout(() => {
-      profileSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-  };
-
-  const handleCoachProfileComplete = (profileData: any) => {
-    // Save profile data to localStorage
-    localStorage.setItem('coach_profile_data', JSON.stringify(profileData));
-    setShowCoachProfileCompletionModal(false);
-    setProfileCompletion(100);
-  };
-
-  const coachTutorialSteps = [
-    {
-      title: 'Welcome to Your Coach Portal!',
-      description: 'This is your coaching dashboard where you\'ll manage players, track their progress, and build your coaching brand. Let\'s get you started!'
-    },
-    {
-      title: 'Player Management',
-      description: 'View all your players in the "Your Players" section. Click on a player to see their games, progress, and communicate directly with them.'
-    },
-    {
-      title: 'Games & Buckets',
-      description: 'Create games (goals) for your players and break them down into buckets (actionable steps). Track completion and provide feedback through comments.'
-    },
-    {
-      title: 'Communication',
-      description: 'Use the Messages tab to chat with your players. Provide guidance, answer questions, and build meaningful coaching relationships.'
-    },
-    {
-      title: 'AI Matching Dashboard',
-      description: 'The AI Matching Dashboard helps you find new players who match your expertise and coaching style. Review match scores and accept requests.'
-    },
-    {
-      title: 'Complete Your Profile',
-      description: 'Finish setting up your coach profile to get published on ISO! Add your bio, expertise, and availability to start attracting players.'
-    }
-  ];
-
-  // Mock current coach data
-  const currentCoach = {
-    name: 'Imam Abdullah Rahman',
-    category: 'The Seeker Pathway',
-    categoryIcon: Moon,
-    profilePicture: coachProfilePicture
-  };
+  }, [coachProfilePicture, coachPhotoFrame]);
 
   const addComment = (playerId: string, gameId: string, bucketId: string) => {
     if (!commentText.trim()) return;
-
     const newComment: Comment = {
-      id: `c-${Date.now()}`,
-      text: commentText,
-      createdAt: new Date().toISOString(),
-      coachName: currentCoach.name
+      id: `c-${Date.now()}`, text: commentText,
+      createdAt: new Date().toISOString(), coachName: currentCoach.name,
     };
-
-    setPlayers(players.map(player => {
-      if (player.id === playerId) {
-        return {
-          ...player,
-          games: player.games.map(game => {
-            if (game.id === gameId) {
-              return {
-                ...game,
-                buckets: game.buckets.map(bucket =>
-                  bucket.id === bucketId
-                    ? { ...bucket, comments: [...bucket.comments, newComment] }
-                    : bucket
-                )
-              };
-            }
-            return game;
-          })
-        };
-      }
-      return player;
+    setPlayers(prev => prev.map(player => {
+      if (player.id !== playerId) return player;
+      return {
+        ...player,
+        games: player.games.map(game => {
+          if (game.id !== gameId) return game;
+          return {
+            ...game,
+            buckets: game.buckets.map(bucket =>
+              bucket.id === bucketId ? { ...bucket, comments: [...bucket.comments, newComment] } : bucket,
+            ),
+          };
+        }),
+      };
     }));
-
     setCommentText('');
     setEditingComment(null);
   };
 
   const approveBucket = (playerId: string, gameId: string, bucketId: string) => {
-    setPlayers(players.map(player => {
-      if (player.id === playerId) {
-        return {
-          ...player,
-          games: player.games.map(game => {
-            if (game.id === gameId) {
-              const updatedBuckets = game.buckets.map(bucket =>
-                bucket.id === bucketId
-                  ? { ...bucket, coachApproved: true, pendingApproval: false }
-                  : bucket
-              );
-              const allBucketsApproved = updatedBuckets.every(b => b.completed && b.coachApproved);
-              return {
-                ...game,
-                buckets: updatedBuckets,
-                completed: allBucketsApproved,
-                completedDate: allBucketsApproved ? new Date().toISOString().split('T')[0] : game.completedDate
-              };
-            }
-            return game;
-          })
-        };
-      }
-      return player;
+    setPlayers(prev => prev.map(player => {
+      if (player.id !== playerId) return player;
+      return {
+        ...player,
+        games: player.games.map(game => {
+          if (game.id !== gameId) return game;
+          const updatedBuckets = game.buckets.map(bucket =>
+            bucket.id === bucketId ? { ...bucket, coachApproved: true, pendingApproval: false } : bucket,
+          );
+          const allApproved = updatedBuckets.every(b => b.completed && b.coachApproved);
+          return {
+            ...game, buckets: updatedBuckets,
+            completed: allApproved,
+            completedDate: allApproved ? new Date().toISOString().split('T')[0] : game.completedDate,
+          };
+        }),
+      };
     }));
   };
 
   const addNewGame = (playerId: string) => {
-    if (!newGameTitle.trim()) return;
-
+    if (!newGameTitle.trim() || !selectedPlayer) return;
     const newGame: Game = {
-      id: `g-${Date.now()}`,
-      title: newGameTitle,
-      description: newGameDescription,
-      completed: false,
-      buckets: []
+      id: `g-${Date.now()}`, title: newGameTitle, description: newGameDescription,
+      completed: false, buckets: [],
     };
-
-    setPlayers(players.map(player => {
-      if (player.id === playerId) {
-        return {
-          ...player,
-          games: [...player.games, newGame]
-        };
-      }
-      return player;
-    }));
-
+    setPlayers(prev => prev.map(p => p.id === playerId ? { ...p, games: [...p.games, newGame] } : p));
     setNewGameTitle('');
     setNewGameDescription('');
     setShowNewGameForm(false);
   };
 
-  const calculatePlayerStats = (player: Player) => {
-    const totalGames = player.games.length;
-    const gamesWon = player.games.filter(g => g.completed).length;
-    const totalBuckets = player.games.reduce((sum, game) => sum + game.buckets.length, 0);
-    const bucketsScored = player.games.reduce((sum, game) => 
-      sum + game.buckets.filter(b => b.completed && b.coachApproved).length, 0
-    );
-    const pendingApprovals = player.games.reduce((sum, game) => 
-      sum + game.buckets.filter(b => b.pendingApproval).length, 0
-    );
-    const isChampion = gamesWon >= 6;
-
-    return { totalGames, gamesWon, totalBuckets, bucketsScored, pendingApprovals, isChampion };
-  };
-
   const allStats = {
     totalPlayers: players.length,
-    totalPendingApprovals: players.reduce((sum, player) => 
-      sum + player.games.reduce((gameSum, game) => 
-        gameSum + game.buckets.filter(b => b.pendingApproval).length, 0
-      ), 0
-    ),
-    totalActiveGames: players.reduce((sum, player) => 
-      sum + player.games.filter(g => !g.completed).length, 0
-    ),
-    champions: players.filter(player => 
-      player.games.filter(g => g.completed).length >= 6
-    ).length
+    totalPendingApprovals: players.reduce((sum, p) =>
+      sum + p.games.reduce((gs, g) => gs + g.buckets.filter(b => b.pendingApproval).length, 0), 0),
+    totalActiveGames: players.reduce((sum, p) => sum + p.games.filter(g => !g.completed).length, 0),
+    champions: players.filter(p => p.games.filter(g => g.completed).length >= 6).length,
   };
 
+  const sidebarW = sidebarExpanded ? SIDEBAR_W_EXPANDED : SIDEBAR_W_COLLAPSED;
+
   return (
-    <div className="px-4 sm:px-8">
-      {/* Tutorial */}
+    <div style={{ display: 'flex', minHeight: '100vh', paddingTop: NAV_H }}>
       {showTutorial && (
         <PortalTutorial
           steps={coachTutorialSteps}
-          onComplete={() => {
-            localStorage.setItem(COACH_TUTORIAL_KEY, 'true');
-            setShowTutorial(false);
-          }}
+          onComplete={() => { localStorage.setItem(COACH_TUTORIAL_KEY, 'true'); setShowTutorial(false); }}
           role="coach"
         />
       )}
 
-      {/* Coach Profile Completion Modal */}
-      {showCoachProfileCompletionModal && (
-        <CoachProfileCompletionModal
-          onClose={() => setShowCoachProfileCompletionModal(false)}
-          onComplete={handleCoachProfileComplete}
-        />
-      )}
+      <CoachSidebar
+        active={activeSection}
+        onSelect={setActiveSection}
+        expanded={sidebarExpanded}
+        onToggle={() => setSidebarExpanded(e => !e)}
+        accentColor={accentColor}
+      />
 
-      <div className="max-w-7xl mx-auto">
-        {/* Profile Completion Banner */}
-        {showProfileCompletion && (
-          <div className="mb-6 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border-2 border-orange-500/50 rounded-2xl p-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-orange-500/20 rounded-xl">
-                <AlertCircle className="w-6 h-6 text-orange-400" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold text-lg mb-1">Complete Your Coach Profile</h3>
-                <p className="text-slate-300 text-sm">
-                  Finish setting up your account to get published on ISO and start attracting players.
-                </p>
-              </div>
+      <main style={{
+        flex: 1, marginLeft: sidebarW, transition: 'margin-left 0.25s ease',
+        minHeight: `calc(100vh - ${NAV_H}px)`, overflowY: 'auto', background: '#111111',
+      }}>
+        <PortalChromeBar role="coach" portalLabel="Coach Portal" accentColor={accentColor} />
+
+        {profileCompletion < 85 && (
+          <div style={{
+            margin: '24px 32px 0', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)',
+            borderRadius: 14, padding: '16px 20px', display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <AlertCircle size={20} style={{ color: '#f97316', flexShrink: 0 }} />
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                Complete your coach profile to get published on ISO.
+              </p>
             </div>
             <button
-              onClick={() => setShowCoachProfileCompletionModal(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2"
+              onClick={goToProfileWithHighlights}
+              style={{
+                background: '#f97316', color: '#fff', border: 'none', borderRadius: 10,
+                padding: '10px 20px', fontFamily: "'Barlow', sans-serif", fontSize: 13,
+                fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+              }}
             >
-              Complete Profile
-              <ArrowRight className="w-5 h-5" />
+              Complete Profile <ArrowRight size={14} />
             </button>
           </div>
         )}
 
-        {/* Header */}
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="w-14 h-14 border border-slate-700">
-              {currentCoach.profilePicture ? (
-                <AvatarImage src={currentCoach.profilePicture} alt={currentCoach.name} />
-              ) : (
-                <AvatarFallback className="bg-orange-500 text-white text-lg">
-                  {currentCoach.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <PortalGreeting
-              role="coach"
-              name={currentCoach.name.split(' ')[0]}
-              accentColor="#f97316"
-              subline={`${currentCoach.category} · ${currentCoach.name}`}
-              className="!mb-0"
+        {activeSection === 'dashboard' && (
+          <CoachDashboardView
+            allStats={allStats}
+            coachIdentity={coachIdentity}
+            coachCard={coachCard}
+            pendingReview={pendingReview}
+            accentColor={accentColor}
+            onNavigate={setActiveSection}
+          />
+        )}
+
+        {activeSection === 'players' && (
+          <CoachPlayersView
+            players={players}
+            selectedPlayer={selectedPlayer}
+            selectedGame={selectedGame}
+            onSelectPlayer={setSelectedPlayer}
+            onSelectGame={setSelectedGame}
+            showNewGameForm={showNewGameForm}
+            setShowNewGameForm={setShowNewGameForm}
+            newGameTitle={newGameTitle}
+            setNewGameTitle={setNewGameTitle}
+            newGameDescription={newGameDescription}
+            setNewGameDescription={setNewGameDescription}
+            onAddGame={() => selectedPlayer && addNewGame(selectedPlayer.id)}
+            editingComment={editingComment}
+            setEditingComment={setEditingComment}
+            commentText={commentText}
+            setCommentText={setCommentText}
+            onAddComment={addComment}
+            onApprove={approveBucket}
+            onGoToMessages={p => { setSelectedPlayerForChat(p); setActiveSection('messages'); }}
+            accentColor={accentColor}
+          />
+        )}
+
+        {activeSection === 'messages' && (
+          <CoachMessagesView
+            players={players}
+            selectedPlayer={selectedPlayerForChat}
+            onSelectPlayer={setSelectedPlayerForChat}
+            coachName={currentCoach.name}
+            accentColor={accentColor}
+          />
+        )}
+
+        {activeSection === 'matching' && (
+          <div style={{ padding: '32px 32px 60px' }}>
+            <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>
+              AI Matching
+            </h2>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 28px' }}>
+              Review player match scores and accept new requests
+            </p>
+            <AIMatchingDashboard />
+          </div>
+        )}
+
+        {activeSection === 'community' && (
+          <div style={{ padding: '32px 32px 60px' }}>
+            <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>ISO Community</h2>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+              Share wins, celebrate goals, and encourage players & coaches across every pathway.
+            </p>
+            <ISOCommunityForum
+              lockedPathwayId={pathwayChannelId}
+              lockedPathwayName={pathwayChannelName}
             />
           </div>
-          <button
-            onClick={handleStartTutorial}
-            className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white hover:bg-white/10 transition-colors"
-          >
-            Start Tutorial
-          </button>
-        </div>
+        )}
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as CoachTab)} className="space-y-6">
-          <div className="flex items-center justify-between">
-          <TabsList className="bg-slate-900 border border-slate-800 p-1">
-            <TabsTrigger value="players" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-              <Users className="w-4 h-4 mr-2" />
-              My Players
-            </TabsTrigger>
-              <TabsTrigger value="messages" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Messages
-            </TabsTrigger>
-            <TabsTrigger value="matching" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI Matching
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/10 data-[state=active]:text-white">
-              <UserCircle className="w-4 h-4 mr-2" />
-              My Profile
-            </TabsTrigger>
-          </TabsList>
-            <button
-              onClick={() => setShowLockerRoom(true)}
-              className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Locker Room
-            </button>
+        {activeSection === 'locker-room' && (
+          <div style={{ padding: '32px 32px 60px' }}>
+            <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>Locker Room</h2>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+              Pathway channels & video library · coaches can access all pathways
+            </p>
+            <LockerRoomChat
+              lockedPathwayId={pathwayChannelId}
+              userRole="coach"
+              coachName={coachIdentity.fullName}
+            />
           </div>
+        )}
 
-          {/* Locker Room Modal */}
-          {showLockerRoom && (
-            <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="relative w-full h-full max-w-7xl max-h-[90vh] rounded-2xl overflow-hidden">
-                <LockerRoom 
-                  userRole="coach" 
-                  isPaidMember={true}
-                  onClose={() => setShowLockerRoom(false)}
-                />
-              </div>
-            </div>
-          )}
+        {activeSection === 'store' && (
+          <div style={{ padding: '32px 32px 60px' }}>
+            <CoachStoreSection accentColor={accentColor} />
+          </div>
+        )}
 
-          {/* Messages Tab */}
-          <TabsContent value="messages" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Players List */}
-              <div className="lg:col-span-1">
-                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4">
-                  <h3 className="text-white font-semibold mb-4">Your Players</h3>
-                  <div className="space-y-2">
-                            {players.map((player) => {
-                        const PlayerCategoryIcon = typeof player.categoryIcon === 'string' && player.categoryIcon === '☪️' ? Moon : (typeof player.categoryIcon !== 'string' ? player.categoryIcon : null);
-                        return (
-                      <button
-                        key={player.id}
-                        onClick={() => setSelectedPlayerForChat(player)}
-                        className={`w-full text-left p-3 rounded-lg transition-colors ${
-                          selectedPlayerForChat?.id === player.id
-                            ? 'bg-orange-500/20 border border-orange-500/50'
-                            : 'bg-slate-800 hover:bg-slate-700 border border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="w-10 h-10">
-                            <AvatarImage src={player.avatar} alt={player.name} />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                              {player.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white font-medium truncate">{player.name}</p>
-                            <p className="text-slate-400 text-xs truncate flex items-center gap-1">
-                              {PlayerCategoryIcon && React.createElement(PlayerCategoryIcon, { className: 'w-3 h-3' })}
-                              {player.category}
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-                    )})}
+        {activeSection === 'profile' && (
+          <div style={{ padding: '32px 32px 60px' }} ref={profileSectionRef}>
+            <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>
+              My Profile
+            </h2>
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 28px' }}>
+              How players see you on ISO — review your card and refine your details
+            </p>
+
+            {coachCard && (
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: 32, alignItems: 'flex-start',
+                marginBottom: 32, padding: 24,
+                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14,
+              }}>
+                <CoachISOCard card={coachCard} pendingReview={pendingReview} pathwayColor={accentColor} />
+                <div style={{ flex: 1, minWidth: 240 }}>
+                  <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: '#F2F2F2', margin: '0 0 12px' }}>
+                    {coachIdentity.fullName}
+                  </h3>
+                  <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.45)', margin: '0 0 16px', lineHeight: 1.6 }}>
+                    {coachCard.result.reasoning}
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                    <span style={{ padding: '4px 12px', borderRadius: 100, fontSize: 11, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: 1, color: accentColor, background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}>
+                      OVR {coachCard.result.overall}
+                    </span>
+                    <span style={{ padding: '4px 12px', borderRadius: 100, fontSize: 11, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: 1, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      {coachCard.result.tierLabel} Tier
+                    </span>
+                    {pendingReview && (
+                      <span style={{ padding: '4px 12px', borderRadius: 100, fontSize: 11, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: 1, color: '#f97316', background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.3)' }}>
+                        Not Yet Public
+                      </span>
+                    )}
                   </div>
+                  <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.35)', margin: '0 0 20px' }}>
+                    Fields below were pre-filled from your onboarding intake. Update availability and preferences to complete your profile.
+                  </p>
+                  <CoachOverallProgressBar accentColor={accentColor} compact />
                 </div>
               </div>
+            )}
 
-              {/* Chat Area */}
-              <div className="lg:col-span-3">
-                {selectedPlayerForChat ? (
-                  <div className="h-[calc(100vh-300px)] min-h-[600px]">
-                    <CoachPlayerChat
-                      currentUserId="coach-1"
-                      currentUserName={currentCoach.name}
-                      currentUserRole="coach"
-                      otherUserId={selectedPlayerForChat.id}
-                      otherUserName={selectedPlayerForChat.name}
-                      otherUserRole="player"
-                      otherUserAvatar={selectedPlayerForChat.avatar}
-                      category={selectedPlayerForChat.category}
-                      categoryIcon={selectedPlayerForChat.categoryIcon}
-                    />
-                  </div>
-                ) : (
-                  <div className="h-[calc(100vh-300px)] min-h-[600px] flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
-                    <div className="text-center">
-                      <MessageSquare className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                      <h3 className="text-white font-semibold mb-2">Select a Player</h3>
-                      <p className="text-slate-400 text-sm">Choose a player from the list to start chatting</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* My Players Tab */}
-          <TabsContent value="players" className="space-y-6">
-            {/* Overview Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <User className="w-8 h-8 text-blue-500" />
-                  <span className="text-blue-400">Players</span>
-                </div>
-                <div className="text-white mb-1">{allStats.totalPlayers}</div>
-                <p className="text-slate-400 text-sm">Active Players</p>
-              </div>
-
-              <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/30 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <AlertCircle className="w-8 h-8 text-orange-500" />
-                  <span className="text-orange-400">Pending</span>
-                </div>
-                <div className="text-white mb-1">{allStats.totalPendingApprovals}</div>
-                <p className="text-slate-400 text-sm">Awaiting Review</p>
-              </div>
-
-              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/30 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Target className="w-8 h-8 text-green-500" />
-                  <span className="text-green-400">Games</span>
-                </div>
-                <div className="text-white mb-1">{allStats.totalActiveGames}</div>
-                <p className="text-slate-400 text-sm">In Progress</p>
-              </div>
-
-              <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Award className="w-8 h-8 text-yellow-500" />
-                  <span className="text-yellow-400">Champions</span>
-                </div>
-                <div className="text-white mb-1">{allStats.champions}</div>
-                <p className="text-slate-400 text-sm">Graduated</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Players Sidebar */}
-              <div className="lg:col-span-1">
-                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                  <h3 className="text-white mb-4">Your Players</h3>
-                  <div className="space-y-3">
-                    {players.map((player) => {
-                      const stats = calculatePlayerStats(player);
-                      return (
-                        <button
-                          key={player.id}
-                          onClick={() => {
-                            setSelectedPlayer(player);
-                            setSelectedGame(null);
-                          }}
-                          className={`w-full text-left p-4 rounded-xl border transition-all ${
-                            selectedPlayer?.id === player.id
-                              ? 'bg-orange-500/10 border-orange-500/50'
-                              : 'bg-slate-800 border-slate-700 hover:border-slate-600'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src={player.avatar} />
-                              <AvatarFallback className="bg-orange-500 text-white">
-                                {player.name.split(' ').map(n => n[0]).join('')}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-white truncate">{player.name}</h4>
-                              <p className="text-slate-400 text-sm">
-                                {stats.gamesWon}/{stats.totalGames} games won
-                              </p>
-                              {stats.pendingApprovals > 0 && (
-                                <Badge className="mt-2 bg-orange-500/20 text-orange-400 border-orange-500/30">
-                                  {stats.pendingApprovals} pending
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Player Details */}
-              <div className="lg:col-span-2">
-                {selectedPlayer ? (
-                  <div className="space-y-6">
-                    {/* Player Header */}
-                    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="w-16 h-16">
-                            <AvatarImage src={selectedPlayer.avatar} />
-                            <AvatarFallback className="bg-orange-500 text-white text-xl">
-                              {selectedPlayer.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h2 className="text-white mb-1">{selectedPlayer.name}</h2>
-                            <p className="text-slate-400 text-sm">{selectedPlayer.email}</p>
-                            <p className="text-slate-500 text-sm mt-1">
-                              Joined {new Date(selectedPlayer.joinedDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Button className="bg-orange-500 text-white hover:bg-orange-600">
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Message
-                        </Button>
-                      </div>
-
-                      {/* Player Stats */}
-                      {(() => {
-                        const stats = calculatePlayerStats(selectedPlayer);
-                        return (
-                          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800">
-                            <div className="text-center">
-                              <div className="text-orange-400 mb-1">{stats.bucketsScored}/{stats.totalBuckets}</div>
-                              <p className="text-slate-400 text-sm">Buckets</p>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-blue-400 mb-1">{stats.gamesWon}/{stats.totalGames}</div>
-                              <p className="text-slate-400 text-sm">Games</p>
-                            </div>
-                            <div className="text-center">
-                              <div className={stats.isChampion ? 'text-yellow-400 mb-1 flex items-center justify-center' : 'text-slate-500 mb-1'}>
-                                {stats.isChampion ? <Trophy className="w-5 h-5" /> : `${6 - stats.gamesWon} to go`}
-                              </div>
-                              <p className="text-slate-400 text-sm">Champion</p>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Games & Goals */}
-                    <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-white">Games & Goals</h3>
-                        <Button 
-                          onClick={() => setShowNewGameForm(!showNewGameForm)}
-                          className="bg-orange-500 text-white hover:bg-orange-600"
-                          size="sm"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          New Game
-                        </Button>
-                      </div>
-
-                      {/* New Game Form */}
-                      {showNewGameForm && (
-                        <div className="mb-6 p-4 bg-slate-800 rounded-xl border border-slate-700">
-                          <h4 className="text-white mb-3">Create New Game</h4>
-                          <div className="space-y-3">
-                            <div>
-                              <label className="block text-slate-400 mb-1 text-sm">Game Title</label>
-                              <input
-                                type="text"
-                                value={newGameTitle}
-                                onChange={(e) => setNewGameTitle(e.target.value)}
-                                placeholder="e.g., Establish Daily Prayer Routine"
-                                className="w-full bg-slate-900 text-white rounded-lg p-2 border border-slate-600 focus:border-orange-500 focus:outline-none"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-slate-400 mb-1 text-sm">Description</label>
-                              <input
-                                type="text"
-                                value={newGameDescription}
-                                onChange={(e) => setNewGameDescription(e.target.value)}
-                                placeholder="Brief description of this milestone"
-                                className="w-full bg-slate-900 text-white rounded-lg p-2 border border-slate-600 focus:border-orange-500 focus:outline-none"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <Button 
-                                onClick={() => addNewGame(selectedPlayer.id)}
-                                className="bg-orange-500 text-white hover:bg-orange-600"
-                              >
-                                Create Game
-                              </Button>
-                              <Button 
-                                onClick={() => {
-                                  setShowNewGameForm(false);
-                                  setNewGameTitle('');
-                                  setNewGameDescription('');
-                                }}
-                                variant="outline"
-                                className="border-slate-600 text-slate-400 hover:bg-slate-800"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Games List */}
-                      <div className="space-y-4">
-                        {selectedPlayer.games.map((game) => {
-                          const bucketsCompleted = game.buckets.filter(b => b.completed && b.coachApproved).length;
-                          const totalBucketsInGame = game.buckets.length;
-                          const progress = totalBucketsInGame > 0 ? Math.round((bucketsCompleted / totalBucketsInGame) * 100) : 0;
-                          const pendingInGame = game.buckets.filter(b => b.pendingApproval).length;
-
-                          return (
-                            <div key={game.id} className="bg-slate-800 rounded-xl border border-slate-700">
-                              {/* Game Header */}
-                              <div 
-                                className={`p-4 cursor-pointer transition-colors ${
-                                  game.completed 
-                                    ? 'bg-gradient-to-r from-green-900/30 to-green-800/20' 
-                                    : 'hover:bg-slate-800/80'
-                                }`}
-                                onClick={() => setSelectedGame(selectedGame?.id === game.id ? null : game)}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    {game.completed ? (
-                                      <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                                        <Trophy className="w-5 h-5 text-green-500" />
-                                      </div>
-                                    ) : (
-                                      <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
-                                        <Target className="w-5 h-5 text-orange-500" />
-                                      </div>
-                                    )}
-                                    <div>
-                                      <h4 className="text-white">{game.title}</h4>
-                                      {game.description && (
-                                        <p className="text-slate-500 text-sm">{game.description}</p>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <div className="text-white text-sm">
-                                      {bucketsCompleted}/{totalBucketsInGame} buckets
-                                    </div>
-                                    {pendingInGame > 0 && (
-                                      <Badge className="mt-1 bg-orange-500/20 text-orange-400 border-orange-500/30">
-                                        {pendingInGame} pending
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Progress Bar */}
-                                {!game.completed && totalBucketsInGame > 0 && (
-                                  <div className="mt-3 bg-slate-700 rounded-full h-1.5 overflow-hidden">
-                                    <div 
-                                      className="bg-gradient-to-r from-orange-500 to-orange-400 h-full transition-all duration-500"
-                                      style={{ width: `${progress}%` }}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Buckets List (Expandable) */}
-                              {selectedGame?.id === game.id && (
-                                <div className="p-4 border-t border-slate-700">
-                                  <div className="space-y-3">
-                                    {game.buckets.map((bucket) => (
-                                      <div
-                                        key={bucket.id}
-                                        className={`p-4 rounded-lg border ${
-                                          bucket.coachApproved
-                                            ? 'bg-green-900/20 border-green-700/50'
-                                            : bucket.pendingApproval
-                                            ? 'bg-orange-900/20 border-orange-700/50'
-                                            : 'bg-slate-900 border-slate-600'
-                                        }`}
-                                      >
-                                        <div className="flex items-start gap-3 mb-3">
-                                          <div className="flex-shrink-0 mt-1">
-                                            {bucket.coachApproved ? (
-                                              <CheckCircle2 className="w-6 h-6 text-green-500" />
-                                            ) : bucket.completed ? (
-                                              <Clock className="w-6 h-6 text-orange-500" />
-                                            ) : (
-                                              <Circle className="w-6 h-6 text-slate-500" />
-                                            )}
-                                          </div>
-                                          <div className="flex-1">
-                                            <h5 className={`${bucket.coachApproved ? 'text-slate-400 line-through' : 'text-white'} mb-1`}>
-                                              {bucket.title}
-                                            </h5>
-                                            <p className="text-slate-500 text-sm mb-2">{bucket.description}</p>
-                                            
-                                            {bucket.dueDate && !bucket.completed && (
-                                              <div className="flex items-center gap-2 text-orange-400 text-sm mb-2">
-                                                <Calendar className="w-4 h-4" />
-                                                Due: {new Date(bucket.dueDate).toLocaleDateString()}
-                                              </div>
-                                            )}
-
-                                            {bucket.pendingApproval && (
-                                              <div className="mt-3">
-                                                <Button
-                                                  onClick={() => approveBucket(selectedPlayer.id, game.id, bucket.id)}
-                                                  className="bg-green-600 text-white hover:bg-green-700"
-                                                  size="sm"
-                                                >
-                                                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                                                  Approve Completion
-                                                </Button>
-                                              </div>
-                                            )}
-
-                                            {/* Comments Section */}
-                                            {bucket.comments.length > 0 && (
-                                              <div className="mt-3 space-y-2">
-                                                {bucket.comments.map((comment) => (
-                                                  <div key={comment.id} className="bg-slate-800/50 rounded p-3 text-sm">
-                                                    <div className="flex items-start justify-between mb-1">
-                                                      <span className="text-orange-400">{comment.coachName}</span>
-                                                      <span className="text-slate-500 text-xs">
-                                                        {new Date(comment.createdAt).toLocaleDateString()}
-                                                      </span>
-                                                    </div>
-                                                    <p className="text-slate-300">{comment.text}</p>
-                                                  </div>
-                                                ))}
-                                              </div>
-                                            )}
-
-                                            {/* Add Comment Form */}
-                                            {editingComment === bucket.id ? (
-                                              <div className="mt-3 space-y-2">
-                                                <Textarea
-                                                  value={commentText}
-                                                  onChange={(e) => setCommentText(e.target.value)}
-                                                  placeholder="Write feedback or encouragement..."
-                                                  className="bg-slate-800 border-slate-600 text-white"
-                                                  rows={3}
-                                                />
-                                                <div className="flex gap-2">
-                                                  <Button
-                                                    onClick={() => addComment(selectedPlayer.id, game.id, bucket.id)}
-                                                    className="bg-orange-500 text-white hover:bg-orange-600"
-                                                    size="sm"
-                                                  >
-                                                    <Save className="w-4 h-4 mr-2" />
-                                                    Post Comment
-                                                  </Button>
-                                                  <Button
-                                                    onClick={() => {
-                                                      setEditingComment(null);
-                                                      setCommentText('');
-                                                    }}
-                                                    variant="outline"
-                                                    className="border-slate-600 text-slate-400 hover:bg-slate-800"
-                                                    size="sm"
-                                                  >
-                                                    <X className="w-4 h-4 mr-2" />
-                                                    Cancel
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                            ) : (
-                                              <Button
-                                                onClick={() => setEditingComment(bucket.id)}
-                                                variant="outline"
-                                                className="mt-3 border-slate-600 text-slate-400 hover:bg-slate-800"
-                                                size="sm"
-                                              >
-                                                <Edit3 className="w-4 h-4 mr-2" />
-                                                Add Comment
-                                              </Button>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-900 rounded-2xl border border-slate-800 p-12 text-center">
-                    <User className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-white mb-2">Select a Player</h3>
-                    <p className="text-slate-400">Choose a player from the sidebar to view their progress and manage their goals</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* AI Matching Tab */}
-          <TabsContent value="matching" className="space-y-6">
-            <AIMatchingDashboard />
-          </TabsContent>
-
-          {/* My Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
-            <div ref={profileSectionRef} id="coach-profile-section">
-              <CoachProfileSection
-                onProfileCompletionChange={setProfileCompletion}
-                onProfilePictureChange={setCoachProfilePicture}
-                initialProfilePicture={coachProfilePicture}
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+            <CoachProfileSection
+              accentColor={accentColor}
+              onProfileCompletionChange={(pct) => {
+                setProfileCompletion(pct);
+                if (pct >= 100) setHighlightProfileGaps(false);
+              }}
+              onProfilePictureChange={setCoachProfilePicture}
+              onPhotoFrameChange={setCoachPhotoFrame}
+              initialProfilePicture={coachProfilePicture}
+              initialPhotoFrame={coachPhotoFrame}
+              highlightIncomplete={highlightProfileGaps}
+              onHighlightDismiss={() => setHighlightProfileGaps(false)}
+            />
+          </div>
+        )}
+      </main>
     </div>
   );
 }

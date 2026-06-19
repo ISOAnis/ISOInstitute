@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { PortalSignOutModal } from "./PortalSignOutModal";
 
 type Page =
   | "home"
@@ -143,26 +144,61 @@ export function Navigation({
             <div className="flex items-center pl-4">
               <button
                 onClick={() => onNavigate("home")}
-                className="transition-opacity cursor-pointer"
+                className="transition-opacity cursor-pointer flex items-center gap-2"
                 onMouseEnter={() => setHoveredItem("logo")}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                <span
-                  className="text-white text-lg font-semibold tracking-wide transition-all"
-                  style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    textShadow:
-                      hoveredItem === "logo"
-                        ? "0 0 12px rgba(255, 255, 255, 0.8)"
-                        : "none",
-                    color:
-                      hoveredItem === "logo"
-                        ? "#ffffff"
-                        : "rgba(255, 255, 255, 0.9)",
-                  }}
-                >
-                  ISO Institute
-                </span>
+                {currentPage === "coach-portal" ||
+                currentPage === "player-portal" ? (
+                  <>
+                    <img
+                      src="/ISO OFFICIAL.png"
+                      alt="ISO Institute"
+                      className="h-8 w-auto object-contain"
+                      style={{
+                        opacity: hoveredItem === "logo" ? 1 : 0.92,
+                        transition: "opacity 0.3s ease",
+                      }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display =
+                          "none";
+                      }}
+                    />
+                    <span
+                      className="text-white text-sm font-semibold tracking-wide transition-all hidden sm:inline"
+                      style={{
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        textShadow:
+                          hoveredItem === "logo"
+                            ? "0 0 12px rgba(255, 255, 255, 0.8)"
+                            : "none",
+                        color:
+                          hoveredItem === "logo"
+                            ? "#ffffff"
+                            : "rgba(255, 255, 255, 0.85)",
+                      }}
+                    >
+                      ISO Institute
+                    </span>
+                  </>
+                ) : (
+                  <span
+                    className="text-white text-lg font-semibold tracking-wide transition-all"
+                    style={{
+                      fontFamily: "'Bebas Neue', sans-serif",
+                      textShadow:
+                        hoveredItem === "logo"
+                          ? "0 0 12px rgba(255, 255, 255, 0.8)"
+                          : "none",
+                      color:
+                        hoveredItem === "logo"
+                          ? "#ffffff"
+                          : "rgba(255, 255, 255, 0.9)",
+                    }}
+                  >
+                    ISO Institute
+                  </span>
+                )}
               </button>
             </div>
 
@@ -554,51 +590,12 @@ export function Navigation({
         </div>
       </nav>
 
-      {/* Sign Out Confirmation Modal */}
-      {showSignOutModal && (
-        <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
-          onClick={handleCancelSignOut}
-        >
-          <div
-            className="bg-slate-900 rounded-3xl max-w-md w-full p-8 border border-slate-800"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-white text-xl font-semibold">
-                Sign Out Required
-              </h2>
-              <button
-                onClick={handleCancelSignOut}
-                className="text-slate-400 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-slate-300 mb-8">
-              You are currently signed in as a{" "}
-              {pendingPortalType === "player" ? "coach" : "player"}. Please sign
-              out to access the{" "}
-              {pendingPortalType === "player" ? "player" : "coach"} portal.
-            </p>
-
-            <div className="flex gap-4">
-              <button
-                onClick={handleCancelSignOut}
-                className="flex-1 bg-slate-800 text-white py-3 rounded-full hover:bg-slate-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmSignOut}
-                className="flex-1 bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
+      {showSignOutModal && pendingPortalType && (
+        <PortalSignOutModal
+          pendingPortalType={pendingPortalType}
+          onCancel={handleCancelSignOut}
+          onConfirm={handleConfirmSignOut}
+        />
       )}
     </>
   );

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Navigation } from './Navigation';
 import { CoachPortal } from './CoachPortal';
-import { Footer } from './Footer';
 
 interface CoachPortalPageProps {
   onNavigate: (
@@ -15,12 +14,9 @@ export function CoachPortalPage({ onNavigate }: CoachPortalPageProps) {
   }, []);
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#111111' }}>
+    <div style={{ minHeight: '100vh', background: '#111111' }}>
       <Navigation currentPage="coach-portal" onNavigate={onNavigate} />
-      <div className="pt-32 pb-16">
-        <CoachPortal />
-      </div>
-      <Footer onNavigate={onNavigate} />
+      <CoachPortal />
     </div>
   );
 }

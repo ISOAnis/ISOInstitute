@@ -6,8 +6,9 @@ import { ConsultationModal } from './components/ConsultationModal';
 import { CoachPortalPage } from './components/CoachPortalPage';
 import { PlayerPortalPage } from './components/PlayerPortalPage';
 import { About } from './components/About';
-import { X } from 'lucide-react';
+import { PortalSignOutModal } from './components/PortalSignOutModal';
 import './styles/about.css';
+import { approveCoachApplicationForDemo } from './utils/membership';
 
 // Lazy load heavy components
 const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
@@ -48,6 +49,7 @@ export default function App() {
   const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [pendingPortalType, setPendingPortalType] = useState<'player' | 'coach' | null>(null);
+  const [portalGateTick, setPortalGateTick] = useState(0);
 
   useEffect(() => {
     try {
@@ -240,6 +242,7 @@ export default function App() {
   };
 
   // Portal gate — check login, onboarding, and coach pending status
+  void portalGateTick;
   const isOnboarded = (() => {
     try { return !!localStorage.getItem('iso_onboarding_complete'); } catch { return false; }
   })();
@@ -249,6 +252,12 @@ export default function App() {
   const isCoachPending = (() => {
     try { return !!localStorage.getItem('iso_coach_pending'); } catch { return false; }
   })();
+
+  const handleDemoCoachApproval = () => {
+    approveCoachApplicationForDemo();
+    setPortalGateTick((tick) => tick + 1);
+    setCurrentPage('coach-portal');
+  };
 
   // Coach applied but not yet approved — show pending screen
   if (currentPage === 'coach-portal' && isCoachPending && !isOnboarded) {
@@ -290,6 +299,25 @@ export default function App() {
             </ul>
           </div>
           <button
+            onClick={handleDemoCoachApproval}
+            style={{
+              ...GS,
+              fontSize: '14px',
+              letterSpacing: '3px',
+              background: 'rgba(34,197,94,0.18)',
+              color: '#22c55e',
+              border: '1px solid rgba(34,197,94,0.4)',
+              borderRadius: '999px',
+              padding: '14px 36px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              marginBottom: 12,
+              width: '100%',
+            }}
+          >
+            Approved
+          </button>
+          <button
             onClick={() => handleNavigate('home')}
             style={{
               ...GS,
@@ -302,6 +330,7 @@ export default function App() {
               padding: '14px 36px',
               cursor: 'pointer',
               transition: 'all 0.2s',
+              width: '100%',
             }}
           >
             Back to ISO
@@ -488,41 +517,12 @@ export default function App() {
         />
       )}
 
-      {/* Sign Out Confirmation Modal */}
-      {showSignOutModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={handleCancelSignOut}>
-          <div className="bg-slate-900 rounded-3xl max-w-md w-full p-8 border border-slate-800" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-white text-xl font-semibold">Sign Out Required</h2>
-              <button
-                onClick={handleCancelSignOut}
-                className="text-slate-400 hover:text-white transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-slate-300 mb-8">
-              You are currently signed in as a {pendingPortalType === 'player' ? 'coach' : 'player'}. 
-              Please sign out to access the {pendingPortalType === 'player' ? 'player' : 'coach'} portal.
-            </p>
-
-            <div className="flex gap-4">
-              <button
-                onClick={handleCancelSignOut}
-                className="flex-1 bg-slate-800 text-white py-3 rounded-full hover:bg-slate-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmSignOut}
-                className="flex-1 bg-orange-500 text-white py-3 rounded-full hover:bg-orange-600 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
+      {showSignOutModal && pendingPortalType && (
+        <PortalSignOutModal
+          pendingPortalType={pendingPortalType}
+          onCancel={handleCancelSignOut}
+          onConfirm={handleConfirmSignOut}
+        />
       )}
     </div>
   );

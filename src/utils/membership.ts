@@ -189,3 +189,28 @@ export function approvePathwayChangeRequest(): boolean {
 export function clearPathwayChangeRequest() {
   localStorage.removeItem('iso_pathway_change_request');
 }
+
+/** Demo helper — advisory board approves coach application */
+export function approveCoachApplicationForDemo(): void {
+  localStorage.removeItem('iso_coach_pending');
+  localStorage.setItem('iso_onboarding_complete', 'true');
+  localStorage.setItem('iso_demo_portal', 'coach');
+  try {
+    const saved = localStorage.getItem('iso_demo_user');
+    if (!saved) {
+      localStorage.setItem(
+        'iso_demo_user',
+        JSON.stringify({ email: 'demo@coach.iso', roles: ['coach'] } satisfies DemoUser),
+      );
+      return;
+    }
+    const user = JSON.parse(saved) as DemoUser;
+    user.roles = ['coach'];
+    localStorage.setItem('iso_demo_user', JSON.stringify(user));
+  } catch {
+    localStorage.setItem(
+      'iso_demo_user',
+      JSON.stringify({ email: 'demo@coach.iso', roles: ['coach'] } satisfies DemoUser),
+    );
+  }
+}
