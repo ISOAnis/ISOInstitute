@@ -79,7 +79,7 @@ const TEAM = [
 
 export function About({ onNavigate }: AboutProps) {
   return (
-    <div className="about-splash">
+    <div className="about-splash about-splash--app">
       <div className="about-splash-bg" aria-hidden="true">
         <div className="about-splash-bg-vignette" />
         <div className="about-splash-bg-glow" />

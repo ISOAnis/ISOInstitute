@@ -14,6 +14,20 @@
   overflow-x: hidden;
 }
 
+/* Embedded in main app (Navigation + Footer) — solid bg, no fixed overlay bleeding into footer */
+.about-splash--app {
+  --about-bg: #111111;
+  --about-surface: #141414;
+  --about-surface2: #1a1a1a;
+  background: #111111;
+  position: relative;
+  isolation: isolate;
+}
+
+.about-splash--app .about-splash-bg {
+  display: none;
+}
+
 .about-splash-bg {
   pointer-events: none;
   position: fixed;
