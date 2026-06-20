@@ -34,7 +34,7 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
-const LIVE_STREAM_URL = 'https://youtu.be/dmkHZkFmQSA';
+const LIVE_STREAM_URL = 'https://youtube.com/live/oYSlRvQgJ20';
 const PREVIOUS_EPISODE_URL = 'https://youtu.be/cWm4Hp3NwOA?si=b4f66CPC3VXo0M1K';
 const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const ASSIST_LIVE_START_HOUR = 18; // Sunday 6 PM Mountain Time
