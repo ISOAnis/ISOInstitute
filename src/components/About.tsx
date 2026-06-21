@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Moon, Dumbbell, Globe, Activity, Rocket, Settings, type LucideIcon } from 'lucide-react';
 import { SplashNavigation } from './SplashNavigation';
+import { AboutCardRail } from './AboutCardRail';
 import '../styles/about.css';
 
 type Page =
@@ -111,7 +112,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
         <section className="about-section about-section-tight">
           <div className="about-eyebrow">The Challenge</div>
           <h2 className="about-heading about-heading-cards">Three Problems. One Mission.</h2>
-          <div className="about-problem-grid">
+          <AboutCardRail label="Three problems" itemCount={PROBLEMS.length} gridClassName="about-problem-grid">
             {PROBLEMS.map((problem) => (
               <div key={problem.num} className="about-problem-card">
                 <div className="about-problem-num">Problem {problem.num}</div>
@@ -119,7 +120,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
                 <div className="about-problem-desc">{problem.desc}</div>
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* Mission */}
@@ -185,7 +186,11 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
           <p className="about-section-lede">
             Six archetypes for players and coaches — choose where you want to grow or lead.
           </p>
-          <div className="about-pathway-grid">
+          <AboutCardRail
+            label="Six pathways"
+            itemCount={PATHWAY_ARCHETYPES.length}
+            gridClassName="about-pathway-grid"
+          >
             {PATHWAY_ARCHETYPES.map((pathway, index) => {
               const Icon = pathway.icon;
               return (
@@ -207,7 +212,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
                 </div>
               );
             })}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* What We Stand On */}
@@ -218,7 +223,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
             ISO is faith-driven — not in what it asks of you, but in how it was built. ISO is open to
             everyone willing to grow with discipline, humility, and respect for the values we stand on.
           </p>
-          <div className="about-values">
+          <div className="about-values about-values-rail">
             {VALUES.map((value) => (
               <span key={value} className="about-value">
                 {value}
@@ -231,7 +236,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
         <section className="about-section">
           <div className="about-eyebrow">The Impact</div>
           <h2 className="about-heading about-heading-cards">Why ISO Matters</h2>
-          <div className="about-impact-grid">
+          <AboutCardRail label="Why ISO matters" itemCount={IMPACTS.length} gridClassName="about-impact-grid">
             {IMPACTS.map((impact, index) => (
               <div
                 key={impact}
@@ -240,14 +245,14 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
                 {impact}
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* The Team */}
         <section className="about-section">
           <div className="about-eyebrow">Behind ISO</div>
           <h2 className="about-heading about-heading-cards">The Team</h2>
-          <div className="about-team-grid">
+          <AboutCardRail label="The ISO team" itemCount={TEAM.length} gridClassName="about-team-grid">
             {TEAM.map((member) => (
               <div key={member.name} className="about-team-card">
                 <div className="about-team-avatar">{member.initials}</div>
@@ -255,7 +260,7 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
                 <div className="about-team-role">{member.role}</div>
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* Close */}
