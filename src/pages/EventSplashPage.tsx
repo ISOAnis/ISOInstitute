@@ -34,8 +34,10 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
-const LIVE_STREAM_URL = 'https://youtube.com/live/oYSlRvQgJ20';
+const LIVE_STREAM_URL = 'https://www.youtube.com/watch?v=Ll35nTPYMPk';
 const PREVIOUS_EPISODE_URL = 'https://youtu.be/dmkHZkFmQSA';
+const CURRENT_EPISODE_LABEL = 'Watch EP. 04';
+const PREVIOUS_EPISODE_LABEL = 'Watch EP. 03';
 const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const ASSIST_LIVE_START_HOUR = 18; // Sunday 6 PM Mountain Time
 const ASSIST_LIVE_END_HOUR = 19; // Sunday 7 PM Mountain Time
@@ -110,16 +112,11 @@ function getSundayLiveStartMs(year: number, month: number, day: number) {
   );
 }
 
-// First episode: Sunday May 31, 2026, 6:00 PM Mountain Time
-const ASSIST_FIRST_EPISODE_LIVE_START_MS = zonedTimeToUtc(
-  2026,
-  5,
-  31,
-  ASSIST_LIVE_START_HOUR,
-  0,
-  0,
-  MOUNTAIN_TIME_ZONE,
-);
+/** Week off — next live: Sunday July 5, 2026 · EP. 04 (remove after it airs). */
+const ASSIST_SCHEDULE_OVERRIDE = {
+  liveStartMs: zonedTimeToUtc(2026, 7, 5, ASSIST_LIVE_START_HOUR, 0, 0, MOUNTAIN_TIME_ZONE),
+  episodeNumber: 4,
+};
 
 const episodeDateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'long',
@@ -129,6 +126,23 @@ const episodeDateFormatter = new Intl.DateTimeFormat('en-US', {
 
 function getAssistSchedule(now: Date) {
   const nowMs = now.getTime();
+  const liveDurationMs = (ASSIST_LIVE_END_HOUR - ASSIST_LIVE_START_HOUR) * 60 * 60 * 1000;
+
+  const overrideStartMs = ASSIST_SCHEDULE_OVERRIDE.liveStartMs;
+  const overrideEndMs = overrideStartMs + liveDurationMs;
+
+  if (nowMs < overrideEndMs) {
+    const isLive = nowMs >= overrideStartMs && nowMs < overrideEndMs;
+    const diffMs = isLive ? 0 : Math.max(0, overrideStartMs - nowMs);
+
+    return {
+      isLive,
+      diffMs,
+      episodeNumber: ASSIST_SCHEDULE_OVERRIDE.episodeNumber,
+      episodeDateLabel: episodeDateFormatter.format(new Date(overrideStartMs)),
+    };
+  }
+
   const parts = getZonedParts(now, MOUNTAIN_TIME_ZONE);
   const sundayAnchor = new Date(Date.UTC(parts.year, parts.month - 1, parts.day - parts.dayOfWeek));
 
@@ -137,14 +151,14 @@ function getAssistSchedule(now: Date) {
     sundayAnchor.getUTCMonth() + 1,
     sundayAnchor.getUTCDate(),
   );
-  const liveEndMs = liveStartMs + (ASSIST_LIVE_END_HOUR - ASSIST_LIVE_START_HOUR) * 60 * 60 * 1000;
+  const liveEndMs = liveStartMs + liveDurationMs;
 
   const isLive = nowMs >= liveStartMs && nowMs < liveEndMs;
   const nextTargetMs = nowMs >= liveEndMs ? liveStartMs + ASSIST_WEEK_MS : liveStartMs;
   const diffMs = isLive ? 0 : Math.max(0, nextTargetMs - nowMs);
 
-  const episodeNumber =
-    Math.floor((nextTargetMs - ASSIST_FIRST_EPISODE_LIVE_START_MS) / ASSIST_WEEK_MS) + 1;
+  const weeksSinceOverride = Math.floor((nextTargetMs - overrideStartMs) / ASSIST_WEEK_MS);
+  const episodeNumber = ASSIST_SCHEDULE_OVERRIDE.episodeNumber + weeksSinceOverride;
   const episodeDateLabel = episodeDateFormatter.format(new Date(nextTargetMs));
 
   return {
@@ -319,6 +333,22 @@ function AssistCountdownSection() {
       >
         {episodeLabel}
       </p>
+
+      {now.getTime() < ASSIST_SCHEDULE_OVERRIDE.liveStartMs && (
+        <p
+          style={{
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: '13px',
+            lineHeight: 1.5,
+            color: '#9a9a9a',
+            margin: '10px auto 0',
+            maxWidth: '320px',
+            padding: '0 16px',
+          }}
+        >
+          Break for June 28 — we&apos;ll be back July 5.
+        </p>
+      )}
 
       <div
         style={{
@@ -535,7 +565,7 @@ function CTAButton({
   return (
     <motion.button
       className="w-[260px] rounded-2xl px-8 py-4 text-base font-extrabold text-center border-2 border-white"
-      style={{ 
+      style={{
         fontFamily: "'Bebas Neue', sans-serif",
         backgroundColor: isHovered ? '#000000' : '#ffffff',
         color: isHovered ? '#ffffff' : '#000000',
@@ -586,7 +616,7 @@ function LiveStreamButton({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      {isLive ? 'Currently Live' : 'Join Live Stream'}
+      {CURRENT_EPISODE_LABEL}
     </motion.button>
   );
 }
@@ -608,7 +638,7 @@ function CTAButtonsRow({
   
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4 pb-5">
-      <CTAButton variant="primary" onClick={onWaitlistClick}>
+      <CTAButton onClick={onWaitlistClick}>
         Join the Waitlist
       </CTAButton>
       <div className="relative">
@@ -625,11 +655,11 @@ function CTAButtonsRow({
           onMouseEnter={(e) => { e.currentTarget.style.color = '#aaaaaa'; }}
           onMouseLeave={(e) => { e.currentTarget.style.color = '#888888'; }}
         >
-          View previous episode
+          {PREVIOUS_EPISODE_LABEL}
         </a>
       </div>
       {SHOW_PILOT_BUTTON && (
-        <CTAButton variant="primary" onClick={onPilotClick}>
+        <CTAButton onClick={onPilotClick}>
           Apply for Pilot Program
         </CTAButton>
       )}
