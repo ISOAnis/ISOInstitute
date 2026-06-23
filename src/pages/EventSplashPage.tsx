@@ -198,7 +198,7 @@ function AssistCountdownSection() {
     return () => window.clearInterval(id);
   }, []);
 
-  const { diffMs, episodeNumber, episodeDateLabel } = getAssistSchedule(now);
+  const { isLive, diffMs, episodeNumber, episodeDateLabel } = getAssistSchedule(now);
   const diff = diffMs;
   const episodeLabel = `EP. ${String(episodeNumber).padStart(2, '0')} • ${episodeDateLabel}`;
 
@@ -246,10 +246,35 @@ function AssistCountdownSection() {
           textTransform: 'uppercase',
           color: '#9a9a9a',
           margin: '0 0 14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
         }}
       >
+        {isLive && (
+          <span
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#ef4444',
+              boxShadow: '0 0 8px rgba(239, 68, 68, 0.8)',
+              animation: 'assist-live-pulse 1.4s ease-in-out infinite',
+              flexShrink: 0,
+            }}
+          />
+        )}
         ISO: THE ASSIST
       </p>
+      {isLive && (
+        <style>{`
+          @keyframes assist-live-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+          }
+        `}</style>
+      )}
       <p
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
@@ -262,38 +287,77 @@ function AssistCountdownSection() {
        A weekly talk dedicated to the ones our communities don't celebrate enough.
       </p>
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
-            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{days}</span>
-          </div>
-          <span style={labelStyle}>DAYS</span>
+      {isLive ? (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #1a0a0a 0%, #0c0c0c 50%, #1a0a0a 100%)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            padding: '20px 32px',
+            margin: '0 auto',
+            maxWidth: '320px',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: '48px',
+              fontWeight: 900,
+              letterSpacing: '6px',
+              color: '#ef4444',
+              display: 'block',
+              lineHeight: 1,
+            }}
+          >
+            LIVE NOW
+          </span>
+          <span
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: '12px',
+              letterSpacing: '3px',
+              textTransform: 'uppercase',
+              color: '#9a9a9a',
+              marginTop: '8px',
+              display: 'block',
+            }}
+          >
+            Tap Join Live below
+          </span>
         </div>
-        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+              <span style={{ ...valueStyle, color: '#e0e0e0' }}>{days}</span>
+            </div>
+            <span style={labelStyle}>DAYS</span>
+          </div>
+          <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
-            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{hours}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+              <span style={{ ...valueStyle, color: '#e0e0e0' }}>{hours}</span>
+            </div>
+            <span style={labelStyle}>HOURS</span>
           </div>
-          <span style={labelStyle}>HOURS</span>
-        </div>
-        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+          <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
-            <span style={{ ...valueStyle, color: '#e0e0e0' }}>{minutes}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+              <span style={{ ...valueStyle, color: '#e0e0e0' }}>{minutes}</span>
+            </div>
+            <span style={labelStyle}>MINS</span>
           </div>
-          <span style={labelStyle}>MINS</span>
-        </div>
-        <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
+          <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#2a2a2a', fontSize: '24px', fontWeight: 900, marginTop: '8px', alignSelf: 'flex-start' }}>:</span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
-            <span style={{ ...valueStyle, color: '#555' }}>{seconds}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ background: '#0c0c0c', border: '0.5px solid #1a1a1a', padding: '12px 16px', minWidth: '66px', textAlign: 'center' }}>
+              <span style={{ ...valueStyle, color: '#555' }}>{seconds}</span>
+            </div>
+            <span style={labelStyle}>SECS</span>
           </div>
-          <span style={labelStyle}>SECS</span>
         </div>
-      </div>
+      )}
 
       <div
         style={{
@@ -616,7 +680,7 @@ function LiveStreamButton({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      {CURRENT_EPISODE_LABEL}
+      {isLive ? 'Join Live' : CURRENT_EPISODE_LABEL}
     </motion.button>
   );
 }

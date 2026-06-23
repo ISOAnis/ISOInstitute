@@ -24,20 +24,45 @@ const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 
 type SplashView = 'splash' | 'about';
 
+function getViewFromUrl(): SplashView {
+  return window.location.hash === '#about' ? 'about' : 'splash';
+}
+
+function setUrlForView(view: SplashView) {
+  const base = window.location.pathname + window.location.search;
+  const nextUrl = view === 'about' ? `${base}#about` : base;
+  if (window.location.pathname + window.location.search + window.location.hash !== nextUrl) {
+    window.history.pushState(null, '', nextUrl);
+  }
+}
+
 // =============================================================================
 // SPLASH PAGE ONLY - This branch shows only the event splash page
 // =============================================================================
 export default function App() {
-  const [view, setView] = useState<SplashView>('splash');
+  const [view, setView] = useState<SplashView>(getViewFromUrl);
+
+  const navigate = (next: SplashView) => {
+    setView(next);
+    setUrlForView(next);
+  };
+
+  useEffect(() => {
+    const onPopState = () => setView(getViewFromUrl());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.title =
+      view === 'about' ? 'About · ISO Institute' : 'In Search Of · ISO Institute';
   }, [view]);
 
   if (view === 'about') {
     return (
       <About
-        onBack={() => setView('splash')}
+        onBack={() => navigate('splash')}
         onWaitlistClick={() =>
           window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
         }
@@ -45,7 +70,7 @@ export default function App() {
     );
   }
 
-  return <EventSplashPage onNavigateToAbout={() => setView('about')} />;
+  return <EventSplashPage onNavigateToAbout={() => navigate('about')} />;
 }
 
 // =============================================================================
