@@ -6,6 +6,8 @@ import { CoachModal } from './CoachModal';
 import { SignupModal } from './SignupModal';
 import { PATHWAYS } from '../data/pathways';
 import { getUserPlan } from '../utils/membership';
+import { AboutCardRail } from './AboutCardRail';
+import '../styles/pathways.css';
 
 // =============================================================================
 // UNIFIED PATHWAY CARD COMPONENT - Single consistent style for all cards
@@ -122,16 +124,6 @@ interface PathwaysProps {
   } | null;
 }
 
-const FlowConnector = () => (
-  <div className="flex items-center self-center gap-2 md:gap-3 text-white h-full">
-    <div className="h-px w-10 md:w-16 bg-gradient-to-r from-white/0 via-white/40 to-white/0 rounded-full shadow-[0_0_12px_rgba(255,255,255,0.25)]" />
-    <div className="flex items-center justify-center w-12 h-12 rounded-full border border-white/25 bg-white/10 shadow-[0_0_18px_rgba(255,255,255,0.35)]">
-      <ArrowRight className="w-5 h-5 text-white" strokeWidth={2.5} />
-    </div>
-    <div className="h-px w-10 md:w-16 bg-gradient-to-r from-white/0 via-white/40 to-white/0 rounded-full shadow-[0_0_12px_rgba(255,255,255,0.25)]" />
-  </div>
-);
-
 // Level descriptions and gear unlocks
 const levelDetails: Record<string, { title: string; description: string; gear: string }> = {
   freshman: {
@@ -160,6 +152,51 @@ const levelDetails: Record<string, { title: string; description: string; gear: s
     gear: 'Unlock: Custom signature gear with your name, coach status badge, the legendary ISO tracksuit, and your own colorway collection.'
   }
 };
+
+const HOW_IT_WORKS_STEPS = [
+  {
+    num: '01',
+    title: 'Get Assessed',
+    body: 'Answer a short intake and ISO places you at your real level — Freshman, JV, or Varsity. No self-selecting, no guessing.',
+  },
+  {
+    num: '02',
+    title: 'Connect with a Coach',
+    body: 'Browse verified coach profiles in your pathway. Every ISO coach is reviewed by the Advisory Board before they work with players.',
+  },
+  {
+    num: '03',
+    title: 'Start Getting Buckets',
+    body: 'Set micro-goals, win games, and level up — all while building discipline, character, and real accountability.',
+  },
+] as const;
+
+const SESSION_STEPS = [
+  {
+    step: '01',
+    title: 'Review Your Last 30 Days',
+    body: "Your coach checks in on the goals you set last session. What landed, what didn't, and why — no sugarcoating.",
+    color: '#22c55e',
+  },
+  {
+    step: '02',
+    title: 'Identify Your #1 Blocker',
+    body: 'Together you zero in on the one thing holding you back most right now — not ten things. One thing, with a real plan.',
+    color: '#3b82f6',
+  },
+  {
+    step: '03',
+    title: 'Set Your 2-Week Focus',
+    body: 'You leave with a specific, measurable target for the next two weeks. Your coach holds you to it at the next check-in.',
+    color: '#a855f7',
+  },
+] as const;
+
+const STAT_ITEMS = [
+  { stat: '3–4×', label: 'faster progression with a dedicated coach vs. going solo' },
+  { stat: 'Walk-On', label: 'is free — one conversation a month, zero commitment required' },
+  { stat: '100%', label: 'of ISO coaches are advisory-board reviewed before working with players' },
+] as const;
 
 export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: PathwaysProps) {
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
@@ -327,7 +364,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
   return (
     <>
       <div 
-        className="min-h-screen pb-32 px-4 sm:px-6 lg:px-8"
+        className="pathways-page min-h-screen pb-32 px-4 sm:px-6 lg:px-8"
         style={{
           background: '#111111',
         }}
@@ -336,14 +373,14 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
 
           {/* ── HERO HOOK ── */}
           <motion.div
-            className="text-center"
-            style={{ marginBottom: 70, paddingTop: 96 }}
+            className="pathways-hero text-center"
+            style={{ marginBottom: 70 }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           >
             <span
-              className="inline-block px-4 py-2 rounded-full text-sm mb-8"
+              className="pathways-hero-badge inline-block px-4 py-2 rounded-full text-sm mb-8"
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 letterSpacing: '3px',
@@ -433,91 +470,31 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
           </motion.div>
 
           {/* ── HOW IT WORKS ── */}
-          <div className="text-center" style={{ marginBottom: 80 }}>
-            <div className="inline-block mb-6">
-              <span className="px-4 py-2 text-white rounded-full backdrop-blur-[10px]" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.3)' }}>
-                The ISO System
-              </span>
+          <section className="pathways-how-section">
+            <div className="pathways-how-header text-center">
+              <p className="pathways-eyebrow">The ISO System</p>
+              <h2 className="pathways-section-heading text-white mb-4 text-5xl md:text-6xl">
+                How It Works
+              </h2>
+              <p className="pathways-how-lede">
+                Three steps from assessment to real progress with a coach who holds you accountable.
+              </p>
             </div>
-            <h2 
-              className="text-white mb-8 text-5xl md:text-6xl"
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+
+            <AboutCardRail
+              label="How ISO works"
+              itemCount={HOW_IT_WORKS_STEPS.length}
+              gridClassName="pathways-how-grid"
             >
-              How It Works
-            </h2>
-            
-            {/* Clean Step Flow */}
-            <div className="max-w-6xl mx-auto">
-              <div className="relative flex items-center gap-8 overflow-x-auto pb-4 px-2 md:px-0 md:justify-center text-center">
-                <div className="pointer-events-none absolute left-0 right-0 top-1/2 hidden md:block">
-                  <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                </div>
-
-                {/* Step 1 */}
-                <motion.div
-                  className="relative min-w-[260px] md:min-w-0 md:flex-1 max-w-sm flex flex-col items-center text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                >
-                  <h3 
-                    className="text-white mb-4 text-2xl text-center"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                  >
-                    Get Assessed
-                  </h3>
-                  <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Answer a short intake and ISO places you at your real level — Freshman, JV, or Varsity. No self-selecting, no guessing.
-                  </p>
-                </motion.div>
-
-                {/* Flow arrow */}
-                <FlowConnector />
-                
-                {/* Step 2 */}
-                <motion.div
-                  className="relative min-w-[260px] md:min-w-0 md:flex-1 max-w-sm flex flex-col items-center text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                >
-                  <h3 
-                    className="text-white mb-4 text-2xl text-center"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                  >
-                    Connect with a Coach
-                  </h3>
-                  <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Browse verified coach profiles in your pathway. Every ISO coach is reviewed by the Advisory Board before they work with players.
-                  </p>
-                </motion.div>
-
-                {/* Flow arrow */}
-                <FlowConnector />
-                
-                {/* Step 3 */}
-                <motion.div
-                  className="relative min-w-[260px] md:min-w-0 md:flex-1 max-w-sm flex flex-col items-center text-center"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-                >
-                  <h3 
-                    className="text-white mb-4 text-2xl text-center"
-                    style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                  >
-                    Start Getting Buckets
-                  </h3>
-                  <p className="text-white/60 text-base leading-relaxed md:text-lg text-center mx-auto" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Set micro-goals, win games, and level up — all while building discipline, character, and real accountability.
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </div>
+              {HOW_IT_WORKS_STEPS.map((step) => (
+                <article key={step.num} className="pathways-how-card">
+                  <p className="pathways-how-num">Step {step.num}</p>
+                  <h3 className="pathways-how-title">{step.title}</h3>
+                  <p className="pathways-how-body">{step.body}</p>
+                </article>
+              ))}
+            </AboutCardRail>
+          </section>
 
           {/* ── WHAT A SESSION LOOKS LIKE ── */}
           <motion.div
@@ -534,41 +511,19 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                 </span>
               </div>
               <h2
-                className="text-white text-5xl md:text-6xl mb-8"
+                className="pathways-section-heading text-white text-5xl md:text-6xl mb-8"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
                 What a Session Actually Looks Like
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  step: '01',
-                  title: 'Review Your Last 30 Days',
-                  body: 'Your coach checks in on the goals you set last session. What landed, what didn\'t, and why — no sugarcoating.',
-                  color: '#22c55e',
-                },
-                {
-                  step: '02',
-                  title: 'Identify Your #1 Blocker',
-                  body: 'Together you zero in on the one thing holding you back most right now — not ten things. One thing, with a real plan.',
-                  color: '#3b82f6',
-                },
-                {
-                  step: '03',
-                  title: 'Set Your 2-Week Focus',
-                  body: 'You leave with a specific, measurable target for the next two weeks. Your coach holds you to it at the next check-in.',
-                  color: '#a855f7',
-                },
-              ].map((item) => (
-                <div
-                  key={item.step}
-                  className="rounded-2xl p-8"
-                  style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
+            <AboutCardRail
+              label="What a session looks like"
+              itemCount={SESSION_STEPS.length}
+              gridClassName="pathways-session-grid"
+            >
+              {SESSION_STEPS.map((item) => (
+                <div key={item.step} className="pathways-session-card">
                   <div
                     className="text-5xl mb-4"
                     style={{
@@ -590,29 +545,18 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                   </p>
                 </div>
               ))}
-            </div>
+            </AboutCardRail>
           </motion.div>
 
           {/* ── STAT ROW ── */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-px rounded-2xl overflow-hidden"
-            style={{ marginBottom: 96 }}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+          <motion.div style={{ marginBottom: 96 }}>
+          <AboutCardRail
+            label="ISO player stats"
+            itemCount={STAT_ITEMS.length}
+            gridClassName="pathways-stats-grid"
           >
-            {[
-              { stat: '3–4×', label: 'faster progression with a dedicated coach vs. going solo' },
-              { stat: 'Walk-On', label: 'is free — one conversation a month, zero commitment required' },
-              { stat: '100%', label: 'of ISO coaches are advisory-board reviewed before working with players' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="text-center py-4 px-8"
-                style={{ background: '#111111' }}
-              >
+            {STAT_ITEMS.map((item) => (
+              <div key={item.stat} className="pathways-stat-card">
                 <div
                   style={{
                     fontFamily: "'Bebas Neue', sans-serif",
@@ -630,17 +574,17 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                 </p>
               </div>
             ))}
+          </AboutCardRail>
           </motion.div>
 
           {/* Progress System Overview */}
           <div 
-            className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6"
-            style={{ marginTop: 64, marginBottom: 96 }}
+            className="pathways-progress-box bg-slate-900/50 rounded-2xl border border-slate-800 p-6"
             onMouseEnter={() => setIsHoveringProgressBox(true)}
             onMouseLeave={() => setIsHoveringProgressBox(false)}
           >
             <h2 
-              className="text-white text-center mb-4 text-5xl md:text-6xl"
+              className="pathways-section-heading text-white text-center mb-4 text-5xl md:text-6xl"
               style={{ fontFamily: "'Bebas Neue', sans-serif" }}
             >
               The ISO Progress System
@@ -649,12 +593,16 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
               Progress through levels based on your commitment and flex your growth with premium & exclusive ISO apparel. Start where you're ready.
               <br />
               <span 
+                className="hidden md:inline"
                 style={{ 
                   color: '#f97316',
                   animation: isHoveringProgressBox ? 'blink 1.5s ease-in-out infinite' : 'none'
                 }}
               >
                 Hover over each level to see the details.
+              </span>
+              <span className="md:hidden" style={{ color: '#f97316' }}>
+                Tap each level to see the details.
               </span>
             </p>
             <style>{`
@@ -691,12 +639,13 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                       }}
                       onMouseEnter={() => setHoveredLevel(segment.id)}
                       onMouseLeave={() => setHoveredLevel(null)}
+                      onClick={() => setHoveredLevel(segment.id)}
                     />
                   ))}
                 </div>
               </div>
               
-              <div className="flex justify-between mt-3">
+              <div className="pathways-levels-row">
                 {[
                   { level: 'Freshman', id: 'freshman', icon: Sprout, minTime: '3mo' },
                   { level: 'JV', id: 'jv', icon: BookOpen, minTime: '3mo' },
@@ -709,11 +658,12 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
                   return (
                     <div 
                       key={stage.id} 
-                      className={`flex flex-col items-center flex-1 cursor-pointer transition-all duration-300 ${
+                      className={`pathways-level-item transition-all duration-300 ${
                         hoveredLevel !== null && !isHovered ? 'opacity-40' : 'opacity-100'
                       }`}
                       onMouseEnter={() => setHoveredLevel(stage.id)}
                       onMouseLeave={() => setHoveredLevel(null)}
+                      onClick={() => setHoveredLevel(stage.id)}
                     >
                       {IconComponent && (
                         <IconComponent 
@@ -803,7 +753,7 @@ export function Pathways({ onNavigate, onNavigateToCallIso, commitmentStatus }: 
 
           {/* ── CTA BLOCK ── */}
           <motion.div
-            className="text-center rounded-3xl py-16 px-8"
+            className="pathways-cta-block text-center rounded-3xl py-16 px-8"
             style={{
               background: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 70%)',
               border: '1px solid rgba(255,255,255,0.1)',
