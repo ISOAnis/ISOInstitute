@@ -22,8 +22,8 @@ export function SplashNavigation({
 
   const pillClass = `flex items-center justify-between rounded-full pl-4 pr-5 py-1 shadow-lg transition-all duration-300 ${
     isScrolled
-      ? 'bg-[#141414]/95 shadow-black/40 backdrop-blur-[40px]'
-      : 'bg-[#141414]/80 shadow-black/25 backdrop-blur-[16px]'
+      ? 'bg-black/90 shadow-black/60 backdrop-blur-[40px]'
+      : 'bg-black/65 shadow-black/30 backdrop-blur-[16px]'
   }`;
 
   const brandStyle = { fontFamily: "'Bebas Neue', sans-serif", color: '#E8E8E8' };
@@ -40,7 +40,10 @@ export function SplashNavigation({
   return (
     <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
       <div className="w-full max-w-5xl">
-        <div className={pillClass} style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div
+          className={pillClass}
+          style={{ border: `1px solid rgba(255, 255, 255, ${isScrolled ? 0.3 : 0.15})` }}
+        >
           {mode === 'about' ? (
             <button
               type="button"
