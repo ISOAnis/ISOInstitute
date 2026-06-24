@@ -14,20 +14,6 @@
   overflow-x: hidden;
 }
 
-/* Embedded in main app (Navigation + Footer) — solid bg, no fixed overlay bleeding into footer */
-.about-splash--app {
-  --about-bg: #111111;
-  --about-surface: #141414;
-  --about-surface2: #1a1a1a;
-  background: #111111;
-  position: relative;
-  isolation: isolate;
-}
-
-.about-splash--app .about-splash-bg {
-  display: none;
-}
-
 .about-splash-bg {
   pointer-events: none;
   position: fixed;
@@ -58,11 +44,6 @@
   position: relative;
   z-index: 1;
   padding-top: 88px;
-}
-
-/* Main site nav (App.tsx) — same fixed pill offset as splash nav */
-.about-splash-content--app {
-  padding-top: 96px;
 }
 
 .about-section {
@@ -178,15 +159,20 @@
 
 @media (max-width: 768px) {
   .about-mission-heading.about-heading {
-    font-size: clamp(22px, 4.8vw, 44px);
+    font-size: clamp(30px, 7.5vw, 44px);
+    line-height: 1.12;
+    margin-bottom: 8px;
   }
-}
 
-@media (max-width: 520px) {
-  .about-mission-heading.about-heading {
-    font-size: clamp(17px, 4.2vw, 28px);
-    letter-spacing: 0.3px;
-    padding: 0 12px;
+  .about-mission-line {
+    white-space: normal;
+  }
+
+  .about-why-line {
+    font-size: 15px;
+    line-height: 1.65;
+    max-width: 340px;
+    padding-top: 4px;
   }
 }
 
@@ -699,6 +685,29 @@
   margin-top: 14px;
 }
 
+/* Horizontal card rails — mobile only (see @media below) */
+.about-card-rail-wrap {
+  position: relative;
+}
+
+.about-card-rail-hint,
+.about-card-rail-dots {
+  display: none;
+}
+
+.about-card-rail-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.about-card-rail-dot.is-active {
+  background: var(--about-gold);
+  transform: scale(1.2);
+}
+
 @media (max-width: 860px) {
   .about-section {
     padding: 56px 20px;
@@ -756,8 +765,105 @@
   }
 }
 
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  .about-card-rail-hint {
+    display: block;
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--about-dim);
+    text-align: center;
+    margin: -24px 0 14px;
+  }
+
+  .about-card-rail-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .about-card-rail-wrap .about-card-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 4px;
+  }
+
+  .about-card-rail-wrap .about-card-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .about-card-rail-wrap .about-problem-grid.about-card-rail > .about-problem-card {
+    flex: 0 0 min(85vw, 300px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 220px;
+  }
+
+  .about-card-rail-wrap .about-pathway-grid.about-card-rail > .about-pathway-card {
+    flex: 0 0 min(78vw, 280px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .about-card-rail-wrap .about-impact-grid.about-card-rail > .about-impact-bubble {
+    flex: 0 0 min(85vw, 300px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    grid-column: auto;
+    max-width: none;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-card-rail-wrap .about-team-grid.about-card-rail > .about-team-card {
+    flex: 0 0 min(72vw, 260px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .about-values-rail {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 4px;
+    max-width: none;
+    margin-bottom: 40px;
+  }
+
+  .about-values-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .about-values-rail .about-value {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+}
+
 @media (max-width: 520px) {
-  .about-pathway-grid {
+  .about-pathway-grid:not(.about-card-rail) {
     grid-template-columns: 1fr;
   }
 }
