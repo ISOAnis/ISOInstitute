@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Moon, Dumbbell, Globe, Activity, Rocket, Settings, type LucideIcon } from 'lucide-react';
+import { AboutCardRail } from './AboutCardRail';
 import '../styles/about.css';
 
 type Page =
@@ -16,6 +17,7 @@ type Page =
 
 interface AboutProps {
   onNavigate?: (page: Page) => void;
+  onWaitlistClick?: () => void;
 }
 
 const PROBLEMS = [
@@ -77,15 +79,23 @@ const TEAM = [
   { initials: 'IE', name: 'Idris Elmi', role: 'Technical Lead' },
 ] as const;
 
-export function About({ onNavigate }: AboutProps) {
+export function About({ onNavigate, onWaitlistClick }: AboutProps) {
+  const handlePrimaryCta = () => {
+    if (onWaitlistClick) {
+      onWaitlistClick();
+      return;
+    }
+    onNavigate?.('pathways');
+  };
+
   return (
-    <div className="about-splash about-splash--app">
+    <div className="about-splash">
       <div className="about-splash-bg" aria-hidden="true">
         <div className="about-splash-bg-vignette" />
         <div className="about-splash-bg-glow" />
       </div>
 
-      <div className="about-splash-content about-splash-content--app">
+      <div className="about-splash-content">
         {/* Hero */}
         <section className="about-hero">
           <img src="/ISO OFFICIAL.png" alt="ISO" className="about-hero-logo" />
@@ -100,7 +110,7 @@ export function About({ onNavigate }: AboutProps) {
         <section className="about-section about-section-tight">
           <div className="about-eyebrow">The Challenge</div>
           <h2 className="about-heading about-heading-cards">Three Problems. One Mission.</h2>
-          <div className="about-problem-grid">
+          <AboutCardRail label="Three problems" itemCount={PROBLEMS.length} gridClassName="about-problem-grid">
             {PROBLEMS.map((problem) => (
               <div key={problem.num} className="about-problem-card">
                 <div className="about-problem-num">Problem {problem.num}</div>
@@ -108,7 +118,7 @@ export function About({ onNavigate }: AboutProps) {
                 <div className="about-problem-desc">{problem.desc}</div>
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* Mission */}
@@ -174,7 +184,11 @@ export function About({ onNavigate }: AboutProps) {
           <p className="about-section-lede">
             Six archetypes for players and coaches — choose where you want to grow or lead.
           </p>
-          <div className="about-pathway-grid">
+          <AboutCardRail
+            label="Six pathways"
+            itemCount={PATHWAY_ARCHETYPES.length}
+            gridClassName="about-pathway-grid"
+          >
             {PATHWAY_ARCHETYPES.map((pathway, index) => {
               const Icon = pathway.icon;
               return (
@@ -196,7 +210,7 @@ export function About({ onNavigate }: AboutProps) {
                 </div>
               );
             })}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* What We Stand On */}
@@ -207,7 +221,7 @@ export function About({ onNavigate }: AboutProps) {
             ISO is faith-driven — not in what it asks of you, but in how it was built. ISO is open to
             everyone willing to grow with discipline, humility, and respect for the values we stand on.
           </p>
-          <div className="about-values">
+          <div className="about-values about-values-rail">
             {VALUES.map((value) => (
               <span key={value} className="about-value">
                 {value}
@@ -220,7 +234,7 @@ export function About({ onNavigate }: AboutProps) {
         <section className="about-section">
           <div className="about-eyebrow">The Impact</div>
           <h2 className="about-heading about-heading-cards">Why ISO Matters</h2>
-          <div className="about-impact-grid">
+          <AboutCardRail label="Why ISO matters" itemCount={IMPACTS.length} gridClassName="about-impact-grid">
             {IMPACTS.map((impact, index) => (
               <div
                 key={impact}
@@ -229,14 +243,14 @@ export function About({ onNavigate }: AboutProps) {
                 {impact}
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* The Team */}
         <section className="about-section">
           <div className="about-eyebrow">Behind ISO</div>
           <h2 className="about-heading about-heading-cards">The Team</h2>
-          <div className="about-team-grid">
+          <AboutCardRail label="The ISO team" itemCount={TEAM.length} gridClassName="about-team-grid">
             {TEAM.map((member) => (
               <div key={member.name} className="about-team-card">
                 <div className="about-team-avatar">{member.initials}</div>
@@ -244,7 +258,7 @@ export function About({ onNavigate }: AboutProps) {
                 <div className="about-team-role">{member.role}</div>
               </div>
             ))}
-          </div>
+          </AboutCardRail>
         </section>
 
         {/* Close */}
@@ -254,10 +268,10 @@ export function About({ onNavigate }: AboutProps) {
             <br />
             And sustained by humility.
           </h2>
-          <button type="button" className="about-close-btn" onClick={() => onNavigate?.('pathways')}>
-            Call an ISO
+          <button type="button" className="about-close-btn" onClick={handlePrimaryCta}>
+            {onWaitlistClick ? 'Join the Waitlist' : 'Call an ISO'}
           </button>
-          <div className="about-close-sub">Players</div>
+          <div className="about-close-sub">{onWaitlistClick ? 'Early Access' : 'Players'}</div>
         </section>
       </div>
     </div>
