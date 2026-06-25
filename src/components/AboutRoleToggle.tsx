@@ -8,7 +8,7 @@ const ROLE_CONTENT: Record<
 > = {
   players: {
     label: 'For Players',
-    title: 'Grow with real accountability',
+    title: 'Built by Courage',
     body:
       'Get matched with a coach who has been in your shoes, struggled your same struggle, learned the playbook, and is giving the game back with humility — real life accountability, not another app.',
     highlights: [
@@ -19,7 +19,7 @@ const ROLE_CONTENT: Record<
   },
   coaches: {
     label: 'For Coaches',
-    title: 'Give the game back',
+    title: 'Sustained by Humility',
     body:
       "Coaches are verified professionals and community leaders with real experience in one of the six pathways. They're not here to give generic advice — they've walked the path and lead with humility.",
     highlights: [
@@ -39,7 +39,7 @@ export function AboutRoleToggle() {
       <div className="about-eyebrow">Who It's For</div>
       <p className="about-section-lede about-role-intro">
         The ISO Institute is the first gamified development platform for courageous people In
-        Search Of real growth.
+        Search Of real growth — and for others in search of a platform to give back.
       </p>
 
       <div className="about-role-toggle" role="tablist" aria-label="Choose player or coach view">

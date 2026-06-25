@@ -265,9 +265,9 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
         {/* Close */}
         <section className="about-section about-close">
           <h2 className="about-close-title">
-            ISO is built by courage.
+            Built by Courage.
             <br />
-            And sustained by humility.
+            Sustained by Humility.
           </h2>
           <button type="button" className="about-close-btn" onClick={handlePrimaryCta}>
             {onWaitlistClick ? 'Join the Waitlist' : 'Call an ISO'}
