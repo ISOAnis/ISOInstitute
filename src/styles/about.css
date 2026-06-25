@@ -139,6 +139,182 @@
   text-align: center;
 }
 
+.about-mission-pin {
+  position: relative;
+  height: calc(100vh - 88px);
+  margin: 0;
+  padding: 0;
+  z-index: 1;
+}
+
+.about-mission-pin.is-locked {
+  z-index: 30;
+}
+
+.about-mission-sticky {
+  position: sticky;
+  top: 88px;
+  height: calc(100vh - 88px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-mission-sticky.is-locked {
+  background: var(--about-bg);
+}
+
+.about-mission-sticky-inner {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.about-mission-pin .about-mission-line {
+  white-space: normal;
+}
+
+.about-mission-pin .about-eyebrow {
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .about-mission-pin {
+    height: calc(100vh - 72px);
+  }
+
+  .about-mission-sticky {
+    top: 72px;
+    height: calc(100vh - 72px);
+  }
+}
+
+.about-role-toggle-wrap {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.about-role-intro {
+  max-width: 560px;
+  margin-bottom: 28px;
+}
+
+.about-role-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 24px;
+  background: var(--about-surface);
+  border: 1px solid var(--about-border);
+  border-radius: 999px;
+}
+
+.about-role-toggle-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--about-muted);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.about-role-toggle-btn:hover {
+  color: var(--about-text);
+}
+
+.about-role-toggle-btn.active {
+  color: #0c0c0c;
+  background: #e8e8e8;
+}
+
+.about-role-panel {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+  background: var(--about-surface);
+  border: 1px solid var(--about-border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  animation: about-role-fade-in 0.25s ease;
+}
+
+@keyframes about-role-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-role-panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.3px;
+  color: var(--about-text);
+  margin-bottom: 12px;
+}
+
+.about-role-panel-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--about-muted);
+  margin: 0 0 18px;
+}
+
+.about-role-panel-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-role-panel-list li {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--about-dim);
+  padding-left: 16px;
+  position: relative;
+}
+
+.about-role-panel-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--about-gold);
+}
+
+.about-role-culture {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(18px, 3vw, 22px);
+  letter-spacing: 0.5px;
+  color: var(--about-muted);
+  max-width: 520px;
+  margin: 28px auto 0;
+  line-height: 1.5;
+}
+
+.about-role-culture strong {
+  color: var(--about-gold);
+  font-weight: 600;
+}
+
 .about-mission-section .about-eyebrow {
   font-size: 13px;
   margin-bottom: 24px;

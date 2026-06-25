@@ -1,0 +1,129 @@
+.splash-footer {
+  position: relative;
+  z-index: 10;
+  margin-top: 48px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #111111;
+  color: #e8e8e8;
+}
+
+.splash-footer-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+}
+
+.splash-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.splash-footer-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.splash-footer-tagline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(18px, 3.5vw, 22px);
+  letter-spacing: 1px;
+  color: #e8e8e8;
+  max-width: 420px;
+  line-height: 1.3;
+}
+
+.splash-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.splash-footer-col-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #9a9a9a;
+  margin-bottom: 14px;
+}
+
+.splash-footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.splash-footer-link {
+  font-size: 15px;
+  color: #e8e8e8;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.splash-footer-link:hover {
+  color: #c08038;
+}
+
+.splash-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.splash-footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e8e8e8;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.splash-footer-social-link:hover {
+  border-color: rgba(192, 128, 56, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.splash-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #787878;
+}
+
+@media (min-width: 640px) {
+  .splash-footer-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .splash-footer-brand {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 24px;
+  }
+
+  .splash-footer-tagline {
+    max-width: none;
+  }
+}

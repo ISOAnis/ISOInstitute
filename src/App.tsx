@@ -19,18 +19,22 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import EventSplashPage from './pages/EventSplashPage';
 import { About } from './components/About';
+import { FAQPage } from './components/FAQPage';
 
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 
-type SplashView = 'splash' | 'about';
+type SplashView = 'splash' | 'about' | 'faq';
 
 function getViewFromUrl(): SplashView {
-  return window.location.hash === '#about' ? 'about' : 'splash';
+  if (window.location.hash === '#about') return 'about';
+  if (window.location.hash === '#faq') return 'faq';
+  return 'splash';
 }
 
 function setUrlForView(view: SplashView) {
   const base = window.location.pathname + window.location.search;
-  const nextUrl = view === 'about' ? `${base}#about` : base;
+  const hash = view === 'about' ? '#about' : view === 'faq' ? '#faq' : '';
+  const nextUrl = `${base}${hash}`;
   if (window.location.pathname + window.location.search + window.location.hash !== nextUrl) {
     window.history.pushState(null, '', nextUrl);
   }
@@ -56,7 +60,11 @@ export default function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title =
-      view === 'about' ? 'About · ISO Institute' : 'In Search Of · ISO Institute';
+      view === 'about'
+        ? 'About · ISO Institute'
+        : view === 'faq'
+          ? 'FAQ · ISO Institute'
+          : 'In Search Of · ISO Institute';
   }, [view]);
 
   if (view === 'about') {
@@ -66,11 +74,29 @@ export default function App() {
         onWaitlistClick={() =>
           window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
         }
+        onNavigateToFAQ={() => navigate('faq')}
       />
     );
   }
 
-  return <EventSplashPage onNavigateToAbout={() => navigate('about')} />;
+  if (view === 'faq') {
+    return (
+      <FAQPage
+        onBack={() => navigate('splash')}
+        onWaitlistClick={() =>
+          window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
+        }
+        onNavigateToAbout={() => navigate('about')}
+      />
+    );
+  }
+
+  return (
+    <EventSplashPage
+      onNavigateToAbout={() => navigate('about')}
+      onNavigateToFAQ={() => navigate('faq')}
+    />
+  );
 }
 
 // =============================================================================

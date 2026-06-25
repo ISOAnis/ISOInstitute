@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { Moon, Dumbbell, Globe, Activity, Rocket, Settings, type LucideIcon } from 'lucide-react';
 import { SplashNavigation } from './SplashNavigation';
+import { SplashFooter } from './SplashFooter';
 import { AboutCardRail } from './AboutCardRail';
+import { AboutRoleToggle } from './AboutRoleToggle';
+import { AboutMissionScroll } from './AboutMissionScroll';
 import '../styles/about.css';
 
 type Page =
@@ -18,6 +21,8 @@ interface AboutProps {
   onNavigate?: (page: Page) => void;
   onWaitlistClick?: () => void;
   onBack?: () => void;
+  onNavigateToAbout?: () => void;
+  onNavigateToFAQ?: () => void;
 }
 
 const PROBLEMS = [
@@ -79,7 +84,7 @@ const TEAM = [
   { initials: 'IE', name: 'Idris Elmi', role: 'Technical Lead' },
 ] as const;
 
-export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
+export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, onNavigateToFAQ }: AboutProps) {
   const handlePrimaryCta = () => {
     if (onWaitlistClick) {
       onWaitlistClick();
@@ -123,16 +128,8 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
           </AboutCardRail>
         </section>
 
-        {/* Mission */}
-        <section className="about-section about-mission-section">
-          <div className="about-eyebrow">Mission</div>
-          <h2 className="about-heading about-mission-heading">
-            <span className="about-mission-line">ISO is built to inspire ambition, elevate overlooked</span>
-            <span className="about-mission-line">
-              talent, and rebuild community pathways to success.
-            </span>
-          </h2>
-        </section>
+        {/* Mission — scroll-scrub zoom */}
+        <AboutMissionScroll />
 
         <p className="about-why-line">
           Access used to come through people who let you get close enough to learn.{' '}
@@ -213,6 +210,8 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
               );
             })}
           </AboutCardRail>
+
+          <AboutRoleToggle />
         </section>
 
         {/* What We Stand On */}
@@ -276,6 +275,12 @@ export function About({ onNavigate, onWaitlistClick, onBack }: AboutProps) {
           <div className="about-close-sub">{onWaitlistClick ? 'Early Access' : 'Players'}</div>
         </section>
       </div>
+
+      <SplashFooter
+        onNavigateToAbout={onNavigateToAbout}
+        onNavigateToFAQ={onNavigateToFAQ}
+        onWaitlistClick={onWaitlistClick}
+      />
     </div>
   );
 }

@@ -16,18 +16,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Instagram, Linkedin, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { SplashNavigation } from '../components/SplashNavigation';
+import { SplashFooter } from '../components/SplashFooter';
 // =============================================================================
 // CONSTANTS
 // =============================================================================
 
-// Social media links - replace with actual URLs
-const SOCIAL_LINKS = {
-  instagram: 'https://www.instagram.com/isoinstitute/',
-  tiktok: 'https://tiktok.com/@iso_institute',
-  linkedin: 'https://www.linkedin.com/company/isoinstitute/',
-};
+// Social media links live in SplashFooter
 
 // Pilot program application URL - Typeform application
 const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
@@ -524,97 +520,6 @@ function PilotInfoModal({
 }
 
 /**
- * Social Media Icons Row Component with Brand Colors
- */
-function SocialIconsRow() {
-  return (
-    <div className="flex items-center justify-center gap-4">
-      {/* Instagram - Gradient */}
-      <motion.a
-        href={SOCIAL_LINKS.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all hover:border-white/30 hover:bg-white/10"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Follow us on Instagram"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FFDC80" />
-              <stop offset="25%" stopColor="#F77737" />
-              <stop offset="50%" stopColor="#E1306C" />
-              <stop offset="75%" stopColor="#C13584" />
-              <stop offset="100%" stopColor="#833AB4" />
-            </linearGradient>
-          </defs>
-          <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#instagram-gradient)" strokeWidth="2" fill="none" />
-          <circle cx="12" cy="12" r="4" stroke="url(#instagram-gradient)" strokeWidth="2" fill="none" />
-          <circle cx="17.5" cy="6.5" r="1.5" fill="url(#instagram-gradient)" />
-        </svg>
-      </motion.a>
-
-      {/* TikTok - Brand Colors */}
-      <motion.a
-        href={SOCIAL_LINKS.tiktok}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all hover:border-white/30 hover:bg-white/10"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Follow us on TikTok"
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Cyan shadow */}
-          <path 
-            d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" 
-            fill="#25F4EE"
-            transform="translate(-1, 0)"
-          />
-          {/* Pink shadow */}
-          <path 
-            d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" 
-            fill="#FE2C55"
-            transform="translate(1, 0)"
-          />
-          {/* White main */}
-          <path 
-            d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" 
-            fill="white"
-          />
-        </svg>
-      </motion.a>
-
-      {/* LinkedIn - Blue */}
-      <motion.a
-        href={SOCIAL_LINKS.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all hover:border-white/30 hover:bg-white/10"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Follow us on LinkedIn"
-      >
-        <Linkedin size={22} color="#0A66C2" fill="#0A66C2" />
-      </motion.a>
-    </div>
-  );
-}
-
-/**
  * CTA Button Component with fluid color invert on hover
  */
 function CTAButton({
@@ -735,7 +640,13 @@ function CTAButtonsRow({
 // MAIN SPLASH PAGE COMPONENT
 // =============================================================================
 
-export function EventSplashPage({ onNavigateToAbout }: { onNavigateToAbout?: () => void }) {
+export function EventSplashPage({
+  onNavigateToAbout,
+  onNavigateToFAQ,
+}: {
+  onNavigateToAbout?: () => void;
+  onNavigateToFAQ?: () => void;
+}) {
   const [showPilotModal, setShowPilotModal] = useState(false);
 
   const openWaitlistForm = () => {
@@ -843,7 +754,7 @@ export function EventSplashPage({ onNavigateToAbout }: { onNavigateToAbout?: () 
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.45 }}
           >
-            A gamified development platform and cultural movement built to inspire ambition,
+            The ISO Institute is a gamified development platform built to inspire ambition,
             <br />
             elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
@@ -864,42 +775,14 @@ export function EventSplashPage({ onNavigateToAbout }: { onNavigateToAbout?: () 
             />
           </motion.div>
 
-          {/* Divider */}
-          <motion.div
-            className="mx-auto mb-8 h-px w-24 bg-white/10"
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          />
-
-          {/* Social Media Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-          >
-            <p
-              className="mb-4 text-sm uppercase tracking-[0.2em] text-white"
-              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            >
-              Follow the Movement
-            </p>
-            <SocialIconsRow />
-          </motion.div>
         </div>
       </div>
 
-      {/* Optional Footer Text */}
-      <motion.footer
-        className="pb-6 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1 }}
-      >
-        <p className="text-xs text-white/70">
-          © {new Date().getFullYear()} ISO Institute. All rights reserved.
-        </p>
-      </motion.footer>
+      <SplashFooter
+        onNavigateToAbout={onNavigateToAbout}
+        onNavigateToFAQ={onNavigateToFAQ}
+        onWaitlistClick={openWaitlistForm}
+      />
 
       {/* Modals */}
       <PilotInfoModal
