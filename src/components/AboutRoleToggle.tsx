@@ -39,7 +39,7 @@ export function AboutRoleToggle() {
       <div className="about-eyebrow">Who It's For</div>
       <p className="about-section-lede about-role-intro">
         The ISO Institute is the first gamified development platform for courageous people In
-        Search Of real growth — and for others in search of a platform to give back.
+        Search Of real growth — and for others In Search Of a platform to give back.
       </p>
 
       <div className="about-role-toggle" role="tablist" aria-label="Choose player or coach view">
