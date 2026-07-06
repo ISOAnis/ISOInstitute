@@ -9,6 +9,8 @@ import { calculateMatch, type PlayerProfile, type CoachProfile } from '../utils/
 import { Badge } from './ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { CoachTradingCard } from './CoachTradingCard';
+import { useDiscoverableCoaches } from '../hooks/useDiscoverableCoaches';
+import { coachToListItem, type CoachListItem } from '../types/discoverableCoach';
 
 // Mock availability data - in production, this would come from a backend/database
 const coachAvailability: Record<string, Array<{date: string, slots: Array<{id: string, start: string, end: string, booked?: boolean}>}>> = {
@@ -70,172 +72,20 @@ interface CoachModalProps {
     color: string;
   };
   onClose: () => void;
-  onNavigateToCallIso?: (coachName: string) => void;
+  onNavigateToCallIso?: (coachName: string, categoryId?: string, coachId?: string) => void;
 }
 
-const coachData: Record<string, Array<{
-  name: string;
-  role: string;
-  bio: string;
-  varsityPrice: number;
-  yearsExperience: number;
-  specialization: string[];
-  successRate?: string;
-  tier: 'standard' | 'specialist' | 'premium';
-  additionalPerks?: string[];
-}>> = {
-  deen: [
-    { 
-      name: 'Imam Abdullah Rahman', 
-      role: 'Islamic Scholar & Youth Coach', 
-      bio: 'Dedicated to helping young Muslims navigate faith in modern society. 15+ years of experience in youth development and Islamic education.',
-      varsityPrice: 45,
-      yearsExperience: 15,
-      specialization: ['Quran Study', 'Youth Development', 'Spiritual Counseling'],
-      successRate: '95% player satisfaction',
-      tier: 'premium',
-      additionalPerks: ['Direct access to Islamic scholars network', 'Monthly group spiritual sessions']
-    },
-    { 
-      name: 'Sister Amina Khalid', 
-      role: 'Spiritual Counselor', 
-      bio: 'Certified counselor specializing in faith-based mental wellness and personal development for student athletes.',
-      varsityPrice: 25,
-      yearsExperience: 7,
-      specialization: ['Mental Wellness', 'Faith Integration', 'Student Athletes'],
-      tier: 'standard'
-    },
-  ],
-  health: [
-    { 
-      name: 'Osaid Sasi', 
-      role: 'Strength & Conditioning Coach', 
-      bio: 'CEO of Iron Fortress, a calesthenics training brand for athletes and fitness enthusiasts. Passionate about building discipline through physical excellence.',
-      varsityPrice: 35,
-      yearsExperience: 5,
-      specialization: ['Calesthenics Training', 'Athletic Performance', 'Nutrition','Entrepreneurship'],
-      successRate: '15+ athletes trained',
-      tier: 'specialist',
-      additionalPerks: ['Custom workout video library', 'Form check videos within 24hrs']
-    },
-    { 
-      name: 'Dr. Sarah Mitchell', 
-      role: 'Sports Psychologist', 
-      bio: 'Specializes in mental health and peak performance for young athletes. Licensed clinical psychologist.',
-      varsityPrice: 65,
-      yearsExperience: 12,
-      specialization: ['Sports Psychology', 'Mental Performance', 'Clinical Therapy'],
-      successRate: 'Licensed therapist',
-      tier: 'premium',
-      additionalPerks: ['Access to mental health resources library', 'Crisis support availability']
-    },
-  ],
-  medicine: [
-    { 
-      name: 'Dr. Hassan Ahmed', 
-      role: 'Emergency Medicine Physician', 
-      bio: 'Practicing ER doctor and pre-med advisor. Committed to coaching the next generation of healthcare professionals.',
-      varsityPrice: 55,
-      yearsExperience: 14,
-      specialization: ['Medical School Prep', 'Clinical Experience', 'MCAT Strategy'],
-      successRate: '85% med school acceptance rate',
-      tier: 'premium',
-      additionalPerks: ['Clinical shadowing opportunities', 'Medical school interview prep']
-    },
-    { 
-      name: 'Wacim Benyoucef', 
-      role: '3rd Year Medical Student at the University of Missouri Columbia', 
-      bio: 'Dedicated to compassionate care and coaching students interested in healthcare careers.',
-      varsityPrice: 0,
-      yearsExperience: 1,
-      specialization: ['Public and Global Health', 'Policy', 'Medical Education'],
-      tier: 'standard'
-    },
-  ],
-  engineering: [
-    { 
-      name: 'Anis Benyoucef', 
-      role: '5x Intern - Apple, Zoox, Stanford Research', 
-      bio: 'I have 2+ years of internship experience across leading companies such as Apple and Zoox, giving me diverse experience in product design, hardware testing and validation, manufacturing, and quality. Passionate about community building and leadership',
-      varsityPrice: 40,
-      yearsExperience: 5,
-      specialization: ['Big Tech Recruiting', 'Hardware Engineering', 'Product Design', 'Interview Prep'],
-      successRate: '20+ players placed at top tech companies',
-      tier: 'specialist',
-      additionalPerks: ['Resume review within 48hrs', 'Referral opportunities at Apple/Zoox']
-    },
-    { 
-      name: 'Dr. Layla Chen', 
-      role: 'Mechanical Engineer & Researcher', 
-      bio: 'PhD in Robotics. Focused on innovation and coaching underrepresented students in STEM fields.',
-      varsityPrice: 50,
-      yearsExperience: 12,
-      specialization: ['Robotics', 'Research Methods', 'Graduate School Prep'],
-      successRate: 'PhD advisor',
-      tier: 'premium',
-      additionalPerks: ['Research lab connections', 'Academic publication guidance']
-    },
-  ],
-  entrepreneurship: [
-    { 
-      name: 'Jamal Williams', 
-      role: 'Social Entrepreneur & Founder', 
-      bio: 'Founded three successful startups. Now dedicated to helping young entrepreneurs build sustainable businesses.',
-      varsityPrice: 75,
-      yearsExperience: 18,
-      specialization: ['Startup Strategy', 'Fundraising', 'Social Impact'],
-      successRate: '3 exits, $50M+ raised',
-      tier: 'premium',
-      additionalPerks: ['Investor introductions', 'Pitch deck teardowns', 'Founder community access']
-    },
-    { 
-      name: 'Aisha Mohammed', 
-      role: 'Venture Capitalist', 
-      bio: 'Investing in purpose-driven startups. Coach to aspiring founders looking to create meaningful impact.',
-      varsityPrice: 60,
-      yearsExperience: 10,
-      specialization: ['Venture Capital', 'Investment Strategy', 'Pitch Preparation'],
-      successRate: '$100M+ invested',
-      tier: 'premium',
-      additionalPerks: ['VC network access', 'Investment readiness assessment']
-    },
-  ],
-  global: [
-    { 
-      name: 'Ambassador David Chen', 
-      role: 'Former Diplomat & Policy Advisor', 
-      bio: '20 years in international relations. Now coaching students interested in global affairs and diplomacy.',
-      varsityPrice: 70,
-      yearsExperience: 20,
-      specialization: ['International Relations', 'Diplomacy', 'Policy Analysis'],
-      successRate: 'Former US Ambassador',
-      tier: 'premium',
-      additionalPerks: ['UN/State Dept connections', 'Policy writing workshops']
-    },
-    { 
-      name: 'Nadia Ibrahim', 
-      role: 'International Business Consultant', 
-      bio: 'Advising Fortune 500 companies on global strategy. Passionate about ethical leadership development.',
-      varsityPrice: 45,
-      yearsExperience: 12,
-      specialization: ['Global Business', 'Strategy Consulting', 'Leadership'],
-      successRate: 'Fortune 500 consultant',
-      tier: 'specialist',
-      additionalPerks: ['Corporate strategy frameworks', 'Executive presence training']
-    },
-  ],
-};
-
 export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModalProps) {
-  const coaches = coachData[category.id] || [];
+  const { coaches: discoverableCoaches, loading: coachesLoading } = useDiscoverableCoaches(category.id);
+  const coaches: CoachListItem[] = discoverableCoaches.map(coachToListItem);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [showCalendarForCoach, setShowCalendarForCoach] = useState<string | null>(null);
   const [isISOEvaluationModalOpen, setIsISOEvaluationModalOpen] = useState(false);
-  const [selectedCoach, setSelectedCoach] = useState<typeof coaches[0] | null>(null);
+  const [selectedCoach, setSelectedCoach] = useState<CoachListItem | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'match' | 'experience' | 'overall' | 'availability'>('match');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewingCard, setViewingCard] = useState<typeof coaches[0] | null>(null);
+  const [viewingCard, setViewingCard] = useState<CoachListItem | null>(null);
   const [animatingCardId, setAnimatingCardId] = useState<string | null>(null);
 
   // Get player profile from props or context (would come from auth in production)
@@ -544,6 +394,15 @@ export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModa
           </div>
           
           {/* Modern Card-Based Coach Grid */}
+          {coachesLoading ? (
+            <div className="text-center py-16 text-slate-400" style={{ fontFamily: "'Barlow', sans-serif" }}>
+              Loading coaches…
+            </div>
+          ) : filteredCoaches.length === 0 ? (
+            <div className="text-center py-16 text-slate-400" style={{ fontFamily: "'Barlow', sans-serif" }}>
+              No coaches are available for this pathway yet. Check back soon.
+            </div>
+          ) : (
           <div className="grid grid-cols-1 gap-4">
             {filteredCoaches.map((coach, index) => {
               const matchResult = getMatchScore(coach.name);
@@ -552,7 +411,7 @@ export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModa
               
               return (
                 <motion.div
-                key={index}
+                key={coach.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
@@ -684,15 +543,8 @@ export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModa
                 </motion.div>
               );
             })}
-            
-            {filteredCoaches.length === 0 && (
-              <div className="text-center py-16">
-                <Search className="w-16 h-16 text-slate-600 mx-auto mb-4 opacity-50" />
-                <p className="text-slate-400 text-lg font-medium mb-2">No coaches found</p>
-                <p className="text-slate-500 text-sm">Try adjusting your search or filters</p>
-              </div>
-            )}
           </div>
+          )}
         </div>
       </motion.div>
       </div>
@@ -853,7 +705,7 @@ export function CoachModal({ category, onClose, onNavigateToCallIso }: CoachModa
             // Navigate to Call ISO page instead of opening modal
             if (onNavigateToCallIso) {
               setViewingCard(null);
-              onNavigateToCallIso(viewingCard.name, category.id);
+              onNavigateToCallIso(viewingCard.name, category.id, viewingCard.id);
             }
           }}
         />

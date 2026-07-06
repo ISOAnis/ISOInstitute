@@ -4,22 +4,25 @@ import { createPortal } from 'react-dom';
 import { X, Calendar as CalendarIcon, Clock, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Calendar } from './ui/calendar';
+import { useAuth } from '../contexts/AuthContext';
+import { createDiscoveryBooking, parseScheduledAt } from '../services/discoveryService';
 
 interface ConsultationModalProps {
   coachName: string;
+  coachId?: string;
   categoryId?: string;
   onClose: () => void;
   onScheduleComplete: () => void;
 }
 
-const STORAGE_KEY = 'iso_demo_user';
-
 export function ConsultationModal({ 
   coachName, 
+  coachId,
   categoryId,
   onClose, 
   onScheduleComplete 
 }: ConsultationModalProps) {
+  const { user, plan, isLoggedIn } = useAuth();
   const [step, setStep] = useState<'calendar' | 'success'>('calendar');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
@@ -38,13 +41,33 @@ export function ConsultationModal({
       return;
     }
 
+    if (!isLoggedIn || !user?.id) {
+      alert('Please sign in to schedule a try-out.');
+      return;
+    }
+
+    if (!coachId || !categoryId) {
+      alert('Coach information is missing. Please go back and try again.');
+      return;
+    }
+
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsSubmitting(false);
-    setStep('success');
+
+    try {
+      await createDiscoveryBooking({
+        playerId: user.id,
+        coachId,
+        pathwayId: categoryId,
+        plan,
+        scheduledAt: parseScheduledAt(selectedDate, selectedTimeSlot),
+      });
+      setStep('success');
+    } catch (err) {
+      console.error('Booking failed:', err);
+      alert(err instanceof Error ? err.message : 'Could not schedule try-out. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSuccessButtonClick = () => {

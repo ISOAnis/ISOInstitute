@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Moon, Dumbbell, Activity, Settings, Rocket, Globe } from 'lucide-react';
 import './JoinISOPage.css';
 import { LockerRoomCheckoutModal } from '../components/LockerRoomCheckoutModal';
-import { setAssessedLevel, setExploringPathway, lockPathway, setUserPlan, approveCoachApplicationForDemo, type MembershipPlan } from '../utils/membership';
+import { setAssessedLevel, setExploringPathway, type MembershipPlan } from '../utils/membership';
 import { LOCKER_ROOM_PRICE_USD } from '../utils/explorerUsage';
 import { savePlayerProfileFromAssessment } from '../utils/playerProfile';
 import { saveCoachProfileFromAssessment, hydrateCoachProfileFromAssessment } from '../utils/coachProfile';
@@ -17,6 +17,15 @@ import {
 import { CoachISOCard } from '../components/CoachISOCard';
 import { CoachPhotoEditorModal } from '../components/CoachPhotoEditorModal';
 import { DEFAULT_PHOTO_FRAME, type CoachPhotoFrame } from '../utils/coachPhotoStorage';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  completeCoachOnboarding,
+  completeExplorerOnboarding,
+  completePlayerOnboarding,
+} from '../services/onboardingService';
+import { ensureUserRecords } from '../services/profileService';
+import { resolvePortalDestination, shouldSkipPortalRedirect } from '../utils/portalRouting';
+import { supabase } from '../lib/supabase';
 
 // ====================================================================
 // TYPES
@@ -24,6 +33,7 @@ import { DEFAULT_PHOTO_FRAME, type CoachPhotoFrame } from '../utils/coachPhotoSt
 
 type Screen =
   | 'create-account'
+  | 'check-email'
   | 'join'
   | 'player'
   | 'player-proc'
@@ -1908,6 +1918,33 @@ function PlayerLevelBenefits({ assignedLevel }: { assignedLevel: PlayerLevel }) 
 }
 
 // ====================================================================
+// AUTH HELPERS
+// ====================================================================
+
+function formatAuthError(error: unknown): string {
+  const message = error instanceof Error ? error.message : 'Something went wrong.';
+  const lower = message.toLowerCase();
+
+  if (lower.includes('email not confirmed')) {
+    return 'Confirm your email first. Check your inbox for the ISO confirmation link, then sign in.';
+  }
+  if (lower.includes('invalid login credentials')) {
+    return 'Incorrect email or password. If you just signed up, confirm your email before signing in.';
+  }
+  if (lower.includes('user already registered')) {
+    return 'An account with this email already exists. Sign in instead.';
+  }
+  if (lower.includes('relation') && lower.includes('does not exist')) {
+    return 'Database setup is incomplete. Run the Supabase migrations, then try again.';
+  }
+  if (lower.includes('row-level security')) {
+    return 'Database permissions are blocking this action. Run migration 002 in Supabase SQL Editor.';
+  }
+
+  return message;
+}
+
+// ====================================================================
 // MAIN COMPONENT
 // ====================================================================
 
@@ -1917,6 +1954,19 @@ interface JoinISOPageProps {
 }
 
 export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOPageProps) {
+  const {
+    user,
+    profile,
+    loading: authLoading,
+    isPlayerOnboarded,
+    isCoachOnboarded,
+    isCoachPending,
+    signUp,
+    signIn,
+    signInWithOAuth,
+    refreshProfile,
+  } = useAuth();
+
   const [screen, setScreen] = useState<Screen>('create-account');
   const [exiting, setExiting] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
@@ -1941,6 +1991,10 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authError, setAuthError] = useState('');
+  const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [onboardingSaving, setOnboardingSaving] = useState(false);
+  const [routeReady, setRouteReady] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // --- Build the active questions list based on role + pathway ---
   const questions = useMemo<Question[]>(() => {
@@ -2011,7 +2065,7 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
   // --- Persist progress ---
   useEffect(() => {
-    const nonPersistScreens: Screen[] = ['create-account', 'success-player', 'success-coach', 'success-explorer'];
+    const nonPersistScreens: Screen[] = ['create-account', 'check-email', 'success-player', 'success-coach', 'success-explorer'];
     if (!nonPersistScreens.includes(screen)) {
       try {
         const { c_photo, ...restAnswers } = answers;
@@ -2027,43 +2081,57 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
   // --- Init: determine starting screen ---
   useEffect(() => {
-    const user = localStorage.getItem('iso_demo_user');
-    const onboardingDone = localStorage.getItem('iso_onboarding_complete');
-
-    // Already fully onboarded — redirect to portal
-    if (user && onboardingDone) {
-      const portal = localStorage.getItem('iso_demo_portal');
-      onNavigate(portal === 'coach' ? 'coach-portal' : 'player-portal');
+    if (authLoading || (user && !profile)) {
+      setRouteReady(false);
       return;
     }
 
-    // Logged in, onboarding not done — resume or start role selection
-    if (user) {
-      try {
-        const saved = localStorage.getItem('iso-onboarding');
-        if (saved) {
-          const parsed = JSON.parse(saved) as {
-            screen: Screen; currentQ: number; answers: Answers; hasPhoto?: boolean;
-          };
-          const { screen: s, currentQ: q, answers: a, hasPhoto } = parsed;
-          if (s === 'player' || s === 'coach' || s === 'explorer') {
-            if (hasPhoto) {
-              const photo = loadOnboardingPhoto();
-              if (photo) a.c_photo = photo;
-            }
-            setScreen(s); setCurrentQ(q); setAnswers(a);
-            return;
+    if (!user) {
+      setScreen('create-account');
+      setRouteReady(true);
+      return;
+    }
+
+    const email = user.email ?? profile?.email ?? '';
+    if (email) setAuthEmail(email);
+
+    try {
+      const saved = localStorage.getItem('iso-onboarding');
+      if (saved) {
+        const parsed = JSON.parse(saved) as {
+          screen: Screen; currentQ: number; answers: Answers; hasPhoto?: boolean;
+        };
+        const { screen: s, currentQ: q, answers: a, hasPhoto } = parsed;
+        if (s === 'player' || s === 'coach' || s === 'explorer') {
+          if (hasPhoto) {
+            const photo = loadOnboardingPhoto();
+            if (photo) a.c_photo = photo;
           }
+          setScreen(s); setCurrentQ(q); setAnswers(a);
+          setRouteReady(true);
+          return;
         }
-      } catch {}
-      setScreen('join');
-      return;
+      }
+    } catch {}
+
+    if (!shouldSkipPortalRedirect()) {
+      const destination = resolvePortalDestination({
+        profile,
+        isPlayerOnboarded,
+        isCoachOnboarded,
+        isCoachPending,
+      });
+      if (destination !== 'join') {
+        setIsRedirecting(true);
+        onNavigate(destination);
+        return;
+      }
     }
 
-    // Not logged in — show create account (default)
-    setScreen('create-account');
+    setScreen('join');
+    setRouteReady(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, user, profile, isPlayerOnboarded, isCoachOnboarded, isCoachPending]);
 
   const updateAnswer = (id: string, val: AnswerVal) =>
     setAnswers(prev => ({ ...prev, [id]: val }));
@@ -2144,90 +2212,122 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
     setCurrentQ(0);
   };
 
-  // --- Account creation (mock — stores to localStorage) ---
-  const handleCreateAccount = () => {
+  // --- Account creation ---
+  const handleCreateAccount = async () => {
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
     if (authPassword.length < 6) { setAuthError('Password must be at least 6 characters.'); return; }
     setAuthError('');
-    const userData = { email: authEmail, roles: [] as string[] };
-    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
-    localStorage.setItem('iso_demo_plan', 'walk-on');
-    goto('join');
+    setAuthSubmitting(true);
+    try {
+      const { needsEmailConfirmation } = await signUp(authEmail, authPassword);
+      if (needsEmailConfirmation) {
+        goto('check-email');
+        return;
+      }
+      goto('join');
+    } catch (error) {
+      setAuthError(formatAuthError(error));
+    } finally {
+      setAuthSubmitting(false);
+    }
   };
 
-  // --- Sign in (mock — accepts any email/password) ---
-  const handleSignIn = () => {
+  // --- Sign in ---
+  const handleSignIn = async () => {
     if (!authEmail.trim()) { setAuthError('Please enter your email.'); return; }
+    if (!authPassword) { setAuthError('Please enter your password.'); return; }
     setAuthError('');
-    const existing = localStorage.getItem('iso_demo_user');
-    let userData = { email: authEmail, roles: [] as string[] };
-    if (existing) {
-      try {
-        const parsed = JSON.parse(existing);
-        userData = { ...parsed, email: authEmail };
-      } catch {}
-    }
-    localStorage.setItem('iso_demo_user', JSON.stringify(userData));
-    const onboardingDone = localStorage.getItem('iso_onboarding_complete');
-    if (onboardingDone) {
-      const portal = localStorage.getItem('iso_demo_portal');
-      onNavigate(portal === 'coach' ? 'coach-portal' : 'player-portal');
-    } else {
+    setAuthSubmitting(true);
+    setIsRedirecting(true);
+    try {
+      await signIn(authEmail, authPassword);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { profile: freshProfile } = await ensureUserRecords(authUser);
+        const destination = resolvePortalDestination({
+          profile: freshProfile,
+          isPlayerOnboarded: freshProfile.player_onboarding_complete,
+          isCoachOnboarded:
+            freshProfile.coach_onboarding_complete &&
+            freshProfile.coach_application_status === 'approved',
+          isCoachPending: freshProfile.coach_application_status === 'pending',
+        });
+        await refreshProfile();
+        if (destination !== 'join') {
+          onNavigate(destination);
+          return;
+        }
+      }
+      setIsRedirecting(false);
       goto('join');
+      setRouteReady(true);
+    } catch (error) {
+      setIsRedirecting(false);
+      setAuthError(formatAuthError(error));
+    } finally {
+      setAuthSubmitting(false);
+    }
+  };
+
+  const handleOAuth = async (provider: 'google' | 'apple') => {
+    setAuthError('');
+    setAuthSubmitting(true);
+    try {
+      await signInWithOAuth(provider);
+    } catch (error) {
+      setAuthError(formatAuthError(error));
+      setAuthSubmitting(false);
     }
   };
 
   // --- Mark onboarding complete (player/explorer) or pending review (coach) ---
-  const completeOnboarding = (role: 'player' | 'coach' | 'explorer', plan: MembershipPlan = 'walk-on') => {
-    if (role === 'player') {
-      localStorage.setItem('iso_onboarding_complete', 'true');
-      localStorage.setItem('iso_demo_portal', 'player');
-      localStorage.setItem('iso_demo_plan', plan);
-      localStorage.removeItem('iso_explorer');
-      if (playerResult) setAssessedLevel(playerResult.level);
-      if (answers.pathway) {
-        if (plan === 'locker-room' || plan === 'varsity') {
-          lockPathway(answers.pathway as string);
-        } else {
+  const completeOnboarding = async (role: 'player' | 'coach' | 'explorer', plan: MembershipPlan = 'walk-on') => {
+    if (!user?.id) {
+      setAuthError('You must be signed in to complete onboarding.');
+      goto('create-account');
+      return;
+    }
+
+    const email = user.email ?? authEmail;
+    setOnboardingSaving(true);
+
+    try {
+      if (role === 'player') {
+        if (!playerResult) throw new Error('Player assessment is missing.');
+        await completePlayerOnboarding(user.id, answers, email, playerResult, 'walk-on');
+        setAssessedLevel(playerResult.level);
+        if (answers.pathway) {
           setExploringPathway(answers.pathway as string);
         }
-      }
-      let email = authEmail;
-      try {
-        const u = JSON.parse(localStorage.getItem('iso_demo_user') || '{}');
-        email = u.email ?? email;
-      } catch {}
-      savePlayerProfileFromAssessment(answers, email);
-    } else if (role === 'explorer') {
-      localStorage.setItem('iso_onboarding_complete', 'true');
-      localStorage.setItem('iso_demo_portal', 'player');
-      localStorage.setItem('iso_explorer', 'true');
-      localStorage.setItem('iso_demo_plan', 'walk-on');
-    } else {
-      // Coach: application submitted — portal access pending Advisory Board approval
-      localStorage.setItem('iso_coach_pending', 'true');
-      localStorage.setItem('iso_demo_portal', 'coach');
-      if (coachResult) {
-        saveCoachProfileFromAssessment(answers, coachResult, authEmail);
-      }
-      // Do NOT set iso_onboarding_complete — portal access blocked until approved
-    }
-    const existing = localStorage.getItem('iso_demo_user');
-    if (existing) {
-      try {
-        const u = JSON.parse(existing);
-        u.roles = [role];
-        if (role === 'coach' && answers.c_gender) {
-          u.gender = (answers.c_gender as string).toLowerCase() === 'female' ? 'female' : 'male';
+        savePlayerProfileFromAssessment(answers, email);
+        localStorage.setItem('iso_onboarding_complete', 'true');
+        localStorage.setItem('iso_demo_portal', 'player');
+        localStorage.setItem('iso_demo_plan', 'walk-on');
+        if (plan !== 'walk-on') {
+          localStorage.setItem('iso_demo_plan', plan);
         }
-        if (role === 'player' && answers.gender) {
-          u.gender = (answers.gender as string).toLowerCase() === 'female' ? 'female' : 'male';
-        }
-        localStorage.setItem('iso_demo_user', JSON.stringify(u));
-      } catch {}
+      } else if (role === 'explorer') {
+        await completeExplorerOnboarding(user.id, answers);
+        localStorage.setItem('iso_onboarding_complete', 'true');
+        localStorage.setItem('iso_demo_portal', 'player');
+        localStorage.setItem('iso_demo_plan', 'walk-on');
+      } else {
+        if (!coachResult) throw new Error('Coach assessment is missing.');
+        await completeCoachOnboarding(user.id, answers, coachResult, email);
+        saveCoachProfileFromAssessment(answers, coachResult, email);
+        localStorage.setItem('iso_coach_pending', 'true');
+        localStorage.setItem('iso_demo_portal', 'coach');
+      }
+
+      await refreshProfile();
+      localStorage.removeItem('iso-onboarding');
+      localStorage.removeItem(ONBOARDING_PHOTO_KEY);
+    } catch (error) {
+      console.error('Failed to complete onboarding:', error);
+      setAuthError(error instanceof Error ? error.message : 'Could not save onboarding.');
+    } finally {
+      setOnboardingSaving(false);
     }
-    localStorage.removeItem('iso-onboarding');
-    localStorage.removeItem(ONBOARDING_PHOTO_KEY);
   };
 
   const fname = (answers.fname as string) ?? '';
@@ -2236,6 +2336,33 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
   // ====================================================================
   // RENDER
   // ====================================================================
+
+  if (authLoading || (user && !profile) || !routeReady || isRedirecting) {
+    return (
+      <div
+        className="iso-join"
+        style={{
+          minHeight: '100vh',
+          background: '#0A0A0A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: 14,
+            letterSpacing: 4,
+            color: 'rgba(255,255,255,0.35)',
+            margin: 0,
+          }}
+        >
+          Loading...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={`iso-join${exiting ? ' iso-join--exiting' : ''}`}>
@@ -2260,21 +2387,11 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
               </p>
 
               {/* Social buttons */}
-              <button className="iso-join__social-btn" onClick={() => {
-                setAuthError('');
-                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'google@user.com', roles: [] }));
-                localStorage.setItem('iso_demo_plan', 'walk-on');
-                goto('join');
-              }}>
+              <button className="iso-join__social-btn" disabled={authSubmitting} onClick={() => void handleOAuth('google')}>
                 <span className="iso-join__social-icon">G</span>
                 Continue with Google
               </button>
-              <button className="iso-join__social-btn" onClick={() => {
-                setAuthError('');
-                localStorage.setItem('iso_demo_user', JSON.stringify({ email: 'apple@user.com', roles: [] }));
-                localStorage.setItem('iso_demo_plan', 'walk-on');
-                goto('join');
-              }}>
+              <button className="iso-join__social-btn" disabled={authSubmitting} onClick={() => void handleOAuth('apple')}>
                 <span className="iso-join__social-icon">🍎</span>
                 Continue with Apple
               </button>
@@ -2310,10 +2427,14 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
               <button
                 className="iso-join__auth-cta"
-                onClick={authMode === 'create' ? handleCreateAccount : handleSignIn}
-                disabled={!authEmail.trim()}
+                onClick={() => void (authMode === 'create' ? handleCreateAccount() : handleSignIn())}
+                disabled={!authEmail.trim() || authSubmitting}
               >
-                {authMode === 'create' ? 'Create Account' : 'Sign In'}
+                {authSubmitting
+                  ? 'Please wait...'
+                  : authMode === 'create'
+                    ? 'Create Account'
+                    : 'Sign In'}
               </button>
 
               <div className="iso-join__auth-toggle">
@@ -2332,6 +2453,36 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
         </div>
       )}
 
+      {screen === 'check-email' && (
+        <div className="iso-join__screen">
+          <div className="iso-join__auth">
+            <div className="iso-join__auth-form">
+              <div className="iso-join__season-tag" style={{ alignSelf: 'flex-start', marginBottom: 28 }}>
+                <span className="iso-join__season-dot" />
+                ISO Platform
+              </div>
+              <h1 className="iso-join__auth-headline">Check Your Email.</h1>
+              <p className="iso-join__auth-sub">
+                We sent a confirmation link to <strong>{authEmail}</strong>. Click it to activate your account, then come back here and sign in.
+              </p>
+              <p className="iso-join__auth-sub" style={{ marginTop: 16, opacity: 0.7 }}>
+                After confirming, you&apos;ll land back on Join ISO and can start onboarding.
+              </p>
+              <button
+                className="iso-join__auth-cta"
+                onClick={() => { setAuthMode('signin'); goto('create-account'); }}
+              >
+                I Confirmed — Sign In
+              </button>
+              <div className="iso-join__auth-toggle">
+                Wrong email?{' '}
+                <button onClick={() => goto('create-account')}>Go back</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── JOIN / ROLE SELECT ── */}
       {screen === 'join' && (
         <div className="iso-join__screen">
@@ -2342,10 +2493,21 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
             </div>
             <h1 className="iso-join__headline">Choose Your Path.</h1>
             <p className="iso-join__subhead">Know where you're headed — or start by finding out.</p>
+            {user && isPlayerOnboarded && !isCoachOnboarded && !isCoachPending && (
+              <p className="iso-join__auth-sub" style={{ marginBottom: 20, textAlign: 'center' }}>
+                You&apos;re signed in as a player. Select <strong>Join as Coach</strong> below to add a coach profile to this account — no sign out needed.
+              </p>
+            )}
+            {!user && (
+              <p className="iso-join__auth-error" style={{ marginBottom: 20 }}>
+                Sign in or create an account before starting onboarding.
+              </p>
+            )}
             <div className="iso-join__cards iso-join__cards--3">
               <button
                 className="iso-join__card"
-                onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('player'); }}
+                disabled={!user}
+                onClick={() => { if (!user) return; clearProgress(); setAnswers({}); setCurrentQ(0); goto('player'); }}
                 aria-label="Join as Player"
               >
                 <div className="iso-join__card-icon-wrap">🏅</div>
@@ -2360,7 +2522,8 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
               <button
                 className="iso-join__card iso-join__card--explorer"
-                onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('explorer'); }}
+                disabled={!user}
+                onClick={() => { if (!user) return; clearProgress(); setAnswers({}); setCurrentQ(0); goto('explorer'); }}
                 aria-label="Still Exploring"
               >
                 <div className="iso-join__card-icon-wrap">🧭</div>
@@ -2375,7 +2538,8 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
               <button
                 className="iso-join__card"
-                onClick={() => { clearProgress(); setAnswers({}); setCurrentQ(0); goto('coach'); }}
+                disabled={!user}
+                onClick={() => { if (!user) return; clearProgress(); setAnswers({}); setCurrentQ(0); goto('coach'); }}
                 aria-label="Join as Coach"
               >
                 <div className="iso-join__card-icon-wrap">⭐</div>
@@ -2600,10 +2764,10 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
               {' '}Your journey starts now.
             </p>
             <div className="iso-join__success-badge">ISO · {playerResult.levelLabel}</div>
-            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('player', selectedPlan); onNavigate('player-portal'); }}>
+            <button className="iso-join__btn-primary" disabled={onboardingSaving} onClick={() => { void completeOnboarding('player', selectedPlan).then(() => onNavigate('player-portal')); }}>
               Enter My Portal
             </button>
-            <button className="iso-join__btn-home" style={{ marginTop: 10 }} onClick={() => { completeOnboarding('player', selectedPlan); onNavigate('home'); }}>
+            <button className="iso-join__btn-home" style={{ marginTop: 10 }} disabled={onboardingSaving} onClick={() => { void completeOnboarding('player', selectedPlan).then(() => onNavigate('home')); }}>
               Back to ISO
             </button>
           </div>
@@ -2692,14 +2856,14 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
             <button
               className="iso-join__btn-primary"
-              onClick={() => { completeOnboarding('explorer'); onNavigate('player-portal'); }}
+              onClick={() => { void completeOnboarding('explorer').then(() => onNavigate('player-portal')); }}
             >
               Start Exploring
             </button>
             <button
               className="iso-join__btn-home"
               style={{ marginTop: 10 }}
-              onClick={() => { completeOnboarding('explorer'); onNavigate('home'); }}
+              onClick={() => { void completeOnboarding('explorer').then(() => onNavigate('home')); }}
             >
               Back to ISO
             </button>
@@ -2891,16 +3055,13 @@ export function JoinISOPage({ onNavigate, initialAuthMode = 'create' }: JoinISOP
 
             <button
               className="iso-join__btn-primary"
-              style={{ marginBottom: 10, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.4)', color: '#22c55e' }}
-              onClick={() => {
-                completeOnboarding('coach');
-                approveCoachApplicationForDemo();
-                onNavigate('coach-portal');
-              }}
+              style={{ marginBottom: 10 }}
+              disabled={onboardingSaving}
+              onClick={() => { void completeOnboarding('coach').then(() => onNavigate('coach-portal')); }}
             >
-              Approved
+              Submit Application
             </button>
-            <button className="iso-join__btn-primary" onClick={() => { completeOnboarding('coach'); onNavigate('home'); }}>
+            <button className="iso-join__btn-primary" disabled={onboardingSaving} onClick={() => { void completeOnboarding('coach').then(() => onNavigate('home')); }}>
               Back to ISO
             </button>
           </div>

@@ -29,22 +29,22 @@ import { ProfileCompletionModal } from './ProfileCompletionModal';
 import { PathwaySelectionModal } from './PathwaySelectionModal';
 import { LockerRoomCheckoutModal } from './LockerRoomCheckoutModal';
 import { VarsityInterestModal } from './VarsityInterestModal';
+import { ConsultationModal } from './ConsultationModal';
 import { PortalGreeting } from './PortalGreeting';
 import { PortalChromeBar } from './PortalChromeBar';
 import { PlayerISODashboard } from './PlayerISODashboard';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import {
-  getUserGender, getUserPlan, setUserPlan, filterByGender, usesExplorerPortal,
-  type MembershipPlan, type UserGender, PLAN_LABELS, canAccessLockerRoomChat, canAccessOnlineStore,
+  getUserPlan, setUserPlan, usesExplorerPortal,
+  type MembershipPlan, PLAN_LABELS, canAccessLockerRoomChat, canAccessOnlineStore,
   isPathwayLocked, getActivePathway, getLockedPathway, getExploringPathway, lockPathway,
   setExploringPathway,
 } from '../utils/membership';
 import {
   type ExplorerUsage,
   getExplorerUsage,
-  saveExplorerUsage,
+  saveExplorerUsage as saveLocalExplorerUsage,
   canScheduleCoachCall,
-  recordCoachCall,
   chatUsedWithCoach,
   chatUsedForPathway,
   discoveryCallsRemaining,
@@ -52,6 +52,14 @@ import {
   LOCKER_ROOM_PRICE_USD,
   TRYOUT_MINUTES,
 } from '../utils/explorerUsage';
+import { useDiscoverableCoaches } from '../hooks/useDiscoverableCoaches';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  fetchExplorerUsage as fetchDbExplorerUsage,
+  saveExplorerUsage as saveDbExplorerUsage,
+  resetExplorerUsage,
+} from '../services/discoveryService';
+import { type ExplorerCoachView as ExplorerCoach, toExplorerCoachView } from '../types/discoverableCoach';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 interface Bucket {
@@ -505,79 +513,7 @@ function SkillTreeView({ pathwayId, gamesWon, accentColor }: { pathwayId: string
   );
 }
 
-// ─── EXPLORER MOCK COACHES ───────────────────────────────────────────────────
-interface ExplorerCoach {
-  id: string;
-  name: string;
-  title: string;
-  specialty: string;
-  rating: number;
-  tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
-  bio: string;
-  skills: string[];
-  pathwayId: string;
-  gender: UserGender;
-  acceptsShadowing: boolean;
-  shadowingCadenceMonths: number;
-  varsityMonthlyPrice: number;
-}
-
-const varsityPriceFromRating = (rating: number): number => {
-  if (rating >= 95) return 120;
-  if (rating >= 90) return 100;
-  if (rating >= 85) return 85;
-  if (rating >= 80) return 75;
-  return 60;
-};
-
-// Tier thresholds: 60-69 Bronze, 70-79 Silver, 80-89 Gold, 90-99 Platinum
-const getRatingTier = (r: number): ExplorerCoach['tier'] => {
-  if (r >= 90) return 'Platinum';
-  if (r >= 80) return 'Gold';
-  if (r >= 70) return 'Silver';
-  return 'Bronze';
-};
-
-const RAW_COACHES: Omit<ExplorerCoach, 'acceptsShadowing' | 'shadowingCadenceMonths'>[] = [
-  // Deen
-  { id: 'dc1', pathwayId: 'deen', gender: 'male', name: 'Omar Siddiqui', title: 'Islamic Studies Graduate', specialty: 'Quran & Sunnah', rating: 87, tier: getRatingTier(87), bio: 'Spent 3 years at Al-Azhar. Helps students build a consistent prayer and Quran routine grounded in authentic scholarship.', skills: ['Quran Memorization', 'Fiqh Basics', 'Habit Building'] },
-  { id: 'dc2', pathwayId: 'deen', gender: 'male', name: 'Yusuf Al-Amin', title: 'Community Youth Leader', specialty: 'Spiritual Identity', rating: 79, tier: getRatingTier(79), bio: 'Runs youth halaqas and focuses on helping young Muslims build a strong Islamic identity in the modern world.', skills: ['Youth Mentorship', 'Islamic Identity', 'Dawah'] },
-  { id: 'dc3', pathwayId: 'deen', gender: 'female', name: 'Fatima Hassan', title: 'Islamic Counselor', specialty: 'Faith & Wellbeing', rating: 91, tier: getRatingTier(91), bio: 'Certified counselor integrating Islamic principles with mental wellness. Works with students navigating faith challenges.', skills: ['Islamic Counseling', 'Mindfulness', 'Community Service'] },
-  // Health
-  { id: 'hc1', pathwayId: 'health', gender: 'male', name: 'Marcus Webb', title: 'D1 Strength & Conditioning Coach', specialty: 'Athletic Development', rating: 93, tier: getRatingTier(93), bio: 'Former D1 athlete turned S&C coach. Built performance programs for 50+ young athletes focused on foundation movement.', skills: ['Strength Training', 'Speed & Agility', 'Recovery'] },
-  { id: 'hc2', pathwayId: 'health', gender: 'female', name: 'Aisha Brooks', title: 'Certified Nutritionist', specialty: 'Sports Nutrition', rating: 82, tier: getRatingTier(82), bio: 'Works with student athletes on fueling properly for performance, focusing on practical, real-world nutrition habits.', skills: ['Meal Planning', 'Hydration', 'Performance Nutrition'] },
-  { id: 'hc3', pathwayId: 'health', gender: 'male', name: 'Darius King', title: 'Personal Trainer & Sports Psych', specialty: 'Mental Toughness', rating: 76, tier: getRatingTier(76), bio: 'Combines physical training with mental resilience coaching. Specialty in helping athletes break through plateaus.', skills: ['Mental Toughness', 'Goal Setting', 'Athletic Performance'] },
-  // Medicine
-  { id: 'mc1', pathwayId: 'medicine', gender: 'female', name: 'Dr. Leila Nasser', title: 'MD, Internal Medicine', specialty: 'Pre-Med Roadmap', rating: 96, tier: getRatingTier(96), bio: 'Board-certified physician who guides pre-med students through MCAT prep, clinical exposure, and medical school applications.', skills: ['MCAT Strategy', 'Clinical Shadowing', 'Med School Apps'] },
-  { id: 'mc2', pathwayId: 'medicine', gender: 'male', name: 'James Okafor', title: '4th Year Medical Student', specialty: 'Academic Excellence', rating: 81, tier: getRatingTier(81), bio: 'Currently at Johns Hopkins Medicine. Helps pre-meds navigate undergraduate research, volunteering, and GPA management.', skills: ['Research', 'Volunteering', 'Academic Planning'] },
-  { id: 'mc3', pathwayId: 'medicine', gender: 'female', name: 'Priya Sharma', title: 'Pre-Health Advisor', specialty: 'Healthcare Pathways', rating: 78, tier: getRatingTier(78), bio: 'Advises students on all healthcare pathways — nursing, PA, dentistry, medicine — and builds personalized academic plans.', skills: ['Path Planning', 'Healthcare Exposure', 'GPA Strategy'] },
-  // Engineering
-  { id: 'ec1', pathwayId: 'engineering', gender: 'male', name: 'Tariq Osman', title: 'Software Engineer at Google', specialty: 'CS & Coding', rating: 94, tier: getRatingTier(94), bio: 'Google L5 engineer helping students break into top CS programs and tech internships through project-based mentorship.', skills: ['DSA', 'System Design', 'Interview Prep'] },
-  { id: 'ec2', pathwayId: 'engineering', gender: 'female', name: 'Sofia Reyes', title: 'Mechanical Engineer, NASA JPL', specialty: 'STEM Identity', rating: 88, tier: getRatingTier(88), bio: "Works with students who want to enter engineering but don't know where to start — builds their confidence and roadmap.", skills: ['STEM Foundation', 'College Apps', 'Research Projects'] },
-  { id: 'ec3', pathwayId: 'engineering', gender: 'male', name: 'Kevin Lin', title: 'Startup Founder, ex-Apple', specialty: 'Builder Mindset', rating: 83, tier: getRatingTier(83), bio: 'Built and shipped 3 products by age 25. Coaches students on going from idea to shipped project to portfolio-ready.', skills: ['Project Building', 'Prototyping', 'Entrepreneurial Engineering'] },
-  // Entrepreneurship
-  { id: 'en1', pathwayId: 'entrepreneurship', gender: 'female', name: 'Naomi Carter', title: 'Founder, Series A Startup', specialty: 'Business Building', rating: 92, tier: getRatingTier(92), bio: 'Raised $2M for her edtech startup. Coaches young founders through idea validation, MVP building, and early traction.', skills: ['Idea Validation', 'Fundraising', 'Team Building'] },
-  { id: 'en2', pathwayId: 'entrepreneurship', gender: 'male', name: 'Andre Williams', title: 'Small Business Owner', specialty: 'Practical Entrepreneurship', rating: 77, tier: getRatingTier(77), bio: 'Built a 7-figure local business from scratch. Specializes in the fundamentals — cash flow, customers, and consistency.', skills: ['Cash Flow', 'Marketing', 'Operations'] },
-  { id: 'en3', pathwayId: 'entrepreneurship', gender: 'female', name: 'Zara Ahmed', title: 'Product Manager, ex-Meta', specialty: 'Product Thinking', rating: 85, tier: getRatingTier(85), bio: 'Bridges the gap between engineering and business. Helps aspiring founders think like product builders, not just dreamers.', skills: ['Product Strategy', 'User Research', 'Go-to-Market'] },
-  // Global
-  { id: 'gl1', pathwayId: 'global', gender: 'male', name: 'Marcus Johnson', title: 'Foreign Policy Analyst', specialty: 'International Relations', rating: 89, tier: getRatingTier(89), bio: 'Works at a DC think tank. Coaches students navigating Model UN, policy papers, and careers in diplomacy and global affairs.', skills: ['Policy Writing', 'Diplomacy', 'Global Systems'] },
-  { id: 'gl2', pathwayId: 'global', gender: 'female', name: 'Amira Khalil', title: 'NGO Director', specialty: 'Social Impact', rating: 95, tier: getRatingTier(95), bio: 'Runs a global education NGO reaching 10,000+ students. Guides emerging leaders building movements and social enterprises.', skills: ['Leadership', 'Community Organizing', 'Impact Strategy'] },
-  { id: 'gl3', pathwayId: 'global', gender: 'male', name: 'David Mensah', title: 'UN Youth Delegate', specialty: 'Global Citizenship', rating: 80, tier: getRatingTier(80), bio: 'Selected as a UN Youth Delegate at 23. Helps students find their voice on global issues and develop a clear advocacy platform.', skills: ['Public Speaking', 'Advocacy', 'Research'] },
-];
-
-const COACH_AVAIL_OVERRIDES: Record<string, Partial<Pick<ExplorerCoach, 'acceptsShadowing' | 'shadowingCadenceMonths'>>> = {
-  dc3: { shadowingCadenceMonths: 6 },
-  hc3: { acceptsShadowing: false },
-  mc3: { shadowingCadenceMonths: 3 },
-  en2: { shadowingCadenceMonths: 6 },
-};
-
-const EXPLORER_COACHES: ExplorerCoach[] = RAW_COACHES.map(c => ({
-  ...c,
-  acceptsShadowing: COACH_AVAIL_OVERRIDES[c.id]?.acceptsShadowing ?? true,
-  shadowingCadenceMonths: COACH_AVAIL_OVERRIDES[c.id]?.shadowingCadenceMonths ?? 1,
-  varsityMonthlyPrice: varsityPriceFromRating(c.rating),
-}));
+// ─── EXPLORER COACHES (loaded from Supabase) ─────────────────────────────────
 
 const TIER_COLORS: Record<string, string> = { Bronze: '#cd7f32', Silver: '#A8A8A8', Gold: '#F5C842', Platinum: '#a855f7' };
 
@@ -804,13 +740,18 @@ function CoachCardModal({
 }
 
 function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any) => void; onPlanChange?: (plan: MembershipPlan) => void }) {
+  const { user, isAdmin } = useAuth();
+  const { coaches: discoverableCoaches, loading: coachesLoading } = useDiscoverableCoaches();
+  const matchedCoaches = useMemo(
+    () => discoverableCoaches.map(toExplorerCoachView),
+    [discoverableCoaches],
+  );
   const [usage, setUsage] = useState<ExplorerUsage>(getExplorerUsage);
   const [activeSection, setActiveSection] = useState<WalkOnSection>('explore');
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
   const [selectedCoach, setSelectedCoach] = useState<ExplorerCoach | null>(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [membershipPlan, setMembershipPlan] = useState<MembershipPlan>(getUserPlan);
-  const [playerGender, setPlayerGender] = useState<UserGender | null>(getUserGender);
   const [currentPathwayId, setCurrentPathwayId] = useState(() => getActivePathway(getUserPlan()));
   const [showLockConfirm, setShowLockConfirm] = useState(false);
   const [showChangeRequest, setShowChangeRequest] = useState(false);
@@ -820,6 +761,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const [pendingUpgradePlan, setPendingUpgradePlan] = useState<MembershipPlan>('locker-room');
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialScope, setTutorialScope] = useState<PlayerTutorialScope>('walk-on');
+  const [showTryOutBooking, setShowTryOutBooking] = useState(false);
 
   const explorerTutorialSteps = getPlayerTutorialSteps(tutorialScope);
 
@@ -833,6 +775,13 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     const timer = window.setTimeout(() => setShowTutorial(true), 300);
     return () => window.clearTimeout(timer);
   }, [membershipPlan]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    void fetchDbExplorerUsage(user.id)
+      .then(setUsage)
+      .catch((err) => console.error('Failed to load explorer usage:', err));
+  }, [user?.id]);
 
   useEffect(() => {
     const initial = localStorage.getItem('iso_portal_initial_section');
@@ -866,11 +815,6 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
   const lockedPathwayId = getLockedPathway() || currentPathwayId || getExploringPathway() || null;
   const hasLockerRoomPriority = membershipPlan === 'locker-room';
   const hasLockerRoomAccess = canAccessLockerRoomChat(membershipPlan);
-
-  const matchedCoaches = useMemo(
-    () => filterByGender(EXPLORER_COACHES, playerGender),
-    [playerGender],
-  );
 
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
@@ -917,7 +861,36 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     if (plan === 'locker-room') setActiveSection('explore');
   };
 
-  const saveUsage = (u: ExplorerUsage) => { setUsage(u); saveExplorerUsage(u); };
+  const saveUsage = (u: ExplorerUsage) => {
+    setUsage(u);
+    if (user?.id) {
+      void saveDbExplorerUsage(user.id, u).catch((err) => console.error('Failed to save usage:', err));
+    } else {
+      saveLocalExplorerUsage(u);
+    }
+  };
+
+  const handleResetTryouts = async () => {
+    if (!user?.id) return;
+    try {
+      await resetExplorerUsage(user.id);
+      saveLocalExplorerUsage({
+        pathwayChats: {},
+        coachChats: [],
+        shadowUsedThisMonth: false,
+        lastReset: new Date().toISOString().slice(0, 7),
+      });
+      setUsage({
+        pathwayChats: {},
+        coachChats: [],
+        shadowUsedThisMonth: false,
+        lastReset: new Date().toISOString().slice(0, 7),
+      });
+    } catch (err) {
+      console.error('Failed to reset try-outs:', err);
+      alert(err instanceof Error ? err.message : 'Could not reset try-outs');
+    }
+  };
 
   const coachChatUsed = (coach: ExplorerCoach) =>
     membershipPlan === 'locker-room'
@@ -1071,7 +1044,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', borderRadius: 12, padding: '14px 20px', marginBottom: 24 }}>
               <Zap size={16} style={{ color: '#f97316', flexShrink: 0 }} />
-              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+              <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0, flex: 1 }}>
                 <strong style={{ color: 'white' }}>{PLAN_LABELS[membershipPlan]}:</strong>{' '}
                 {membershipPlan === 'locker-room'
                   ? `${discoveryCallsRemaining(membershipPlan, usage)} of ${LOCKER_ROOM_MONTHLY_CALLS} try outs left · different coaches only · ${TRYOUT_MINUTES} min each.`
@@ -1081,13 +1054,16 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                 {membershipPlan === 'walk-on' && ' No online merch — grab gear at in-person ISO events.'}
                 {hasLockerRoomPriority && ' Loved your try out? Call an ISO to upgrade to the ISO Pass.'}
               </p>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => void handleResetTryouts()}
+                  style={{ flexShrink: 0, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '6px 12px', color: 'rgba(255,255,255,0.6)', fontFamily: "'Barlow', sans-serif", fontSize: 11, cursor: 'pointer', whiteSpace: 'nowrap' as const }}
+                >
+                  Reset try-outs
+                </button>
+              )}
             </div>
-            {!playerGender && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: 12, padding: '14px 20px', marginBottom: 24 }}>
-                <AlertCircle size={16} style={{ color: '#3b82f6', flexShrink: 0 }} />
-                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Set your gender in My Profile to see matched coaches.</p>
-              </div>
-            )}
             <div style={{ marginBottom: 32 }}>
               <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 34, margin: '0 0 6px', letterSpacing: 1 }}>Explore Pathways</h2>
               <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: 0 }}>1 try out per pathway · Shadowing unlocks after your try out (if coach allows)</p>
@@ -1166,14 +1142,17 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
                 </div>
               </div>
             </div>
-            {explorePathwayCoaches.length === 0 ? (
+            {coachesLoading ? (
+              <div style={{ padding: 48, textAlign: 'center' as const, color: 'rgba(255,255,255,0.4)', fontFamily: "'Barlow', sans-serif" }}>
+                Loading coaches…
+              </div>
+            ) : explorePathwayCoaches.length === 0 ? (
               <div style={{ padding: 48, textAlign: 'center' as const, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16 }}>
                 <Users size={32} style={{ color: 'rgba(255,255,255,0.2)', marginBottom: 12 }} />
                 <h3 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, margin: '0 0 8px' }}>No Coaches Available</h3>
                 <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 20px' }}>
-                  {!playerGender ? 'Complete your profile with your gender to see matched coaches.' : 'No coaches match your profile for this pathway.'}
+                  No coaches are available for this pathway yet. Check back as new coaches complete onboarding.
                 </p>
-                {!playerGender && <button onClick={() => setActiveSection('profile')} style={{ background: exploreHex, color: '#fff', border: 'none', borderRadius: 100, padding: '10px 24px', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 2, cursor: 'pointer' }}>COMPLETE PROFILE</button>}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1331,9 +1310,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
             canShadow={shadow.canShadow}
             shadowBlockedReason={shadow.reason}
             hasLockerRoomPriority={hasLockerRoomPriority}
-            onScheduleChat={() => {
-              saveUsage(recordCoachCall(usage, membershipPlan, selectedCoach.id, selectedCoach.pathwayId));
-            }}
+            onScheduleChat={() => setShowTryOutBooking(true)}
             onScheduleShadow={() => { saveUsage({ ...usage, shadowUsedThisMonth: true }); }}
             onRequestVarsity={() => {
               setVarsityInterestCoach(selectedCoach);
@@ -1344,6 +1321,23 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           />
         );
       })()}
+
+      {showTryOutBooking && selectedCoach && (
+        <ConsultationModal
+          coachName={selectedCoach.name}
+          coachId={selectedCoach.id}
+          categoryId={selectedCoach.pathwayId}
+          onClose={() => setShowTryOutBooking(false)}
+          onScheduleComplete={() => {
+            setShowTryOutBooking(false);
+            if (user?.id) {
+              void fetchDbExplorerUsage(user.id)
+                .then(setUsage)
+                .catch((err) => console.error('Failed to refresh usage:', err));
+            }
+          }}
+        />
+      )}
 
       {showLockerCheckout && (
         <LockerRoomCheckoutModal

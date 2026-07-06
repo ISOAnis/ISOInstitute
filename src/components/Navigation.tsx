@@ -2,6 +2,8 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { PortalSignOutModal } from "./PortalSignOutModal";
+import { useAuth } from "../contexts/AuthContext";
+import { markJoinAddRoleIntent } from "../utils/portalRouting";
 
 type Page =
   | "home"
@@ -15,11 +17,6 @@ type Page =
   | "for-coaches"
   | "join";
 type UserRole = "coach" | "player" | "community-leader";
-
-interface User {
-  email: string;
-  roles: UserRole[];
-}
 
 interface NavigationProps {
   onOpenCommunityPortal?: () => void;
@@ -35,16 +32,21 @@ interface NavigationProps {
   ) => void;
 }
 
-const STORAGE_KEY = "iso_demo_user";
-const STORAGE_PORTAL_KEY = "iso_demo_portal";
-
 export function Navigation({
   onOpenCommunityPortal,
   currentPage,
   onNavigate,
   onPlayerStatusChange,
 }: NavigationProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const {
+    isLoggedIn,
+    isPlayerOnboarded,
+    isCoachOnboarded,
+    profile,
+    signOut,
+    switchPortalRole,
+  } = useAuth();
+
   const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [pendingPortalType, setPendingPortalType] = useState<
@@ -52,7 +54,7 @@ export function Navigation({
   >(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [isOnboarded, setIsOnboarded] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -62,66 +64,19 @@ export function Navigation({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Load saved user state from localStorage on mount and sync with changes
-  useEffect(() => {
-    const checkUserState = () => {
-      try {
-        const savedUser = localStorage.getItem(STORAGE_KEY);
-
-        if (savedUser) {
-          const parsedUser = JSON.parse(savedUser);
-          setUser(parsedUser);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Failed to load saved user state:", error);
-        setUser(null);
-      }
-    };
-
-    // Check on mount
-    checkUserState();
-
-    // Listen for storage events (from other tabs/windows)
-    window.addEventListener("storage", checkUserState);
-
-    // Poll localStorage periodically to catch changes in the same tab
-    const interval = setInterval(checkUserState, 500);
-
-    return () => {
-      window.removeEventListener("storage", checkUserState);
-      clearInterval(interval);
-    };
-  }, []);
-
-  // Sync onboarding completion state
-  useEffect(() => {
-    const checkOnboarding = () => {
-      setIsOnboarded(!!localStorage.getItem("iso_onboarding_complete"));
-    };
-    checkOnboarding();
-    const interval = setInterval(checkOnboarding, 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLogout = () => {
-    setUser(null);
-    setIsOnboarded(false);
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(STORAGE_PORTAL_KEY);
-    localStorage.removeItem("iso_onboarding_complete");
-    localStorage.removeItem("iso_coach_pending");
-    localStorage.removeItem("iso_explorer");
-    localStorage.removeItem("iso-onboarding");
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+    }
     onNavigate("home");
   };
 
   const handleConfirmSignOut = () => {
-    handleLogout();
+    void handleLogout().then(() => onNavigate("join"));
     setShowSignOutModal(false);
     setPendingPortalType(null);
-    onNavigate("join");
   };
 
   const handleCancelSignOut = () => {
@@ -297,21 +252,22 @@ export function Navigation({
                   >
                     <button
                       onClick={() => {
-                        const savedPortal =
-                          localStorage.getItem(STORAGE_PORTAL_KEY);
-                        if (user && savedPortal === "coach") {
-                          onNavigate("coach-portal");
-                          setShowPortalDropdown(false);
-                        } else if (user && savedPortal === "player") {
-                          // User is logged in as player, show sign out modal
-                          setPendingPortalType("coach");
-                          setShowSignOutModal(true);
-                          setShowPortalDropdown(false);
-                        } else {
+                        const activeRole = profile?.active_role;
+                        if (!isLoggedIn) {
                           localStorage.setItem("iso_join_intent", "signin");
                           onNavigate("join");
                           setShowPortalDropdown(false);
+                          return;
                         }
+                        if (isCoachOnboarded || profile?.coach_application_status === "pending") {
+                          onNavigate("coach-portal");
+                        } else if (profile?.roles.includes("coach")) {
+                          void switchPortalRole("coach").then(() => onNavigate("coach-portal"));
+                        } else {
+                          if (isPlayerOnboarded) markJoinAddRoleIntent();
+                          onNavigate("join");
+                        }
+                        setShowPortalDropdown(false);
                       }}
                       onMouseEnter={() => setHoveredItem("coach-portal")}
                       onMouseLeave={() => setHoveredItem(null)}
@@ -338,20 +294,28 @@ export function Navigation({
                     </button>
                     <button
                       onClick={() => {
-                        const savedPortal =
-                          localStorage.getItem(STORAGE_PORTAL_KEY);
-                        if (user && savedPortal === "player") {
-                          onNavigate("player-portal");
-                          setShowPortalDropdown(false);
-                        } else if (user && savedPortal === "coach") {
-                          setPendingPortalType("player");
-                          setShowSignOutModal(true);
-                          setShowPortalDropdown(false);
-                        } else {
+                        const activeRole = profile?.active_role;
+                        if (!isLoggedIn) {
                           localStorage.setItem("iso_join_intent", "signin");
                           onNavigate("join");
                           setShowPortalDropdown(false);
+                          return;
                         }
+                        if (isPlayerOnboarded) {
+                          if (activeRole !== "player") {
+                            void switchPortalRole("player").then(() => onNavigate("player-portal"));
+                          } else {
+                            onNavigate("player-portal");
+                          }
+                        } else if (profile?.roles.includes("player")) {
+                          onNavigate("join");
+                        } else if (activeRole === "coach") {
+                          setPendingPortalType("player");
+                          setShowSignOutModal(true);
+                        } else {
+                          onNavigate("join");
+                        }
+                        setShowPortalDropdown(false);
                       }}
                       onMouseEnter={() => setHoveredItem("player-portal")}
                       onMouseLeave={() => setHoveredItem(null)}
@@ -394,12 +358,12 @@ export function Navigation({
 
               {/* Auth area — state-aware buttons */}
               {(() => {
-                const loggedIn = !!localStorage.getItem("iso_demo_user");
+                const isOnboarded = isPlayerOnboarded || isCoachOnboarded;
                 if (isOnboarded) {
                   // Fully onboarded — just sign out
                   return (
                     <button
-                      onClick={handleLogout}
+                      onClick={() => void handleLogout()}
                       onMouseEnter={() => setHoveredItem("signout")}
                       onMouseLeave={() => setHoveredItem(null)}
                       className="relative rounded-full font-semibold transition-all duration-200"
@@ -421,7 +385,7 @@ export function Navigation({
                       Sign Out
                     </button>
                   );
-                } else if (loggedIn) {
+                } else if (isLoggedIn) {
                   // Logged in but not onboarded — Onboard + Sign Out
                   return (
                     <div
@@ -461,7 +425,7 @@ export function Navigation({
                         Onboard
                       </button>
                       <button
-                        onClick={handleLogout}
+                        onClick={() => void handleLogout()}
                         onMouseEnter={() => setHoveredItem("signout")}
                         onMouseLeave={() => setHoveredItem(null)}
                         className="relative rounded-full font-semibold transition-all duration-200"
@@ -520,6 +484,9 @@ export function Navigation({
                       </button>
                       <button
                         onClick={() => {
+                          if (isLoggedIn && (isPlayerOnboarded || isCoachOnboarded)) {
+                            markJoinAddRoleIntent();
+                          }
                           localStorage.removeItem("iso_join_intent");
                           onNavigate("join");
                         }}
