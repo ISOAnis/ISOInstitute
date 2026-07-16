@@ -18,6 +18,11 @@ import {
   syncLegacyLocalStorage,
   updateActiveRole,
 } from '../services/profileService';
+import {
+  fetchPlayerPathway,
+  resolveDuePathwayChange,
+  setOwnPlan,
+} from '../services/pathwayService';
 import type { MembershipPlan, Profile, Subscription, UserRole } from '../types/database';
 
 interface AuthContextValue {
@@ -41,9 +46,34 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
   switchPortalRole: (role: UserRole) => Promise<void>;
   approveCoach: (coachUserId: string) => Promise<void>;
+  updatePlan: (plan: MembershipPlan) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+/** Mirror DB pathway state to the legacy localStorage keys the portals read. */
+async function syncPathwayState(userId: string) {
+  try {
+    // Auto-approve any pathway change past its 7-day window first.
+    await resolveDuePathwayChange().catch(() => null);
+
+    const pathway = await fetchPlayerPathway(userId);
+    if (!pathway) return;
+
+    if (pathway.locked_pathway_id) {
+      localStorage.setItem('iso_locked_pathway', pathway.locked_pathway_id);
+      localStorage.setItem('iso_selected_pathway', pathway.locked_pathway_id);
+    }
+    if (pathway.exploring_pathway_id) {
+      localStorage.setItem('iso_exploring_pathway', pathway.exploring_pathway_id);
+      if (!pathway.locked_pathway_id) {
+        localStorage.setItem('iso_selected_pathway', pathway.exploring_pathway_id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync pathway state:', error);
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -69,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(nextProfile);
       setSubscription(nextSubscription);
       syncLegacyLocalStorage(nextProfile, nextSubscription);
+      await syncPathwayState(userId);
     } catch (error) {
       console.error('Failed to load user profile:', error);
       setProfile(null);
@@ -175,6 +206,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await refreshProfile();
   }, [profile?.is_admin, refreshProfile, session?.user?.id]);
 
+  const updatePlan = useCallback(async (nextPlan: MembershipPlan) => {
+    if (!session?.user?.id) throw new Error('Not signed in');
+    await setOwnPlan(nextPlan);
+    const nextSubscription = await fetchSubscription(session.user.id);
+    setSubscription(nextSubscription);
+    if (profile) syncLegacyLocalStorage(profile, nextSubscription);
+  }, [profile, session?.user?.id]);
+
   const plan: MembershipPlan = subscription?.plan ?? 'walk-on';
   const isLoggedIn = !!session?.user;
   const isPlayerOnboarded = !!profile?.player_onboarding_complete;
@@ -207,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       switchPortalRole,
       approveCoach,
+      updatePlan,
     }),
     [
       session,
@@ -227,6 +267,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       switchPortalRole,
       approveCoach,
+      updatePlan,
     ],
   );
 

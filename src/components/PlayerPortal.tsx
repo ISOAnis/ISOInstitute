@@ -59,6 +59,7 @@ import {
   saveExplorerUsage as saveDbExplorerUsage,
   resetExplorerUsage,
 } from '../services/discoveryService';
+import { saveExploringPathway, saveLockedPathway } from '../services/pathwayService';
 import { type ExplorerCoachView as ExplorerCoach, toExplorerCoachView } from '../types/discoverableCoach';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
@@ -740,7 +741,7 @@ function CoachCardModal({
 }
 
 function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any) => void; onPlanChange?: (plan: MembershipPlan) => void }) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, updatePlan, plan: dbPlan, loading: authLoading } = useAuth();
   const { coaches: discoverableCoaches, loading: coachesLoading } = useDiscoverableCoaches();
   const matchedCoaches = useMemo(
     () => discoverableCoaches.map(toExplorerCoachView),
@@ -783,6 +784,16 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
       .catch((err) => console.error('Failed to load explorer usage:', err));
   }, [user?.id]);
 
+  // Keep portal plan in sync with the DB subscription once auth loads.
+  useEffect(() => {
+    if (!authLoading && dbPlan !== membershipPlan) {
+      setMembershipPlan(dbPlan);
+      setUserPlan(dbPlan);
+      onPlanChange?.(dbPlan);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, dbPlan]);
+
   useEffect(() => {
     const initial = localStorage.getItem('iso_portal_initial_section');
     if (initial === 'store') {
@@ -803,6 +814,10 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     const exploring = getExploringPathway();
     if (exploring) {
       lockPathway(exploring);
+      if (user?.id) {
+        void saveLockedPathway(user.id, exploring)
+          .catch((err) => console.error('Failed to persist locked pathway:', err));
+      }
       setCurrentPathwayId(exploring);
       setSelectedPathway(exploring);
       return;
@@ -820,6 +835,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     setUserPlan(plan);
     setMembershipPlan(plan);
     onPlanChange?.(plan);
+    void updatePlan(plan).catch((err) => console.error('Failed to persist plan:', err));
     if (plan === 'locker-room') setActiveSection('locker-room');
   };
 
@@ -913,6 +929,10 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     if (!pathwayIsLocked) {
       setCurrentPathwayId(pathwayId);
       setExploringPathway(pathwayId);
+      if (user?.id) {
+        void saveExploringPathway(user.id, pathwayId)
+          .catch((err) => console.error('Failed to persist exploring pathway:', err));
+      }
     }
     setSelectedPathway(pathwayId);
   };
@@ -1730,6 +1750,7 @@ function UpgradePrompt({
 
 // ─── MAIN PLAYER PORTAL ───────────────────────────────────────────────────────
 export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
+  const { plan: dbPlan, updatePlan, loading: authLoading } = useAuth();
   const [games, setGames] = useState<Game[]>(mockGames);
   const [activeSection, setActiveSection] = useState<PlayerSection>('dashboard');
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -1751,9 +1772,19 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
     }
   }, []);
 
+  // Keep portal plan in sync with the DB subscription once auth loads.
+  useEffect(() => {
+    if (!authLoading && dbPlan !== membershipPlan) {
+      setMembershipPlan(dbPlan);
+      setUserPlan(dbPlan);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, dbPlan]);
+
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
     setMembershipPlan(plan);
+    void updatePlan(plan).catch((err) => console.error('Failed to persist plan:', err));
   };
 
   const canAccessSection = (section: PlayerSection) => SECTIONS_BY_PLAN[membershipPlan].includes(section);

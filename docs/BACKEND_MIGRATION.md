@@ -108,8 +108,6 @@ supabase/scripts/reset_tryout_usage.sql
 
 ## What still uses mocks / localStorage
 
-- Membership plan (`iso_demo_plan`)
-- Pathway lock / explore state
 - Games & buckets
 - Coach–player chat
 - Locker Room chat & videos
@@ -140,6 +138,7 @@ Run in order:
 1. `supabase/migrations/001_initial_schema.sql`
 2. `supabase/migrations/002_profile_insert_policies.sql`
 3. `supabase/migrations/003_phase3_discovery.sql`
+4. `supabase/migrations/004_membership_and_pathways.sql`
 
 ---
 
@@ -154,9 +153,18 @@ Run in order:
 
 ---
 
+### Phase 4 — Membership & pathways in DB
+
+- **Migration 004** — `set_own_plan` RPC (temporary self-service plan change until Stripe), `resolve_due_pathway_change` (7-day auto-approve), `review_pathway_change` (admin approve/deny)
+- `src/services/pathwayService.ts` — pathway + plan reads/writes against Supabase
+- `AuthContext` — `updatePlan()`; syncs DB pathway state to legacy localStorage keys on login; resolves due pathway changes automatically
+- Plan upgrades in PlayerPortal / PathwayLockConfirmModal persist to `subscriptions`
+- Exploring + locked pathways persist to `player_pathways`
+- Pathway change requests go to `pathway_change_requests` with real 7-day auto-approve; admin can approve immediately
+
 ## Next planned phase
 
-**Phase 4** — Wire `subscriptions` and `player_pathways` from Supabase instead of localStorage, so plan and pathway lock are real in the database.
+**Phase 5** — Games & buckets: coach creates games/buckets per player, progress persists in Supabase (core varsity coaching loop).
 
 ---
 

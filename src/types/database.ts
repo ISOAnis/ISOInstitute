@@ -89,6 +89,27 @@ export interface PathwayChangeRequest {
   resolved_at: string | null;
 }
 
+export interface DiscoveryBooking {
+  id: string;
+  player_id: string;
+  coach_id: string;
+  pathway_id: string;
+  plan: MembershipPlan;
+  scheduled_at: string;
+  duration_minutes: number;
+  status: 'scheduled' | 'completed' | 'canceled' | 'no_show';
+  created_at: string;
+}
+
+export interface UsageCounter {
+  user_id: string;
+  month: string;
+  pathway_chats: Record<string, boolean>;
+  coach_chat_ids: string[];
+  shadow_used: boolean;
+  updated_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -139,9 +160,40 @@ export type Database = {
         Update: Partial<PathwayChangeRequest>;
         Relationships: [];
       };
+      discovery_bookings: {
+        Row: DiscoveryBooking;
+        Insert: Partial<DiscoveryBooking> & {
+          player_id: string;
+          coach_id: string;
+          pathway_id: string;
+          plan: MembershipPlan;
+          scheduled_at: string;
+        };
+        Update: Partial<DiscoveryBooking>;
+        Relationships: [];
+      };
+      usage_counters: {
+        Row: UsageCounter;
+        Insert: Partial<UsageCounter> & { user_id: string; month: string };
+        Update: Partial<UsageCounter>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      set_own_plan: {
+        Args: { new_plan: MembershipPlan };
+        Returns: undefined;
+      };
+      resolve_due_pathway_change: {
+        Args: Record<string, never>;
+        Returns: string | null;
+      };
+      review_pathway_change: {
+        Args: { request_id: string; decision: 'approved' | 'denied' };
+        Returns: undefined;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

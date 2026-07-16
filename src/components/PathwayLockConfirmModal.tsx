@@ -4,6 +4,8 @@ import { X, Lock } from 'lucide-react';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
 import { lockPathway, setUserPlan, getExploringPathway, type MembershipPlan } from '../utils/membership';
 import { LOCKER_ROOM_PRICE_USD } from '../utils/explorerUsage';
+import { useAuth } from '../contexts/AuthContext';
+import { saveLockedPathway } from '../services/pathwayService';
 
 const PATHWAY_HEX: Record<string, string> = {
   deen: '#10b981', health: '#ef4444', medicine: '#3b82f6',
@@ -17,15 +19,30 @@ interface PathwayLockConfirmModalProps {
 }
 
 export function PathwayLockConfirmModal({ onClose, onConfirmed, targetPlan = 'locker-room' }: PathwayLockConfirmModalProps) {
+  const { user, updatePlan } = useAuth();
   const exploring = getExploringPathway();
   const [selected, setSelected] = useState(exploring || PATHWAYS[0].id);
+  const [saving, setSaving] = useState(false);
   const hex = PATHWAY_HEX[selected] ?? '#f97316';
   const name = PATHWAY_BY_ID[selected as keyof typeof PATHWAY_BY_ID]?.name ?? selected;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (saving) return;
+    setSaving(true);
+    // Local state first so the portal updates immediately even if DB write fails.
     lockPathway(selected);
     setUserPlan(targetPlan);
-    onConfirmed(targetPlan);
+    try {
+      if (user?.id) {
+        await saveLockedPathway(user.id, selected);
+        await updatePlan(targetPlan);
+      }
+    } catch (err) {
+      console.error('Failed to persist pathway lock/plan:', err);
+    } finally {
+      setSaving(false);
+      onConfirmed(targetPlan);
+    }
   };
 
   return (
@@ -56,8 +73,8 @@ export function PathwayLockConfirmModal({ onClose, onConfirmed, targetPlan = 'lo
             You're joining {targetPlan === 'varsity' ? 'ISO Pass' : 'Locker Room'} as a <strong style={{ color: hex }}>{name}</strong> member{targetPlan === 'locker-room' ? ` · $${LOCKER_ROOM_PRICE_USD}/mo` : ''}
           </p>
         </div>
-        <button onClick={handleConfirm} style={{ width: '100%', background: '#f97316', color: '#fff', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2, cursor: 'pointer' }}>
-          CONFIRM & JOIN {targetPlan === 'varsity' ? 'ISO PASS' : 'LOCKER ROOM'}
+        <button onClick={() => void handleConfirm()} disabled={saving} style={{ width: '100%', background: saving ? 'rgba(249,115,22,0.5)' : '#f97316', color: '#fff', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: 2, cursor: saving ? 'wait' : 'pointer' }}>
+          {saving ? 'SAVING…' : `CONFIRM & JOIN ${targetPlan === 'varsity' ? 'ISO PASS' : 'LOCKER ROOM'}`}
         </button>
       </div>
     </div>

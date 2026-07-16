@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Lock, Send, CheckCircle2 } from 'lucide-react';
 import { PATHWAYS, PATHWAY_BY_ID } from '../data/pathways';
+import { getLockedPathway } from '../utils/membership';
+import { useAuth } from '../contexts/AuthContext';
 import {
-  getLockedPathway,
-  getPathwayChangeRequest,
-  submitPathwayChangeRequest,
-  approvePathwayChangeRequest,
-  type PathwayChangeRequest,
-} from '../utils/membership';
+  fetchPendingPathwayChange,
+  reviewPathwayChange,
+  submitPathwayChange,
+} from '../services/pathwayService';
+import type { PathwayChangeRequest } from '../types/database';
 
 const PATHWAY_HEX: Record<string, string> = {
   deen: '#10b981', health: '#ef4444', medicine: '#3b82f6',
@@ -21,32 +22,71 @@ interface PathwayChangeRequestModalProps {
 }
 
 export function PathwayChangeRequestModal({ onClose, onPathwayChanged }: PathwayChangeRequestModalProps) {
+  const { user, isAdmin } = useAuth();
   const lockedPathway = getLockedPathway() || '';
-  const existing = getPathwayChangeRequest();
   const [requestedPathway, setRequestedPathway] = useState('');
   const [justification, setJustification] = useState('');
-  const [submitted, setSubmitted] = useState<PathwayChangeRequest | null>(existing?.status === 'pending' ? existing : null);
-  const [approved, setApproved] = useState(existing?.status === 'approved');
+  const [submitted, setSubmitted] = useState<PathwayChangeRequest | null>(null);
+  const [approved, setApproved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    void fetchPendingPathwayChange(user.id)
+      .then((req) => { if (!cancelled) setSubmitted(req); })
+      .catch((err) => console.error('Failed to load pathway change request:', err))
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const currentName = PATHWAY_BY_ID[lockedPathway as keyof typeof PATHWAY_BY_ID]?.name ?? lockedPathway;
   const lockedHex = PATHWAY_HEX[lockedPathway] ?? '#f97316';
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!requestedPathway || requestedPathway === lockedPathway) return;
     if (justification.trim().length < 20) return;
-    const req = submitPathwayChangeRequest(lockedPathway, requestedPathway, justification.trim());
-    setSubmitted(req);
-  };
-
-  const handleDemoApprove = () => {
-    if (approvePathwayChangeRequest()) {
-      const req = getPathwayChangeRequest();
-      if (req?.status === 'approved') {
-        setApproved(true);
-        onPathwayChanged(req.requestedPathway);
-      }
+    if (!user?.id) {
+      setError('Please sign in to submit a request.');
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const req = await submitPathwayChange(user.id, lockedPathway, requestedPathway, justification.trim());
+      setSubmitted(req);
+    } catch (err) {
+      console.error('Failed to submit pathway change:', err);
+      setError(err instanceof Error ? err.message : 'Could not submit request');
+    } finally {
+      setSaving(false);
     }
   };
+
+  const handleAdminApprove = async () => {
+    if (!submitted) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await reviewPathwayChange(submitted.id, 'approved');
+      setApproved(true);
+      onPathwayChanged(submitted.requested_pathway);
+    } catch (err) {
+      console.error('Failed to approve pathway change:', err);
+      setError(err instanceof Error ? err.message : 'Could not approve request');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const autoApproveDate = submitted
+    ? new Date(submitted.auto_approve_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : null;
 
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
@@ -61,7 +101,9 @@ export function PathwayChangeRequestModal({ onClose, onPathwayChanged }: Pathway
           </button>
         </div>
 
-        {approved ? (
+        {loading ? (
+          <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '20px 0' }}>Loading…</p>
+        ) : approved ? (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
             <CheckCircle2 size={40} style={{ color: '#22c55e', marginBottom: 12 }} />
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 15, color: 'rgba(255,255,255,0.7)', margin: '0 0 20px' }}>
@@ -76,21 +118,22 @@ export function PathwayChangeRequestModal({ onClose, onPathwayChanged }: Pathway
                 Request submitted — pending ISO Advisory Board review.
               </p>
               <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
-                {currentName} → {PATHWAY_BY_ID[submitted.requestedPathway as keyof typeof PATHWAY_BY_ID]?.name}
+                {currentName} → {PATHWAY_BY_ID[submitted.requested_pathway as keyof typeof PATHWAY_BY_ID]?.name}
+                {autoApproveDate && ` · auto-approves ${autoApproveDate} if not reviewed`}
               </p>
             </div>
-            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 16 }}>
-              Demo: simulate advisory board approval below.
-            </p>
-            <button onClick={handleDemoApprove} style={{ width: '100%', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', borderRadius: 10, padding: '12px 0', color: '#22c55e', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: 'pointer', marginBottom: 10 }}>
-              SIMULATE ADVISORY APPROVAL (DEMO)
-            </button>
+            {isAdmin && (
+              <button onClick={() => void handleAdminApprove()} disabled={saving} style={{ width: '100%', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', borderRadius: 10, padding: '12px 0', color: '#22c55e', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 1, cursor: saving ? 'wait' : 'pointer', marginBottom: 10 }}>
+                {saving ? 'APPROVING…' : 'APPROVE NOW (ADMIN)'}
+              </button>
+            )}
+            {error && <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: '#ef4444', margin: '0 0 10px' }}>{error}</p>}
             <button onClick={onClose} style={{ width: '100%', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '10px 0', color: 'rgba(255,255,255,0.5)', fontFamily: "'Barlow', sans-serif", fontSize: 13, cursor: 'pointer' }}>Close</button>
           </div>
         ) : (
           <>
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.6 }}>
-              You're locked to <strong style={{ color: lockedHex }}>{currentName}</strong>. Locker Room members stay in one pathway for community identity and goal setting. Submit a request with justification to switch.
+              You're locked to <strong style={{ color: lockedHex }}>{currentName}</strong>. Locker Room members stay in one pathway for community identity and goal setting. Submit a request with justification to switch — it auto-approves after 7 days if the board doesn't respond.
             </p>
             <label style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Request New Pathway</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 20 }}>
@@ -108,12 +151,13 @@ export function PathwayChangeRequestModal({ onClose, onPathwayChanged }: Pathway
               rows={4}
               style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 14px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 14, resize: 'vertical', outline: 'none', marginBottom: 20, boxSizing: 'border-box' }}
             />
+            {error && <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 12, color: '#ef4444', margin: '0 0 10px' }}>{error}</p>}
             <button
-              onClick={handleSubmit}
-              disabled={!requestedPathway || justification.trim().length < 20}
-              style={{ width: '100%', background: requestedPathway && justification.trim().length >= 20 ? lockedHex : 'rgba(255,255,255,0.08)', color: requestedPathway && justification.trim().length >= 20 ? '#fff' : 'rgba(255,255,255,0.25)', border: 'none', borderRadius: 10, padding: '13px 0', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: requestedPathway && justification.trim().length >= 20 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              onClick={() => void handleSubmit()}
+              disabled={!requestedPathway || justification.trim().length < 20 || saving}
+              style={{ width: '100%', background: requestedPathway && justification.trim().length >= 20 && !saving ? lockedHex : 'rgba(255,255,255,0.08)', color: requestedPathway && justification.trim().length >= 20 && !saving ? '#fff' : 'rgba(255,255,255,0.25)', border: 'none', borderRadius: 10, padding: '13px 0', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 2, cursor: requestedPathway && justification.trim().length >= 20 && !saving ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
-              <Send size={14} /> SUBMIT TO ADVISORY BOARD
+              <Send size={14} /> {saving ? 'SUBMITTING…' : 'SUBMIT TO ADVISORY BOARD'}
             </button>
           </>
         )}
