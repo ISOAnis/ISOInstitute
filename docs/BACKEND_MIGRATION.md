@@ -82,6 +82,9 @@ The app started as a **demo/prototype**. Login was fake, and most data lived in 
 | `discovery_bookings` | Scheduled try-out sessions |
 | `usage_counters` | Monthly try-out limits per user |
 | `discoverable_coaches` | View of approved, visible coaches |
+| `games` | Coach-assigned goals per player |
+| `buckets` | Tasks inside a game (`open` → `pending_approval` → `approved`) |
+| `bucket_comments` | Coach feedback on buckets |
 
 ---
 
@@ -108,7 +111,6 @@ supabase/scripts/reset_tryout_usage.sql
 
 ## What still uses mocks / localStorage
 
-- Games & buckets
 - Coach–player chat
 - Locker Room chat & videos
 - ISO Community forum
@@ -139,6 +141,7 @@ Run in order:
 2. `supabase/migrations/002_profile_insert_policies.sql`
 3. `supabase/migrations/003_phase3_discovery.sql`
 4. `supabase/migrations/004_membership_and_pathways.sql`
+5. `supabase/migrations/005_games_and_buckets.sql`
 
 ---
 
@@ -162,9 +165,17 @@ Run in order:
 - Exploring + locked pathways persist to `player_pathways`
 - Pathway change requests go to `pathway_change_requests` with real 7-day auto-approve; admin can approve immediately
 
+### Phase 5 — Games & buckets in DB
+
+- **Migration 005** — `games`, `buckets`, `bucket_comments` tables + RLS; `get_coach_roster()` RPC (players who booked a try-out with the coach or already have games)
+- `src/services/gamesService.ts` — fetch/create games, add buckets, player mark-done, coach approve, comments
+- **PlayerPortal** — logged-in players load real games; checking a bucket sets `pending_approval` in DB (game only "won" when the coach approves everything); guests keep the demo data
+- **CoachPortal** — "My Players" roster comes from the DB for logged-in coaches; New Game, new **Add Bucket** form, Approve Completion, and comments all persist
+- Bucket lifecycle enforced by RLS: players can only flip between `open`/`pending_approval`; only the coach can approve
+
 ## Next planned phase
 
-**Phase 5** — Games & buckets: coach creates games/buckets per player, progress persists in Supabase (core varsity coaching loop).
+**Phase 6** — Messaging (coach–player chat) or AI matching / varsity pairing — pick based on priority.
 
 ---
 
@@ -200,9 +211,10 @@ The club remembers how many try-outs you used this month so you can’t book unl
 
 ### What’s still pretend
 
-- Picking your paid plan (Walk-On → Locker Room) — still mostly sticky notes
-- Games, homework buckets, chat, forum, store — still toy versions
+- Chat, forum, store — still toy versions
 - Paying with money (Stripe) — not hooked up yet
+
+*(Since this was written: picking your plan, choosing your pathway, and the coach's games & buckets homework board are now all saved in the filing cabinet too.)*
 
 ### Simple picture
 

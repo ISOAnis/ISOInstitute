@@ -60,6 +60,11 @@ import {
   resetExplorerUsage,
 } from '../services/discoveryService';
 import { saveExploringPathway, saveLockedPathway } from '../services/pathwayService';
+import {
+  fetchGamesForPlayer,
+  setBucketStatus,
+  type GameWithBuckets,
+} from '../services/gamesService';
 import { type ExplorerCoachView as ExplorerCoach, toExplorerCoachView } from '../types/discoverableCoach';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
@@ -126,6 +131,23 @@ const mockGames: Game[] = [
     ],
   },
 ];
+
+/** Map a Supabase game row (with buckets) to the portal's UI shape. */
+function dbGameToUiGame(game: GameWithBuckets): Game {
+  return {
+    id: game.id,
+    title: game.title,
+    completed: game.completed,
+    completedDate: game.completed_at ? game.completed_at.split('T')[0] : undefined,
+    buckets: game.buckets.map((b) => ({
+      id: b.id,
+      title: b.title,
+      description: b.description ?? '',
+      completed: b.status !== 'open',
+      dueDate: b.due_date ?? undefined,
+    })),
+  };
+}
 
 // ─── SKILL TREE DATA ──────────────────────────────────────────────────────────
 // Diamond connection graph — same topology for every pathway
@@ -1537,10 +1559,12 @@ function DashboardView({
 // ─── PROGRESS VIEW ────────────────────────────────────────────────────────────
 function ProgressView({
   games, setGames, gamesWon, totalBuckets, bucketsScored, winPercentage, accentColor, showTierBar,
+  onPersistBucketToggle,
 }: {
   games: Game[]; setGames: (g: Game[]) => void;
   gamesWon: number; totalBuckets: number; bucketsScored: number; winPercentage: number;
   accentColor: string; showTierBar: boolean;
+  onPersistBucketToggle?: (bucketId: string, completed: boolean) => void;
 }) {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const overallProgress = Math.min(100, (gamesWon / 15) * 100);
@@ -1555,9 +1579,16 @@ function ProgressView({
   }, [gamesWon]);
 
   const toggleBucket = (gameId: string, bucketId: string) => {
+    const targetBucket = games.find(g => g.id === gameId)?.buckets.find(b => b.id === bucketId);
+    if (targetBucket) onPersistBucketToggle?.(bucketId, !targetBucket.completed);
+
     setGames(games.map(game => {
       if (game.id !== gameId) return game;
       const updatedBuckets = game.buckets.map(b => b.id === bucketId ? { ...b, completed: !b.completed } : b);
+      if (onPersistBucketToggle) {
+        // DB mode: the game is only "won" once the coach approves every bucket.
+        return { ...game, buckets: updatedBuckets };
+      }
       const allDone = updatedBuckets.every(b => b.completed);
       return { ...game, buckets: updatedBuckets, completed: allDone, completedDate: allDone ? new Date().toISOString().split('T')[0] : game.completedDate };
     }));
@@ -1750,7 +1781,7 @@ function UpgradePrompt({
 
 // ─── MAIN PLAYER PORTAL ───────────────────────────────────────────────────────
 export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
-  const { plan: dbPlan, updatePlan, loading: authLoading } = useAuth();
+  const { user, plan: dbPlan, updatePlan, loading: authLoading } = useAuth();
   const [games, setGames] = useState<Game[]>(mockGames);
   const [activeSection, setActiveSection] = useState<PlayerSection>('dashboard');
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -1780,6 +1811,26 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, dbPlan]);
+
+  // Logged-in players get their real games from the DB; guests keep the demo set.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    fetchGamesForPlayer(user.id)
+      .then((rows) => {
+        if (!cancelled) setGames(rows.map(dbGameToUiGame));
+      })
+      .catch((err) => console.error('Failed to load games:', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  // Marking a bucket done sends it to the coach for approval.
+  const persistBucketToggle = user
+    ? (bucketId: string, completed: boolean) => {
+        void setBucketStatus(bucketId, completed ? 'pending_approval' : 'open')
+          .catch((err) => console.error('Failed to save bucket:', err));
+      }
+    : undefined;
 
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
@@ -1934,6 +1985,7 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
                 gamesWon={gamesWon} totalBuckets={totalBuckets}
                 bucketsScored={bucketsScored} winPercentage={winPercentage}
                 accentColor={accentColor} showTierBar={showTierBar}
+                onPersistBucketToggle={persistBucketToggle}
               />
             : <UpgradePrompt targetPlan="locker-room" accentColor={accentColor} onUpgrade={() => handleUpgrade('locker-room')} onBack={() => setActiveSection('dashboard')} />
         )}

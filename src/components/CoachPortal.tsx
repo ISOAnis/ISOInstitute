@@ -28,6 +28,19 @@ import {
   type CoachCardDisplay, type CoachIdentity,
 } from '../utils/coachProfile';
 import { loadPhotoFrame, type CoachPhotoFrame } from '../utils/coachPhotoStorage';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  addBucket as addBucketDb,
+  addBucketComment,
+  approveBucket as approveBucketDb,
+  createGame,
+  fetchCoachRoster,
+  fetchGamesForPlayer,
+  type BucketWithComments,
+  type GameWithBuckets,
+} from '../services/gamesService';
+import { getPathwayName } from '../data/pathways';
+import type { CoachRosterEntry } from '../types/database';
 
 // ─── TYPES & MOCK DATA ────────────────────────────────────────────────────────
 
@@ -161,6 +174,50 @@ const mockPlayers: Player[] = [
     ],
   },
 ];
+
+// ─── DB → UI MAPPING ──────────────────────────────────────────────────────────
+function dbBucketToUi(bucket: BucketWithComments): Bucket {
+  return {
+    id: bucket.id,
+    title: bucket.title,
+    description: bucket.description ?? '',
+    completed: bucket.status !== 'open',
+    dueDate: bucket.due_date ?? undefined,
+    coachApproved: bucket.status === 'approved',
+    pendingApproval: bucket.status === 'pending_approval',
+    comments: bucket.comments.map((c) => ({
+      id: c.id,
+      text: c.body,
+      createdAt: c.created_at,
+      coachName: c.author_name,
+    })),
+  };
+}
+
+function dbGameToUi(game: GameWithBuckets): Game {
+  return {
+    id: game.id,
+    title: game.title,
+    description: game.description ?? undefined,
+    completed: game.completed,
+    completedDate: game.completed_at ? game.completed_at.split('T')[0] : undefined,
+    buckets: game.buckets.map(dbBucketToUi),
+  };
+}
+
+function rosterEntryToPlayer(entry: CoachRosterEntry, games: GameWithBuckets[]): Player {
+  const name = [entry.first_name, entry.last_name].filter(Boolean).join(' ') || entry.email;
+  return {
+    id: entry.player_id,
+    name,
+    email: entry.email,
+    category: entry.pathway_id ? getPathwayName(entry.pathway_id) : 'Exploring pathways',
+    categoryIcon: Moon,
+    joinedDate: entry.joined_at,
+    games: games.map(dbGameToUi),
+    avatar: entry.avatar_url ?? undefined,
+  };
+}
 
 const NAV_H = 72;
 const SIDEBAR_W_EXPANDED = 220;
@@ -375,6 +432,8 @@ function CoachPlayersView({
   players, selectedPlayer, selectedGame, onSelectPlayer, onSelectGame,
   showNewGameForm, setShowNewGameForm, newGameTitle, setNewGameTitle,
   newGameDescription, setNewGameDescription, onAddGame,
+  newBucketGameId, setNewBucketGameId, newBucketTitle, setNewBucketTitle,
+  newBucketDescription, setNewBucketDescription, newBucketDueDate, setNewBucketDueDate, onAddBucket,
   editingComment, setEditingComment, commentText, setCommentText,
   onAddComment, onApprove,   onGoToMessages, accentColor,
 }: {
@@ -390,6 +449,15 @@ function CoachPlayersView({
   newGameDescription: string;
   setNewGameDescription: (v: string) => void;
   onAddGame: () => void;
+  newBucketGameId: string | null;
+  setNewBucketGameId: (v: string | null) => void;
+  newBucketTitle: string;
+  setNewBucketTitle: (v: string) => void;
+  newBucketDescription: string;
+  setNewBucketDescription: (v: string) => void;
+  newBucketDueDate: string;
+  setNewBucketDueDate: (v: string) => void;
+  onAddBucket: (gameId: string) => void;
   editingComment: string | null;
   setEditingComment: (v: string | null) => void;
   commentText: string;
@@ -414,6 +482,11 @@ function CoachPlayersView({
           <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: 2, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: 16 }}>
             Your Roster
           </div>
+          {players.length === 0 && (
+            <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+              No players yet. Players appear here after they book a try-out with you.
+            </p>
+          )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {players.map(player => {
               const stats = calculatePlayerStats(player);
@@ -674,6 +747,58 @@ function CoachPlayersView({
                                 </div>
                               ))}
                             </div>
+
+                            {newBucketGameId === game.id ? (
+                              <div style={{ marginTop: 14, padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600, color: '#F2F2F2', marginBottom: 10 }}>Add Bucket</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                  <input
+                                    type="text"
+                                    value={newBucketTitle}
+                                    onChange={e => setNewBucketTitle(e.target.value)}
+                                    placeholder="Bucket title"
+                                    style={{
+                                      width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                      borderRadius: 8, padding: '9px 12px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 13, outline: 'none', boxSizing: 'border-box',
+                                    }}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={newBucketDescription}
+                                    onChange={e => setNewBucketDescription(e.target.value)}
+                                    placeholder="Brief description"
+                                    style={{
+                                      width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                      borderRadius: 8, padding: '9px 12px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 13, outline: 'none', boxSizing: 'border-box',
+                                    }}
+                                  />
+                                  <input
+                                    type="date"
+                                    value={newBucketDueDate}
+                                    onChange={e => setNewBucketDueDate(e.target.value)}
+                                    style={{
+                                      width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                                      borderRadius: 8, padding: '9px 12px', color: '#fff', fontFamily: "'Barlow', sans-serif", fontSize: 13, outline: 'none', boxSizing: 'border-box',
+                                    }}
+                                  />
+                                  <div style={{ display: 'flex', gap: 8 }}>
+                                    <BtnPrimary onClick={() => onAddBucket(game.id)} small accentColor={accentColor}>Add Bucket</BtnPrimary>
+                                    <BtnGhost onClick={() => { setNewBucketGameId(null); setNewBucketTitle(''); setNewBucketDescription(''); setNewBucketDueDate(''); }} small>Cancel</BtnGhost>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setNewBucketGameId(game.id)}
+                                style={{
+                                  marginTop: 12, background: 'transparent', border: 'none', cursor: 'pointer',
+                                  display: 'flex', alignItems: 'center', gap: 6,
+                                  fontFamily: "'Barlow', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.4)',
+                                }}
+                              >
+                                <Plus size={12} /> Add bucket
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
@@ -781,15 +906,46 @@ function CoachMessagesView({
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 export function CoachPortal() {
+  const { user } = useAuth();
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(players[0]);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(mockPlayers[0]?.id ?? null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [newGameTitle, setNewGameTitle] = useState('');
   const [newGameDescription, setNewGameDescription] = useState('');
   const [showNewGameForm, setShowNewGameForm] = useState(false);
-  const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(players[0]);
+  const [newBucketGameId, setNewBucketGameId] = useState<string | null>(null);
+  const [newBucketTitle, setNewBucketTitle] = useState('');
+  const [newBucketDescription, setNewBucketDescription] = useState('');
+  const [newBucketDueDate, setNewBucketDueDate] = useState('');
+  const [selectedPlayerForChat, setSelectedPlayerForChat] = useState<Player | null>(mockPlayers[0]);
+
+  const selectedPlayer = players.find(p => p.id === selectedPlayerId) ?? null;
+
+  // Logged-in coaches see their real roster (try-out bookings + assigned games).
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const roster = await fetchCoachRoster();
+        const withGames = await Promise.all(
+          roster.map(async (entry) =>
+            rosterEntryToPlayer(entry, await fetchGamesForPlayer(entry.player_id)),
+          ),
+        );
+        if (cancelled) return;
+        setPlayers(withGames);
+        setSelectedPlayerId(withGames[0]?.id ?? null);
+        setSelectedPlayerForChat(withGames[0] ?? null);
+      } catch (err) {
+        console.error('Failed to load roster:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
   const [showTutorial, setShowTutorial] = useState(false);
   const [highlightProfileGaps, setHighlightProfileGaps] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(() => {
@@ -855,6 +1011,10 @@ export function CoachPortal() {
       id: `c-${Date.now()}`, text: commentText,
       createdAt: new Date().toISOString(), coachName: currentCoach.name,
     };
+    if (user) {
+      void addBucketComment(bucketId, user.id, currentCoach.name, commentText.trim())
+        .catch(err => console.error('Failed to save comment:', err));
+    }
     setPlayers(prev => prev.map(player => {
       if (player.id !== playerId) return player;
       return {
@@ -875,6 +1035,10 @@ export function CoachPortal() {
   };
 
   const approveBucket = (playerId: string, gameId: string, bucketId: string) => {
+    if (user) {
+      void approveBucketDb(gameId, bucketId)
+        .catch(err => console.error('Failed to approve bucket:', err));
+    }
     setPlayers(prev => prev.map(player => {
       if (player.id !== playerId) return player;
       return {
@@ -895,16 +1059,53 @@ export function CoachPortal() {
     }));
   };
 
-  const addNewGame = (playerId: string) => {
+  const addNewGame = async (playerId: string) => {
     if (!newGameTitle.trim() || !selectedPlayer) return;
-    const newGame: Game = {
+    let newGame: Game = {
       id: `g-${Date.now()}`, title: newGameTitle, description: newGameDescription,
       completed: false, buckets: [],
     };
+    if (user) {
+      try {
+        const row = await createGame(user.id, playerId, newGameTitle.trim(), newGameDescription.trim());
+        newGame = { id: row.id, title: row.title, description: row.description ?? undefined, completed: false, buckets: [] };
+      } catch (err) {
+        console.error('Failed to create game:', err);
+        return;
+      }
+    }
     setPlayers(prev => prev.map(p => p.id === playerId ? { ...p, games: [...p.games, newGame] } : p));
     setNewGameTitle('');
     setNewGameDescription('');
     setShowNewGameForm(false);
+  };
+
+  const addNewBucket = async (playerId: string, gameId: string) => {
+    if (!newBucketTitle.trim()) return;
+    let bucket: Bucket = {
+      id: `b-${Date.now()}`, title: newBucketTitle.trim(), description: newBucketDescription.trim(),
+      completed: false, coachApproved: false, dueDate: newBucketDueDate || undefined, comments: [],
+    };
+    if (user) {
+      try {
+        const row = await addBucketDb(gameId, newBucketTitle.trim(), newBucketDescription.trim(), newBucketDueDate || undefined);
+        bucket = {
+          id: row.id, title: row.title, description: row.description ?? '',
+          completed: false, coachApproved: false, dueDate: row.due_date ?? undefined, comments: [],
+        };
+      } catch (err) {
+        console.error('Failed to add bucket:', err);
+        return;
+      }
+    }
+    setPlayers(prev => prev.map(p => p.id !== playerId ? p : {
+      ...p,
+      games: p.games.map(g => g.id !== gameId ? g : { ...g, buckets: [...g.buckets, bucket] }),
+    }));
+    setNewBucketTitle('');
+    setNewBucketDescription('');
+    setNewBucketDueDate('');
+    setNewBucketGameId(null);
   };
 
   const allStats = {
@@ -988,7 +1189,7 @@ export function CoachPortal() {
             players={players}
             selectedPlayer={selectedPlayer}
             selectedGame={selectedGame}
-            onSelectPlayer={setSelectedPlayer}
+            onSelectPlayer={p => setSelectedPlayerId(p.id)}
             onSelectGame={setSelectedGame}
             showNewGameForm={showNewGameForm}
             setShowNewGameForm={setShowNewGameForm}
@@ -997,6 +1198,15 @@ export function CoachPortal() {
             newGameDescription={newGameDescription}
             setNewGameDescription={setNewGameDescription}
             onAddGame={() => selectedPlayer && addNewGame(selectedPlayer.id)}
+            newBucketGameId={newBucketGameId}
+            setNewBucketGameId={setNewBucketGameId}
+            newBucketTitle={newBucketTitle}
+            setNewBucketTitle={setNewBucketTitle}
+            newBucketDescription={newBucketDescription}
+            setNewBucketDescription={setNewBucketDescription}
+            newBucketDueDate={newBucketDueDate}
+            setNewBucketDueDate={setNewBucketDueDate}
+            onAddBucket={gameId => selectedPlayer && addNewBucket(selectedPlayer.id, gameId)}
             editingComment={editingComment}
             setEditingComment={setEditingComment}
             commentText={commentText}

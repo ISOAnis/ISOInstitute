@@ -110,6 +110,51 @@ export interface UsageCounter {
   updated_at: string;
 }
 
+export type BucketStatus = 'open' | 'pending_approval' | 'approved';
+
+export interface DbGame {
+  id: string;
+  coach_id: string;
+  player_id: string;
+  title: string;
+  description: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbBucket {
+  id: string;
+  game_id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  status: BucketStatus;
+  sort_order: number;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface DbBucketComment {
+  id: string;
+  bucket_id: string;
+  author_id: string;
+  author_name: string;
+  body: string;
+  created_at: string;
+}
+
+export interface CoachRosterEntry {
+  player_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  avatar_url: string | null;
+  pathway_id: string | null;
+  joined_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -178,6 +223,29 @@ export type Database = {
         Update: Partial<UsageCounter>;
         Relationships: [];
       };
+      games: {
+        Row: DbGame;
+        Insert: Partial<DbGame> & { coach_id: string; player_id: string; title: string };
+        Update: Partial<DbGame>;
+        Relationships: [];
+      };
+      buckets: {
+        Row: DbBucket;
+        Insert: Partial<DbBucket> & { game_id: string; title: string };
+        Update: Partial<DbBucket>;
+        Relationships: [];
+      };
+      bucket_comments: {
+        Row: DbBucketComment;
+        Insert: Partial<DbBucketComment> & {
+          bucket_id: string;
+          author_id: string;
+          author_name: string;
+          body: string;
+        };
+        Update: Partial<DbBucketComment>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -192,6 +260,10 @@ export type Database = {
       review_pathway_change: {
         Args: { request_id: string; decision: 'approved' | 'denied' };
         Returns: undefined;
+      };
+      get_coach_roster: {
+        Args: Record<string, never>;
+        Returns: CoachRosterEntry[];
       };
     };
     Enums: Record<string, never>;
