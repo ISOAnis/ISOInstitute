@@ -112,8 +112,8 @@ supabase/scripts/reset_tryout_usage.sql
 
 ## What still uses mocks / localStorage
 
-- Locker Room chat & videos
-- ISO Community forum
+- Locker Room **videos** (catalog still demo)
+- Forum **comments** (encouragements are real; threaded replies not yet)
 - AI matching / varsity pairing
 - ISO Store catalog & orders
 - Coach real availability (time slots are fake)
@@ -143,6 +143,7 @@ Run in order:
 4. `supabase/migrations/004_membership_and_pathways.sql`
 5. `supabase/migrations/005_games_and_buckets.sql`
 6. `supabase/migrations/006_messaging.sql`
+7. `supabase/migrations/007_community.sql`
 
 ---
 
@@ -154,6 +155,7 @@ Run in order:
 4. Onboarding flash on login → loading gate in App + JoinISOPage
 5. Explorer try-out had no calendar → wired `ConsultationModal`
 6. “Chatted” stuck after test booking → admin reset + SQL script
+7. Coach Messages showed “Imam Abdullah Rahman” → prefer Auth profile name; render live display names
 
 ---
 
@@ -183,9 +185,17 @@ Run in order:
 - **PlayerPortal Messages** — shows your real coaches (from bookings/games) instead of the hardcoded "Imam Abdullah Rahman"; coach picker appears if you have more than one
 - **CoachPortal Messages** — chats use real profile IDs, so coach ↔ player messages actually connect
 
+### Phase 7 — Community forum & Locker Room channels in DB
+
+- **Migration 007** — `community_posts`, `post_encouragements`, `locker_messages` + RLS; realtime on locker channel messages
+- `src/services/communityService.ts` — forum CRUD + encouragements; locker fetch/send + realtime subscribe
+- **ISOCommunityForum** — signed-in members post wins/goals and encourage peers; guests keep the demo feed
+- **LockerRoomChat** — pathway channel messages persist and stream live; videos remain demo for now
+- Plan gating (Locker Room / Varsity) stays in the app UI
+
 ## Next planned phase
 
-**Phase 7** — AI matching / varsity pairing, or Locker Room chat & community forum — pick based on priority.
+**Phase 8** — AI matching / varsity pairing (match requests + accept/decline → coaching relationship).
 
 ---
 

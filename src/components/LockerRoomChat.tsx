@@ -1,7 +1,14 @@
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Users, Video, MapPin } from 'lucide-react';
 import { PATHWAYS, PATHWAY_BY_ID, type PathwayId } from '../data/pathways';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  fetchLockerMessages,
+  sendLockerMessage,
+  subscribeToLockerChannel,
+} from '../services/communityService';
+import type { DbLockerMessage } from '../types/database';
 
 const PATHWAY_HEX: Record<string, string> = {
   deen: '#10b981', health: '#ef4444', medicine: '#3b82f6',
@@ -48,10 +55,22 @@ interface LockerRoomChatProps {
   coachName?: string;
 }
 
+function dbToChatMessage(m: DbLockerMessage): ChatMessage {
+  return {
+    id: m.id,
+    userName: m.sender_role === 'coach' ? `${m.sender_name} (Coach)` : m.sender_name,
+    lockedPathwayId: (m.sender_pathway_id as PathwayId) || 'deen',
+    content: m.body,
+    timestamp: new Date(m.created_at),
+    channelPathwayId: (m.channel_pathway_id as PathwayId) || 'deen',
+  };
+}
+
 export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName }: LockerRoomChatProps) {
+  const { user, profile } = useAuth();
   const [selectedChannel, setSelectedChannel] = useState<PathwayId>((lockedPathwayId as PathwayId) || 'deen');
   const [activeTab, setActiveTab] = useState<'chat' | 'videos'>('chat');
-  const [messages, setMessages] = useState<ChatMessage[]>(MOCK_MESSAGES);
+  const [messages, setMessages] = useState<ChatMessage[]>(user ? [] : MOCK_MESSAGES);
   const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
   const hex = PATHWAY_HEX[selectedChannel] ?? '#f97316';
@@ -60,23 +79,64 @@ export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName
   const isCoach = userRole === 'coach';
   const postingInOtherChannel = !isCoach && selectedChannel !== lockedPathwayId;
 
-  const filteredMessages = messages.filter(m => m.channelPathwayId === selectedChannel);
-  const filteredVideos = MOCK_VIDEOS.filter(v => !v.pathwayId || v.pathwayId === selectedChannel);
-  const onlineCount = 3 + (selectedChannel.charCodeAt(0) % 4);
+  const profileName = profile
+    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
+    : '';
+  const senderName = profileName || (isCoach ? coachName ?? 'Coach' : 'You');
+
+  // Signed-in members get the real channel with live updates; guests see the demo.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    fetchLockerMessages(selectedChannel)
+      .then((rows) => {
+        if (!cancelled) setMessages(rows.map(dbToChatMessage));
+      })
+      .catch((err) => console.error('Failed to load locker room messages:', err));
+
+    const unsubscribe = subscribeToLockerChannel(selectedChannel, (m) => {
+      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, dbToChatMessage(m)]));
+      setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [user?.id, selectedChannel]);
 
   const sendMessage = () => {
-    if (!input.trim() || !lockedPathwayId) return;
+    const content = input.trim();
+    if (!content || !lockedPathwayId) return;
+    setInput('');
+
+    if (user) {
+      void sendLockerMessage({
+        senderId: user.id,
+        senderName,
+        senderRole: userRole,
+        senderPathwayId: lockedPathwayId,
+        channelPathwayId: selectedChannel,
+        body: content,
+      })
+        .then((row) => {
+          setMessages((prev) => (prev.some((x) => x.id === row.id) ? prev : [...prev, dbToChatMessage(row)]));
+          setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        })
+        .catch((err) => console.error('Failed to send locker room message:', err));
+      return;
+    }
+
     const msg: ChatMessage = {
       id: Date.now().toString(),
       userName: isCoach ? (coachName ?? 'Coach') : 'You',
       userLocation: 'Your Location',
       lockedPathwayId: lockedPathwayId as PathwayId,
-      content: input.trim(),
+      content,
       timestamp: new Date(),
       channelPathwayId: selectedChannel,
     };
     setMessages(prev => [...prev, msg]);
-    setInput('');
     setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
   };
 

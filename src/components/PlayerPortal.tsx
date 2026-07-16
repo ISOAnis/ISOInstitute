@@ -1889,7 +1889,9 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   const bucketsScored = games.reduce((s, g) => s + g.buckets.filter(b => b.completed).length, 0);
   const winPercentage = totalGames > 0 ? Math.round((gamesWon / totalGames) * 100) : 0;
 
-  const currentCoachName = 'Imam Abdullah Rahman';
+  const currentCoachName = selectedCoach
+    ? coachDisplayName(selectedCoach)
+    : 'Your Coach';
 
   const skillTreeNodes = SKILL_TREES[selectedPathwayId] || SKILL_TREES.deen;
   const skillNodesUnlocked = skillTreeNodes.filter(n => gamesWon >= n.unlocksAt).length;

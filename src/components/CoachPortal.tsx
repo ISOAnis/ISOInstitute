@@ -907,7 +907,7 @@ function CoachMessagesView({
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 export function CoachPortal() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(mockPlayers[0]?.id ?? null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -973,8 +973,12 @@ export function CoachPortal() {
     }, 50);
   };
 
+  // Prefer the real profile name over the locally cached coach identity.
+  const profileFullName = profile
+    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
+    : '';
   const currentCoach = {
-    name: coachIdentity.fullName,
+    name: profileFullName || coachIdentity.fullName,
     category: `${coachIdentity.pathwayName} Pathway`,
     categoryIcon: Moon,
     profilePicture: coachProfilePicture,
@@ -1264,7 +1268,7 @@ export function CoachPortal() {
             <LockerRoomChat
               lockedPathwayId={pathwayChannelId}
               userRole="coach"
-              coachName={coachIdentity.fullName}
+              coachName={currentCoach.name}
             />
           </div>
         )}

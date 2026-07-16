@@ -164,6 +164,37 @@ export interface DbMessage {
   created_at: string;
 }
 
+export type CommunityPostType = 'goal' | 'win' | 'encourage' | 'milestone';
+
+export interface DbCommunityPost {
+  id: string;
+  author_id: string;
+  author_name: string;
+  author_role: 'player' | 'coach';
+  pathway_id: string;
+  post_type: CommunityPostType;
+  content: string;
+  goal_title: string | null;
+  created_at: string;
+}
+
+export interface DbPostEncouragement {
+  post_id: string;
+  user_id: string;
+  created_at: string;
+}
+
+export interface DbLockerMessage {
+  id: string;
+  sender_id: string;
+  sender_name: string;
+  sender_role: 'player' | 'coach';
+  sender_pathway_id: string;
+  channel_pathway_id: string;
+  body: string;
+  created_at: string;
+}
+
 export interface PlayerCoachEntry {
   coach_id: string;
   first_name: string | null;
@@ -273,6 +304,35 @@ export type Database = {
           body: string;
         };
         Update: Partial<DbMessage>;
+        Relationships: [];
+      };
+      community_posts: {
+        Row: DbCommunityPost;
+        Insert: Partial<DbCommunityPost> & {
+          author_id: string;
+          author_name: string;
+          pathway_id: string;
+          content: string;
+        };
+        Update: Partial<DbCommunityPost>;
+        Relationships: [];
+      };
+      post_encouragements: {
+        Row: DbPostEncouragement;
+        Insert: { post_id: string; user_id: string };
+        Update: Partial<DbPostEncouragement>;
+        Relationships: [];
+      };
+      locker_messages: {
+        Row: DbLockerMessage;
+        Insert: Partial<DbLockerMessage> & {
+          sender_id: string;
+          sender_name: string;
+          sender_pathway_id: string;
+          channel_pathway_id: string;
+          body: string;
+        };
+        Update: Partial<DbLockerMessage>;
         Relationships: [];
       };
     };

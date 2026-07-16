@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Heart, MessageCircle, Target, Trophy, Sparkles, Send,
   Lock, Flame, Users,
@@ -7,6 +7,13 @@ import {
 import { PATHWAY_BY_ID, type PathwayId } from '../data/pathways';
 import { ExplorerUpgradeGate } from './ExplorerUpgradeGate';
 import { getPortalFirstName } from '../utils/portalGreeting';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  createCommunityPost,
+  fetchCommunityPosts,
+  setEncouragement,
+  type CommunityPostWithMeta,
+} from '../services/communityService';
 
 const PATHWAY_HEX: Record<string, string> = {
   deen: '#10b981', health: '#ef4444', medicine: '#3b82f6',
@@ -83,18 +90,56 @@ interface ISOCommunityForumProps {
   lockedPathwayName?: string;
 }
 
+function dbToForumPost(p: CommunityPostWithMeta): ForumPost {
+  return {
+    id: p.id,
+    authorName: p.author_name,
+    authorRole: p.author_role,
+    pathwayId: (p.pathway_id as PathwayId) || 'engineering',
+    type: p.post_type,
+    content: p.content,
+    goalTitle: p.goal_title ?? undefined,
+    timestamp: new Date(p.created_at),
+    encourages: p.encourages,
+    comments: 0,
+    encouragedByMe: p.encouragedByMe,
+  };
+}
+
 export function ISOCommunityForum({ lockedPathwayId, lockedPathwayName }: ISOCommunityForumProps) {
-  const [posts, setPosts] = useState<ForumPost[]>(MOCK_POSTS);
+  const { user, profile } = useAuth();
+  const [posts, setPosts] = useState<ForumPost[]>(user ? [] : MOCK_POSTS);
   const [filter, setFilter] = useState<'all' | PostType>('all');
   const [compose, setCompose] = useState('');
   const [postType, setPostType] = useState<PostType>('win');
-  const playerName = getPortalFirstName('player');
+  const profileName = profile
+    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
+    : '';
+  const playerName = profileName || getPortalFirstName('player');
+  const authorRole: 'player' | 'coach' = profile?.active_role === 'coach' ? 'coach' : 'player';
   const pathwayId = (lockedPathwayId as PathwayId) || 'engineering';
   const pathwayHex = PATHWAY_HEX[pathwayId] ?? '#f97316';
+
+  // Signed-in members read/write the real forum; guests see the demo feed.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    fetchCommunityPosts(user.id)
+      .then((rows) => {
+        if (!cancelled) setPosts(rows.map(dbToForumPost));
+      })
+      .catch((err) => console.error('Failed to load community posts:', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const filtered = filter === 'all' ? posts : posts.filter(p => p.type === filter);
 
   const toggleEncourage = (id: string) => {
+    const target = posts.find(p => p.id === id);
+    if (user && target) {
+      void setEncouragement(id, user.id, !target.encouragedByMe)
+        .catch(err => console.error('Failed to save encouragement:', err));
+    }
     setPosts(prev => prev.map(p => {
       if (p.id !== id) return p;
       const encouraged = !p.encouragedByMe;
@@ -106,20 +151,41 @@ export function ISOCommunityForum({ lockedPathwayId, lockedPathwayName }: ISOCom
     }));
   };
 
-  const sharePost = () => {
-    if (!compose.trim()) return;
-    const post: ForumPost = {
+  const sharePost = async () => {
+    const content = compose.trim();
+    if (!content) return;
+
+    let post: ForumPost = {
       id: Date.now().toString(),
       authorName: playerName,
-      authorRole: 'player',
+      authorRole,
       pathwayId,
       type: postType,
-      content: compose.trim(),
-      goalTitle: postType === 'goal' ? compose.trim().slice(0, 48) : undefined,
+      content,
+      goalTitle: postType === 'goal' ? content.slice(0, 48) : undefined,
       timestamp: new Date(),
       encourages: 0,
       comments: 0,
     };
+
+    if (user) {
+      try {
+        const row = await createCommunityPost({
+          authorId: user.id,
+          authorName: playerName,
+          authorRole,
+          pathwayId,
+          postType,
+          content,
+          goalTitle: postType === 'goal' ? content.slice(0, 48) : undefined,
+        });
+        post = dbToForumPost({ ...row, encourages: 0, encouragedByMe: false });
+      } catch (err) {
+        console.error('Failed to share post:', err);
+        return;
+      }
+    }
+
     setPosts(prev => [post, ...prev]);
     setCompose('');
   };

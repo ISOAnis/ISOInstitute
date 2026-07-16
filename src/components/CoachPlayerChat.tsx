@@ -303,7 +303,9 @@ export function CoachPlayerChat({
                   {!isCurrent && <ChatAvatar name={otherUserName} src={otherUserAvatar} size={32} />}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: isCurrent ? 'flex-end' : 'flex-start', maxWidth: '72%' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: PORTAL_TEXT_DIM }}>{message.senderName}</span>
+                      <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: PORTAL_TEXT_DIM }}>
+                        {isCurrent ? currentUserName : otherUserName}
+                      </span>
                       <span style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>{formatTime(message.timestamp)}</span>
                     </div>
                     <div style={{
