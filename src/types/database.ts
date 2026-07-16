@@ -155,6 +155,25 @@ export interface CoachRosterEntry {
   joined_at: string;
 }
 
+export interface DbMessage {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface PlayerCoachEntry {
+  coach_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  avatar_url: string | null;
+  pathway_id: string | null;
+  connected_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -246,6 +265,16 @@ export type Database = {
         Update: Partial<DbBucketComment>;
         Relationships: [];
       };
+      messages: {
+        Row: DbMessage;
+        Insert: Partial<DbMessage> & {
+          sender_id: string;
+          recipient_id: string;
+          body: string;
+        };
+        Update: Partial<DbMessage>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -264,6 +293,10 @@ export type Database = {
       get_coach_roster: {
         Args: Record<string, never>;
         Returns: CoachRosterEntry[];
+      };
+      get_player_coaches: {
+        Args: Record<string, never>;
+        Returns: PlayerCoachEntry[];
       };
     };
     Enums: Record<string, never>;

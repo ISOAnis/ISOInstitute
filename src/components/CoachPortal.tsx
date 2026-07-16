@@ -825,12 +825,13 @@ function CoachPlayersView({
 // ─── MESSAGES VIEW ────────────────────────────────────────────────────────────
 
 function CoachMessagesView({
-  players, selectedPlayer, onSelectPlayer, coachName, accentColor,
+  players, selectedPlayer, onSelectPlayer, coachName, coachUserId, accentColor,
 }: {
   players: Player[];
   selectedPlayer: Player | null;
   onSelectPlayer: (p: Player) => void;
   coachName: string;
+  coachUserId: string;
   accentColor: string;
 }) {
   return (
@@ -876,7 +877,7 @@ function CoachMessagesView({
           {selectedPlayer ? (
             <div style={{ flex: 1, minHeight: 500 }}>
               <CoachPlayerChat
-                currentUserId="coach-1"
+                currentUserId={coachUserId}
                 currentUserName={coachName}
                 currentUserRole="coach"
                 otherUserId={selectedPlayer.id}
@@ -1224,6 +1225,7 @@ export function CoachPortal() {
             selectedPlayer={selectedPlayerForChat}
             onSelectPlayer={setSelectedPlayerForChat}
             coachName={currentCoach.name}
+            coachUserId={user?.id ?? 'coach-1'}
             accentColor={accentColor}
           />
         )}

@@ -85,6 +85,7 @@ The app started as a **demo/prototype**. Login was fake, and most data lived in 
 | `games` | Coach-assigned goals per player |
 | `buckets` | Tasks inside a game (`open` → `pending_approval` → `approved`) |
 | `bucket_comments` | Coach feedback on buckets |
+| `messages` | Direct coach ↔ player chat (realtime enabled) |
 
 ---
 
@@ -111,7 +112,6 @@ supabase/scripts/reset_tryout_usage.sql
 
 ## What still uses mocks / localStorage
 
-- Coach–player chat
 - Locker Room chat & videos
 - ISO Community forum
 - AI matching / varsity pairing
@@ -142,6 +142,7 @@ Run in order:
 3. `supabase/migrations/003_phase3_discovery.sql`
 4. `supabase/migrations/004_membership_and_pathways.sql`
 5. `supabase/migrations/005_games_and_buckets.sql`
+6. `supabase/migrations/006_messaging.sql`
 
 ---
 
@@ -173,9 +174,18 @@ Run in order:
 - **CoachPortal** — "My Players" roster comes from the DB for logged-in coaches; New Game, new **Add Bucket** form, Approve Completion, and comments all persist
 - Bucket lifecycle enforced by RLS: players can only flip between `open`/`pending_approval`; only the coach can approve
 
+### Phase 6 — Coach–player messaging in DB
+
+- **Migration 006** — `messages` table + RLS, realtime publication, `has_coaching_relationship()` helper, `get_player_coaches()` RPC
+- Sending requires a real coaching relationship (a try-out booking or an assigned game between the two users) — enforced at the database level
+- `src/services/messagesService.ts` — fetch conversation, send, mark read, realtime subscription to incoming messages
+- **CoachPlayerChat** — signed-in users get real DB chat with live incoming messages and read receipts; guests keep the demo transcript
+- **PlayerPortal Messages** — shows your real coaches (from bookings/games) instead of the hardcoded "Imam Abdullah Rahman"; coach picker appears if you have more than one
+- **CoachPortal Messages** — chats use real profile IDs, so coach ↔ player messages actually connect
+
 ## Next planned phase
 
-**Phase 6** — Messaging (coach–player chat) or AI matching / varsity pairing — pick based on priority.
+**Phase 7** — AI matching / varsity pairing, or Locker Room chat & community forum — pick based on priority.
 
 ---
 

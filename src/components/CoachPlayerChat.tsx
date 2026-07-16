@@ -5,6 +5,16 @@ import {
   PORTAL_ACCENT, PORTAL_PANEL_BG, PORTAL_PANEL_BORDER,
   PORTAL_INPUT_BG, PORTAL_INPUT_BORDER, PORTAL_TEXT_PRIMARY, PORTAL_TEXT_MUTED, PORTAL_TEXT_DIM,
 } from '../utils/portalTheme';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  fetchConversation,
+  markConversationRead,
+  sendMessage,
+  subscribeToIncomingMessages,
+} from '../services/messagesService';
+import type { DbMessage } from '../types/database';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface Message {
   id: string;
@@ -122,13 +132,55 @@ export function CoachPlayerChat({
   categoryIcon,
   accentColor = PORTAL_ACCENT,
 }: CoachPlayerChatProps) {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const { user } = useAuth();
+  // Real chat when signed in and talking to a real profile (UUID); demo otherwise.
+  const dbMode = Boolean(user && UUID_RE.test(otherUserId));
+  const effectiveUserId = dbMode && user ? user.id : currentUserId;
+
+  const [messages, setMessages] = useState<Message[]>(dbMode ? [] : mockMessages);
   const [messageInput, setMessageInput] = useState('');
   const [isTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const previousMessagesLengthRef = useRef(mockMessages.length);
   const hasInitializedRef = useRef(false);
+
+  const dbToMessage = (m: DbMessage): Message => {
+    const mine = m.sender_id === effectiveUserId;
+    return {
+      id: m.id,
+      content: m.body,
+      senderId: m.sender_id,
+      senderName: mine ? currentUserName : otherUserName,
+      senderRole: mine ? currentUserRole : otherUserRole,
+      timestamp: new Date(m.created_at),
+      read: m.read_at != null,
+    };
+  };
+
+  useEffect(() => {
+    if (!dbMode || !user) return;
+    let cancelled = false;
+    setMessages([]);
+    fetchConversation(user.id, otherUserId)
+      .then((rows) => {
+        if (!cancelled) setMessages(rows.map(dbToMessage));
+      })
+      .catch((err) => console.error('Failed to load messages:', err));
+    void markConversationRead(user.id, otherUserId).catch(() => {});
+
+    const unsubscribe = subscribeToIncomingMessages(user.id, (m) => {
+      if (m.sender_id !== otherUserId) return;
+      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, dbToMessage(m)]));
+      void markConversationRead(user.id, otherUserId).catch(() => {});
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbMode, user?.id, otherUserId]);
 
   useEffect(() => {
     if (!hasInitializedRef.current) {
@@ -155,17 +207,26 @@ export function CoachPlayerChat({
   };
 
   const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-    setMessages([...messages, {
+    const content = messageInput.trim();
+    if (!content) return;
+    setMessageInput('');
+
+    if (dbMode && user) {
+      void sendMessage(user.id, otherUserId, content)
+        .then((row) => setMessages((prev) => [...prev, dbToMessage(row)]))
+        .catch((err) => console.error('Failed to send message:', err));
+      return;
+    }
+
+    setMessages((prev) => [...prev, {
       id: Date.now().toString(),
-      content: messageInput.trim(),
+      content,
       senderId: currentUserId,
       senderName: currentUserName,
       senderRole: currentUserRole,
       timestamp: new Date(),
       read: false,
     }]);
-    setMessageInput('');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -175,7 +236,7 @@ export function CoachPlayerChat({
     }
   };
 
-  const isCurrentUser = (message: Message) => message.senderId === currentUserId;
+  const isCurrentUser = (message: Message) => message.senderId === effectiveUserId;
 
   const renderCategoryIcon = () => {
     if (!categoryIcon) return null;

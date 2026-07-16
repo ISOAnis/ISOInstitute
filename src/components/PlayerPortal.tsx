@@ -65,6 +65,8 @@ import {
   setBucketStatus,
   type GameWithBuckets,
 } from '../services/gamesService';
+import { fetchPlayerCoaches } from '../services/messagesService';
+import type { PlayerCoachEntry } from '../types/database';
 import { type ExplorerCoachView as ExplorerCoach, toExplorerCoachView } from '../types/discoverableCoach';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
@@ -1832,6 +1834,27 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
       }
     : undefined;
 
+  // Coaches connected to this player (try-out bookings or assigned games).
+  const [myCoaches, setMyCoaches] = useState<PlayerCoachEntry[]>([]);
+  const [selectedCoachId, setSelectedCoachId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    fetchPlayerCoaches()
+      .then((rows) => {
+        if (cancelled) return;
+        setMyCoaches(rows);
+        setSelectedCoachId((prev) => prev ?? rows[0]?.coach_id ?? null);
+      })
+      .catch((err) => console.error('Failed to load coaches:', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const selectedCoach = myCoaches.find((c) => c.coach_id === selectedCoachId) ?? null;
+  const coachDisplayName = (c: PlayerCoachEntry) =>
+    [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
     setMembershipPlan(plan);
@@ -1991,12 +2014,57 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         )}
         {activeSection === 'messages' && (
           canAccessSection('messages')
-            ? <div style={{ padding: '32px', height: 'calc(100vh - 72px)' }}>
-              <CoachPlayerChat
-                  currentUserId="player-1" currentUserName="You" currentUserRole="player"
-                  otherUserId="coach-1" otherUserName={currentCoachName} otherUserRole="coach"
-                  category={pathway?.name || 'Your Pathway'} categoryIcon={pathwayIconMap[selectedPathwayId] || Moon}
-              />
+            ? <div style={{ padding: '32px', height: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {user && myCoaches.length > 1 && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {myCoaches.map((c) => {
+                    const isSelected = c.coach_id === selectedCoachId;
+                    return (
+                      <button
+                        key={c.coach_id}
+                        onClick={() => setSelectedCoachId(c.coach_id)}
+                        style={{
+                          padding: '8px 16px', borderRadius: 100, cursor: 'pointer',
+                          background: isSelected ? `${accentColor}20` : 'rgba(255,255,255,0.04)',
+                          border: `1px solid ${isSelected ? `${accentColor}50` : 'rgba(255,255,255,0.1)'}`,
+                          fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600,
+                          color: isSelected ? accentColor : 'rgba(255,255,255,0.6)',
+                        }}
+                      >
+                        {coachDisplayName(c)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {user && myCoaches.length === 0 ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14 }}>
+                  <div style={{ textAlign: 'center', padding: 40 }}>
+                    <MessageSquare size={40} style={{ color: 'rgba(255,255,255,0.15)', marginBottom: 16 }} />
+                    <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: '#F2F2F2', margin: '0 0 8px' }}>No coach yet</h3>
+                    <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+                      Book a try-out with a coach and they'll show up here.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ flex: 1, minHeight: 0 }}>
+                  <CoachPlayerChat
+                    currentUserId={user?.id ?? 'player-1'} currentUserName="You" currentUserRole="player"
+                    otherUserId={user && selectedCoach ? selectedCoach.coach_id : 'coach-1'}
+                    otherUserName={user && selectedCoach ? coachDisplayName(selectedCoach) : currentCoachName}
+                    otherUserRole="coach"
+                    otherUserAvatar={user && selectedCoach ? selectedCoach.avatar_url ?? undefined : undefined}
+                    category={
+                      user && selectedCoach?.pathway_id
+                        ? PATHWAY_BY_ID[selectedCoach.pathway_id as keyof typeof PATHWAY_BY_ID]?.name ?? selectedCoach.pathway_id
+                        : pathway?.name || 'Your Pathway'
+                    }
+                    categoryIcon={pathwayIconMap[user && selectedCoach?.pathway_id ? selectedCoach.pathway_id : selectedPathwayId] || Moon}
+                    accentColor={accentColor}
+                  />
+                </div>
+              )}
             </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}
