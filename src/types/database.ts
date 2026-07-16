@@ -76,6 +76,20 @@ export interface PlayerPathway {
   updated_at: string;
 }
 
+/** Subset of coach_profiles used for portal identity hydration. */
+export interface DbCoachProfile {
+  user_id: string;
+  pathway_id: string | null;
+  bio: string | null;
+  years_of_experience: string | null;
+  current_role: string | null;
+  photo_url: string | null;
+  card_display: Record<string, unknown> | null;
+  is_discoverable: boolean;
+  completion_pct: number;
+  updated_at: string;
+}
+
 export interface PathwayChangeRequest {
   id: string;
   player_id: string;
@@ -203,6 +217,34 @@ export interface PlayerCoachEntry {
   avatar_url: string | null;
   pathway_id: string | null;
   connected_at: string;
+}
+
+export type MatchRequestStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'expired'
+  | 'canceled';
+
+export interface MatchQuestionnaire {
+  commitment?: string;
+  goals?: string;
+  timeframe?: string;
+  challenges?: string;
+  [key: string]: unknown;
+}
+
+export interface DbMatchRequest {
+  id: string;
+  player_id: string;
+  coach_id: string;
+  plan: MembershipPlan;
+  status: MatchRequestStatus;
+  match_score: number;
+  match_reasons: string[];
+  questionnaire: MatchQuestionnaire;
+  created_at: string;
+  responded_at: string | null;
 }
 
 export type Database = {
@@ -335,6 +377,16 @@ export type Database = {
         Update: Partial<DbLockerMessage>;
         Relationships: [];
       };
+      match_requests: {
+        Row: DbMatchRequest;
+        Insert: Partial<DbMatchRequest> & {
+          player_id: string;
+          coach_id: string;
+          plan: MembershipPlan;
+        };
+        Update: Partial<DbMatchRequest>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -357,6 +409,30 @@ export type Database = {
       get_player_coaches: {
         Args: Record<string, never>;
         Returns: PlayerCoachEntry[];
+      };
+      respond_to_match: {
+        Args: { request_id: string; decision: 'accepted' | 'declined' };
+        Returns: undefined;
+      };
+      get_coach_match_requests: {
+        Args: Record<string, never>;
+        Returns: Array<{
+          id: string;
+          player_id: string;
+          coach_id: string;
+          plan: MembershipPlan;
+          status: MatchRequestStatus;
+          match_score: number;
+          match_reasons: string[];
+          questionnaire: MatchQuestionnaire;
+          created_at: string;
+          responded_at: string | null;
+          player_first_name: string | null;
+          player_last_name: string | null;
+          player_email: string;
+          player_avatar_url: string | null;
+          pathway_id: string | null;
+        }>;
       };
     };
     Enums: Record<string, never>;

@@ -183,7 +183,9 @@ export function CoachISODashboard({
   const progress = React.useMemo(() => getCoachProgressSnapshot(), []);
   const overall = coachCard?.result.overall ?? progress.overall;
   const tierLabel = coachCard?.result.tierLabel ?? progress.tierLabel;
-  const pathwayLabel = `${coachIdentity.pathwayName} Pathway`;
+  const pathwayLabel = /pathway$/i.test(coachIdentity.pathwayName)
+    ? coachIdentity.pathwayName
+    : `${coachIdentity.pathwayName} Pathway`;
   const satisfactionPct = 92;
   const activePlayers = stats.totalPlayers;
 

@@ -114,10 +114,9 @@ supabase/scripts/reset_tryout_usage.sql
 
 - Locker Room **videos** (catalog still demo)
 - Forum **comments** (encouragements are real; threaded replies not yet)
-- AI matching / varsity pairing
 - ISO Store catalog & orders
 - Coach real availability (time slots are fake)
-- Stripe payments
+- Stripe payments (match requests defer charge until Stripe)
 
 ---
 
@@ -144,6 +143,7 @@ Run in order:
 5. `supabase/migrations/005_games_and_buckets.sql`
 6. `supabase/migrations/006_messaging.sql`
 7. `supabase/migrations/007_community.sql`
+8. `supabase/migrations/008_match_requests.sql`
 
 ---
 
@@ -193,9 +193,16 @@ Run in order:
 - **LockerRoomChat** — pathway channel messages persist and stream live; videos remain demo for now
 - Plan gating (Locker Room / Varsity) stays in the app UI
 
+### Phase 8 — AI matching / varsity pairing
+
+- **Migration 008** — `match_requests` table + RLS; `respond_to_match()` (accept seeds a kickoff game); `get_coach_match_requests()` inbox RPC
+- `src/services/matchingService.ts` — submit request, coach inbox fetch, accept/decline
+- **CallIsoPage** + **PlayerPortal VarsityInterestModal** — create a real pending request for that coach (plan upgrades to varsity; Stripe still deferred)
+- **AIMatchingDashboard** — loads pending requests from DB; Accept starts coaching (roster + messaging unlock); Decline closes the request
+
 ## Next planned phase
 
-**Phase 8** — AI matching / varsity pairing (match requests + accept/decline → coaching relationship).
+**Phase 9** — ISO Store / Stripe payments, or real coach availability calendars.
 
 ---
 

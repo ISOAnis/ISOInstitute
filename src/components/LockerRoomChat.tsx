@@ -55,11 +55,15 @@ interface LockerRoomChatProps {
   coachName?: string;
 }
 
-function dbToChatMessage(m: DbLockerMessage): ChatMessage {
+function dbToChatMessage(m: DbLockerMessage, overridePathwayId?: string): ChatMessage {
+  const pathway =
+    (overridePathwayId as PathwayId) ||
+    (m.sender_pathway_id as PathwayId) ||
+    'deen';
   return {
     id: m.id,
     userName: m.sender_role === 'coach' ? `${m.sender_name} (Coach)` : m.sender_name,
-    lockedPathwayId: (m.sender_pathway_id as PathwayId) || 'deen',
+    lockedPathwayId: pathway,
     content: m.body,
     timestamp: new Date(m.created_at),
     channelPathwayId: (m.channel_pathway_id as PathwayId) || 'deen',
@@ -78,6 +82,12 @@ export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName
   const lockedName = PATHWAY_BY_ID[lockedPathwayId as keyof typeof PATHWAY_BY_ID]?.name ?? lockedPathwayId;
   const isCoach = userRole === 'coach';
   const postingInOtherChannel = !isCoach && selectedChannel !== lockedPathwayId;
+  const filteredMessages = messages.filter((m) => m.channelPathwayId === selectedChannel);
+  const filteredVideos = MOCK_VIDEOS.filter(
+    (v) => v.pathwayId === null || v.pathwayId === selectedChannel,
+  );
+  // Decorative presence count until we wire real presence.
+  const onlineCount = 3 + (filteredMessages.length % 5);
 
   const profileName = profile
     ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
@@ -85,17 +95,21 @@ export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName
   const senderName = profileName || (isCoach ? coachName ?? 'Coach' : 'You');
 
   // Signed-in members get the real channel with live updates; guests see the demo.
+  // Own messages use the current locked pathway so stale demo pathway badges don't stick.
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    const mapRow = (m: DbLockerMessage) =>
+      dbToChatMessage(m, m.sender_id === user.id ? lockedPathwayId : undefined);
+
     fetchLockerMessages(selectedChannel)
       .then((rows) => {
-        if (!cancelled) setMessages(rows.map(dbToChatMessage));
+        if (!cancelled) setMessages(rows.map(mapRow));
       })
       .catch((err) => console.error('Failed to load locker room messages:', err));
 
     const unsubscribe = subscribeToLockerChannel(selectedChannel, (m) => {
-      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, dbToChatMessage(m)]));
+      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, mapRow(m)]));
       setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
     });
 
@@ -103,7 +117,7 @@ export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName
       cancelled = true;
       unsubscribe();
     };
-  }, [user?.id, selectedChannel]);
+  }, [user?.id, selectedChannel, lockedPathwayId]);
 
   const sendMessage = () => {
     const content = input.trim();
@@ -120,7 +134,11 @@ export function LockerRoomChat({ lockedPathwayId, userRole = 'player', coachName
         body: content,
       })
         .then((row) => {
-          setMessages((prev) => (prev.some((x) => x.id === row.id) ? prev : [...prev, dbToChatMessage(row)]));
+          setMessages((prev) =>
+            prev.some((x) => x.id === row.id)
+              ? prev
+              : [...prev, dbToChatMessage(row, lockedPathwayId)],
+          );
           setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
         })
         .catch((err) => console.error('Failed to send locker room message:', err));

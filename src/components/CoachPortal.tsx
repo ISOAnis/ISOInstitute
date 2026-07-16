@@ -24,11 +24,17 @@ import { CoachISOCard } from './CoachISOCard';
 import { PortalChromeBar } from './PortalChromeBar';
 import { getCoachPathwayChannelId } from '../utils/coachProgress';
 import {
-  resolveCoachIdentity, resolveCoachCard, isCoachCardPendingReview,
+  getCoachIdentity,
+  hydrateCoachIdentityFromDb, clearDemoCoachLocalStorage,
   type CoachCardDisplay, type CoachIdentity,
 } from '../utils/coachProfile';
 import { loadPhotoFrame, type CoachPhotoFrame } from '../utils/coachPhotoStorage';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  fetchCoachAssessment,
+  fetchCoachProfile,
+  fetchProfile,
+} from '../services/profileService';
 import {
   addBucket as addBucketDb,
   addBucketComment,
@@ -39,7 +45,7 @@ import {
   type BucketWithComments,
   type GameWithBuckets,
 } from '../services/gamesService';
-import { getPathwayName } from '../data/pathways';
+import { getPathwayName, normalizePathwayId } from '../data/pathways';
 import type { CoachRosterEntry } from '../types/database';
 
 // ─── TYPES & MOCK DATA ────────────────────────────────────────────────────────
@@ -907,7 +913,7 @@ function CoachMessagesView({
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 export function CoachPortal() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(mockPlayers[0]?.id ?? null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -957,13 +963,70 @@ export function CoachPortal() {
   const [coachPhotoFrame, setCoachPhotoFrame] = useState<CoachPhotoFrame>(() => loadPhotoFrame());
   const [activeSection, setActiveSection] = useState<CoachSection>('dashboard');
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [coachIdentity] = useState(() => resolveCoachIdentity());
-  const [coachCard, setCoachCard] = useState(() => resolveCoachCard());
-  const [pendingReview] = useState(() => isCoachCardPendingReview());
+  const [coachIdentity, setCoachIdentity] = useState<CoachIdentity>(() => {
+    clearDemoCoachLocalStorage();
+    return (
+      getCoachIdentity() ?? {
+        firstName: '',
+        lastName: '',
+        fullName: '',
+        email: '',
+        pathwayId: 'engineering',
+        pathwayName: 'The Builder Pathway',
+        pathwayColor: '#a855f7',
+      }
+    );
+  });
+  const [coachCard, setCoachCard] = useState<CoachCardDisplay | null>(null);
+  const [pendingReview, setPendingReview] = useState(false);
   const accentColor = coachIdentity.pathwayColor;
-  const pathwayChannelId = getCoachPathwayChannelId();
+  const pathwayChannelId = normalizePathwayId(coachIdentity.pathwayId) ?? getCoachPathwayChannelId();
   const pathwayChannelName = coachIdentity.pathwayName;
   const profileSectionRef = useRef<HTMLDivElement | null>(null);
+
+  // Always hydrate from Supabase for the signed-in coach — never keep Imam/Seeker demo.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    clearDemoCoachLocalStorage();
+
+    void (async () => {
+      try {
+        const [dbProfile, coachProfile, assessment] = await Promise.all([
+          // Always re-fetch so we don't race AuthContext's first null profile paint.
+          fetchProfile(user.id),
+          fetchCoachProfile(user.id),
+          fetchCoachAssessment(user.id),
+        ]);
+        if (cancelled) return;
+
+        if (!dbProfile && !coachProfile) {
+          console.warn('No coach profile rows found for', user.id);
+          return;
+        }
+
+        const { identity, card } = hydrateCoachIdentityFromDb(
+          dbProfile,
+          coachProfile,
+          assessment,
+        );
+        setCoachIdentity(identity);
+        setCoachCard(card);
+        setPendingReview(
+          assessment?.application_status === 'pending' ||
+            dbProfile?.coach_application_status === 'pending',
+        );
+        if (card.photo) setCoachProfilePicture(card.photo);
+        if (typeof coachProfile?.completion_pct === 'number') {
+          setProfileCompletion(coachProfile.completion_pct);
+        }
+      } catch (err) {
+        console.error('Failed to load coach identity from DB:', err);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const goToProfileWithHighlights = () => {
     setActiveSection('profile');
@@ -973,13 +1036,9 @@ export function CoachPortal() {
     }, 50);
   };
 
-  // Prefer the real profile name over the locally cached coach identity.
-  const profileFullName = profile
-    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
-    : '';
   const currentCoach = {
-    name: profileFullName || coachIdentity.fullName,
-    category: `${coachIdentity.pathwayName} Pathway`,
+    name: coachIdentity.fullName,
+    category: coachIdentity.pathwayName,
     categoryIcon: Moon,
     profilePicture: coachProfilePicture,
   };

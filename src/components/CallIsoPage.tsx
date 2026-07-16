@@ -4,8 +4,12 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PATHWAYS } from '../data/pathways';
 import { fetchCoachByName } from '../services/coaches';
 import { coachToListItem } from '../types/discoverableCoach';
+import { useAuth } from '../contexts/AuthContext';
+import { submitMatchRequest } from '../services/matchingService';
+import { getLockedPathway, getExploringPathway } from '../utils/membership';
 
 interface Coach {
+  id: string;
   name: string;
   role: string;
   bio: string;
@@ -43,6 +47,7 @@ const categoryInfo = Object.fromEntries(
 ) as Record<string, { title: string; legacyName: string; emoji: string }>;
 
 export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
+  const { user, updatePlan } = useAuth();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,25 +181,41 @@ export function CallIsoPage({ coachName, onBack }: CallIsoPageProps) {
     setShowPaymentForm(true);
   };
 
-  // Handle payment form submission
+  // Handle payment form submission — creates a real match request for the coach inbox.
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!user) {
+      alert('Please sign in to request ISO Pass with this coach.');
+      return;
+    }
+    if (!coach.id) {
+      alert('Coach profile is missing. Please go back and try again.');
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
-      // Pseudo-code for creating pending payment intent
-      console.log('Creating pending payment intent for', coach.name);
-      console.log('Payment details collected but not charged');
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Show success screen
+      const playerPathwayId = getLockedPathway() || getExploringPathway() || coach.categoryId || null;
+      await submitMatchRequest({
+        playerId: user.id,
+        coachId: coach.id,
+        plan: 'varsity',
+        playerPathwayId,
+        coachPathwayId: coach.categoryId || null,
+        questionnaire: {
+          commitment: `Requesting ISO Pass with ${coach.name}`,
+          goals: `Dedicated coaching on ${coach.categoryTitle || 'my pathway'}`,
+          timeframe: '5-10-hours',
+          challenges: 'Looking for structured accountability and a dedicated coach',
+        },
+      });
+      // Unlock varsity portal features while payment stays deferred until Stripe.
+      await updatePlan('varsity').catch(() => null);
       setShowSuccess(true);
       setShowPaymentForm(false);
     } catch (error) {
-      console.error('Payment intent creation failed:', error);
-      alert('There was an error processing your request. Please try again.');
+      console.error('Match request failed:', error);
+      alert(error instanceof Error ? error.message : 'There was an error processing your request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

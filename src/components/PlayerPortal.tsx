@@ -59,7 +59,8 @@ import {
   saveExplorerUsage as saveDbExplorerUsage,
   resetExplorerUsage,
 } from '../services/discoveryService';
-import { saveExploringPathway, saveLockedPathway } from '../services/pathwayService';
+import { fetchPlayerPathway, saveExploringPathway, saveLockedPathway } from '../services/pathwayService';
+import { submitMatchRequest } from '../services/matchingService';
 import {
   fetchGamesForPlayer,
   setBucketStatus,
@@ -83,7 +84,7 @@ interface SkillNodeDef {
   row: number; col: number; unlocksAt: number;
 }
 type WalkOnSection = 'explore' | 'goals' | 'community' | 'locker-room' | 'store' | 'profile';
-type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'store' | 'profile' | 'locker-room';
+type PlayerSection = 'dashboard' | 'skill-tree' | 'progress' | 'messages' | 'community' | 'store' | 'profile' | 'locker-room';
 
 interface PlayerPortalProps {
   onNavigate?: (page: any) => void;
@@ -247,16 +248,17 @@ const SIDEBAR_ITEMS: { id: PlayerSection; label: string; Icon: React.ComponentTy
   { id: 'dashboard',  label: 'Dashboard',   Icon: Home },
   { id: 'skill-tree', label: 'Skill Tree',  Icon: GitBranch },
   { id: 'progress',   label: 'My Progress', Icon: Trophy },
-  { id: 'store',      label: 'ISO Store',   Icon: ShoppingBag },
   { id: 'messages',   label: 'Messages',    Icon: MessageSquare },
+  { id: 'community',  label: 'ISO Community', Icon: MessageCircle },
   { id: 'locker-room', label: 'Locker Room', Icon: Video },
+  { id: 'store',      label: 'ISO Store',   Icon: ShoppingBag },
   { id: 'profile',    label: 'My Profile',  Icon: UserCircle },
 ];
 
 const SECTIONS_BY_PLAN: Record<MembershipPlan, PlayerSection[]> = {
   'walk-on': ['dashboard', 'profile'],
   'locker-room': ['dashboard', 'progress', 'profile'],
-  varsity: ['dashboard', 'skill-tree', 'progress', 'store', 'messages', 'locker-room', 'profile'],
+  varsity: ['dashboard', 'skill-tree', 'progress', 'messages', 'community', 'locker-room', 'store', 'profile'],
 };
 
 const NAV_H = 72; // px — nav bar bottom clearance
@@ -765,7 +767,8 @@ function CoachCardModal({
 }
 
 function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any) => void; onPlanChange?: (plan: MembershipPlan) => void }) {
-  const { user, isAdmin, updatePlan, plan: dbPlan, loading: authLoading } = useAuth();
+  const { user, profile, isAdmin, updatePlan, plan: dbPlan, loading: authLoading } = useAuth();
+  const playerFirstName = profile?.first_name?.trim() || undefined;
   const { coaches: discoverableCoaches, loading: coachesLoading } = useDiscoverableCoaches();
   const matchedCoaches = useMemo(
     () => discoverableCoaches.map(toExplorerCoachView),
@@ -817,6 +820,31 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, dbPlan]);
+
+  // Prefer player_pathways from Supabase over stale localStorage pathway picks.
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    void fetchPlayerPathway(user.id)
+      .then((pathway) => {
+        if (cancelled || !pathway) return;
+        const locked = pathway.locked_pathway_id;
+        const exploring = pathway.exploring_pathway_id;
+        if (locked) {
+          localStorage.setItem('iso_locked_pathway', locked);
+          localStorage.setItem('iso_selected_pathway', locked);
+          setCurrentPathwayId(locked);
+          setSelectedPathway(locked);
+        } else if (exploring) {
+          localStorage.setItem('iso_exploring_pathway', exploring);
+          localStorage.setItem('iso_selected_pathway', exploring);
+          setCurrentPathwayId(exploring);
+          setSelectedPathway(exploring);
+        }
+      })
+      .catch((err) => console.error('Failed to load player pathway:', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   useEffect(() => {
     const initial = localStorage.getItem('iso_portal_initial_section');
@@ -1057,6 +1085,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
         {activeSection === 'explore' && (
           <PortalGreeting
             role="player"
+            name={playerFirstName}
             accentColor={exploreHex}
             subline={`${PLAN_LABELS[membershipPlan]} · ${currentPathwayName ?? 'Explore pathways'}`}
           />
@@ -1064,6 +1093,7 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
         {activeSection === 'community' && hasLockerRoomAccess && (
           <PortalGreeting
             role="player"
+            name={playerFirstName}
             accentColor={activeHex}
             subline={`ISO Community · ${currentPathwayName ?? 'All pathways'}`}
           />
@@ -1396,14 +1426,42 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
           coachMonthlyPrice={varsityInterestCoach.varsityMonthlyPrice}
           onClose={() => { setShowVarsityInterest(false); setVarsityInterestCoach(null); }}
           onRequestVarsity={() => {
+            const coach = varsityInterestCoach;
             setShowVarsityInterest(false);
             setVarsityInterestCoach(null);
-            if (getLockedPathway()) {
-              handleUpgrade('varsity');
-            } else {
-              setPendingUpgradePlan('varsity');
-              setShowLockConfirm(true);
+
+            const finishUpgrade = () => {
+              if (getLockedPathway()) {
+                handleUpgrade('varsity');
+              } else {
+                setPendingUpgradePlan('varsity');
+                setShowLockConfirm(true);
+              }
+            };
+
+            if (user?.id && coach?.id) {
+              void submitMatchRequest({
+                playerId: user.id,
+                coachId: coach.id,
+                plan: 'varsity',
+                playerPathwayId: getLockedPathway() || getExploringPathway() || coach.pathwayId,
+                coachPathwayId: coach.pathwayId,
+                questionnaire: {
+                  commitment: `Requesting ISO Pass with ${coach.name}`,
+                  goals: `Dedicated coaching on ${PATHWAY_BY_ID[coach.pathwayId as keyof typeof PATHWAY_BY_ID]?.name || coach.pathwayId}`,
+                  timeframe: '5-10-hours',
+                  challenges: 'Looking for structured accountability and a dedicated coach',
+                },
+              })
+                .then(finishUpgrade)
+                .catch((err) => {
+                  console.error('Failed to submit match request:', err);
+                  alert(err instanceof Error ? err.message : 'Could not send ISO Pass request');
+                });
+              return;
             }
+
+            finishUpgrade();
           }}
           onScholarshipInfo={() => alert('ISO Foundation scholarships: apply at iso.foundation/scholarships. Coaches may sponsor pro bono ISO Pass spots — never off-platform.')}
         />
@@ -1432,10 +1490,12 @@ function ExplorerPortal({ onNavigate, onPlanChange }: { onNavigate?: (page: any)
 function DashboardView({
   gamesWon, totalGames, bucketsScored, totalBuckets, winPercentage,
   coachName, pathway, pathwayId, accentColor, onNavigate: onGoTo, membershipPlan,
+  playerName,
 }: {
   gamesWon: number; totalGames: number; bucketsScored: number; totalBuckets: number;
   winPercentage: number; coachName: string; pathway: string; pathwayId: string;
   accentColor: string; onNavigate: (s: PlayerSection) => void; membershipPlan: MembershipPlan;
+  playerName?: string;
 }) {
   const showDedicatedCoach = membershipPlan === 'varsity';
   const currentTier = TIERS.slice().reverse().find(t => gamesWon >= t.minGames) || TIERS[0];
@@ -1445,6 +1505,7 @@ function DashboardView({
     <div style={{ padding: '32px 32px 60px' }}>
       <PortalGreeting
         role="player"
+        name={playerName}
         accentColor={accentColor}
         subline={`${pathway}${showDedicatedCoach ? ` · with ${coachName}` : ''}`}
       />
@@ -1783,7 +1844,8 @@ function UpgradePrompt({
 
 // ─── MAIN PLAYER PORTAL ───────────────────────────────────────────────────────
 export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
-  const { user, plan: dbPlan, updatePlan, loading: authLoading } = useAuth();
+  const { user, profile, plan: dbPlan, updatePlan, loading: authLoading } = useAuth();
+  const playerFirstName = profile?.first_name?.trim() || undefined;
   const [games, setGames] = useState<Game[]>(mockGames);
   const [activeSection, setActiveSection] = useState<PlayerSection>('dashboard');
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -1865,10 +1927,27 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   const isPaidMember = membershipPlan === 'locker-room' || membershipPlan === 'varsity';
   const showTierBar = membershipPlan === 'varsity';
 
-  // Selected pathway
+  // Selected pathway — prefer Supabase player_pathways, fall back to localStorage.
   const [selectedPathwayId, setSelectedPathwayId] = useState(() => {
     try { return localStorage.getItem('iso_selected_pathway') || 'deen'; } catch { return 'deen'; }
   });
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    void fetchPlayerPathway(user.id)
+      .then((pathwayRow) => {
+        if (cancelled || !pathwayRow) return;
+        const id = pathwayRow.locked_pathway_id || pathwayRow.exploring_pathway_id;
+        if (!id) return;
+        localStorage.setItem('iso_selected_pathway', id);
+        if (pathwayRow.locked_pathway_id) {
+          localStorage.setItem('iso_locked_pathway', pathwayRow.locked_pathway_id);
+        }
+        setSelectedPathwayId(id);
+      })
+      .catch((err) => console.error('Failed to load player pathway:', err));
+    return () => { cancelled = true; };
+  }, [user?.id]);
   useEffect(() => {
     const check = () => {
       try { const s = localStorage.getItem('iso_selected_pathway'); if (s) setSelectedPathwayId(s); } catch {}
@@ -1996,6 +2075,7 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
             activeGameTitle={activeGame?.title}
             openBuckets={openBuckets}
             onNavigate={(section) => setActiveSection(section as PlayerSection)}
+            playerName={playerFirstName}
           />
         )}
         {activeSection === 'skill-tree' && (
@@ -2070,10 +2150,23 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
             </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}
-        {activeSection === 'store' && (
-          canAccessSection('store')
+        {activeSection === 'community' && (
+          canAccessSection('community')
             ? <div style={{ padding: '32px 32px 60px' }}>
-                <ISOStoreSection membershipPlan={membershipPlan} accentColor={accentColor} onUpgrade={handleUpgrade} />
+                <PortalGreeting
+                  role="player"
+                  name={playerFirstName}
+                  accentColor={accentColor}
+                  subline={`ISO Community · ${pathway?.name || 'All pathways'}`}
+                />
+                <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>ISO Community</h2>
+                <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 24px' }}>
+                  Share wins, celebrate goals, and encourage players & coaches across every pathway.
+                </p>
+                <ISOCommunityForum
+                  lockedPathwayId={getLockedPathway() || selectedPathwayId}
+                  lockedPathwayName={pathway?.name}
+                />
               </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}
@@ -2085,6 +2178,13 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
                   Pathway channels & video library · connect with other ISO Pass players
                 </p>
                 <LockerRoomChat lockedPathwayId={getLockedPathway() || selectedPathwayId} />
+              </div>
+            : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
+        )}
+        {activeSection === 'store' && (
+          canAccessSection('store')
+            ? <div style={{ padding: '32px 32px 60px' }}>
+                <ISOStoreSection membershipPlan={membershipPlan} accentColor={accentColor} onUpgrade={handleUpgrade} />
               </div>
             : <UpgradePrompt targetPlan="varsity" accentColor={accentColor} onUpgrade={() => handleUpgrade('varsity')} onBack={() => setActiveSection('dashboard')} />
         )}

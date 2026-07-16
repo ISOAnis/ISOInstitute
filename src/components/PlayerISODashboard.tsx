@@ -27,6 +27,7 @@ interface PlayerISODashboardProps {
   activeGameTitle?: string;
   openBuckets: number;
   onNavigate: (section: string) => void;
+  playerName?: string;
 }
 
 interface Opportunity {
@@ -181,7 +182,7 @@ function buildOpportunities(props: PlayerISODashboardProps, progress: ReturnType
 export function PlayerISODashboard({
   gamesWon, totalGames, bucketsScored, totalBuckets, winPercentage,
   coachName, pathway, pathwayId, accentColor, skillNodesUnlocked, totalSkillNodes,
-  activeGameTitle, openBuckets, onNavigate,
+  activeGameTitle, openBuckets, onNavigate, playerName,
 }: PlayerISODashboardProps) {
   const progress = React.useMemo(
     () => getPlayerProgressSnapshot(
@@ -224,6 +225,7 @@ export function PlayerISODashboard({
     <div style={{ padding: '24px 28px 60px', maxWidth: 1280, margin: '0 auto' }}>
       <PortalGreeting
         role="player"
+        name={playerName}
         accentColor={accentColor}
         subline={`${pathway} · ISO Pass · ${progress.tierName} · with ${coachName}`}
       />

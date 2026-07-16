@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import type {
   CoachApplicationStatus,
+  DbCoachProfile,
   MembershipPlan,
   Profile,
   Subscription,
@@ -23,6 +24,42 @@ export async function fetchSubscription(userId: string): Promise<Subscription | 
   const { data, error } = await supabase
     .from('subscriptions')
     .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+/** Own coach profile row (pathway, photo, card) for portal hydration. */
+export async function fetchCoachProfile(userId: string): Promise<DbCoachProfile | null> {
+  const { data, error } = await supabase
+    .from('coach_profiles')
+    .select(
+      'user_id, pathway_id, bio, years_of_experience, current_role, photo_url, card_display, is_discoverable, completion_pct, updated_at',
+    )
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+/** Own coach assessment (OVR / tier) for portal hydration. */
+export async function fetchCoachAssessment(userId: string): Promise<{
+  overall_rating: number;
+  tier: string;
+  tier_label: string | null;
+  strengths: string[];
+  opportunities: string[];
+  reasoning: string | null;
+  application_status: string;
+} | null> {
+  const { data, error } = await supabase
+    .from('coach_assessments')
+    .select(
+      'overall_rating, tier, tier_label, strengths, opportunities, reasoning, application_status',
+    )
     .eq('user_id', userId)
     .maybeSingle();
 
@@ -159,6 +196,9 @@ export function syncLegacyLocalStorage(profile: Profile, subscription: Subscript
       'iso_demo_user',
       JSON.stringify({
         email: profile.email,
+        firstName: profile.first_name ?? undefined,
+        lastName: profile.last_name ?? undefined,
+        name: [profile.first_name, profile.last_name].filter(Boolean).join(' ') || undefined,
         roles: profile.roles,
         gender: profile.gender ?? undefined,
       }),

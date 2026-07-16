@@ -2,6 +2,17 @@
 
 import type { CoachPhotoFrame } from './coachPhotoStorage';
 import { DEFAULT_PHOTO_FRAME, loadPhotoFrame, savePhotoFrame } from './coachPhotoStorage';
+import { PATHWAY_BY_ID, normalizePathwayId, type PathwayId } from '../data/pathways';
+import type { DbCoachProfile, Profile } from '../types/database';
+
+const PATHWAY_HEX: Record<PathwayId, string> = {
+  deen: '#10b981',
+  health: '#ef4444',
+  medicine: '#3b82f6',
+  engineering: '#a855f7',
+  entrepreneurship: '#f97316',
+  global: '#06b6d4',
+};
 
 export type CoachTier = 'bronze' | 'silver' | 'gold' | 'premium';
 
@@ -325,6 +336,135 @@ export const DEMO_COACH_RESULT: CoachResultData = {
 
 export function resolveCoachIdentity(): CoachIdentity {
   return getCoachIdentity() ?? DEMO_COACH_IDENTITY;
+}
+
+function isDemoCoachIdentity(identity: CoachIdentity | null | undefined): boolean {
+  if (!identity) return true;
+  return (
+    identity.email === 'demo@coach.iso' ||
+    identity.fullName === DEMO_COACH_IDENTITY.fullName ||
+    identity.firstName === 'Imam'
+  );
+}
+
+/** Wipe demo coach localStorage so it cannot override a real Supabase coach. */
+export function clearDemoCoachLocalStorage() {
+  try {
+    const stored = getCoachIdentity();
+    if (isDemoCoachIdentity(stored)) {
+      localStorage.removeItem('iso_coach_identity');
+      localStorage.removeItem('iso_coach_card');
+      localStorage.removeItem('iso_coach_result');
+      localStorage.removeItem('coach_profile_data');
+    }
+    localStorage.removeItem('iso_coach_pending');
+  } catch {
+    // Non-fatal
+  }
+}
+
+export interface CoachAssessmentSnapshot {
+  overall_rating: number;
+  tier: CoachTier;
+  tier_label: string | null;
+  strengths: string[];
+  opportunities: string[];
+  reasoning: string | null;
+  application_status: string;
+}
+
+/**
+ * Build coach portal identity + card strictly from Supabase.
+ * Never falls back to the Imam/Seeker demo identity.
+ */
+export function hydrateCoachIdentityFromDb(
+  profile: Profile | null,
+  coachProfile: DbCoachProfile | null,
+  assessment: CoachAssessmentSnapshot | null = null,
+): { identity: CoachIdentity; card: CoachCardDisplay } {
+  clearDemoCoachLocalStorage();
+
+  const fromCardName = (() => {
+    const name = coachProfile?.card_display?.pathwayName;
+    if (typeof name !== 'string') return null;
+    const match = Object.values(PATHWAY_BY_ID).find(
+      (p) =>
+        p.name === name ||
+        p.name.includes(name) ||
+        name.includes(p.name.replace(/^The /, '')),
+    );
+    return match?.id ?? null;
+  })();
+
+  const resolvedPathwayId =
+    normalizePathwayId(coachProfile?.pathway_id) ?? fromCardName ?? 'engineering';
+
+  const meta = PATHWAY_BY_ID[resolvedPathwayId];
+  const firstName = profile?.first_name?.trim() || 'Coach';
+  const lastName = profile?.last_name?.trim() || '';
+  const fullName =
+    [firstName, lastName].filter(Boolean).join(' ') ||
+    profile?.email?.split('@')[0] ||
+    'Coach';
+
+  const identity: CoachIdentity = {
+    firstName,
+    lastName,
+    fullName,
+    email: profile?.email || '',
+    pathwayId: resolvedPathwayId,
+    pathwayName: meta?.name ?? 'Pathway',
+    pathwayColor: PATHWAY_HEX[resolvedPathwayId] ?? '#f97316',
+    gender: profile?.gender ?? undefined,
+  };
+
+  const cardFromDb = (coachProfile?.card_display ?? {}) as Partial<CoachCardDisplay>;
+  const result: CoachResultData = {
+    overall: assessment?.overall_rating ?? 0,
+    tier: (assessment?.tier as CoachTier) ?? 'bronze',
+    tierLabel: assessment?.tier_label ?? 'Bronze',
+    strengths: assessment?.strengths?.length
+      ? assessment.strengths
+      : (cardFromDb.result?.strengths ?? []),
+    opportunities: assessment?.opportunities?.length
+      ? assessment.opportunities
+      : (cardFromDb.result?.opportunities ?? []),
+    reasoning: assessment?.reasoning ?? cardFromDb.result?.reasoning ?? '',
+  };
+
+  const card: CoachCardDisplay = {
+    name: fullName,
+    pathwayName: identity.pathwayName,
+    role: coachProfile?.current_role || cardFromDb.role || 'Active coach',
+    years: Number(coachProfile?.years_of_experience) || cardFromDb.years || 0,
+    photo: coachProfile?.photo_url ?? cardFromDb.photo ?? localStorage.getItem('coach_profile_picture'),
+    photoFrame: cardFromDb.photoFrame ?? loadPhotoFrame(),
+    skillTags: cardFromDb.skillTags ?? result.strengths.slice(0, 3),
+    outcomeCount: cardFromDb.outcomeCount ?? result.strengths.length,
+    result,
+  };
+
+  try {
+    localStorage.setItem('iso_coach_identity', JSON.stringify(identity));
+    localStorage.setItem('iso_coach_card', JSON.stringify(card));
+    localStorage.setItem('iso_coach_result', JSON.stringify(result));
+    if (coachProfile?.photo_url) {
+      localStorage.setItem('coach_profile_picture', coachProfile.photo_url);
+    }
+    if (typeof coachProfile?.completion_pct === 'number') {
+      localStorage.setItem('coach_profile_completion', String(coachProfile.completion_pct));
+    }
+    if (
+      assessment?.application_status === 'approved' ||
+      profile?.coach_application_status === 'approved'
+    ) {
+      localStorage.removeItem('iso_coach_pending');
+    }
+  } catch {
+    // Non-fatal
+  }
+
+  return { identity, card };
 }
 
 export function resolveCoachCard(): CoachCardDisplay | null {
