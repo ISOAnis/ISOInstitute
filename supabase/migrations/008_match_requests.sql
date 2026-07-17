@@ -32,6 +32,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS match_requests_one_pending_idx
 
 ALTER TABLE public.match_requests ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "match_requests_select_participants" ON public.match_requests;
 CREATE POLICY "match_requests_select_participants"
   ON public.match_requests FOR SELECT
   USING (
@@ -40,10 +41,12 @@ CREATE POLICY "match_requests_select_participants"
     OR public.is_admin()
   );
 
+DROP POLICY IF EXISTS "match_requests_insert_player" ON public.match_requests;
 CREATE POLICY "match_requests_insert_player"
   ON public.match_requests FOR INSERT
   WITH CHECK (auth.uid() = player_id);
 
+DROP POLICY IF EXISTS "match_requests_update_coach_or_player" ON public.match_requests;
 CREATE POLICY "match_requests_update_coach_or_player"
   ON public.match_requests FOR UPDATE
   USING (

@@ -146,3 +146,26 @@ export async function respondToMatch(
   });
   if (error) throw error;
 }
+
+export type PlayerMatchStatus = 'none' | 'pending' | 'accepted';
+
+/** Latest open/accepted match status per coach for the signed-in player. */
+export async function fetchPlayerMatchStatuses(
+  playerId: string,
+): Promise<Record<string, PlayerMatchStatus>> {
+  const { data, error } = await supabase
+    .from('match_requests')
+    .select('coach_id, status, created_at')
+    .eq('player_id', playerId)
+    .in('status', ['pending', 'accepted'])
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  const statuses: Record<string, PlayerMatchStatus> = {};
+  for (const row of data ?? []) {
+    if (statuses[row.coach_id]) continue; // keep newest
+    statuses[row.coach_id] = row.status === 'accepted' ? 'accepted' : 'pending';
+  }
+  return statuses;
+}

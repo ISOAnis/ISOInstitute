@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import {
   Sparkles, Star, Target, Trophy, Calendar, Video, MessageSquare,
-  UserCircle, GitBranch, ChevronRight, TrendingUp, CheckCircle2,
+  UserCircle, GitBranch, ChevronRight, TrendingUp, CheckCircle2, ArrowRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { PortalGreeting } from './PortalGreeting';
@@ -28,6 +28,11 @@ interface PlayerISODashboardProps {
   openBuckets: number;
   onNavigate: (section: string) => void;
   playerName?: string;
+  /** When set, shows Request ISO Pass CTA for this coach */
+  coachId?: string | null;
+  matchStatus?: 'none' | 'pending' | 'accepted';
+  onRequestIsoPass?: () => void;
+  onMessageCoach?: () => void;
 }
 
 interface Opportunity {
@@ -183,6 +188,7 @@ export function PlayerISODashboard({
   gamesWon, totalGames, bucketsScored, totalBuckets, winPercentage,
   coachName, pathway, pathwayId, accentColor, skillNodesUnlocked, totalSkillNodes,
   activeGameTitle, openBuckets, onNavigate, playerName,
+  coachId, matchStatus = 'none', onRequestIsoPass, onMessageCoach,
 }: PlayerISODashboardProps) {
   const progress = React.useMemo(
     () => getPlayerProgressSnapshot(
@@ -282,7 +288,7 @@ export function PlayerISODashboard({
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
               background: 'rgba(0,0,0,0.25)', borderRadius: 12, padding: '12px 14px',
-              marginBottom: 14,
+              marginBottom: coachId ? 10 : 14,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
@@ -291,15 +297,62 @@ export function PlayerISODashboard({
               }}>
                 {coachInitials}
               </div>
-              <div style={{ minWidth: 0 }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600, color: '#F2F2F2' }}>
                   {coachName}
                 </div>
                 <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                  Your ISO Pass coach
+                  {matchStatus === 'accepted'
+                    ? 'Your ISO Pass coach'
+                    : matchStatus === 'pending'
+                      ? 'ISO Pass request pending'
+                      : 'Connected coach · request ISO Pass'}
                 </div>
               </div>
             </div>
+
+            {coachId && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                {matchStatus === 'none' && onRequestIsoPass && (
+                  <button
+                    type="button"
+                    onClick={onRequestIsoPass}
+                    style={{
+                      width: '100%', padding: '12px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                      background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+                      color: '#fff', fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: 1.5,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    }}
+                  >
+                    REQUEST ISO PASS WITH {coachName.split(' ')[0].toUpperCase()}
+                    <ArrowRight size={14} />
+                  </button>
+                )}
+                {matchStatus === 'pending' && (
+                  <div style={{
+                    padding: '10px 12px', borderRadius: 10, textAlign: 'center',
+                    background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.35)',
+                    fontFamily: "'Barlow', sans-serif", fontSize: 12, color: '#c084fc',
+                  }}>
+                    Waiting for {coachName.split(' ')[0]} to accept your ISO Pass request
+                  </div>
+                )}
+                {onMessageCoach && (
+                  <button
+                    type="button"
+                    onClick={onMessageCoach}
+                    style={{
+                      width: '100%', padding: '10px 14px', borderRadius: 10, cursor: 'pointer',
+                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)',
+                      color: 'rgba(255,255,255,0.7)', fontFamily: "'Barlow', sans-serif", fontSize: 13, fontWeight: 600,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    }}
+                  >
+                    <MessageSquare size={14} /> Message {coachName.split(' ')[0]}
+                  </button>
+                )}
+              </div>
+            )}
 
             {activeGameTitle && (
               <div style={{

@@ -60,7 +60,12 @@ import {
   resetExplorerUsage,
 } from '../services/discoveryService';
 import { fetchPlayerPathway, saveExploringPathway, saveLockedPathway } from '../services/pathwayService';
-import { submitMatchRequest } from '../services/matchingService';
+import {
+  submitMatchRequest,
+  fetchPlayerMatchStatuses,
+  type PlayerMatchStatus,
+} from '../services/matchingService';
+import { fetchCoachById } from '../services/coaches';
 import {
   fetchGamesForPlayer,
   setBucketStatus,
@@ -1899,6 +1904,22 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
   // Coaches connected to this player (try-out bookings or assigned games).
   const [myCoaches, setMyCoaches] = useState<PlayerCoachEntry[]>([]);
   const [selectedCoachId, setSelectedCoachId] = useState<string | null>(null);
+  const [matchStatuses, setMatchStatuses] = useState<Record<string, PlayerMatchStatus>>({});
+  const [coachPrices, setCoachPrices] = useState<Record<string, number>>({});
+  const [showVarsityInterest, setShowVarsityInterest] = useState(false);
+  const [varsityInterestCoach, setVarsityInterestCoach] = useState<{
+    id: string;
+    name: string;
+    pathwayId: string;
+    varsityMonthlyPrice: number;
+  } | null>(null);
+
+  const refreshMatchStatuses = () => {
+    if (!user) return;
+    void fetchPlayerMatchStatuses(user.id)
+      .then(setMatchStatuses)
+      .catch((err) => console.error('Failed to load match statuses:', err));
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -1908,14 +1929,39 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
         if (cancelled) return;
         setMyCoaches(rows);
         setSelectedCoachId((prev) => prev ?? rows[0]?.coach_id ?? null);
+        // Soft-load ISO Pass prices for request modal
+        void Promise.all(
+          rows.map(async (c) => {
+            try {
+              const discovered = await fetchCoachById(c.coach_id);
+              return [c.coach_id, discovered?.varsityPrice ?? 75] as const;
+            } catch {
+              return [c.coach_id, 75] as const;
+            }
+          }),
+        ).then((pairs) => {
+          if (cancelled) return;
+          setCoachPrices(Object.fromEntries(pairs));
+        });
       })
       .catch((err) => console.error('Failed to load coaches:', err));
+    refreshMatchStatuses();
     return () => { cancelled = true; };
   }, [user?.id]);
 
   const selectedCoach = myCoaches.find((c) => c.coach_id === selectedCoachId) ?? null;
   const coachDisplayName = (c: PlayerCoachEntry) =>
     [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email;
+
+  const openIsoPassRequest = (coach: PlayerCoachEntry) => {
+    setVarsityInterestCoach({
+      id: coach.coach_id,
+      name: coachDisplayName(coach),
+      pathwayId: coach.pathway_id || selectedPathwayId,
+      varsityMonthlyPrice: coachPrices[coach.coach_id] ?? 75,
+    });
+    setShowVarsityInterest(true);
+  };
 
   const handleUpgrade = (plan: MembershipPlan) => {
     setUserPlan(plan);
@@ -2076,6 +2122,10 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
             openBuckets={openBuckets}
             onNavigate={(section) => setActiveSection(section as PlayerSection)}
             playerName={playerFirstName}
+            coachId={selectedCoach?.coach_id ?? null}
+            matchStatus={selectedCoach ? (matchStatuses[selectedCoach.coach_id] ?? 'none') : 'none'}
+            onRequestIsoPass={selectedCoach ? () => openIsoPassRequest(selectedCoach) : undefined}
+            onMessageCoach={selectedCoach ? () => setActiveSection('messages') : undefined}
           />
         )}
         {activeSection === 'skill-tree' && (
@@ -2119,6 +2169,53 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
                   })}
                 </div>
               )}
+              {user && selectedCoach && (() => {
+                const status = matchStatuses[selectedCoach.coach_id] ?? 'none';
+                const first = coachDisplayName(selectedCoach).split(' ')[0];
+                if (status === 'accepted') return null;
+                return (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+                    padding: '14px 18px', borderRadius: 14,
+                    background: status === 'pending'
+                      ? 'rgba(168,85,247,0.1)'
+                      : 'linear-gradient(90deg, rgba(168,85,247,0.18) 0%, rgba(124,58,237,0.08) 100%)',
+                    border: '1px solid rgba(168,85,247,0.4)',
+                  }}>
+                    <div>
+                      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: '#F2F2F2', letterSpacing: 0.5 }}>
+                        {status === 'pending' ? `ISO Pass request sent to ${first}` : `Want dedicated coaching with ${first}?`}
+                      </div>
+                      <div style={{ fontFamily: "'Barlow', sans-serif", fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                        {status === 'pending'
+                          ? "They'll see this under Match Score and can accept or decline."
+                          : 'Request an ISO Pass — weekly check-ins, playbook, and progress with this coach.'}
+                      </div>
+                    </div>
+                    {status === 'none' ? (
+                      <button
+                        type="button"
+                        onClick={() => openIsoPassRequest(selectedCoach)}
+                        style={{
+                          flexShrink: 0, padding: '12px 20px', borderRadius: 100, border: 'none', cursor: 'pointer',
+                          background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+                          color: '#fff', fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: 1.5,
+                        }}
+                      >
+                        REQUEST ISO PASS
+                      </button>
+                    ) : (
+                      <div style={{
+                        flexShrink: 0, padding: '8px 14px', borderRadius: 100,
+                        background: 'rgba(168,85,247,0.2)', color: '#c084fc',
+                        fontFamily: "'Barlow', sans-serif", fontSize: 12, fontWeight: 600,
+                      }}>
+                        Pending
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               {user && myCoaches.length === 0 ? (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14 }}>
                   <div style={{ textAlign: 'center', padding: 40 }}>
@@ -2198,6 +2295,50 @@ export function PlayerPortal({ onNavigate }: PlayerPortalProps) {
           </div>
         )}
       </main>
+
+      {showVarsityInterest && varsityInterestCoach && (
+        <VarsityInterestModal
+          coachName={varsityInterestCoach.name}
+          coachMonthlyPrice={varsityInterestCoach.varsityMonthlyPrice}
+          onClose={() => { setShowVarsityInterest(false); setVarsityInterestCoach(null); }}
+          onRequestVarsity={() => {
+            const coach = varsityInterestCoach;
+            setShowVarsityInterest(false);
+            setVarsityInterestCoach(null);
+
+            if (!user?.id || !coach?.id) {
+              alert('Sign in to request an ISO Pass.');
+              return;
+            }
+
+            void submitMatchRequest({
+              playerId: user.id,
+              coachId: coach.id,
+              plan: 'varsity',
+              playerPathwayId: getLockedPathway() || selectedPathwayId || coach.pathwayId,
+              coachPathwayId: coach.pathwayId,
+              questionnaire: {
+                commitment: `Requesting ISO Pass with ${coach.name}`,
+                goals: `Dedicated coaching on ${PATHWAY_BY_ID[coach.pathwayId as keyof typeof PATHWAY_BY_ID]?.name || coach.pathwayId}`,
+                timeframe: '5-10-hours',
+                challenges: 'Looking for structured accountability and a dedicated coach',
+              },
+            })
+              .then(() => {
+                if (membershipPlan !== 'varsity') {
+                  handleUpgrade('varsity');
+                }
+                refreshMatchStatuses();
+                alert(`ISO Pass request sent to ${coach.name}. They'll see it under Match Score.`);
+              })
+              .catch((err) => {
+                console.error('Failed to submit match request:', err);
+                alert(err instanceof Error ? err.message : 'Could not send ISO Pass request');
+              });
+          }}
+          onScholarshipInfo={() => alert('ISO Foundation scholarships: apply at iso.foundation/scholarships. Coaches may sponsor pro bono ISO Pass spots — never off-platform.')}
+        />
+      )}
     </div>
   );
 }

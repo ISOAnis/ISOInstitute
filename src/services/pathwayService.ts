@@ -46,7 +46,10 @@ export async function saveLockedPathway(userId: string, pathwayId: string): Prom
   if (error) throw error;
 }
 
-/** Change own plan via SECURITY DEFINER RPC (temporary until Stripe). */
+/**
+ * Change own plan via SECURITY DEFINER RPC (temporary until Stripe Checkout is live).
+ * Prefer `startPlanCheckout` from stripeService once Phase 9b is wired.
+ */
 export async function setOwnPlan(plan: MembershipPlan): Promise<void> {
   const { error } = await supabase.rpc('set_own_plan', { new_plan: plan });
   if (error) throw error;

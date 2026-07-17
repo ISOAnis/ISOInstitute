@@ -92,7 +92,7 @@ export function AIMatchingDashboard() {
       { category: 'Goals Alignment', score: Math.min(98, request.match_score + 2), details: 'Their goals strongly align with your expertise areas', icon: Target },
       { category: 'Commitment Level', score: Math.min(98, request.match_score), details: `${timeframe.replace(/-/g, ' ')} weekly matches your coaching capacity`, icon: Clock },
       { category: 'Communication Style', score: Math.max(70, request.match_score - 5), details: 'Their learning style fits your coaching approach', icon: MessageSquare },
-      { category: 'Growth Potential', score: Math.min(96, request.match_score + 1), details: 'High likelihood of success based on profile analysis', icon: TrendingUp },
+      { category: 'Growth Potential', score: Math.min(96, request.match_score + 1), details: 'Heuristic estimate based on pathway and request signals', icon: TrendingUp },
     ];
   };
 
@@ -122,11 +122,11 @@ export function AIMatchingDashboard() {
           </div>
           <div>
             <h3 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, color: PORTAL_TEXT_PRIMARY, margin: '0 0 8px', letterSpacing: 0.5 }}>
-              AI-Powered Matching
+              Match Score
             </h3>
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: PORTAL_TEXT_MUTED, margin: '0 0 16px', lineHeight: 1.6 }}>
-              Players who request ISO Pass with you land here. Accept to start a kickoff game on your roster
-              and unlock messaging — decline if it is not the right fit.
+              Players who request ISO Pass with you land here. Scores reflect pathway fit and request details
+              (not AI yet). Accept to start a kickoff game on your roster and unlock messaging — decline if it is not the right fit.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
               <Pill color={PORTAL_ACCENT} bg={`${PORTAL_ACCENT}15`} border={`${PORTAL_ACCENT}35`}>
@@ -209,6 +209,12 @@ export function AIMatchingDashboard() {
                     const style = getMatchStyle(selectedRequest.match_score);
                     return (
                       <div style={{ textAlign: 'right' }}>
+                        <div style={{
+                          fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, fontWeight: 700,
+                          letterSpacing: 1.5, textTransform: 'uppercase', color: PORTAL_TEXT_DIM, marginBottom: 4,
+                        }}>
+                          Match score
+                        </div>
                         <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: style.color, lineHeight: 1 }}>
                           {selectedRequest.match_score}%
                         </div>

@@ -932,7 +932,7 @@ export function CoachProfileSection({
           />
         </div>
         <p style={mutedStyle}>
-          Complete your profile to improve AI matching accuracy and help us connect you with ideal players.
+          Complete your profile to improve match score accuracy and help us connect you with ideal players.
         </p>
       </div>
 

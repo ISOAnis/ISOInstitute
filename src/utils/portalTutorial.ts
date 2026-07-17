@@ -242,7 +242,7 @@ const COACH_BASE: PortalTutorialStep[] = [
     placement: 'right',
   },
   {
-    title: 'AI Matching',
+    title: 'Match Score',
     description: 'Review match scores and accept player requests that fit your expertise.',
     target: 'coach-nav-matching',
     section: 'matching',

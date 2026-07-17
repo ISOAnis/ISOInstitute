@@ -24,7 +24,7 @@ The app started as a **demo/prototype**. Login was fake, and most data lived in 
 | Multi-role | One email can be both player and coach |
 | Plan upgrades | Admin-only via `subscriptions.plan` until Stripe exists |
 | Pathway changes | Auto-approve after 7 days (schema ready, UI partial) |
-| Stripe / payments | Not built yet |
+| Stripe / payments | Schema + Edge Function stubs (Phase 9); Checkout not live yet |
 | Try-outs | In-app calendar only; 30 min sessions |
 | Demo coach | **Anis Benyoucef** on Builder pathway (`engineering`) |
 
@@ -114,9 +114,9 @@ supabase/scripts/reset_tryout_usage.sql
 
 - Locker Room **videos** (catalog still demo)
 - Forum **comments** (encouragements are real; threaded replies not yet)
-- ISO Store catalog & orders
+- ISO Store catalog (orders table exists; UI still mock checkout)
 - Coach real availability (time slots are fake)
-- Stripe payments (match requests defer charge until Stripe)
+- Stripe Checkout / webhook signature verification (schema + stubs ready; not charging yet)
 
 ---
 
@@ -144,6 +144,7 @@ Run in order:
 6. `supabase/migrations/006_messaging.sql`
 7. `supabase/migrations/007_community.sql`
 8. `supabase/migrations/008_match_requests.sql`
+9. `supabase/migrations/009_stripe_billing.sql`
 
 ---
 
@@ -193,16 +194,24 @@ Run in order:
 - **LockerRoomChat** — pathway channel messages persist and stream live; videos remain demo for now
 - Plan gating (Locker Room / Varsity) stays in the app UI
 
-### Phase 8 — AI matching / varsity pairing
+### Phase 8 — Match score / varsity pairing
 
 - **Migration 008** — `match_requests` table + RLS; `respond_to_match()` (accept seeds a kickoff game); `get_coach_match_requests()` inbox RPC
 - `src/services/matchingService.ts` — submit request, coach inbox fetch, accept/decline
 - **CallIsoPage** + **PlayerPortal VarsityInterestModal** — create a real pending request for that coach (plan upgrades to varsity; Stripe still deferred)
 - **AIMatchingDashboard** — loads pending requests from DB; Accept starts coaching (roster + messaging unlock); Decline closes the request
 
+### Phase 9 — Stripe schema + webhook stubs
+
+- **Migration 009** — extends `subscriptions` (`billing_provider`, `stripe_price_id`, `cancel_at_period_end`); adds `stripe_webhook_events`, `stripe_checkout_sessions`, `store_orders`; RPCs `create_checkout_intent`, `apply_stripe_subscription`, `record_stripe_webhook_event`, `complete_stripe_checkout_session`
+- **Edge Functions** (stubs) — `supabase/functions/stripe-webhook`, `supabase/functions/create-checkout-session` (see `supabase/functions/README.md`)
+- **Client** — `src/services/stripeService.ts` (`createCheckoutIntent`, `startCheckout`, `startPlanCheckout`)
+- `set_own_plan` remains for demo upgrades until live Checkout + webhooks replace it
+
 ## Next planned phase
 
-**Phase 9** — ISO Store / Stripe payments, or real coach availability calendars.
+**Phase 9b** — Wire real Stripe Checkout (`sessions.create` + `constructEvent`) and stop using `set_own_plan` for paid upgrades.  
+**Phase 10** — Real coach availability calendars, or ISO Store catalog in DB.
 
 ---
 

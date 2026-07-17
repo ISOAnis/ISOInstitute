@@ -235,7 +235,7 @@ const SIDEBAR_ITEMS: { id: CoachSection; label: string; Icon: React.ComponentTyp
   { id: 'dashboard', label: 'Dashboard', Icon: Home },
   { id: 'players', label: 'My Players', Icon: Users },
   { id: 'messages', label: 'Messages', Icon: MessageSquare },
-  { id: 'matching', label: 'AI Matching', Icon: Sparkles },
+  { id: 'matching', label: 'Match Score', Icon: Sparkles },
   { id: 'community', label: 'ISO Community', Icon: MessageCircle },
   { id: 'locker-room', label: 'Locker Room', Icon: Video },
   { id: 'store', label: 'Coach Store', Icon: ShoppingBag },
@@ -1296,10 +1296,10 @@ export function CoachPortal() {
         {activeSection === 'matching' && (
           <div style={{ padding: '32px 32px 60px' }}>
             <h2 style={{ color: '#F2F2F2', fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, margin: '0 0 6px', letterSpacing: 0.5 }}>
-              AI Matching
+              Match Score
             </h2>
             <p style={{ fontFamily: "'Barlow', sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 0 28px' }}>
-              Review player match scores and accept new requests
+              Review player match scores and accept new ISO Pass requests
             </p>
             <AIMatchingDashboard />
           </div>

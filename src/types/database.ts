@@ -22,6 +22,8 @@ export interface Profile {
   updated_at: string;
 }
 
+export type BillingProvider = 'manual' | 'stripe';
+
 export interface Subscription {
   id: string;
   user_id: string;
@@ -29,9 +31,55 @@ export interface Subscription {
   status: 'active' | 'canceled' | 'past_due' | 'trialing';
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  stripe_price_id: string | null;
+  cancel_at_period_end: boolean;
+  billing_provider: BillingProvider;
   current_period_end: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type CheckoutPurpose = 'locker-room' | 'varsity' | 'iso-pass' | 'store';
+export type CheckoutSessionStatus = 'created' | 'open' | 'completed' | 'expired' | 'canceled';
+export type StoreOrderStatus = 'pending' | 'paid' | 'fulfilled' | 'canceled' | 'refunded';
+
+export interface StripeCheckoutSession {
+  id: string;
+  user_id: string;
+  stripe_session_id: string | null;
+  purpose: CheckoutPurpose;
+  target_plan: MembershipPlan | null;
+  coach_id: string | null;
+  amount_cents: number | null;
+  currency: string;
+  status: CheckoutSessionStatus;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface StoreOrder {
+  id: string;
+  user_id: string;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  status: StoreOrderStatus;
+  total_cents: number;
+  currency: string;
+  items: unknown[];
+  shipping: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StripeWebhookEvent {
+  id: string;
+  type: string;
+  livemode: boolean;
+  payload: Record<string, unknown>;
+  processed_at: string | null;
+  error: string | null;
+  created_at: string;
 }
 
 export interface PlayerAssessment {
@@ -387,11 +435,72 @@ export type Database = {
         Update: Partial<DbMatchRequest>;
         Relationships: [];
       };
+      stripe_checkout_sessions: {
+        Row: StripeCheckoutSession;
+        Insert: Partial<StripeCheckoutSession> & {
+          user_id: string;
+          purpose: CheckoutPurpose;
+        };
+        Update: Partial<StripeCheckoutSession>;
+        Relationships: [];
+      };
+      store_orders: {
+        Row: StoreOrder;
+        Insert: Partial<StoreOrder> & { user_id: string };
+        Update: Partial<StoreOrder>;
+        Relationships: [];
+      };
+      stripe_webhook_events: {
+        Row: StripeWebhookEvent;
+        Insert: Partial<StripeWebhookEvent> & { id: string; type: string };
+        Update: Partial<StripeWebhookEvent>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
       set_own_plan: {
         Args: { new_plan: MembershipPlan };
+        Returns: undefined;
+      };
+      create_checkout_intent: {
+        Args: {
+          p_purpose: CheckoutPurpose;
+          p_target_plan?: MembershipPlan | null;
+          p_coach_id?: string | null;
+          p_amount_cents?: number | null;
+          p_metadata?: Record<string, unknown>;
+        };
+        Returns: string;
+      };
+      apply_stripe_subscription: {
+        Args: {
+          p_user_id: string;
+          p_plan: MembershipPlan;
+          p_status: Subscription['status'];
+          p_stripe_customer_id?: string | null;
+          p_stripe_subscription_id?: string | null;
+          p_stripe_price_id?: string | null;
+          p_current_period_end?: string | null;
+          p_cancel_at_period_end?: boolean;
+        };
+        Returns: undefined;
+      };
+      record_stripe_webhook_event: {
+        Args: {
+          p_event_id: string;
+          p_type: string;
+          p_livemode: boolean;
+          p_payload: Record<string, unknown>;
+          p_error?: string | null;
+        };
+        Returns: boolean;
+      };
+      complete_stripe_checkout_session: {
+        Args: {
+          p_stripe_session_id: string;
+          p_checkout_intent_id?: string | null;
+        };
         Returns: undefined;
       };
       resolve_due_pathway_change: {
