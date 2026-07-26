@@ -30,10 +30,10 @@ const PILOT_APPLICATION_URL = 'https://form.typeform.com/to/ersVpyNB';
 
 // Temporary: Google Form while Supabase waitlist is unavailable
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
-const LIVE_STREAM_URL = 'https://youtube.com/live/EvluZjlWzMY?feature=share';
-const PREVIOUS_EPISODE_URL = 'https://www.youtube.com/watch?v=cI82cH59tSw&t=1s';
-const CURRENT_EPISODE_LABEL = 'Watch EP. 07 Live';
-const PREVIOUS_EPISODE_LABEL = 'Watch EP. 06';
+const LIVE_STREAM_URL = 'https://youtube.com/live/xlRsY_T2SUs?feature=share';
+const PREVIOUS_EPISODE_URL = 'https://youtube.com/live/EvluZjlWzMY?feature=share';
+const CURRENT_EPISODE_LABEL = 'Watch EP. 08 Live';
+const PREVIOUS_EPISODE_LABEL = 'Watch EP. 07';
 const ASSIST_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const ASSIST_LIVE_START_HOUR = 18; // Sunday 6 PM Mountain Time
 const ASSIST_LIVE_END_HOUR = 19; // Sunday 7 PM Mountain Time
@@ -108,10 +108,10 @@ function getSundayLiveStartMs(year: number, month: number, day: number) {
   );
 }
 
-/** Next live: Sunday July 19, 2026 · EP. 07 (remove after it airs). */
+/** Next live: Sunday July 26, 2026 · EP. 08 — Season Finale (remove after it airs). */
 const ASSIST_SCHEDULE_OVERRIDE = {
-  liveStartMs: zonedTimeToUtc(2026, 7, 19, ASSIST_LIVE_START_HOUR, 0, 0, MOUNTAIN_TIME_ZONE),
-  episodeNumber: 7,
+  liveStartMs: zonedTimeToUtc(2026, 7, 26, ASSIST_LIVE_START_HOUR, 0, 0, MOUNTAIN_TIME_ZONE),
+  episodeNumber: 8,
 };
 
 const episodeDateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -392,6 +392,20 @@ function AssistCountdownSection() {
         }}
       >
         {episodeLabel}
+      </p>
+
+      <p
+        style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: '14px',
+          fontWeight: 700,
+          letterSpacing: '4px',
+          textTransform: 'uppercase',
+          color: '#C08038',
+          margin: '8px 0 0',
+        }}
+      >
+        Season Finale
       </p>
 
 
