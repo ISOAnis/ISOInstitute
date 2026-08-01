@@ -105,7 +105,11 @@ export function AssistPage({
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation mode={onBack ? 'about' : 'splash'} onBack={onBack} />
+      <SplashNavigation
+        mode={onBack ? 'about' : 'splash'}
+        onBack={onBack}
+        onNavigateToAssist={onNavigateToAssist}
+      />
 
       <div className="assist-splash-content">
         <header className="assist-hero">

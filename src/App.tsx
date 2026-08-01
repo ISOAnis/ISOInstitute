@@ -84,6 +84,7 @@ export default function App() {
         onBack={() => navigate('splash')}
         onWaitlistClick={openWaitlistForm}
         onNavigateToFAQ={() => navigate('faq')}
+        onNavigateToAssist={() => navigate('assist')}
       />
     );
   }

@@ -20,6 +20,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { SplashNavigation } from '../components/SplashNavigation';
 import { SplashFooter } from '../components/SplashFooter';
+import {
+  SplashIntroOverlay,
+  hasSeenSplashIntro,
+  markSplashIntroSeen,
+} from '../components/SplashIntroOverlay';
 
 // =============================================================================
 // CONSTANTS
@@ -309,6 +314,17 @@ export function EventSplashPage({
   onNavigateToAssist?: () => void;
 }) {
   const [showPilotModal, setShowPilotModal] = useState(false);
+  const [showIntroOverlay, setShowIntroOverlay] = useState(() => !hasSeenSplashIntro());
+  const [mainVisible, setMainVisible] = useState(() => hasSeenSplashIntro());
+
+  const handleIntroExitStart = () => {
+    setMainVisible(true);
+  };
+
+  const handleIntroComplete = () => {
+    markSplashIntroSeen();
+    setShowIntroOverlay(false);
+  };
 
   const openWaitlistForm = () => {
     window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer');
@@ -316,7 +332,27 @@ export function EventSplashPage({
 
   return (
     <div className="relative min-h-screen" style={{ background: '#0C0C0C' }}>
-      <SplashNavigation onNavigateToAbout={onNavigateToAbout} />
+      <AnimatePresence>
+        {showIntroOverlay && (
+          <SplashIntroOverlay
+            key="splash-intro"
+            onExitStart={handleIntroExitStart}
+            onComplete={handleIntroComplete}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        initial={false}
+        animate={{
+          opacity: mainVisible ? 1 : 0,
+        }}
+        transition={{ duration: 0.65, ease: 'easeOut' }}
+      >
+      <SplashNavigation
+        onNavigateToAbout={onNavigateToAbout}
+        onNavigateToAssist={onNavigateToAssist}
+      />
 
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -335,12 +371,7 @@ export function EventSplashPage({
 
       <div className="relative z-10 flex flex-col items-center px-4 pb-8" style={{ paddingTop: '100px' }}>
         <div className="w-full max-w-4xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-8"
-          >
+          <div className="mb-8">
             <img
               src="/ISO OFFICIAL.png"
               alt="ISO"
@@ -349,14 +380,11 @@ export function EventSplashPage({
                 filter: 'drop-shadow(0 0 40px rgba(255, 255, 255, 0.3))',
               }}
             />
-          </motion.div>
+          </div>
 
-          <motion.h1
+          <h1
             className="mb-4 text-5xl font-bold uppercase leading-tight tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl"
             style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
           >
             You&apos;re Not Lost.
             <br />
@@ -372,14 +400,14 @@ export function EventSplashPage({
             >
               In Search Of.
             </span>
-          </motion.h1>
+          </h1>
 
           <motion.p
             className="mx-auto mb-4 max-w-xl text-lg text-white sm:text-xl md:text-2xl"
             style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: mainVisible ? 1 : 0, y: mainVisible ? 0 : 16 }}
+            transition={{ duration: 0.65, delay: mainVisible ? 0.15 : 0 }}
           >
             A movement, a system, a community.
           </motion.p>
@@ -395,21 +423,29 @@ export function EventSplashPage({
               backgroundClip: 'text',
             }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.45 }}
+            animate={{ opacity: mainVisible ? 1 : 0 }}
+            transition={{ duration: 0.65, delay: mainVisible ? 0.25 : 0 }}
           >
             The ISO Institute is a gamified development platform built to inspire ambition,
             <br />
             elevate overlooked talent, and rebuild community pathways to success.
           </motion.p>
 
-          <AssistPromoSection />
+          {mainVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.35 }}
+            >
+              <AssistPromoSection />
+            </motion.div>
+          )}
 
           <motion.div
             className="mb-12 flex justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: mainVisible ? 1 : 0, y: mainVisible ? 0 : 16 }}
+            transition={{ duration: 0.65, delay: mainVisible ? 0.45 : 0 }}
           >
             <CTAButtonsRow
               onWaitlistClick={openWaitlistForm}
@@ -428,6 +464,7 @@ export function EventSplashPage({
       />
 
       <PilotInfoModal isOpen={showPilotModal} onClose={() => setShowPilotModal(false)} />
+      </motion.div>
     </div>
   );
 }

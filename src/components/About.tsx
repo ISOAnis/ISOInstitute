@@ -23,6 +23,7 @@ interface AboutProps {
   onBack?: () => void;
   onNavigateToAbout?: () => void;
   onNavigateToFAQ?: () => void;
+  onNavigateToAssist?: () => void;
 }
 
 const PROBLEMS = [
@@ -84,7 +85,7 @@ const TEAM = [
   { initials: 'IE', name: 'Idris Elmi', role: 'Technical Lead' },
 ] as const;
 
-export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, onNavigateToFAQ }: AboutProps) {
+export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, onNavigateToFAQ, onNavigateToAssist }: AboutProps) {
   const handlePrimaryCta = () => {
     if (onWaitlistClick) {
       onWaitlistClick();
@@ -100,7 +101,11 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation mode={onBack ? 'about' : 'splash'} onBack={onBack} />
+      <SplashNavigation
+        mode={onBack ? 'about' : 'splash'}
+        onBack={onBack}
+        onNavigateToAssist={onNavigateToAssist}
+      />
 
       <div className="about-splash-content">
         {/* Hero */}

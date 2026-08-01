@@ -50,7 +50,11 @@ export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigate
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation mode={onBack ? 'about' : 'splash'} onBack={onBack} />
+      <SplashNavigation
+        mode={onBack ? 'about' : 'splash'}
+        onBack={onBack}
+        onNavigateToAssist={onNavigateToAssist}
+      />
 
       <div className="faq-splash-content">
         <header className="faq-hero">

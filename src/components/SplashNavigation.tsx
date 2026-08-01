@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 interface SplashNavigationProps {
   mode?: 'splash' | 'about';
   onNavigateToAbout?: () => void;
+  onNavigateToAssist?: () => void;
   onBack?: () => void;
 }
 
 export function SplashNavigation({
   mode = 'splash',
   onNavigateToAbout,
+  onNavigateToAssist,
   onBack,
 }: SplashNavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,14 +30,14 @@ export function SplashNavigation({
 
   const brandStyle = { fontFamily: "'Bebas Neue', sans-serif", color: '#E8E8E8' };
 
-  const aboutButtonStyle = {
+  const navButtonStyle = {
     fontFamily: "'Bebas Neue', sans-serif",
     fontSize: '14px',
     letterSpacing: '2px',
-    padding: '7px 22px',
+    padding: '7px 18px',
   };
 
-  const aboutWrapperStyle = { margin: '3px 6px 3px 8px' };
+  const navActionsStyle = { margin: '3px 6px 3px 8px', display: 'flex', alignItems: 'center', gap: '8px' };
 
   return (
     <nav className="fixed top-4 left-0 right-0 z-[100] flex justify-center px-4">
@@ -60,23 +62,45 @@ export function SplashNavigation({
           )}
 
           {mode === 'splash' ? (
-            <div style={aboutWrapperStyle}>
-              <button
-                type="button"
-                onClick={onNavigateToAbout}
-                className="splash-about-btn create-account-btn relative rounded-full overflow-hidden font-semibold whitespace-nowrap"
-                style={aboutButtonStyle}
-              >
-                <span className="relative z-10 transition-colors duration-500 inline-block font-medium">About</span>
-              </button>
+            <div style={navActionsStyle}>
+              {onNavigateToAssist && (
+                <button
+                  type="button"
+                  onClick={onNavigateToAssist}
+                  className="splash-assist-btn create-account-btn relative rounded-full overflow-hidden font-semibold whitespace-nowrap"
+                  style={navButtonStyle}
+                >
+                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">The Assist</span>
+                </button>
+              )}
+              {onNavigateToAbout && (
+                <button
+                  type="button"
+                  onClick={onNavigateToAbout}
+                  className="splash-about-btn create-account-btn relative rounded-full overflow-hidden font-semibold whitespace-nowrap"
+                  style={navButtonStyle}
+                >
+                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">About</span>
+                </button>
+              )}
             </div>
           ) : (
-            <div style={aboutWrapperStyle}>
+            <div style={navActionsStyle}>
+              {onNavigateToAssist && (
+                <button
+                  type="button"
+                  onClick={onNavigateToAssist}
+                  className="splash-assist-btn create-account-btn relative rounded-full overflow-hidden font-semibold whitespace-nowrap"
+                  style={navButtonStyle}
+                >
+                  <span className="relative z-10 transition-colors duration-500 inline-block font-medium">The Assist</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onBack}
                 className="splash-home-btn create-account-btn relative rounded-full overflow-hidden font-semibold whitespace-nowrap"
-                style={aboutButtonStyle}
+                style={navButtonStyle}
               >
                 <span className="relative z-10 transition-colors duration-500 inline-block font-medium">Home</span>
               </button>

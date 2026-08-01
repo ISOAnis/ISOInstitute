@@ -391,6 +391,22 @@ html {
     color: #0C0C0C !important;
   }
 
+  .splash-assist-btn {
+    border: 1px solid #C08038;
+  }
+
+  .splash-assist-btn::before {
+    background: #C08038;
+  }
+
+  .splash-assist-btn span {
+    color: #0C0C0C;
+  }
+
+  .splash-assist-btn:hover span {
+    color: #ffffff !important;
+  }
+
   hr {
     height: 0;
     color: inherit;
