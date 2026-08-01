@@ -11,6 +11,7 @@ interface FAQPageProps {
   onWaitlistClick?: () => void;
   onNavigateToAbout?: () => void;
   onNavigateToFAQ?: () => void;
+  onNavigateToAssist?: () => void;
 }
 
 function PathwaysAnswer() {
@@ -37,7 +38,7 @@ function PathwaysAnswer() {
   );
 }
 
-export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigateToFAQ }: FAQPageProps) {
+export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigateToFAQ, onNavigateToAssist }: FAQPageProps) {
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -110,6 +111,7 @@ export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigate
       <SplashFooter
         onNavigateToAbout={onNavigateToAbout}
         onNavigateToFAQ={onNavigateToFAQ}
+        onNavigateToAssist={onNavigateToAssist}
         onWaitlistClick={onWaitlistClick}
       />
     </div>

@@ -2,47 +2,52 @@
  * =============================================================================
  * TEMPORARY SPLASH PAGE BRANCH
  * =============================================================================
- * 
+ *
  * This branch (SplashPage) renders ONLY the EventSplashPage component.
  * The full site is being developed on the main branch.
- * 
+ *
  * TO RESTORE THE FULL SITE:
  * 1. Switch to the main branch, OR
  * 2. Uncomment the FullApp component below and comment out the EventSplashPage import/render
- * 
+ *
  * REMOVE THIS MODIFICATION AND DELETE src/pages/EventSplashPage.tsx
  * WHEN THE FULL SITE IS READY TO LAUNCH.
  * =============================================================================
  */
 
-import * as React from 'react';
 import { useState, useEffect } from 'react';
 import EventSplashPage from './pages/EventSplashPage';
 import { About } from './components/About';
 import { FAQPage } from './components/FAQPage';
+import { AssistPage } from './components/AssistPage';
 
 const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
 
-type SplashView = 'splash' | 'about' | 'faq';
+type SplashView = 'splash' | 'about' | 'faq' | 'assist';
 
 function getViewFromUrl(): SplashView {
   if (window.location.hash === '#about') return 'about';
   if (window.location.hash === '#faq') return 'faq';
+  if (window.location.hash === '#assist') return 'assist';
   return 'splash';
 }
 
 function setUrlForView(view: SplashView) {
   const base = window.location.pathname + window.location.search;
-  const hash = view === 'about' ? '#about' : view === 'faq' ? '#faq' : '';
+  const hash =
+    view === 'about'
+      ? '#about'
+      : view === 'faq'
+        ? '#faq'
+        : view === 'assist'
+          ? '#assist'
+          : '';
   const nextUrl = `${base}${hash}`;
   if (window.location.pathname + window.location.search + window.location.hash !== nextUrl) {
     window.history.pushState(null, '', nextUrl);
   }
 }
 
-// =============================================================================
-// SPLASH PAGE ONLY - This branch shows only the event splash page
-// =============================================================================
 export default function App() {
   const [view, setView] = useState<SplashView>(getViewFromUrl);
 
@@ -64,16 +69,20 @@ export default function App() {
         ? 'About · ISO Institute'
         : view === 'faq'
           ? 'FAQ · ISO Institute'
-          : 'In Search Of · ISO Institute';
+          : view === 'assist'
+            ? 'The Assist · ISO Institute'
+            : 'In Search Of · ISO Institute';
   }, [view]);
+
+  const openWaitlistForm = () => {
+    window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer');
+  };
 
   if (view === 'about') {
     return (
       <About
         onBack={() => navigate('splash')}
-        onWaitlistClick={() =>
-          window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
-        }
+        onWaitlistClick={openWaitlistForm}
         onNavigateToFAQ={() => navigate('faq')}
       />
     );
@@ -83,10 +92,21 @@ export default function App() {
     return (
       <FAQPage
         onBack={() => navigate('splash')}
-        onWaitlistClick={() =>
-          window.open(WAITLIST_FORM_URL, '_blank', 'noopener,noreferrer')
-        }
+        onWaitlistClick={openWaitlistForm}
         onNavigateToAbout={() => navigate('about')}
+        onNavigateToAssist={() => navigate('assist')}
+      />
+    );
+  }
+
+  if (view === 'assist') {
+    return (
+      <AssistPage
+        onBack={() => navigate('splash')}
+        onWaitlistClick={openWaitlistForm}
+        onNavigateToAbout={() => navigate('about')}
+        onNavigateToFAQ={() => navigate('faq')}
+        onNavigateToAssist={() => navigate('assist')}
       />
     );
   }
@@ -95,222 +115,9 @@ export default function App() {
     <EventSplashPage
       onNavigateToAbout={() => navigate('about')}
       onNavigateToFAQ={() => navigate('faq')}
+      onNavigateToAssist={() => navigate('assist')}
     />
   );
 }
 
-// =============================================================================
-// FULL SITE CODE (PRESERVED BELOW - DO NOT DELETE)
-// Uncomment this section and comment out the above when restoring full site
-// =============================================================================
-
-/*
-import { useState, Suspense, lazy } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
-import { ConsultationModal } from './components/ConsultationModal';
-import { CoachPortalPage } from './components/CoachPortalPage';
-import { PlayerPortalPage } from './components/PlayerPortalPage';
-import { About } from './components/About';
-import './styles/about.css';
-
-// Lazy load heavy components
-const BasketballCourt = lazy(() => import('./components/BasketballCourt').then(m => ({ default: m.BasketballCourt })));
-const WhatIsISO = lazy(() => import('./components/WhatIsISO').then(m => ({ default: m.WhatIsISO })));
-const ProductShowcase = lazy(() => import('./components/ProductShowcase').then(m => ({ default: m.ProductShowcase })));
-const Pricing = lazy(() => import('./components/Pricing').then(m => ({ default: m.Pricing })));
-const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
-const WhyISO = lazy(() => import('./components/WhyISO').then(m => ({ default: m.WhyISO })));
-const Pathways = lazy(() => import('./components/Pathways').then(m => ({ default: m.Pathways })));
-const ISOCommunity = lazy(() => import('./components/ISOCommunity').then(m => ({ default: m.ISOCommunity })));
-const CallIsoPage = lazy(() => import('./components/CallIsoPage').then(m => ({ default: m.CallIsoPage })));
-const StoreDashboard = lazy(() => import('./components/store/StoreDashboard').then(m => ({ default: m.StoreDashboard })));
-
-type Page = 'home' | 'pathways' | 'about' | 'community' | 'call-iso' | 'coach-portal' | 'player-portal' | 'store';
-
-// Loading component
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen bg-slate-950">
-    <div className="text-white text-lg">Loading...</div>
-  </div>
-);
-
-export default function FullApp() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [selectedCoachName, setSelectedCoachName] = useState<string | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [menteeCommitmentStatus, setMenteeCommitmentStatus] = useState<{
-    isCommitted: boolean;
-    mentorName?: string;
-    category?: string;
-    daysRemaining?: number;
-  } | null>(null);
-  const [shouldReopenMentorModal, setShouldReopenMentorModal] = useState(false);
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
-  const [pendingCoachName, setPendingCoachName] = useState<string | null>(null);
-  const [pendingCategoryId, setPendingCategoryId] = useState<string | null>(null);
-
-  // Handle navigation - clear states when navigating to home from logo/nav
-  const handleNavigate = (page: Page) => {
-    // If navigating to home, clear all Call ISO related states
-    if (page === 'home') {
-      setSelectedCoachName(null);
-      setSelectedCategoryId(null);
-      setShouldReopenMentorModal(false);
-      setShowConsultationModal(false);
-      setPendingCoachName(null);
-      setPendingCategoryId(null);
-    }
-    setCurrentPage(page);
-  };
-
-  // Helper to show consultation modal before Call ISO page
-  const navigateToCallIso = (coachName: string, categoryId?: string) => {
-    setPendingCoachName(coachName);
-    setPendingCategoryId(categoryId || null);
-    setShowConsultationModal(true);
-  };
-
-  // After consultation is scheduled, navigate to Call ISO page
-  const handleConsultationComplete = () => {
-    if (pendingCoachName) {
-      setSelectedCoachName(pendingCoachName);
-      setSelectedCategoryId(pendingCategoryId || null);
-      setShowConsultationModal(false);
-      setPendingCoachName(null);
-      setPendingCategoryId(null);
-      setCurrentPage('call-iso');
-    }
-  };
-
-  // Helper to navigate back to coaches (reopen MentorModal)
-  const navigateBackToCoaches = (categoryId?: string) => {
-    setCurrentPage('home');
-    setSelectedCoachName(null);
-    if (categoryId) {
-      setSelectedCategoryId(categoryId);
-    }
-    setShouldReopenMentorModal(true);
-    
-    // Scroll to court section after navigation
-    setTimeout(() => {
-      const courtSection = document.getElementById('iso-court');
-      if (courtSection) {
-        courtSection.scrollIntoView({ behavior: 'auto', block: 'start' });
-      }
-    }, 100);
-  };
-
-  if (currentPage === 'coach-portal') {
-    return <CoachPortalPage onNavigate={handleNavigate} />;
-  }
-
-  if (currentPage === 'player-portal') {
-    return <PlayerPortalPage onNavigate={handleNavigate} />;
-  }
-
-  if (currentPage === 'store') {
-    return (
-      <Suspense fallback={<LoadingSpinner />}>
-        <StoreDashboard onBack={() => handleNavigate('home')} />
-      </Suspense>
-    );
-  }
-
-  return (
-    <div 
-      className="min-h-screen"
-      style={{
-        background: '#030305',
-      }}
-    >
-      <Navigation 
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-      />
-      
-      {currentPage === 'home' && (
-        <>
-          {/* New Simple Hero Section *}
-          <Suspense fallback={<LoadingSpinner />}>
-            <Hero onNavigate={setCurrentPage} />
-          </Suspense>
-          
-          {/* Why ISO Section *}
-          <Suspense fallback={<LoadingSpinner />}>
-            <WhyISO />
-          </Suspense>
-          
-          {/* Basketball Court Section *}
-          <div id="iso-court">
-            <Suspense fallback={<LoadingSpinner />}>
-              <BasketballCourt 
-                commitmentStatus={menteeCommitmentStatus}
-                onNavigateToCallIso={navigateToCallIso}
-                selectedCategoryId={selectedCategoryId}
-                onCategorySelect={(categoryId) => setSelectedCategoryId(categoryId)}
-                forceOpenCategoryId={shouldReopenMentorModal ? selectedCategoryId : null}
-                onForceOpenHandled={() => setShouldReopenMentorModal(false)}
-              />
-            </Suspense>
-          </div>
-          
-          {/* ProductShowcase - temporarily hidden
-          <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
-            <ProductShowcase />
-          </Suspense>
-          *}
-          <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
-            <Pricing />
-          </Suspense>
-        </>
-      )}
-
-      {currentPage === 'pathways' && (
-        <Suspense fallback={<LoadingSpinner />}>
-        <Pathways onNavigate={setCurrentPage} />
-        </Suspense>
-      )}
-
-      {currentPage === 'about' && (
-        <Suspense fallback={<LoadingSpinner />}>
-        <About />
-        </Suspense>
-      )}
-
-      {/* Community page - temporarily hidden *}
-      {false && currentPage === 'community' && (
-        <Suspense fallback={<LoadingSpinner />}>
-        <ISOCommunity />
-        </Suspense>
-      )}
-
-      {/* Call ISO page *}
-      {currentPage === 'call-iso' && selectedCoachName && (
-        <Suspense fallback={<LoadingSpinner />}>
-          <CallIsoPage 
-            coachName={selectedCoachName}
-            onBack={navigateBackToCoaches}
-          />
-        </Suspense>
-      )}
-
-      {currentPage !== 'call-iso' && <Footer onNavigate={setCurrentPage} />}
-
-      {/* Consultation Modal - shown before Call ISO page *}
-      {showConsultationModal && pendingCoachName && (
-        <ConsultationModal
-          coachName={pendingCoachName}
-          categoryId={pendingCategoryId || undefined}
-          onClose={() => {
-            setShowConsultationModal(false);
-            setPendingCoachName(null);
-            setPendingCategoryId(null);
-          }}
-          onScheduleComplete={handleConsultationComplete}
-        />
-      )}
-    </div>
-  );
-}
-*/
+/* Full site code preserved below — see git history / main branch */

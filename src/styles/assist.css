@@ -1,0 +1,401 @@
+.assist-splash-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 88px;
+  padding-bottom: 48px;
+}
+
+.assist-hero {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+  text-align: center;
+}
+
+.assist-hero-kicker {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--about-gold);
+  margin: 0 0 12px;
+}
+
+.assist-hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 8vw, 72px);
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--about-text);
+  margin: 0 0 16px;
+}
+
+.assist-hero-sub {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--about-muted);
+  max-width: 540px;
+  margin: 0 auto 24px;
+}
+
+.assist-platform-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.assist-platform-link {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--about-text);
+  background: var(--about-surface);
+  border: 1px solid var(--about-border);
+  border-radius: 999px;
+  padding: 10px 18px;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.assist-platform-link:hover {
+  border-color: rgba(192, 128, 56, 0.45);
+  background: var(--about-surface2);
+}
+
+
+.assist-layout {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .assist-layout {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.assist-browser {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 900px) {
+  .assist-browser {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+.assist-player-column {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .assist-player-column {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+.assist-season-block {
+  background: var(--about-surface);
+  border: 1px solid var(--about-border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.assist-season-block--upcoming {
+  opacity: 0.65;
+}
+
+.assist-season-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--about-text);
+  transition: background 0.2s;
+}
+
+.assist-season-toggle:hover:not(.assist-season-toggle--disabled) {
+  background: var(--about-surface2);
+}
+
+.assist-season-toggle--open {
+  border-bottom: 1px solid var(--about-border);
+}
+
+.assist-season-toggle--disabled {
+  cursor: default;
+}
+
+.assist-season-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.assist-season-toggle-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.assist-season-toggle-meta {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--about-muted);
+}
+
+.assist-season-chevron {
+  flex-shrink: 0;
+  color: var(--about-muted);
+  transition: transform 0.25s ease;
+}
+
+.assist-season-toggle--open .assist-season-chevron {
+  transform: rotate(180deg);
+}
+
+.assist-season-episodes {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  max-height: min(420px, calc(100vh - 280px));
+  overflow-y: auto;
+}
+
+.assist-season-episodes--open {
+  display: flex;
+}
+
+.assist-player-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  padding: 28px 24px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--about-dim);
+  background: var(--about-surface);
+  border: 1px dashed var(--about-border);
+  border-radius: 16px;
+  scroll-margin-top: 96px;
+}
+
+
+.assist-episode-card {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: var(--about-surface2);
+  border: 1px solid var(--about-border);
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.assist-episode-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--about-surface2);
+}
+
+.assist-episode-card--active {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--about-surface2);
+}
+
+.assist-episode-thumb {
+  width: 72px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #000;
+}
+
+.assist-episode-card-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.assist-episode-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--about-dim);
+}
+
+.assist-finale-badge {
+  color: var(--about-gold);
+  letter-spacing: 1.5px;
+}
+
+.assist-episode-card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+  color: var(--about-text);
+  margin: 0 0 4px;
+}
+
+.assist-episode-card-sub {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--about-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.assist-player-panel {
+  --pathway-accent: var(--about-gold);
+  background: var(--about-surface);
+  border: 2px solid var(--pathway-accent);
+  border-radius: 16px;
+  padding: 20px;
+  scroll-margin-top: 96px;
+  transition: border-color 0.25s ease;
+  width: 100%;
+}
+
+.assist-player-kicker {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--about-gold);
+  margin: 0 0 8px;
+}
+
+.assist-player-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.05;
+  letter-spacing: 0.5px;
+  color: var(--about-text);
+  margin: 0 0 8px;
+}
+
+.assist-player-sub {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--about-muted);
+  margin: 0 0 16px;
+}
+
+.assist-video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 16px;
+}
+
+.assist-video-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.assist-video-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: var(--about-muted);
+}
+
+.assist-video-fallback a {
+  color: var(--about-gold);
+}
+
+.assist-listen-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.assist-listen-link {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--about-text);
+  border: 1px solid var(--about-border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.assist-listen-link:hover {
+  border-color: rgba(192, 128, 56, 0.45);
+  color: var(--about-gold);
+}
+
+.assist-season-two {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+  text-align: center;
+}
+
+.assist-season-two-kicker {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--about-gold);
+  margin: 0 0 10px;
+}
+
+.assist-season-two-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(32px, 5vw, 48px);
+  letter-spacing: 2px;
+  color: var(--about-text);
+  margin: 0 0 12px;
+}
+
+.assist-season-two-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--about-muted);
+  margin: 0 0 24px;
+}

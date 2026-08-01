@@ -51,7 +51,7 @@ export const FAQ_SECTIONS: FAQSection[] = [
         id: 'communities-religions',
         question: 'Is ISO only for certain communities or religions?',
         answer:
-          "No. ISO is for anyone willing to do the work. Our coaches and players come from different backgrounds, faiths, professions, and life experiences. The only requirement is that you're genuinely in search of growth.",
+          "No. ISO is open to anyone willing to do the work. Our coaches and players come from different backgrounds, faiths, professions, and life experiences — the only requirement is that you're genuinely In Search Of growth.\n\nWe also believe in being transparent: one of the six pathways — The Seeker (Deen & Purpose) — was deliberately created to serve Muslims In Search Of Islamic knowledge, spiritual development, and mentorship in faith. That community is part of why ISO was built, and we don't hide it. The other five pathways serve different lanes of growth, and the Institute as a whole remains open to everyone committed to the work.",
       },
     ],
   },
@@ -110,13 +110,14 @@ export const FAQ_SECTIONS: FAQSection[] = [
       {
         id: 'when-assist-airs',
         question: 'When does The Assist air?',
-        answer: 'Every Sunday from 6–7PM MST during Season 1.',
+        answer:
+          'Season 1 ran every Sunday from 6–7 PM MST and is now complete. Season 2 is in the works — follow @isoinstitute for updates.',
       },
       {
         id: 'where-to-watch',
         question: 'Where can I watch?',
         answer:
-          'The Assist airs live on YouTube every Sunday. You can also attend in person at IOCC Denver. Past episodes are available on YouTube, Apple Podcasts, and Spotify.',
+          'All Season 1 episodes are on The Assist page at isoinstitute.org, plus YouTube, Apple Podcasts, and Spotify. You can also attend live events in person at IOCC Denver when new seasons air.',
       },
       {
         id: 'become-guest',

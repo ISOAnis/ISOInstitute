@@ -11,6 +11,7 @@ const SOCIAL_LINKS = {
 interface SplashFooterProps {
   onNavigateToAbout?: () => void;
   onNavigateToFAQ?: () => void;
+  onNavigateToAssist?: () => void;
   onWaitlistClick?: () => void;
 }
 
@@ -54,6 +55,7 @@ function TikTokIcon() {
 export function SplashFooter({
   onNavigateToAbout,
   onNavigateToFAQ,
+  onNavigateToAssist,
   onWaitlistClick,
 }: SplashFooterProps) {
   return (
@@ -68,6 +70,11 @@ export function SplashFooter({
           <div>
             <h3 className="splash-footer-col-title">Resources</h3>
             <ul className="splash-footer-links">
+              {onNavigateToAssist && (
+                <li>
+                  <FooterLink onClick={onNavigateToAssist}>The Assist</FooterLink>
+                </li>
+              )}
               {onNavigateToFAQ && (
                 <li>
                   <FooterLink onClick={onNavigateToFAQ}>FAQ</FooterLink>
