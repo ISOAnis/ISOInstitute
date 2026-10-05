@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ISO · App Store Previews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8873A;
+    --builder: #8e24aa;
+    --seeker: #22c55e;
+    --healer: #1e88e5;
+    --reformer: #02adc1;
+    --founder: #e65200;
+    --warrior: #e53a36;
+    --tier-gold: #F5C842;
+    --text: #F2F2F2;
+    --muted: rgba(255,255,255,0.4);
+    --dim: rgba(255,255,255,0.3);
+    --panel-bg: rgba(255,255,255,0.03);
+    --panel-border: rgba(255,255,255,0.07);
+    --ff-display: 'Bebas Neue', Impact, sans-serif;
+    --ff-body: 'Barlow', system-ui, sans-serif;
+    --ff-cond: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --ff-ios: -apple-system, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #050505; }
+  body { -webkit-font-smoothing: antialiased; color: var(--text); font-family: var(--ff-body); }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+  /* ---------- Viewer chrome (not part of the panels) ---------- */
+  .toolbar {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    display: flex; gap: 8px; align-items: center;
+    background: rgba(20,20,20,0.92); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; padding: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+    backdrop-filter: blur(10px);
+  }
+  .toolbar button { padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.7); }
+  .toolbar button.on { background: var(--gold); color: #111; }
+  .toolbar .hint { color: rgba(255,255,255,0.4); padding: 0 6px; max-width: 280px; line-height: 1.3; font-size: 11px; }
+  body.clean .toolbar, body.clean .panel-label { display: none; }
+  body.clean .stage { gap: 0; padding: 0; }
+
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 72px; padding: 72px 0; zoom: var(--z, 1); }
+  .panel-label { font-family: 'DM Sans', sans-serif; font-size: 22px; color: rgba(255,255,255,0.35); letter-spacing: 1px; margin-bottom: -48px; width: 1290px; }
+
+  /* ---------- Panel: exactly 1290 x 2796 ---------- */
+  .panel {
+    position: relative; width: 1290px; height: 2796px; overflow: hidden;
+    background: #000; flex-shrink: 0;
+  }
+  .panel .glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 62% 38% at 50% 58%, color-mix(in srgb, var(--glow) 30%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 90% 30% at 50% 100%, color-mix(in srgb, var(--glow) 18%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 18% at 50% 12%, color-mix(in srgb, var(--glow) 10%, transparent) 0%, transparent 80%);
+  }
+  .panel .glow.multi {
+    background:
+      radial-gradient(ellipse 34% 22% at 28% 50%, color-mix(in srgb, var(--builder) 22%, transparent), transparent 70%),
+      radial-gradient(ellipse 34% 22% at 72% 48%, color-mix(in srgb, var(--healer) 22%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 24% at 50% 62%, color-mix(in srgb, var(--seeker) 30%, transparent), transparent 70%),
+      radial-gradient(ellipse 34% 22% at 26% 80%, color-mix(in srgb, var(--founder) 18%, transparent), transparent 70%),
+      radial-gradient(ellipse 34% 22% at 74% 82%, color-mix(in srgb, var(--warrior) 18%, transparent), transparent 70%),
+      radial-gradient(ellipse 40% 20% at 50% 96%, color-mix(in srgb, var(--reformer) 18%, transparent), transparent 70%);
+  }
+  .copy {
+    position: absolute; top: 0; left: 0; right: 0; height: 600px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 60px 90px 0;
+  }
+  .copy h1 {
+    font-family: var(--ff-display); font-weight: 400; font-size: 168px; line-height: 0.92;
+    letter-spacing: 2px; color: #fff; max-width: 1110px;
+  }
+  .copy h1 .gold { color: var(--gold); }
+  .copy p {
+    font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 46px; line-height: 1.3;
+    color: rgba(255,255,255,0.62); margin-top: 34px; max-width: 1040px;
+  }
+
+  /* ---------- iPhone frame (390 x 844 screen, scaled up) ---------- */
+  .phone-wrap {
+    position: absolute; top: 624px; left: 50%;
+    width: 418px; height: 872px;
+    transform: translateX(-50%) scale(2.4); transform-origin: top center;
+  }
+  .phone {
+    position: relative; width: 418px; height: 872px; border-radius: 68px;
+    background: #0b0b0c; padding: 14px;
+    box-shadow:
+      0 0 0 1.5px #4a4a4f,
+      0 0 0 4px #1d1d20,
+      0 0 0 5px #5b5b61,
+      0 40px 80px rgba(0,0,0,0.7),
+      0 0 120px color-mix(in srgb, var(--glow) 28%, transparent);
+  }
+  .phone::before, .phone::after {
+    content: ''; position: absolute; width: 4px; background: #3a3a3f; border-radius: 2px;
+  }
+  .phone::before { left: -8px; top: 190px; height: 64px; box-shadow: 0 -86px 0 -8px #3a3a3f, 0 80px 0 0 #3a3a3f; }
+  .phone::after { right: -8px; top: 250px; height: 100px; }
+  .screen {
+    position: relative; width: 390px; height: 844px; border-radius: 54px; overflow: hidden;
+    background: #0A0A0A; font-family: var(--ff-body); color: var(--text);
+    --a: var(--seeker);
+  }
+  .screen .bg-tint {
+    position: absolute; inset: 0 0 auto 0; height: 320px; pointer-events: none;
+    background: radial-gradient(ellipse 90% 70% at 50% 0%, color-mix(in srgb, var(--a) 14%, transparent), transparent 75%);
+  }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 126px; height: 37px; background: #000; border-radius: 20px; z-index: 50; }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 40;
+    display: flex; justify-content: space-between; align-items: center; padding: 4px 0 0;
+    font-family: var(--ff-ios); font-weight: 600; font-size: 17px; letter-spacing: -0.2px; color: #fff;
+  }
+  .statusbar .sb-l { width: 140px; text-align: center; padding-left: 12px; }
+  .statusbar .sb-r { width: 140px; display: flex; justify-content: center; gap: 6px; align-items: center; padding-right: 8px; }
+  .home-ind { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: #fff; z-index: 60; }
+
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 84px; z-index: 30;
+    display: flex; padding: 6px 4px 30px;
+    background: rgba(14,14,14,0.94); border-top: 0.5px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+  }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 48px; color: rgba(255,255,255,0.38); }
+  .tab span { font-family: var(--ff-body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.1px; white-space: nowrap; }
+  .tab.on { color: var(--a); }
+
+  .content { position: absolute; top: 54px; left: 0; right: 0; bottom: 84px; padding: 0 20px; overflow: hidden; }
+  .content.no-tabs { bottom: 0; }
+
+  /* ---------- Shared in-app atoms (from portal styles) ---------- */
+  .ic { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 0; }
+  .card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; }
+  .eyebrow { font-family: var(--ff-cond); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+  .muted { color: var(--muted); }
+  .navrow { height: 44px; display: flex; align-items: center; justify-content: space-between; margin: 0 -12px; }
+  .navrow .nav-btn { min-width: 44px; height: 44px; display: flex; align-items: center; gap: 2px; padding: 0 8px; color: var(--a); font-size: 16px; font-weight: 500; }
+  .navrow .nav-title { font-family: var(--ff-body); font-size: 17px; font-weight: 600; color: var(--text); }
+  .icon-btn { width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); position: relative; }
+  .icon-btn .dot { position: absolute; top: 10px; right: 11px; width: 8px; height: 8px; border-radius: 4px; background: var(--gold); border: 1.5px solid #0A0A0A; }
+  .avatar { width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-family: var(--ff-display); font-size: 19px; color: var(--a); background: color-mix(in srgb, var(--a) 20%, transparent); border: 2px solid color-mix(in srgb, var(--a) 40%, transparent); flex-shrink: 0; }
+  .btn-primary {
+    width: 100%; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--gold); color: #111; font-family: var(--ff-display); font-size: 19px; letter-spacing: 2px;
+    box-shadow: 0 0 24px rgba(200,135,58,0.45), 0 8px 20px -6px rgba(200,135,58,0.5);
+  }
+  .btn-tint {
+    width: 100%; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--ff-display); font-size: 16px; letter-spacing: 2px;
+    color: var(--c); background: color-mix(in srgb, var(--c) 18%, transparent); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent);
+  }
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-family: var(--ff-cond); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 100px; padding: 3px 10px; color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+
+  /* ---------- 1. Pathway selection ---------- */
+  .ob-steps { display: flex; gap: 6px; margin: 2px 0 18px; }
+  .ob-steps div { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); }
+  .ob-steps div.done { background: var(--gold); }
+  .ob-title { font-family: var(--ff-display); font-size: 38px; line-height: 1; color: #fff; letter-spacing: 0.5px; }
+  .ob-sub { font-size: 14px; color: rgba(255,255,255,0.55); margin: 6px 0 18px; line-height: 1.4; }
+  .pw-list { display: flex; flex-direction: column; gap: 9px; }
+  .pw {
+    position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px;
+    min-height: 68px; padding: 10px 14px 10px 14px; border-radius: 18px;
+    background: color-mix(in srgb, var(--c) 13%, rgba(0,0,0,0.4));
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .pw::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--c); opacity: 0.6; }
+  .pw-ic { width: 46px; height: 46px; border-radius: 13px; background: var(--c); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.35); }
+  .pw-tx { flex: 1; min-width: 0; }
+  .pw-nm { font-family: var(--ff-display); font-size: 23px; line-height: 1; color: #fff; letter-spacing: 0.4px; }
+  .pw-lg { font-size: 12.5px; color: rgba(255,255,255,0.8); margin-top: 3px; }
+  .pw-tag { font-size: 12.5px; font-style: italic; color: var(--c); margin-top: 6px; }
+  .pw-radio { width: 26px; height: 26px; border-radius: 13px; border: 2px solid rgba(255,255,255,0.22); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .pw.sel { border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 22%, rgba(0,0,0,0.4)); box-shadow: 0 0 28px color-mix(in srgb, var(--c) 40%, transparent), 0 0 60px color-mix(in srgb, var(--c) 18%, transparent); }
+  .pw.sel .pw-radio { background: var(--c); border-color: var(--c); color: #fff; }
+  .ob-cta { position: absolute; left: 20px; right: 20px; bottom: 40px; }
+  .ob-cta .fine { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
+
+  /* ---------- 2. Coach card ---------- */
+  .match-chip { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2px 0 14px; }
+  .match-chip .txt { font-size: 12.5px; color: rgba(255,255,255,0.5); }
+  .cc-outer { width: 300px; margin: 0 auto; border-radius: 16px; padding: 3px; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); box-shadow: 0 0 25px rgba(234,179,8,0.6), 0 0 50px rgba(245,158,11,0.35); }
+  .cc { position: relative; border-radius: 14px; overflow: hidden; background: linear-gradient(160deg, #10101C 0%, #0C0C16 40%, #070710 100%); }
+  .cc-topbar { height: 3px; background: linear-gradient(90deg, transparent 5%, color-mix(in srgb, var(--a) 40%, transparent) 35%, var(--a) 50%, color-mix(in srgb, var(--a) 40%, transparent) 65%, transparent 95%); }
+  .cc-scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.05) 3px, rgba(0,0,0,0.05) 4px); pointer-events: none; z-index: 8; }
+  .cc-sheen { position: absolute; inset: 0; background: linear-gradient(118deg, transparent 0%, rgba(255,255,255,0.03) 42%, rgba(180,120,50,0.04) 64%, transparent 100%); z-index: 7; pointer-events: none; }
+  .cc-photo { position: relative; height: 176px; overflow: hidden; background: linear-gradient(180deg, color-mix(in srgb, var(--a) 16%, #0C0C16) 0%, #0C0C16 70%, #0C0C16 100%); }
+  .cc-bgtext { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -54%); font-family: var(--ff-display); font-size: 96px; letter-spacing: -3px; color: rgba(255,255,255,0.045); }
+  .cc-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .cc-init div { width: 92px; height: 92px; border-radius: 46px; display: flex; align-items: center; justify-content: center; font-family: var(--ff-display); font-size: 40px; color: var(--a); background: color-mix(in srgb, var(--a) 18%, transparent); border: 2px solid color-mix(in srgb, var(--a) 55%, transparent); box-shadow: 0 0 30px color-mix(in srgb, var(--a) 30%, transparent); }
+  .cc-ovr { position: absolute; top: 10px; left: 14px; z-index: 5; }
+  .cc-ovr-num { font-family: var(--ff-display); font-size: 42px; line-height: 1; color: var(--tier-gold); }
+  .cc-ovr-lbl { font-family: var(--ff-cond); font-size: 10px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.45); text-transform: uppercase; }
+  .cc-tier { position: absolute; top: 12px; right: 12px; z-index: 5; }
+  .cc-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 54px; background: linear-gradient(0deg, #0C0C16, transparent); z-index: 3; }
+  .cc-body { position: relative; z-index: 5; padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .cc-path { font-family: var(--ff-cond); font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--a); }
+  .cc-name { font-family: var(--ff-display); font-size: 30px; line-height: 0.95; color: #F2F2F2; letter-spacing: 1.5px; }
+  .cc-spec { font-size: 12.5px; color: var(--a); margin-top: -2px; }
+  .cc-div { height: 1px; background: rgba(255,255,255,0.07); }
+  .cc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .cc-stat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 7px 4px; text-align: center; }
+  .cc-stat b { display: block; font-family: var(--ff-display); font-weight: 400; font-size: 20px; line-height: 1; color: #F2F2F2; }
+  .cc-stat span { font-family: var(--ff-cond); font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .cc-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .cc-tags span { background: rgba(255,255,255,0.05); border: 1px solid color-mix(in srgb, var(--a) 25%, transparent); border-radius: 100px; padding: 3px 9px; font-size: 10.5px; color: rgba(255,255,255,0.62); }
+  .cc-flip { text-align: center; font-size: 11.5px; color: var(--a); opacity: 0.75; padding-top: 2px; }
+  .cc-foot { position: relative; z-index: 5; padding: 8px 16px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); font-family: var(--ff-cond); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.28); }
+  .cc-foot span:last-child { color: color-mix(in srgb, var(--tier-gold) 70%, transparent); }
+  .cc-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+  .cc-left { text-align: center; font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 14px; }
+
+  /* ---------- 3. Booking ---------- */
+  .coach-mini { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-top: 4px; }
+  .coach-mini .nm { font-size: 15px; font-weight: 600; }
+  .coach-mini .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .sec-label { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 8px; }
+  .seg { display: flex; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 3px; }
+  .seg button { flex: 1; height: 44px; border-radius: 9px; font-family: var(--ff-body); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; }
+  .seg button small { font-size: 10.5px; font-weight: 500; opacity: 0.75; }
+  .seg button.on { background: color-mix(in srgb, var(--a) 22%, #161616); color: #fff; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--a) 50%, transparent); }
+  .days { display: flex; gap: 8px; }
+  .day { flex: 1; height: 66px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+  .day small { font-family: var(--ff-cond); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .day b { font-family: var(--ff-display); font-weight: 400; font-size: 24px; line-height: 1; }
+  .day.on { background: var(--a); border-color: var(--a); color: #06210f; box-shadow: 0 0 20px color-mix(in srgb, var(--a) 40%, transparent); }
+  .day.on small { color: rgba(0,0,0,0.6); }
+  .day.off { opacity: 0.35; }
+  .times { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .time { height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+  .time.on { border: 1.5px solid var(--a); background: color-mix(in srgb, var(--a) 16%, transparent); color: #fff; }
+  .time.off { color: rgba(255,255,255,0.2); text-decoration: line-through; }
+  .summary { padding: 12px 14px; margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .summary .row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,0.8); }
+  .summary .row .ic { color: var(--a); }
+  .summary .note { font-size: 12px; color: rgba(255,255,255,0.4); padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 2px; }
+
+  /* ---------- 4 & 5. Dashboards ---------- */
+  .greet { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 6px; }
+  .greet-hi { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.45); }
+  .greet-nm { font-family: var(--ff-display); font-size: 40px; line-height: 1; color: #F2F2F2; letter-spacing: 0.5px; }
+  .greet-actions { display: flex; gap: 8px; align-items: center; }
+  .greet-sub { font-size: 13px; color: var(--a); opacity: 0.9; margin: 6px 0 12px; }
+  .season { padding: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--a) 10%, transparent) 0%, rgba(255,255,255,0.03) 100%); border-color: color-mix(in srgb, var(--a) 30%, transparent); }
+  .season-top { display: flex; align-items: center; gap: 12px; }
+  .tier-badge { width: 50px; height: 50px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--ff-display); font-size: 22px; color: var(--t); background: color-mix(in srgb, var(--t) 14%, transparent); border: 2px solid color-mix(in srgb, var(--t) 35%, transparent); }
+  .season-pw { font-family: var(--ff-display); font-size: 23px; line-height: 1; margin: 3px 0 3px; }
+  .season-sub { font-size: 12px; color: rgba(255,255,255,0.45); }
+  .ovr-ring { position: relative; width: 64px; height: 64px; flex-shrink: 0; margin-left: auto; }
+  .ovr-ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ovr-ring .num b { font-family: var(--ff-display); font-weight: 400; font-size: 25px; line-height: 0.9; color: #fff; }
+  .ovr-ring .num span { font-family: var(--ff-cond); font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  .coach-row { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.28); border-radius: 12px; padding: 6px 6px 6px 10px; margin-top: 12px; }
+  .coach-row .av { width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: var(--ff-cond); font-weight: 700; font-size: 14px; color: var(--a); background: color-mix(in srgb, var(--a) 22%, transparent); }
+  .coach-row .nm { font-size: 13.5px; font-weight: 600; }
+  .coach-row .sub { font-size: 11px; color: var(--muted); }
+  .pill-btn { margin-left: auto; height: 44px; padding: 0 14px; border-radius: 10px; font-family: var(--ff-cond); font-size: 12px; font-weight: 700; letter-spacing: 1px; color: var(--a); background: color-mix(in srgb, var(--a) 18%, transparent); border: 1px solid color-mix(in srgb, var(--a) 40%, transparent); }
+  .tb { padding: 12px 14px; margin-top: 10px; }
+  .tb-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .tb-lvl { font-family: var(--ff-display); font-size: 28px; line-height: 1; }
+  .tb-right { text-align: right; font-size: 11.5px; color: rgba(255,255,255,0.4); line-height: 1.25; }
+  .tb-right b { font-family: var(--ff-display); font-weight: 400; font-size: 18px; color: var(--a); letter-spacing: 1px; }
+  .tb-segs { display: flex; gap: 3px; margin-bottom: 7px; }
+  .tb-seg { flex: 1; height: 9px; border-radius: 100px; background: rgba(255,255,255,0.06); overflow: hidden; position: relative; }
+  .tb-seg i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 100px; }
+  .tb-labels { display: flex; gap: 3px; font-family: var(--ff-cond); font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+  .tb-labels span { flex: 1; text-align: center; }
+  .stats4 { display: flex; gap: 7px; margin-top: 10px; }
+  .stat { flex: 1; min-width: 0; padding: 10px 8px 9px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+  .stat .lbl { display: flex; align-items: center; gap: 4px; font-family: var(--ff-cond); font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 5px; white-space: nowrap; }
+  .stat .val { font-family: var(--ff-display); font-size: 24px; line-height: 1; color: var(--a); }
+  .stat .val.gold { color: var(--gold); }
+  .sec-head { display: flex; justify-content: space-between; align-items: center; margin: 14px 0 8px; }
+  .sec-head h3 { font-family: var(--ff-display); font-weight: 400; font-size: 22px; letter-spacing: 0.5px; }
+  .sec-head a { font-size: 13px; color: var(--a); font-weight: 600; min-height: 44px; display: flex; align-items: center; margin: -12px 0; }
+  .game { display: flex; flex-direction: column; gap: 9px; padding: 12px 14px; margin-bottom: 8px; border-radius: 16px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); min-height: 44px; }
+  .game.won { background: linear-gradient(90deg, rgba(20,83,45,0.35), rgba(22,101,52,0.18)); border-color: rgba(34,197,94,0.25); }
+  .game-top { display: flex; align-items: center; gap: 12px; }
+  .game-ic { width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .game-tt { font-size: 14.5px; font-weight: 600; }
+  .game-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+  .game-st { margin-left: auto; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+  .bar { height: 6px; border-radius: 100px; background: rgba(255,255,255,0.08); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--gold), #e3a860); }
+
+  .ovr-card { padding: 12px 14px; }
+  .ovr-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .ovr-big { font-family: var(--ff-display); font-size: 34px; line-height: 1; }
+  .ovr-scale { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.38); margin: 8px 0 6px; }
+  .ovr-scale b { font-weight: 600; color: var(--tier-gold); }
+  .ovr-bar { height: 9px; border-radius: 100px; background: rgba(255,255,255,0.06); overflow: hidden; }
+  .ovr-bar i { display: block; height: 100%; width: 72%; border-radius: 100px; background: linear-gradient(90deg, var(--tier-gold), var(--a)); }
+  .sugg { padding: 10px 14px; margin-top: 10px; background: linear-gradient(135deg, color-mix(in srgb, var(--a) 11%, transparent), rgba(255,255,255,0.02)); border: 1px solid color-mix(in srgb, var(--a) 28%, transparent); border-radius: 14px; }
+  .sugg-h { display: flex; align-items: center; gap: 7px; font-family: var(--ff-cond); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--a); margin-bottom: 6px; }
+  .sugg p { font-size: 13px; line-height: 1.42; color: rgba(255,255,255,0.75); }
+  .sugg strong { color: var(--a); font-weight: 600; }
+  .compass { padding: 10px 10px 9px; margin-top: 10px; }
+  .compass .hd { padding: 0 6px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .compass .sub { font-size: 11.5px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .grow { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 6px; }
+  .grow span { font-size: 11px; color: var(--a); background: color-mix(in srgb, var(--a) 14%, transparent); border: 1px solid color-mix(in srgb, var(--a) 35%, transparent); border-radius: 100px; padding: 4px 10px; }
+  .chips2 { display: flex; gap: 8px; margin-top: 10px; }
+  .chips2 .stat { padding: 9px 12px; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
+  .chips2 .stat .lbl { grid-column: 2; grid-row: 1; margin: 0; }
+  .chips2 .stat .val { grid-column: 1; grid-row: 1 / 3; font-size: 30px; }
+  .chips2 .stat .s { grid-column: 2; grid-row: 2; font-size: 11px; color: rgba(255,255,255,0.35); }
+  .sess { display: flex; align-items: center; gap: 11px; padding: 10px 12px; margin-bottom: 8px; min-height: 58px; }
+  .sess .when { width: 48px; text-align: center; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.08); padding-right: 10px; }
+  .sess .when small { display: block; font-family: var(--ff-cond); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--a); }
+  .sess .when b { font-family: var(--ff-display); font-weight: 400; font-size: 17px; line-height: 1.05; }
+  .sess .nm { font-size: 14px; font-weight: 600; }
+  .sess .sub { font-size: 12px; color: rgba(255,255,255,0.42); margin-top: 1px; }
+  .sess .go { margin-left: auto; color: rgba(255,255,255,0.3); }
+
+  /* ---------- 6. Locker Room ---------- */
+  .lr-title { display: flex; justify-content: space-between; align-items: center; padding-top: 4px; }
+  .lr-title h2 { font-family: var(--ff-display); font-weight: 400; font-size: 38px; line-height: 1; letter-spacing: 0.5px; }
+  .lr-sub { font-size: 12.5px; color: var(--muted); margin: 3px 0 12px; display: flex; align-items: center; gap: 6px; }
+  .lr-sub .live { width: 7px; height: 7px; border-radius: 4px; background: var(--seeker); box-shadow: 0 0 8px var(--seeker); }
+  .channels { display: flex; gap: 8px; margin: 0 -20px; padding: 0 20px; overflow: hidden; }
+  .chan { height: 44px; padding: 0 14px; border-radius: 22px; display: flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+  .chan i { width: 8px; height: 8px; border-radius: 4px; background: var(--c); }
+  .chan.on { color: #fff; font-weight: 600; background: color-mix(in srgb, var(--c) 18%, transparent); border-color: color-mix(in srgb, var(--c) 50%, transparent); }
+  .chan em { font-style: normal; font-family: var(--ff-cond); font-size: 9.5px; font-weight: 700; letter-spacing: 1px; color: var(--c); }
+  .lr-seg { margin: 10px 0; }
+  .compose { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 10px; border-color: color-mix(in srgb, var(--a) 28%, transparent); }
+  .compose .ph { flex: 1; font-size: 13.5px; color: rgba(255,255,255,0.35); }
+  .compose .post-btn { height: 44px; padding: 0 16px; border-radius: 22px; background: var(--a); color: #04210f; font-family: var(--ff-display); font-size: 16px; letter-spacing: 1.5px; display: flex; align-items: center; gap: 6px; }
+  .post { position: relative; padding: 13px 14px 4px 16px; margin-top: 10px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); overflow: hidden; }
+  .post::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--p); }
+  .post-hd { display: flex; gap: 11px; align-items: flex-start; margin-bottom: 8px; }
+  .post-av { width: 40px; height: 40px; border-radius: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--ff-display); font-size: 16px; color: var(--p); background: color-mix(in srgb, var(--p) 18%, transparent); border: 2px solid color-mix(in srgb, var(--p) 40%, transparent); }
+  .post-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 14px; font-weight: 600; }
+  .post-name .ago { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.3); margin-left: auto; }
+  .coach-badge { font-family: var(--ff-cond); font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; color: var(--gold); background: rgba(200,135,58,0.16); border: 1px solid rgba(200,135,58,0.35); padding: 1px 7px; border-radius: 100px; }
+  .post-tags { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+  .post-tags .pwt { font-size: 11px; color: var(--p); background: color-mix(in srgb, var(--p) 14%, transparent); padding: 2px 8px; border-radius: 100px; }
+  .post-tags .tt { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--tc); }
+  .post p { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,0.7); }
+  .goal-done { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.22); font-size: 13px; font-weight: 600; color: rgba(34,197,94,0.95); }
+  .post-ft { display: flex; gap: 18px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 10px; }
+  .post-ft button { height: 44px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,0.45); }
+  .post-ft button.on { color: #ec4899; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button id="fitBtn" class="on">Fit to window</button>
+  <button id="actualBtn">Actual size</button>
+  <button id="cleanBtn">Hide labels</button>
+  <span class="hint">Each panel is 1290 × 2796. For pixel-exact exports use Actual size, then DevTools "Capture node screenshot" on a .panel.</span>
+</div>
+
+<main class="stage" id="stage">
+
+  <!-- ============================================================
+       01 · PATHWAY SELECTION (player onboarding)
+       ============================================================ -->
+  <div class="panel-label">01 · Pathway selection · Player</div>
+  <section class="panel" id="panel-1" style="--glow: var(--seeker)">
+    <div class="glow multi"></div>
+    <header class="copy">
+      <h1>It's not you vs you <span class="gold">anymore.</span></h1>
+      <p>Pick your pathway. Get matched with a coach who's walked it.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="none">
+        <div class="bg-tint"></div>
+        <div class="content no-tabs">
+          <div class="navrow">
+            <button class="nav-btn"><i class="ic" data-i="chevron-left" data-s="26"></i></button>
+            <span class="eyebrow">Step 2 of 3</span>
+            <button class="nav-btn" style="color: rgba(255,255,255,0.5); font-size: 15px; padding-right: 12px;">Skip</button>
+          </div>
+          <div class="ob-steps"><div class="done"></div><div class="done"></div><div></div></div>
+          <div class="ob-title">Choose Your Pathway</div>
+          <div class="ob-sub">Select the pathway that aligns with your goals and interests</div>
+
+          <div class="pw-list">
+            <div class="pw sel" style="--c: var(--seeker)">
+              <div class="pw-ic"><i class="ic" data-i="moon" data-s="22"></i></div>
+              <div class="pw-tx">
+                <div class="pw-nm">The Seeker Pathway</div>
+                <div class="pw-lg">Deen and Purpose</div>
+                <div class="pw-tag">"Center your faith before your function."</div>
+              </div>
+              <div class="pw-radio"><i class="ic" data-i="check" data-s="15" data-w="3"></i></div>
+            </div>
+            <div class="pw" style="--c: var(--warrior)">
+              <div class="pw-ic"><i class="ic" data-i="dumbbell" data-s="22"></i></div>
+              <div class="pw-tx"><div class="pw-nm">The Warrior Pathway</div><div class="pw-lg">Health and Wellness</div></div>
+              <div class="pw-radio"></div>
+            </div>
+            <div class="pw" style="--c: var(--healer)">
+              <div class="pw-ic"><i class="ic" data-i="activity" data-s="22"></i></div>
+              <div class="pw-tx"><div class="pw-nm">The Healer Pathway</div><div class="pw-lg">Medicine and Healthcare</div></div>
+              <div class="pw-radio"></div>
+            </div>
+            <div class="pw" style="--c: var(--builder)">
+              <div class="pw-ic"><i class="ic" data-i="settings" data-s="22"></i></div>
+              <div class="pw-tx"><div class="pw-nm">The Builder Pathway</div><div class="pw-lg">Engineering and Tech</div></div>
+              <div class="pw-radio"></div>
+            </div>
+            <div class="pw" style="--c: var(--founder)">
+              <div class="pw-ic"><i class="ic" data-i="rocket" data-s="22"></i></div>
+              <div class="pw-tx"><div class="pw-nm">The Founder Pathway</div><div class="pw-lg">Entrepreneurship and Business</div></div>
+              <div class="pw-radio"></div>
+            </div>
+            <div class="pw" style="--c: var(--reformer)">
+              <div class="pw-ic"><i class="ic" data-i="globe" data-s="22"></i></div>
+              <div class="pw-tx"><div class="pw-nm">The Reformer Pathway</div><div class="pw-lg">Global Affairs, Law, and Policy</div></div>
+              <div class="pw-radio"></div>
+            </div>
+          </div>
+
+          <div class="ob-cta">
+            <button class="btn-primary">Continue as a Seeker <i class="ic" data-i="chevron-right" data-s="20" data-w="2.5"></i></button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============================================================
+       02 · COACH CARD REVEAL (player, Seeker coach)
+       ============================================================ -->
+  <div class="panel-label">02 · Coach card reveal · Player</div>
+  <section class="panel" id="panel-2" style="--glow: var(--seeker)">
+    <div class="glow"></div>
+    <header class="copy">
+      <h1>Meet your <span class="gold">ISO.</span></h1>
+      <p>Real coaches, rated on real impact. Flip the card to see their story.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="player" data-active="book">
+        <div class="bg-tint"></div>
+        <div class="content">
+          <div class="navrow">
+            <button class="nav-btn"><i class="ic" data-i="chevron-left" data-s="26"></i>Coaches</button>
+            <span class="nav-title">Your Match</span>
+            <button class="nav-btn" style="justify-content:center"><i class="ic" data-i="x" data-s="22"></i></button>
+          </div>
+          <div class="match-chip">
+            <span class="pill" style="--c: var(--gold)"><i class="ic" data-i="sparkles" data-s="11"></i> ISO Match</span>
+            <span class="txt">Matched on your Seeker goals</span>
+          </div>
+
+          <div class="cc-outer">
+            <div class="cc">
+              <div class="cc-topbar"></div>
+              <div class="cc-scan"></div>
+              <div class="cc-sheen"></div>
+              <div class="cc-photo">
+                <div class="cc-bgtext">ISO</div>
+                <div class="cc-init"><div>K</div></div>
+                <div class="cc-ovr">
+                  <div class="cc-ovr-num">84</div>
+                  <div class="cc-ovr-lbl">Overall</div>
+                </div>
+                <div class="cc-tier"><span class="pill" style="--c: var(--tier-gold)"><i class="ic" data-i="star" data-s="10" data-f="1"></i> Gold</span></div>
+                <div class="cc-fade"></div>
+              </div>
+              <div class="cc-body">
+                <div class="cc-path">The Seeker Pathway</div>
+                <div class="cc-name">KAMEL</div>
+                <div class="cc-spec">Spiritual Identity · Community Youth Leader</div>
+                <div class="cc-div"></div>
+                <div class="cc-stats">
+                  <div class="cc-stat"><b>7</b><span>Years</span></div>
+                  <div class="cc-stat"><b>3</b><span>Skills</span></div>
+                  <div class="cc-stat"><b>12</b><span>Outcomes</span></div>
+                </div>
+                <div class="cc-tags"><span>Quran &amp; Tafsir</span><span>Habit Building</span><span>Youth Mentorship</span></div>
+                <div class="cc-flip">Tap card to flip and see more</div>
+              </div>
+              <div class="cc-foot"><span>ISO Institute</span><span>Gold Coach</span></div>
+            </div>
+          </div>
+
+          <div class="cc-left">3 of 3 try outs left this month</div>
+          <div class="cc-actions">
+            <button class="btn-tint" style="--c: var(--seeker)"><i class="ic" data-i="message-square" data-s="15"></i> Book Try Out</button>
+            <button class="btn-tint" style="--c: var(--gold)"><i class="ic" data-i="sparkles" data-s="15"></i> Call an ISO · $75/mo</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============================================================
+       03 · BOOKING (player)
+       ============================================================ -->
+  <div class="panel-label">03 · Booking a session · Player</div>
+  <section class="panel" id="panel-3" style="--glow: var(--seeker)">
+    <div class="glow"></div>
+    <header class="copy">
+      <h1>Call the <span class="gold">ISO.</span></h1>
+      <p>Book a 30-minute try out with your coach in a few taps.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="player" data-active="book">
+        <div class="bg-tint"></div>
+        <div class="content">
+          <div class="navrow">
+            <button class="nav-btn"><i class="ic" data-i="chevron-left" data-s="26"></i>Kamel</button>
+            <span class="nav-title">Book a Session</span>
+            <span style="width:44px"></span>
+          </div>
+
+          <div class="card coach-mini">
+            <div class="avatar">K</div>
+            <div style="flex:1; min-width:0">
+              <div class="nm">Coach Kamel</div>
+              <div class="sub">The Seeker Pathway · 84 Overall</div>
+            </div>
+            <span class="pill" style="--c: var(--tier-gold)"><i class="ic" data-i="star" data-s="10" data-f="1"></i> Gold</span>
+          </div>
+
+          <div class="sec-label"><span class="eyebrow">Session type</span></div>
+          <div class="seg">
+            <button class="on">Try Out<small>30 min</small></button>
+            <button>Weekly Check-in<small>ISO Pass</small></button>
+            <button>Shadowing<small>In person</small></button>
+          </div>
+
+          <div class="sec-label">
+            <span class="eyebrow">Sep / Oct 2026</span>
+            <span style="display:flex; gap:4px; margin: -10px -10px -10px 0;">
+              <button class="nav-btn" style="width:44px; justify-content:center; color: rgba(255,255,255,0.3)"><i class="ic" data-i="chevron-left" data-s="20"></i></button>
+              <button class="nav-btn" style="width:44px; justify-content:center"><i class="ic" data-i="chevron-right" data-s="20"></i></button>
+            </span>
+          </div>
+          <div class="days">
+            <div class="day"><small>Wed</small><b>30</b></div>
+            <div class="day on"><small>Thu</small><b>1</b></div>
+            <div class="day"><small>Fri</small><b>2</b></div>
+            <div class="day off"><small>Sat</small><b>3</b></div>
+            <div class="day"><small>Sun</small><b>4</b></div>
+          </div>
+
+          <div class="sec-label"><span class="eyebrow">Available times · ET</span><span style="font-size:12px; color: rgba(255,255,255,0.4)">Video call</span></div>
+          <div class="times">
+            <div class="time">10:00 AM</div>
+            <div class="time off">11:30 AM</div>
+            <div class="time">1:00 PM</div>
+            <div class="time on">4:00 PM</div>
+            <div class="time">5:30 PM</div>
+            <div class="time">7:00 PM</div>
+          </div>
+
+          <div class="card summary">
+            <div class="row"><i class="ic" data-i="calendar" data-s="16"></i> Thursday, Oct 1 · 4:00 PM</div>
+            <div class="row"><i class="ic" data-i="clock" data-s="16"></i> 30-min try out with Kamel</div>
+            <div class="note">Uses 1 of your 3 try outs this month</div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <button class="btn-primary">Confirm Try Out</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============================================================
+       04 · PLAYER DASHBOARD
+       ============================================================ -->
+  <div class="panel-label">04 · Player dashboard · Player</div>
+  <section class="panel" id="panel-4" style="--glow: var(--seeker)">
+    <div class="glow"></div>
+    <header class="copy">
+      <h1>Every rep <span class="gold">counts.</span></h1>
+      <p>Games, buckets, and tiers. Climb from Freshman to Professional.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="player" data-active="home">
+        <div class="bg-tint"></div>
+        <div class="content">
+          <div class="greet">
+            <div>
+              <div class="greet-hi">Good morning,</div>
+              <div class="greet-nm">Jaylen</div>
+            </div>
+            <div class="greet-actions">
+              <button class="icon-btn"><i class="ic" data-i="bell" data-s="19"></i><span class="dot"></span></button>
+              <div class="avatar">J</div>
+            </div>
+          </div>
+          <div class="greet-sub">The Seeker Pathway · ISO Pass · <span class="tier-name">JV</span> · with Kamel</div>
+
+          <div class="card season">
+            <div class="season-top">
+              <div class="tier-badge tier-abbr" style="--t: #3b82f6">JV</div>
+              <div style="min-width:0">
+                <div class="eyebrow">Your Season</div>
+                <div class="season-pw">The Seeker Pathway</div>
+                <div class="season-sub">4 games won · 67% win rate</div>
+              </div>
+              <div class="ovr-ring">
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+                  <circle cx="32" cy="32" r="28" fill="none" stroke="var(--a)" stroke-width="5" stroke-linecap="round"
+                    stroke-dasharray="175.9" stroke-dashoffset="51" transform="rotate(-90 32 32)"/>
+                </svg>
+                <div class="num"><b>71</b><span>Overall</span></div>
+              </div>
+            </div>
+            <div class="coach-row">
+              <div class="av">K</div>
+              <div>
+                <div class="nm">Kamel</div>
+                <div class="sub">Your ISO Pass coach</div>
+              </div>
+              <button class="pill-btn">MESSAGE</button>
+            </div>
+          </div>
+
+          <div class="card tb">
+            <div class="tb-top">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                <span class="tb-lvl"><span style="color: rgba(255,255,255,0.45)">LVL </span><span class="tier-name" style="color:#3b82f6">JV</span></span>
+                <span class="pill" style="--c:#3b82f6">4 games won</span>
+              </div>
+              <div class="tb-right">33% toward <b>Varsity</b><br>2 games to level up</div>
+            </div>
+            <div class="tb-segs">
+              <div class="tb-seg"><i style="width:100%; background:#10b981"></i></div>
+              <div class="tb-seg"><i style="width:33%; background: linear-gradient(90deg, #3b82f6, var(--a))"></i></div>
+              <div class="tb-seg"></div>
+              <div class="tb-seg"></div>
+              <div class="tb-seg"></div>
+            </div>
+            <div class="tb-labels">
+              <span style="color: rgba(255,255,255,0.55)">Freshman</span>
+              <span class="tier-name" style="color:#3b82f6">JV</span>
+              <span>Varsity</span>
+              <span>D1</span>
+              <span>Professional</span>
+            </div>
+          </div>
+
+          <div class="stats4">
+            <div class="stat"><div class="lbl"><i class="ic" data-i="target" data-s="11"></i>Buckets</div><div class="val">18/26</div></div>
+            <div class="stat"><div class="lbl"><i class="ic" data-i="trophy" data-s="11"></i>Games</div><div class="val">4/6</div></div>
+            <div class="stat"><div class="lbl"><i class="ic" data-i="trending-up" data-s="11"></i>Win Rate</div><div class="val">67%</div></div>
+            <div class="stat"><div class="lbl"><i class="ic" data-i="gem" data-s="11"></i>Ring</div><div class="val gold">2 to go</div></div>
+          </div>
+
+          <div class="sec-head"><h3>Your Games</h3><a>See all</a></div>
+          <div class="game">
+            <div class="game-top">
+              <div class="game-ic" style="background: rgba(200,135,58,0.18); color: var(--gold)"><i class="ic" data-i="target" data-s="18"></i></div>
+              <div style="min-width:0"><div class="game-tt">Build Spiritual Foundation</div><div class="game-sub">3/5 buckets scored</div></div>
+              <div class="game-st" style="color: var(--gold)">60%</div>
+            </div>
+            <div class="bar"><i style="width:60%"></i></div>
+          </div>
+          <div class="game">
+            <div class="game-top">
+              <div class="game-ic" style="background: rgba(200,135,58,0.18); color: var(--gold)"><i class="ic" data-i="target" data-s="18"></i></div>
+              <div style="min-width:0"><div class="game-tt">Academic Excellence</div><div class="game-sub">1/3 buckets scored</div></div>
+              <div class="game-st" style="color: var(--gold)">33%</div>
+            </div>
+            <div class="bar"><i style="width:33%"></i></div>
+          </div>
+          <div class="game won">
+            <div class="game-top">
+              <div class="game-ic" style="background: rgba(34,197,94,0.2); color: #22c55e"><i class="ic" data-i="trophy" data-s="18"></i></div>
+              <div style="min-width:0"><div class="game-tt">Establish Daily Prayer Routine</div><div class="game-sub">4/4 buckets scored</div></div>
+              <div class="game-st" style="color: #4ade80">Game Won!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============================================================
+       05 · COACH DASHBOARD
+       ============================================================ -->
+  <div class="panel-label">05 · Coach dashboard · Coach</div>
+  <section class="panel" id="panel-5" style="--glow: var(--seeker)">
+    <div class="glow"></div>
+    <header class="copy">
+      <h1>Your impact has a <span class="gold">number.</span></h1>
+      <p>Every session and every player win moves your Overall.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="coach" data-active="dashboard">
+        <div class="bg-tint"></div>
+        <div class="content">
+          <div class="greet">
+            <div>
+              <div class="greet-hi">Good morning,</div>
+              <div class="greet-nm">Kamel</div>
+            </div>
+            <div class="greet-actions">
+              <button class="icon-btn"><i class="ic" data-i="bell" data-s="19"></i><span class="dot"></span></button>
+              <div class="avatar">K</div>
+            </div>
+          </div>
+          <div class="greet-sub">The Seeker Pathway · Gold Coach · Overall 84</div>
+
+          <div class="card ovr-card">
+            <div class="ovr-top">
+              <div style="display:flex; align-items:center; gap:8px">
+                <span class="ovr-big"><span style="color: rgba(255,255,255,0.45)">Overall </span><span style="color: var(--tier-gold)">84</span></span>
+                <span class="pill" style="--c: var(--tier-gold)"><i class="ic" data-i="star" data-s="10" data-f="1"></i> Gold</span>
+              </div>
+              <div class="tb-right">72% toward <b>85</b><br>6 pts to Premium</div>
+            </div>
+            <div class="ovr-scale"><span><b>84</b> Overall</span><span><b>85</b> Overall</span></div>
+            <div class="ovr-bar"><i></i></div>
+          </div>
+
+          <div class="sugg">
+            <div class="sugg-h"><i class="ic" data-i="sparkles" data-s="14"></i> ISO Suggestion</div>
+            <p>Your <strong>Locker Room content</strong> score has the most room to grow. Video contributions and workshops earn visibility across pathways.</p>
+          </div>
+
+          <div class="card compass">
+            <div class="hd">
+              <div>
+                <div class="eyebrow" style="color: rgba(255,255,255,0.45)">ISO Performance Compass</div>
+                <div class="sub">Where you lead · Where to grow</div>
+              </div>
+            </div>
+            <svg id="radar" width="330" height="146" viewBox="0 0 330 146" style="display:block; margin: 0 auto;"></svg>
+            <div class="grow"><span>Grow: Content</span><span>Grow: Consistency</span></div>
+          </div>
+
+          <div class="chips2">
+            <div class="stat"><div class="lbl">Satisfaction</div><div class="val">92%</div><div class="s">avg. session rating</div></div>
+            <div class="stat"><div class="lbl">Active Players</div><div class="val">12</div><div class="s">on your roster</div></div>
+          </div>
+
+          <div class="sec-head"><h3>Upcoming Sessions</h3><a>Schedule</a></div>
+          <div class="card sess">
+            <div class="when"><small>Today</small><b>4:00</b></div>
+            <div style="min-width:0"><div class="nm">Jaylen</div><div class="sub">Weekly Check-in · <span class="tier-name">JV</span></div></div>
+            <span class="go"><i class="ic" data-i="chevron-right" data-s="18"></i></span>
+          </div>
+          <div class="card sess">
+            <div class="when"><small>Thu</small><b>6:30</b></div>
+            <div style="min-width:0"><div class="nm">Ahmed Hassan</div><div class="sub">Try Out · 30 min</div></div>
+            <span class="go"><i class="ic" data-i="chevron-right" data-s="18"></i></span>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ============================================================
+       06 · LOCKER ROOM
+       ============================================================ -->
+  <div class="panel-label">06 · Locker Room · Player</div>
+  <section class="panel" id="panel-6" style="--glow: var(--seeker)">
+    <div class="glow multi"></div>
+    <header class="copy">
+      <h1>Pull as you <span class="gold">climb.</span></h1>
+      <p>Share wins, lift your pathway, and grow alongside your coaches.</p>
+    </header>
+    <div class="phone-wrap"><div class="phone">
+      <div class="screen" data-tabs="player" data-active="locker">
+        <div class="bg-tint"></div>
+        <div class="content">
+          <div class="lr-title">
+            <h2>Locker Room</h2>
+            <button class="icon-btn"><i class="ic" data-i="video" data-s="19"></i></button>
+          </div>
+          <div class="lr-sub"><span class="live"></span> 47 active today · You post as a Seeker</div>
+
+          <div class="channels">
+            <div class="chan on" style="--c: var(--gold)">All Pathways</div>
+            <div class="chan" style="--c: var(--seeker)"><i></i>Seeker <em>HOME</em></div>
+            <div class="chan" style="--c: var(--warrior)"><i></i>Warrior</div>
+            <div class="chan" style="--c: var(--healer)"><i></i>Healer</div>
+            <div class="chan" style="--c: var(--builder)"><i></i>Builder</div>
+          </div>
+
+          <div class="seg lr-seg">
+            <button class="on">Feed</button>
+            <button>Chat</button>
+            <button>Videos</button>
+          </div>
+
+          <div class="card compose">
+            <div class="avatar" style="width:40px; height:40px; font-size:17px">J</div>
+            <div class="ph">Share a win with your pathway...</div>
+            <button class="post-btn"><i class="ic" data-i="send" data-s="14"></i>POST</button>
+          </div>
+
+          <article class="post" style="--p: var(--seeker)">
+            <div class="post-hd">
+              <div class="post-av">K</div>
+              <div style="flex:1; min-width:0">
+                <div class="post-name">Coach Kamel <span class="coach-badge">COACH</span><span class="ago">2h ago</span></div>
+                <div class="post-tags"><span class="pwt">The Seeker Pathway</span><span class="tt" style="--tc:#a855f7"><i class="ic" data-i="sparkles" data-s="11"></i> Milestone</span></div>
+              </div>
+            </div>
+            <p>Shoutout to Jaylen. Game won on Establish Daily Prayer Routine, with seven straight days of Fajr on time. Small daily reps add up.</p>
+            <div class="post-ft">
+              <button class="on"><i class="ic" data-i="heart" data-s="16" data-f="1"></i> Encourage · 36</button>
+              <button><i class="ic" data-i="message-circle" data-s="16"></i> 8 replies</button>
+            </div>
+          </article>
+
+          <article class="post" style="--p: var(--healer)">
+            <div class="post-hd">
+              <div class="post-av">PS</div>
+              <div style="flex:1; min-width:0">
+                <div class="post-name">Priya S. <span class="ago">4h ago</span></div>
+                <div class="post-tags"><span class="pwt">The Healer Pathway</span><span class="tt" style="--tc:#22c55e"><i class="ic" data-i="target" data-s="11"></i> Goal completed</span></div>
+              </div>
+            </div>
+            <div class="goal-done"><i class="ic" data-i="check" data-s="14" data-w="2.5"></i> Complete MCAT study block 1</div>
+            <p>Finished block 1 today. Anyone else grinding applications this month? Let's hold each other accountable.</p>
+            <div class="post-ft">
+              <button><i class="ic" data-i="heart" data-s="16"></i> Encourage · 9</button>
+              <button><i class="ic" data-i="message-circle" data-s="16"></i> 5 replies</button>
+            </div>
+          </article>
+
+          <article class="post" style="--p: var(--warrior)">
+            <div class="post-hd">
+              <div class="post-av">MW</div>
+              <div style="flex:1; min-width:0">
+                <div class="post-name">Coach Marcus W. <span class="coach-badge">COACH</span><span class="ago">6h ago</span></div>
+                <div class="post-tags"><span class="pwt">The Warrior Pathway</span><span class="tt" style="--tc:#ec4899"><i class="ic" data-i="heart" data-s="11"></i> Encouragement</span></div>
+              </div>
+            </div>
+            <p>Proud of this community. Saw three players hit their weekly movement goals before Friday. That's the ISO standard. Keep stacking wins.</p>
+            <div class="post-ft">
+              <button><i class="ic" data-i="heart" data-s="16"></i> Encourage · 28</button>
+              <button><i class="ic" data-i="message-circle" data-s="16"></i> 7 replies</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+</main>
+
+<script>
+  // Jaylen's tier. The app's real ladder is Freshman, JV, Varsity, D1, Pro (src/utils/playerProgress.ts).
+  const PLAYER_TIER_LABEL = 'JV';
+  document.querySelectorAll('.tier-name').forEach(el => { el.textContent = PLAYER_TIER_LABEL; });
+  document.querySelectorAll('.tier-abbr').forEach(el => { el.textContent = PLAYER_TIER_LABEL.slice(0, 2).toUpperCase(); });
+
+  // Lucide icon paths (inlined so the file works offline, apart from Google Fonts).
+  const ICONS = {
+    'chevron-left': '<path d="m15 18-6-6 6-6"/>',
+    'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+    'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    'check': '<path d="M20 6 9 17l-5-5"/>',
+    'moon': '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    'dumbbell': '<path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/>',
+    'activity': '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    'settings': '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    'rocket': '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+    'globe': '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    'home': '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    'target': '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    'calendar': '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+    'video': '<path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/>',
+    'user-circle': '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/>',
+    'users': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    'sparkles': '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+    'star': '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    'trophy': '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+    'trending-up': '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+    'gem': '<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+    'clock': '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    'bell': '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+    'message-square': '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    'message-circle': '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+    'heart': '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    'send': '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  };
+
+  function svg(name, size, weight, filled) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${weight}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+  }
+
+  const TABS = {
+    player: [
+      { id: 'home', label: 'Home', icon: 'home' },
+      { id: 'games', label: 'Games', icon: 'target' },
+      { id: 'book', label: 'Book', icon: 'calendar' },
+      { id: 'locker', label: 'Locker Room', icon: 'video' },
+      { id: 'profile', label: 'Profile', icon: 'user-circle' },
+    ],
+    coach: [
+      { id: 'dashboard', label: 'Dashboard', icon: 'home' },
+      { id: 'players', label: 'Players', icon: 'users' },
+      { id: 'schedule', label: 'Schedule', icon: 'calendar' },
+      { id: 'locker', label: 'Locker Room', icon: 'video' },
+      { id: 'profile', label: 'Profile', icon: 'user-circle' },
+    ],
+  };
+
+  const STATUS_BAR = `
+    <div class="statusbar">
+      <div class="sb-l">9:41</div>
+      <div class="sb-r">
+        <svg width="19" height="12" viewBox="0 0 19 12" fill="#fff"><rect x="0" y="7.5" width="3.2" height="4.5" rx="1"/><rect x="5" y="5" width="3.2" height="7" rx="1"/><rect x="10" y="2.5" width="3.2" height="9.5" rx="1"/><rect x="15" y="0" width="3.2" height="12" rx="1"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><path d="M8.5 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8.5.6 10.2 10.2 0 0 0 1.3 3.5l1.2 1.2a8.5 8.5 0 0 1 6-2.4Z"/><path d="M8.5 5.8c1.4 0 2.6.5 3.6 1.4l1.2-1.2a6.8 6.8 0 0 0-9.6 0l1.2 1.2c1-.9 2.2-1.4 3.6-1.4Z"/><path d="M8.5 9.2c.5 0 .9.2 1.2.5L8.5 11 7.3 9.7c.3-.3.7-.5 1.2-.5Z"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.8" fill="none" stroke="#fff" stroke-opacity=".35"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="#fff"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="#fff" fill-opacity=".4"/></svg>
+      </div>
+    </div>`;
+
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.insertAdjacentHTML('afterbegin', STATUS_BAR + '<div class="island"></div>');
+    const tabs = TABS[screen.dataset.tabs];
+    if (tabs) {
+      const active = screen.dataset.active;
+      screen.insertAdjacentHTML('beforeend',
+        `<nav class="tabbar">${tabs.map(t =>
+          `<div class="tab${t.id === active ? ' on' : ''}">${svg(t.icon, 24, t.id === active ? 2.2 : 1.8)}<span>${t.label}</span></div>`
+        ).join('')}</nav>`);
+    }
+    screen.insertAdjacentHTML('beforeend', '<div class="home-ind"></div>');
+  });
+
+  document.querySelectorAll('i.ic[data-i]').forEach(el => {
+    el.innerHTML = svg(el.dataset.i, el.dataset.s || 20, el.dataset.w || 2, el.dataset.f === '1');
+  });
+
+  // ISO Performance Compass (metric labels from CoachISODashboard RADAR_METRICS).
+  (function drawRadar() {
+    const el = document.getElementById('radar');
+    const data = [
+      ['Player Dev', 72], ['Communication', 88], ['Presence', 80], ['Impact', 76],
+      ['Community', 95], ['Content', 58], ['Consistency', 66],
+    ];
+    const cx = 165, cy = 76, R = 54, n = data.length;
+    const pt = (i, r) => {
+      const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+      return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    };
+    let out = '';
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+      out += `<polygon points="${data.map((_, i) => pt(i, R * f).join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
+    });
+    data.forEach((_, i) => {
+      const [x, y] = pt(i, R);
+      out += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.08)"/>`;
+    });
+    const accent = '#22c55e';
+    out += `<polygon points="${data.map((d, i) => pt(i, R * d[1] / 100).join(',')).join(' ')}" fill="${accent}" fill-opacity="0.35" stroke="${accent}" stroke-width="2" stroke-linejoin="round"/>`;
+    data.forEach((d, i) => {
+      const [x, y] = pt(i, R * d[1] / 100);
+      out += `<circle cx="${x}" cy="${y}" r="2.6" fill="${accent}"/>`;
+      const [lx, ly] = pt(i, R + 16);
+      const anchor = Math.abs(lx - cx) < 6 ? 'middle' : lx > cx ? 'start' : 'end';
+      out += `<text x="${lx}" y="${ly + 3.5}" text-anchor="${anchor}" font-family="Barlow, sans-serif" font-size="10.5" fill="rgba(255,255,255,0.6)">${d[0]}</text>`;
+    });
+    el.innerHTML = out;
+  })();
+
+  // Viewer controls.
+  const stage = document.getElementById('stage');
+  const fitBtn = document.getElementById('fitBtn');
+  const actualBtn = document.getElementById('actualBtn');
+  let fit = true;
+  function applyZoom() {
+    const z = fit ? Math.min(1, (window.innerWidth - 48) / 1290) : 1;
+    stage.style.setProperty('--z', z);
+    fitBtn.classList.toggle('on', fit);
+    actualBtn.classList.toggle('on', !fit);
+  }
+  fitBtn.onclick = () => { fit = true; applyZoom(); };
+  actualBtn.onclick = () => { fit = false; applyZoom(); };
+  document.getElementById('cleanBtn').onclick = () => document.body.classList.add('clean');
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.body.classList.remove('clean'); });
+  window.addEventListener('resize', applyZoom);
+  applyZoom();
+</script>
+</body>
+</html>
