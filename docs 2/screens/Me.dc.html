@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · My progress</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 84px; overflow-y: auto">
+    <header style="padding: 54px 20px 0; display: flex; align-items: center; gap: 14px">
+      <span style="width: 60px; height: 60px; flex: none; border-radius: 50%; background: #2a2a2a; border: 2px solid #AAAAAA; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; color: #E0E0E0">YN</span>
+      <div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; line-height: 1; text-transform: uppercase; color: #FFFFFF">[Your name]</span>
+        <span style="font-size: 13px; color: #AAAAAA"><span style="color: {{acc.text}}; font-weight: 800">{{acc.name}}</span> pathway · Denver</span>
+      </div>
+      <a href="Playbook.dc.html" aria-label="Settings and The Playbook" style="width: 44px; height: 44px; border-radius: 22px; background: #141414; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>
+    </header>
+
+    <div style="padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 20px">
+      <!-- Level -->
+      <div style="padding: 18px; border-radius: 20px; background: #141414; border: 1px solid #333; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between">
+          <div style="display: flex; flex-direction: column">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.2em; color: #AAAAAA">CURRENT LEVEL</span>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 56px; line-height: 0.95; color: #FFFFFF">JV</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end">
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 40px; line-height: 0.95; color: {{acc.text}}">7</span>
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">{{acc.upper}} ISOs</span>
+          </div>
+        </div>
+        <div style="height: 10px; border-radius: 5px; background: #262626; overflow: hidden"><div style="width: 20%; height: 10px; border-radius: 5px; background: {{acc.fill}}"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #AAAAAA"><span>JV at 5</span><span>8 more ISOs to Varsity</span></div>
+      </div>
+
+      <!-- Ladder -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #AAAAAA">YOUR RANKS</h2>
+        <div style="display: flex; flex-direction: column; padding: 6px 16px; border-radius: 18px; background: #121212; border: 1px solid #222">
+          <sc-for list="{{ladder}}" as="l" hint-placeholder-count="6">
+            <div style="display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid {{l.line}}">
+              <span style="width: 40px; height: 40px; flex: none; box-sizing: border-box; border-radius: 50%; border: 2px solid {{l.ring}}; background: {{l.fill}}; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; color: {{l.numColor}}">{{l.runs}}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+                <span style="display: flex; align-items: center; gap: 8px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; line-height: 1.1; text-transform: uppercase; color: {{l.nameColor}}">{{l.name}}</span><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.12em; color: {{l.badgeColor}}">{{l.badge}}</span></span>
+                <span style="font-size: 12px; line-height: 1.4; color: #AAAAAA">{{l.unlock}}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <span style="font-size: 12px; color: #8f8f8f">Only check-ins at {{acc.name}} ISOs count. Other pathways earn crossover badges.</span>
+      </div>
+
+      <!-- Stats -->
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+        <div style="padding: 12px; border-radius: 14px; background: #121212; border: 1px solid #222; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; color: #FFFFFF">7</span><span style="font-size: 11px; color: #AAAAAA">ISOs attended</span></div>
+        <div style="padding: 12px; border-radius: 14px; background: #121212; border: 1px solid #222; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; color: #FFFFFF">5</span><span style="font-size: 11px; color: #AAAAAA">Coaches met</span></div>
+        <div style="padding: 12px; border-radius: 14px; background: #121212; border: 1px solid #222; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 28px; color: #FFFFFF">1</span><span style="font-size: 11px; color: #AAAAAA">Events</span></div>
+      </div>
+
+      <!-- Pathway -->
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; background: #121212; border: 1px solid #222">
+        <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">YOUR PATHWAY</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; text-transform: uppercase; color: {{acc.text}}">{{acc.name}}</span><span style="font-size: 12px; color: #AAAAAA">1 of 2 switches left this month</span></span>
+        <a href="Onboard2.dc.html" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #333; display: flex; align-items: center; font-size: 13px; font-weight: 800; color: #E0E0E0; text-decoration: none">Switch</a>
+      </div>
+
+      <!-- Next unlock -->
+      <div style="display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 18px; background: {{acc.tint}}; border: 1px solid {{acc.fill}}">
+        <div style="width: 64px; height: 64px; flex: none; border-radius: 14px; background: #1c1c1c; display: flex; align-items: center; justify-content: center; color: {{acc.text}}">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: {{acc.text}}">NEXT UNLOCK · VARSITY</span>
+          <span style="font-size: 16px; font-weight: 800; color: #FFFFFF">{{acc.name}} Pathway Patch</span>
+          <span style="font-size: 12px; color: #AAAAAA">Earned, never sold. Plus Varsity gear access.</span>
+        </div>
+      </div>
+
+      <!-- Locker -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #AAAAAA">YOUR LOCKER</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+          <div style="aspect-ratio: 1; border-radius: 14px; background: #161616; border: 1px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; text-align: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="1.6" stroke-linejoin="round"><path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></svg>
+            <span style="font-size: 11px; font-weight: 700; line-height: 1.2; color: #E0E0E0">First Believers Tee</span>
+          </div>
+          <div style="aspect-ratio: 1; border-radius: 14px; background: #161616; border: 1px solid #C8873A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; text-align: center">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C8873A" stroke-width="1.6" stroke-linejoin="round"><path d="M8 3l-5 3 2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/></svg>
+            <span style="font-size: 11px; font-weight: 700; line-height: 1.2; color: #E0E0E0">ISO Tee · unlocked to buy</span>
+          </div>
+          <div style="aspect-ratio: 1; border-radius: 14px; background: #0f0f0f; border: 1px dashed #333; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; text-align: center">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <span style="font-size: 11px; font-weight: 700; line-height: 1.2; color: #8f8f8f">{{acc.name}} Patch · 15 ISOs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #AAAAAA">RECENT ISOs</h2>
+        <a href="Coach.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #121212; border: 1px solid #222; text-decoration: none; color: #E0E0E0">
+          <span style="width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">SA</span>
+          <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 700; color: #FFFFFF">Breaking into software</span><span style="font-size: 12px; color: #AAAAAA">Builder · Sep 28 · checked in</span></span>
+          <span style="font-size: 13px; font-weight: 800; color: #C8873A">+1 ISO</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 8px; z-index: 4">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</a>
+    <a href="Events.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Events</a>
+    <a href="Coach.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>Coaches</a>
+    <a href="Me.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #C8873A; font-size: 11px; font-weight: 800"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/></svg>Me</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"pathway":{"editor":"enum","options":["Builder","Founder","Healer","Reformer","Warrior","Seeker"],"default":"Builder"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const palette = {
+      Builder: { fill: '#8e24aa', text: '#c77ddb', tint: 'rgba(142,36,170,0.12)' },
+      Founder: { fill: '#e65100', text: '#ff8a50', tint: 'rgba(230,81,0,0.12)' },
+      Healer: { fill: '#1e88e5', text: '#64b5f6', tint: 'rgba(30,136,229,0.12)' },
+      Reformer: { fill: '#00acc1', text: '#4dd0e1', tint: 'rgba(0,172,193,0.12)' },
+      Warrior: { fill: '#e53935', text: '#ef7470', tint: 'rgba(229,57,53,0.12)' },
+      Seeker: { fill: '#1db954', text: '#4cd47b', tint: 'rgba(29,185,84,0.12)' }
+    };
+    const name = this.props.pathway ?? 'Builder';
+    const acc = Object.assign({ name: name, upper: name.toUpperCase() }, palette[name] || palette.Builder);
+    const done = 7;
+    const steps = [
+      [1, 'Freshman', 'Your player card'],
+      [5, 'JV', 'Access to buy the ISO tee'],
+      [15, 'Varsity', 'Earned pathway patch + Varsity gear access'],
+      [35, 'D1', 'First access to The Court + invite-only dinners'],
+      [60, 'Pro', 'Eligible to apply as a coach in your pathway'],
+      [100, 'Hall of Fame', 'Jersey retired: numbered piece + your name on the wall']
+    ];
+    let current = 0;
+    steps.forEach((s, i) => { if (done >= s[0]) current = i; });
+    return {
+      acc: acc,
+      ladder: steps.map((s, i) => {
+        const reached = done >= s[0];
+        const isCur = i === current;
+        return {
+          runs: s[0], name: s[1], unlock: s[2],
+          badge: isCur ? 'YOU ARE HERE' : (i === current + 1 ? 'NEXT' : ''),
+          ring: reached ? acc.fill : '#3a3a3a',
+          fill: isCur ? acc.fill : 'transparent',
+          numColor: isCur ? '#FFFFFF' : (reached ? acc.text : '#8f8f8f'),
+          badgeColor: acc.text,
+          nameColor: reached ? '#FFFFFF' : '#AAAAAA',
+          line: i === steps.length - 1 ? 'transparent' : '#1f1f1f'
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

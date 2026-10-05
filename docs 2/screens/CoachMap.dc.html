@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Manage your ISOs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 84px; overflow-y: auto">
+    <header style="padding: 54px 20px 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0.06em; color: #E0E0E0">ISO</span>
+        <div role="group" aria-label="Mode" style="display: flex; padding: 4px; border-radius: 22px; background: #141414; border: 1px solid #262626">
+          <a href="CoachExplore.dc.html" style="min-height: 36px; padding: 0 16px; border-radius: 18px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: #AAAAAA; text-decoration: none">Player</a>
+          <span aria-current="true" style="min-height: 36px; padding: 0 16px; border-radius: 18px; display: flex; align-items: center; gap: 6px; background: #C8873A; font-size: 13px; font-weight: 800; color: #080808">Coach<span style="min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: #080808; color: #C8873A; font-size: 11px; display: flex; align-items: center; justify-content: center">{{pending}}</span></span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 38px; line-height: 1; text-transform: uppercase; color: #FFFFFF">Manage your ISOs</h1>
+        <p style="margin: 0; font-size: 13px; color: #AAAAAA">2 live pins · {{pending}} players got next</p>
+      </div>
+    </header>
+
+    <div style="padding: 18px 20px 100px; display: flex; flex-direction: column; gap: 22px">
+      <!-- Today -->
+      <a href="CoachCheckIn.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: rgba(230,81,0,0.1); border: 1px solid rgba(230,81,0,0.5); text-decoration: none; color: #E0E0E0">
+        <span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #e65100; display: flex; align-items: center; justify-content: center; color: #FFFFFF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 11px; font-weight: 800; letter-spacing: 0.14em; color: #ff8a50">TODAY · 12:00 PM</span><span style="font-size: 15px; font-weight: 800; color: #FFFFFF">Check in your table</span><span style="font-size: 12px; color: #AAAAAA">Enter each player's 4-digit code</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- Requests -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #C8873A">WHO'S GOT NEXT</h2>
+        <sc-for list="{{requests}}" as="r" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 16px; background: #121212; border: 1px solid #262626">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <span style="width: 44px; height: 44px; flex: none; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #E0E0E0">{{r.initials}}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+                <span style="font-size: 15px; font-weight: 800; color: #FFFFFF">{{r.name}}</span>
+                <span style="font-size: 12px; color: #AAAAAA">{{r.meta}}</span>
+              </span>
+              <span style="padding: 4px 8px; border-radius: 8px; border: 1px solid {{r.tagBorder}}; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: {{r.tagColor}}">{{r.tag}}</span>
+            </div>
+            <p style="margin: 0; padding: 10px 12px; border-radius: 10px; background: #1a1a1a; font-size: 13px; line-height: 1.45; color: #E0E0E0">{{r.note}}</p>
+            <sc-if value="{{r.open}}" hint-placeholder-val="{{true}}">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                <button type="button" onClick="{{r.decline}}" style="height: 44px; border-radius: 12px; border: 1px solid #333; background: transparent; color: #E0E0E0; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer">Not this time</button>
+                <button type="button" onClick="{{r.approve}}" style="height: 44px; border-radius: 12px; border: none; background: #C8873A; color: #080808; font-family: inherit; font-weight: 800; font-size: 14px; cursor: pointer">Approve</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{r.done}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 13px; font-weight: 700; color: {{r.doneColor}}">{{r.doneText}}</span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- Your pins -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #AAAAAA">YOUR LIVE PINS</h2>
+        <div style="position: relative; height: 130px; border-radius: 16px; background: #101113; overflow: hidden; border: 1px solid #222">
+          <div style="position: absolute; left: 0; right: 0; top: 60px; height: 5px; background: #1d1f23"></div>
+          <div style="position: absolute; top: 0; bottom: 0; left: 140px; width: 5px; background: #1d1f23"></div>
+          <div style="position: absolute; top: 0; bottom: 0; left: 270px; width: 3px; background: #18191c"></div>
+          <span style="position: absolute; left: 40px; top: 30px; width: 26px; height: 26px; border-radius: 50%; background: #1a1a1a; border: 2px solid #444"></span>
+          <span style="position: absolute; left: 300px; top: 84px; width: 26px; height: 26px; border-radius: 50%; background: #1a1a1a; border: 2px solid #444"></span>
+          <span style="position: absolute; left: 180px; top: 22px; width: 40px; height: 40px; border-radius: 50%; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px">TUE</span>
+          <span style="position: absolute; left: 80px; top: 76px; width: 40px; height: 40px; border-radius: 50%; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px">SAT</span>
+        </div>
+        <a href="RunDetail.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; background: #121212; border: 1px solid #222; text-decoration: none; color: #E0E0E0">
+          <span style="width: 46px; flex: none; display: flex; flex-direction: column; align-items: center"><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.12em; color: #C8873A">TUE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; color: #FFFFFF">6</span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 700; color: #FFFFFF">From side hustle to storefront</span><span style="font-size: 12px; color: #AAAAAA">12–2 PM · {{tueSeats}} of 3 seats confirmed</span></span>
+          <span style="font-size: 12px; font-weight: 800; color: #C8873A">Edit</span>
+        </a>
+        <a href="RunDetail.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; background: #121212; border: 1px solid #222; text-decoration: none; color: #E0E0E0">
+          <span style="width: 46px; flex: none; display: flex; flex-direction: column; align-items: center"><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.12em; color: #C8873A">SAT</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; color: #FFFFFF">10</span></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 700; color: #FFFFFF">Open floor: your business idea</span><span style="font-size: 12px; color: #AAAAAA">9–10:30 AM · {{satSeats}} of 4 seats confirmed</span></span>
+          <span style="font-size: 12px; font-weight: 800; color: #C8873A">Edit</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <a href="DropPin.dc.html" style="position: absolute; right: 20px; bottom: 100px; height: 56px; padding: 0 20px; border-radius: 28px; background: #C8873A; color: #080808; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; text-decoration: none; box-shadow: 0 8px 24px rgba(0,0,0,0.6); z-index: 3"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Drop a pin</a>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 8px; z-index: 4">
+    <a href="CoachMap.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #C8873A; font-size: 11px; font-weight: 800"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>My ISOs</a>
+    <a href="Events.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Events</a>
+    <a href="CoachDash.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>Players</a>
+    <a href="CoachDash.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { d: {} }; }
+  renderVals() {
+    const base = [
+      { id: 'a', initials: 'AK', name: 'Amira K.', meta: 'JV · 5 ISOs attended · Tue ISO', tag: 'FOUNDER', mine: true, note: 'Launching a food truck next spring. Want to learn how you picked your first location.', run: 'tue' },
+      { id: 'b', initials: 'DL', name: 'Devin L.', meta: 'Freshman · first ISO · Tue ISO', tag: 'FOUNDER', mine: true, note: 'Still in school, been flipping sneakers on the side. Trying to make it real.', run: 'tue' },
+      { id: 'c', initials: 'RT', name: 'Coach Rahim T.', meta: 'Builder coach · Sat ISO', tag: 'OPEN SEAT', mine: false, note: 'Thinking about starting a dev studio. Would love to sit in.', run: 'sat' }
+    ];
+    const d = this.state.d;
+    const set = (id, v) => this.setState({ d: Object.assign({}, d, { [id]: v }) });
+    let tue = 1, sat = 0, pending = 0;
+    base.forEach((r) => {
+      if (d[r.id] === 'yes') { if (r.run === 'tue') tue++; else sat++; }
+      if (!d[r.id]) pending++;
+    });
+    return {
+      pending: pending,
+      tueSeats: tue,
+      satSeats: sat,
+      requests: base.map((r) => ({
+        initials: r.initials, name: r.name, meta: r.meta, note: r.note, tag: r.tag,
+        tagColor: r.mine ? '#C8873A' : '#AAAAAA',
+        tagBorder: r.mine ? '#C8873A' : '#444',
+        open: !d[r.id], done: !!d[r.id],
+        doneText: d[r.id] === 'yes' ? 'Approved. Spot details go out 24 hrs before.' : 'Declined. They get a kind note and other ISOs to try.',
+        doneColor: d[r.id] === 'yes' ? '#C8873A' : '#AAAAAA',
+        approve: () => set(r.id, 'yes'),
+        decline: () => set(r.id, 'no')
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

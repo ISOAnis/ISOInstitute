@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Three quick ones</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 112px; overflow-y: auto; padding: 54px 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <a href="Onboard2.dc.html" aria-label="Back" style="width: 44px; height: 44px; margin-left: -8px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <a href="SpeakISO.dc.html" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 700; color: #AAAAAA; text-decoration: none">Skip for now</a>
+    </div>
+    <div style="display: flex; gap: 6px"><span style="flex: 1; height: 4px; border-radius: 2px; background: #C8873A"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #C8873A"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #C8873A"></span></div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 42px; line-height: 0.95; text-transform: uppercase; color: #FFFFFF">Three quick ones</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #AAAAAA">So we can match you with coaches and tables that fit how you show up.</p>
+    </div>
+
+    <sc-for list="{{questions}}" as="q" hint-placeholder-count="3">
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #121212; border: 1px solid #222">
+        <span style="font-size: 15px; font-weight: 800; color: #FFFFFF">{{q.text}}</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{q.options}}" as="o" hint-placeholder-count="3">
+            <sc-if value="{{o.active}}" hint-placeholder-val="{{false}}">
+              <button type="button" aria-pressed="true" onClick="{{o.pick}}" style="min-height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid #C8873A; background: #C8873A; color: #080808; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer">{{o.label}}</button>
+            </sc-if>
+            <sc-if value="{{o.inactive}}" hint-placeholder-val="{{true}}">
+              <button type="button" aria-pressed="false" onClick="{{o.pick}}" style="min-height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: #E0E0E0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">{{o.label}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 112px; box-sizing: border-box; padding: 14px 20px 30px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; flex-direction: column; justify-content: center">
+    <a href="SpeakISO.dc.html" style="height: 52px; border-radius: 14px; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; text-decoration: none">Continue</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { q0: 'The question asker', q1: 'Straight feedback', q2: 'Early career' }; }
+  renderVals() {
+    const qs = [
+      ['At a table, you are usually…', ['The listener', 'The question asker', 'The storyteller']],
+      ['You learn best from…', ['Real stories', 'Straight feedback', 'Working a problem']],
+      ['Where you are right now', ['In school', 'Early career', 'Switching paths', 'Starting something']]
+    ];
+    return {
+      questions: qs.map((q, i) => {
+        const key = 'q' + i;
+        return {
+          text: q[0],
+          options: q[1].map((o) => ({ label: o, active: this.state[key] === o, inactive: this.state[key] !== o, pick: () => this.setState({ [key]: o }) }))
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Coach application</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+input::placeholder,textarea::placeholder{color:#8f8f8f}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 112px; overflow-y: auto; padding: 54px 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <a href="Onboard1.dc.html" aria-label="Back" style="width: 44px; height: 44px; margin-left: -8px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></a>
+      <span style="font-size: 12px; font-weight: 700; color: #AAAAAA">Reviewed in 24–48 hrs</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.22em; color: #C8873A">COACH APPLICATION</span>
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 42px; line-height: 0.95; text-transform: uppercase; color: #FFFFFF">Pull as you climb</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #AAAAAA">Every ISO coach is approved by our advisory board. Tell us where you've been.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">YOUR PATHWAY</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{paths}}" as="p" hint-placeholder-count="6">
+          <sc-if value="{{p.active}}" hint-placeholder-val="{{false}}">
+            <button type="button" aria-pressed="true" onClick="{{p.pick}}" style="min-height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid #C8873A; background: #C8873A; color: #080808; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer">{{p.name}}</button>
+          </sc-if>
+          <sc-if value="{{p.inactive}}" hint-placeholder-val="{{true}}">
+            <button type="button" aria-pressed="false" onClick="{{p.pick}}" style="min-height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid #333; background: #141414; color: #E0E0E0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">{{p.name}}</button>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="work" style="font-size: 12px; font-weight: 700; color: #AAAAAA">What do you do now?</label><input id="work" type="text" placeholder="Role, company, or what you've built" style="height: 50px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 15px"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="story" style="font-size: 12px; font-weight: 700; color: #AAAAAA">How did you get here? A few lines.</label><textarea id="story" rows="4" placeholder="The real version. Players want the path, not the highlight reel." style="box-sizing: border-box; padding: 12px 14px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 15px; line-height: 1.45; resize: none"></textarea></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="spots" style="font-size: 12px; font-weight: 700; color: #AAAAAA">Where would you host ISOs?</label><input id="spots" type="text" placeholder="Your gym, a café you're at weekly… we'll match ISO Partners" style="height: 50px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 15px"></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><label for="link" style="font-size: 12px; font-weight: 700; color: #AAAAAA">LinkedIn or a link to your work</label><input id="link" type="url" placeholder="https://" style="height: 50px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 15px"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px; background: #121212; border: 1px solid #333">
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.2em; color: #C8873A">THE ISO STANDARD</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+        <span style="padding: 10px 4px; border-radius: 10px; background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.04em; color: #FFFFFF">DISCIPLINE</span>
+        <span style="padding: 10px 4px; border-radius: 10px; background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.04em; color: #FFFFFF">HUMILITY</span>
+        <span style="padding: 10px 4px; border-radius: 10px; background: #1a1a1a; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: 0.04em; color: #FFFFFF">RESPECT</span>
+      </div>
+      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #E0E0E0">ISO coaches serve, they don't perform. ISOs stay on your pathway: careers, skills, and the real journey. No ISO is used to promote any political, social, or personal agenda. Every player who shows up gets the same respect.</p>
+      <button type="button" role="checkbox" aria-checked="{{agreedStr}}" onClick="{{toggle}}" style="display: flex; align-items: center; gap: 12px; padding: 0; border: none; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; min-height: 44px">
+        <sc-if value="{{agreed}}" hint-placeholder-val="{{false}}">
+          <span style="width: 26px; height: 26px; flex: none; border-radius: 7px; background: #C8873A; display: flex; align-items: center; justify-content: center; color: #080808"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span>
+        </sc-if>
+        <sc-if value="{{notAgreed}}" hint-placeholder-val="{{true}}">
+          <span style="width: 26px; height: 26px; flex: none; box-sizing: border-box; border-radius: 7px; border: 2px solid #555"></span>
+        </sc-if>
+        I'll coach by the ISO Standard
+      </button>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 18px; height: 112px; box-sizing: border-box; padding: 14px 20px 30px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; flex-direction: column; justify-content: center">
+    <sc-if value="{{agreed}}" hint-placeholder-val="{{false}}">
+      <a href="CoachReview.dc.html" style="height: 52px; border-radius: 14px; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; text-decoration: none">Submit for review</a>
+    </sc-if>
+    <sc-if value="{{notAgreed}}" hint-placeholder-val="{{true}}">
+      <button type="button" disabled="" style="height: 52px; border: none; border-radius: 14px; background: #2a2a2a; color: #8f8f8f; font-family: inherit; font-weight: 800; font-size: 15px">Agree to the ISO Standard to submit</button>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { path: 'Founder', agreed: false }; }
+  renderVals() {
+    const names = ['Founder', 'Builder', 'Healer', 'Reformer', 'Warrior', 'Seeker'];
+    const a = this.state.agreed;
+    return {
+      paths: names.map((n) => ({ name: n, active: this.state.path === n, inactive: this.state.path !== n, pick: () => this.setState({ path: n }) })),
+      agreed: a,
+      notAgreed: !a,
+      agreedStr: a ? 'true' : 'false',
+      toggle: () => this.setState({ agreed: !a })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Explore ISOs (coach in player mode)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 84px; overflow-y: auto">
+    <header style="padding: 54px 20px 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0.06em; color: #E0E0E0">ISO</span>
+        <div role="group" aria-label="Mode" style="display: flex; padding: 4px; border-radius: 22px; background: #141414; border: 1px solid #262626">
+          <span aria-current="true" style="min-height: 36px; padding: 0 16px; border-radius: 18px; display: flex; align-items: center; background: #E0E0E0; font-size: 13px; font-weight: 800; color: #080808">Player</span>
+          <a href="CoachMap.dc.html" style="min-height: 36px; padding: 0 16px; border-radius: 18px; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #AAAAAA; text-decoration: none">Coach<span style="min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: #C8873A; color: #080808; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span></a>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 38px; line-height: 1; text-transform: uppercase; color: #FFFFFF">Explore ISOs</h1>
+        <p style="margin: 0; font-size: 13px; color: #AAAAAA">Every pathway, near you</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #141414; border: 1px solid #333">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8873A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M12 3l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.3l6-.8z"/></svg>
+        <span style="font-size: 12px; line-height: 1.45; color: #E0E0E0"><b style="color: #FFFFFF">Coach access:</b> join any pathway's ISOs. Players in that pathway get seats first, so you take what's open.</span>
+      </div>
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-right: -20px; padding-right: 20px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="7">
+          <sc-if value="{{f.active}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{f.pick}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #E0E0E0; background: #E0E0E0; color: #080808; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer">{{f.label}}</button>
+          </sc-if>
+          <sc-if value="{{f.inactive}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{f.pick}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2a2a2a; background: #141414; color: #E0E0E0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">{{f.label}}</button>
+          </sc-if>
+        </sc-for>
+      </div>
+    </header>
+
+    <div style="padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{runs}}" as="r" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 16px; background: #121212; border: 1px solid #262626">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="width: 44px; height: 44px; flex: none; border-radius: 50%; background: #2a2a2a; border: 2px solid #AAAAAA; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; color: #E0E0E0">{{r.initials}}</span>
+            <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.14em; color: {{r.text}}"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{r.fill}}"></span>{{r.path}}</span>
+              <span style="font-size: 15px; font-weight: 800; color: #FFFFFF">{{r.title}}</span>
+              <span style="font-size: 12px; color: #AAAAAA">{{r.meta}}</span>
+            </span>
+          </div>
+          <sc-if value="{{r.canRequest}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{r.req}}" style="height: 44px; border-radius: 12px; border: 1px solid #E0E0E0; background: transparent; color: #FFFFFF; font-family: inherit; font-weight: 800; font-size: 14px; cursor: pointer">I got next</button>
+          </sc-if>
+          <sc-if value="{{r.requested}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; font-weight: 700; color: #C8873A">You got next. The host will confirm.</span>
+          </sc-if>
+          <sc-if value="{{r.full}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; font-weight: 700; color: #8f8f8f">Pathway players filled it. Follow the coach for the next one.</span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 8px; z-index: 4">
+    <a href="CoachExplore.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #E0E0E0; font-size: 11px; font-weight: 800"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Explore</a>
+    <a href="Events.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Events</a>
+    <a href="Coach.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>Coaches</a>
+    <a href="Me.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/></svg>Me</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { filter: 'All', req: {} }; }
+  renderVals() {
+    const all = [
+      { id: 1, initials: 'SA', path: 'BUILDER', title: 'Breaking into software', meta: 'Thu 7:30 AM · Downtown Denver · 1 open seat', full: false },
+      { id: 2, initials: 'DK', path: 'WARRIOR', title: 'Discipline before motivation', meta: 'Today 6 PM · Lakewood · 2 open seats', full: false },
+      { id: 3, initials: 'NH', path: 'HEALER', title: 'Med school, the honest version', meta: 'Fri 5 PM · Glendale · full', full: true },
+      { id: 4, initials: 'JR', path: 'REFORMER', title: 'Law school or straight to work?', meta: 'Sun 2 PM · Westminster · 1 open seat', full: false }
+    ];
+    const labels = ['All', 'Builder', 'Warrior', 'Healer', 'Reformer', 'Seeker', 'Founder'];
+    const s = this.state;
+    const shown = s.filter === 'All' ? all : all.filter((r) => r.path === s.filter.toUpperCase());
+    return {
+      filters: labels.map((l) => ({ label: l, active: s.filter === l, inactive: s.filter !== l, pick: () => this.setState({ filter: l }) })),
+      runs: shown.map((r) => ({
+        initials: r.initials, path: r.path, title: r.title, meta: r.meta,
+        fill: ({ BUILDER: '#8e24aa', WARRIOR: '#e53935', HEALER: '#1e88e5', REFORMER: '#00acc1', FOUNDER: '#e65100', SEEKER: '#1db954' })[r.path],
+        text: ({ BUILDER: '#c77ddb', WARRIOR: '#ef7470', HEALER: '#64b5f6', REFORMER: '#4dd0e1', FOUNDER: '#ff8a50', SEEKER: '#4cd47b' })[r.path],
+        full: r.full,
+        requested: !r.full && !!s.req[r.id],
+        canRequest: !r.full && !s.req[r.id],
+        req: () => this.setState({ req: Object.assign({}, s.req, { [r.id]: true }) })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

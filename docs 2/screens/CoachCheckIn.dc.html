@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Check in your table</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+input::placeholder{color:#555}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 112px; overflow-y: auto">
+    <div style="padding: 54px 12px 0; display: flex; align-items: center; justify-content: space-between">
+      <a href="CoachMap.dc.html" aria-label="Back to your ISOs" style="width: 44px; height: 44px; border-radius: 22px; background: #141414; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.2em; color: #AAAAAA">COACH MODE</span>
+      <span style="width: 44px"></span>
+    </div>
+
+    <div style="padding: 14px 20px 24px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.16em; color: #ff8a50"><span style="width: 8px; height: 8px; border-radius: 50%; background: #e65100"></span>TODAY · 12:00 PM</span>
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 42px; line-height: 0.95; text-transform: uppercase; color: #FFFFFF">Check in your table</h1>
+        <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #AAAAAA">Ask each player for their 4-digit code. No code means no RSVP.</p>
+      </div>
+
+      <!-- Code entry -->
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #141414; border: 1px solid #333">
+        <label for="code" style="font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">ENTER CODE</label>
+        <div style="display: flex; gap: 8px">
+          <input id="code" type="text" inputmode="numeric" maxlength="4" placeholder="0000" value="{{code}}" onChange="{{onType}}" style="flex: 1; min-width: 0; height: 60px; box-sizing: border-box; padding: 0 16px; border-radius: 12px; border: 1px solid #3a3a3a; background: #1c1c1c; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 34px; letter-spacing: 0.4em">
+          <button type="button" onClick="{{check}}" style="height: 60px; padding: 0 18px; border: none; border-radius: 12px; background: #C8873A; color: #080808; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer">Check in</button>
+        </div>
+        <sc-if value="{{okMsg}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px; background: rgba(29,185,84,0.1); border: 1px solid #1db954">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4cd47b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M5 12l5 5 9-10"/></svg>
+            <span style="font-size: 13px; line-height: 1.45; color: #E0E0E0">{{okText}}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{badMsg}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px; background: rgba(229,57,53,0.1); border: 1px solid #e53935">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef7470" stroke-width="2.4" stroke-linecap="round" style="flex: none; margin-top: 1px"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></svg>
+            <span style="font-size: 13px; line-height: 1.45; color: #E0E0E0"><b style="color: #FFFFFF">No RSVP for this code.</b> They're not on your list, so you can kindly let them know to say "I got next" on your next ISO. Walk-ins throw off your ISO's numbers.</span>
+          </div>
+        </sc-if>
+        <span style="font-size: 11px; color: #555">Prototype: try 4827, 3391, or any other code</span>
+      </div>
+
+      <!-- Roster -->
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <h2 style="margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; color: #AAAAAA">YOUR TABLE</h2>
+          <span style="font-size: 12px; font-weight: 800; color: #FFFFFF">{{inCount}} of 3 in</span>
+        </div>
+        <div style="display: flex; flex-direction: column; border-radius: 14px; background: #121212; border: 1px solid #222">
+          <sc-for list="{{roster}}" as="p" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid {{p.line}}">
+              <span style="width: 40px; height: 40px; flex: none; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #E0E0E0">{{p.initials}}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 700; color: #FFFFFF">{{p.name}}</span><span style="font-size: 12px; color: #AAAAAA">{{p.meta}}</span></span>
+              <span style="padding: 4px 9px; border-radius: 8px; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; color: {{p.statusColor}}; border: 1px solid {{p.statusColor}}">{{p.status}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 112px; box-sizing: border-box; padding: 14px 20px 30px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; flex-direction: column; justify-content: center; gap: 6px">
+    <a href="CoachMap.dc.html" style="height: 52px; border-radius: 14px; background: {{startBg}}; color: {{startInk}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; text-decoration: none">{{startLabel}}</a>
+    <span style="font-size: 11px; text-align: center; color: #8f8f8f">Players who never check in are marked no-show after 30 min.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { code: '', checked: { js: true }, result: null, last: '' }; }
+  renderVals() {
+    const s = this.state;
+    const players = [
+      { key: 'js', initials: 'JS', name: 'Jalen S.', meta: 'Founder · JV', code: '3391' },
+      { key: 'ak', initials: 'AK', name: 'Amira K.', meta: 'Founder · JV', code: '4827' },
+      { key: 'dl', initials: 'DL', name: 'Devin L.', meta: 'Founder · Freshman · first ISO', code: '1150' }
+    ];
+    const inCount = players.filter((p) => s.checked[p.key]).length;
+    return {
+      code: s.code,
+      onType: (e) => this.setState({ code: (e.target.value || '').replace(/[^0-9]/g, '').slice(0, 4), result: null }),
+      check: () => {
+        const p = players.find((x) => x.code === s.code);
+        if (p) this.setState({ checked: Object.assign({}, s.checked, { [p.key]: true }), result: 'ok', last: p.name, code: '' });
+        else this.setState({ result: 'bad' });
+      },
+      okMsg: s.result === 'ok',
+      badMsg: s.result === 'bad',
+      okText: s.last + ' is checked in. Their $5 hold is released and the ISO counts toward their rank.',
+      inCount: inCount,
+      roster: players.map((p, i) => ({
+        initials: p.initials, name: p.name, meta: p.meta,
+        status: s.checked[p.key] ? 'CHECKED IN' : 'WAITING',
+        statusColor: s.checked[p.key] ? '#4cd47b' : '#8f8f8f',
+        line: i === players.length - 1 ? 'transparent' : '#1f1f1f'
+      })),
+      startLabel: inCount > 0 ? 'Start ISO · ' + inCount + ' checked in' : 'Waiting for your first check-in',
+      startBg: inCount > 0 ? '#C8873A' : '#2a2a2a',
+      startInk: inCount > 0 ? '#080808' : '#8f8f8f'
+    };
+  }
+}
+</script>
+</body>
+</html>

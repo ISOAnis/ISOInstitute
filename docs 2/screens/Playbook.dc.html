@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · The Playbook</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto">
+    <div style="padding: 54px 12px 0; display: flex; align-items: center; justify-content: space-between">
+      <a href="Me.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 22px; background: #141414; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.2em; color: #AAAAAA">SETTINGS</span>
+      <span style="width: 44px"></span>
+    </div>
+
+    <div style="padding: 14px 20px 40px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 48px; line-height: 0.95; text-transform: uppercase; color: #FFFFFF">The Playbook</h1>
+        <p style="margin: 0; font-size: 14px; color: #AAAAAA">How ISO talks, ranks up, and carries itself.</p>
+      </div>
+
+      <div role="tablist" aria-label="Playbook sections" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: #141414; border: 1px solid #262626">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+          <sc-if value="{{t.active}}" hint-placeholder-val="{{false}}">
+            <button type="button" role="tab" aria-selected="true" onClick="{{t.pick}}" style="min-height: 40px; border: none; border-radius: 10px; background: #C8873A; color: #080808; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer">{{t.label}}</button>
+          </sc-if>
+          <sc-if value="{{t.inactive}}" hint-placeholder-val="{{true}}">
+            <button type="button" role="tab" aria-selected="false" onClick="{{t.pick}}" style="min-height: 40px; border: none; border-radius: 10px; background: transparent; color: #AAAAAA; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer">{{t.label}}</button>
+          </sc-if>
+        </sc-for>
+      </div>
+
+      <!-- Lingo -->
+      <sc-if value="{{showLingo}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{lingo}}" as="w" hint-placeholder-count="6">
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 14px; background: #121212; border: 1px solid #222">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 24px; line-height: 1; text-transform: uppercase; color: #C8873A">{{w.term}}</span>
+              <span style="font-size: 14px; line-height: 1.45; color: #E0E0E0">{{w.meaning}}</span>
+              <span style="font-size: 13px; font-style: italic; color: #AAAAAA">{{w.example}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- Ladder -->
+      <sc-if value="{{showLadder}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #E0E0E0">Your rank is how many ISOs you've checked into in your pathway. Show up, rank up.</p>
+          <div style="display: flex; flex-direction: column; padding: 4px 16px; border-radius: 16px; background: #121212; border: 1px solid #222">
+            <sc-for list="{{ladder}}" as="l" hint-placeholder-count="6">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid {{l.line}}">
+                <span style="width: 44px; flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; color: #C8873A">{{l.runs}}</span>
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; text-transform: uppercase; color: #FFFFFF">{{l.name}}</span><span style="font-size: 12px; color: #AAAAAA">{{l.unlock}}</span></span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-size: 12px; line-height: 1.45; color: #8f8f8f">ISOs outside your pathway earn crossover badges. Switching pathways starts that pathway's count; your old progress waits for you.</span>
+        </div>
+      </sc-if>
+
+      <!-- Overall -->
+      <sc-if value="{{showOverall}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #E0E0E0">Every coach has an Overall. It moves with how they serve, not their résumé.</p>
+          <sc-for list="{{overall}}" as="o" hint-placeholder-count="4">
+            <div style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 14px; background: #121212; border: 1px solid #222">
+              <span style="width: 8px; height: 8px; flex: none; margin-top: 6px; border-radius: 50%; background: #C8873A"></span>
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 800; color: #FFFFFF">{{o.title}}</span><span style="font-size: 13px; line-height: 1.45; color: #AAAAAA">{{o.desc}}</span></span>
+            </div>
+          </sc-for>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; text-align: center">
+            <span style="padding: 8px 0; border-radius: 8px; background: #1a1a1a; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: #AAAAAA">BRONZE</span>
+            <span style="padding: 8px 0; border-radius: 8px; background: #1a1a1a; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: #E0E0E0">SILVER</span>
+            <span style="padding: 8px 0; border-radius: 8px; background: #C8873A; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: #080808">GOLD</span>
+            <span style="padding: 8px 0; border-radius: 8px; background: #E0E0E0; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: #080808">PLATINUM</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- Standard -->
+      <sc-if value="{{showStandard}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div style="position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; padding: 20px 18px; border-radius: 16px; background: #141414; border: 1px solid #333">
+            <span aria-hidden="true" style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #C8873A"></span>
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.22em; color: #C8873A">OUR MISSION</span>
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.02; text-transform: uppercase; color: #FFFFFF">Inspire ambition, elevate overlooked talent, and rebuild community pathways to success.</span>
+            <span style="font-size: 13px; line-height: 1.5; color: #AAAAAA">Every ISO, every coach, and every Court night exists for this.</span>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #E0E0E0">ISO is faith-driven in how it was built, not in what it asks of you. It's open to everyone willing to grow by this standard.</p>
+          <sc-for list="{{standard}}" as="s" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 14px; background: #121212; border: 1px solid #222">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; color: #FFFFFF">{{s.title}}</span>
+              <span style="font-size: 13px; line-height: 1.45; color: #AAAAAA">{{s.desc}}</span>
+            </div>
+          </sc-for>
+          <div style="padding: 14px 16px; border-radius: 14px; border: 1px solid #C8873A; font-size: 13px; line-height: 1.5; color: #E0E0E0">ISOs stay on the pathway: careers, skills, and the real journey. No ISO is used to push any political, social, or personal agenda. Everyone at the table gets the same respect. And respect the venue: everyone buys something.</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'Mission' }; }
+  renderVals() {
+    const tab = this.state.tab;
+    const ladder = [
+      [1, 'Freshman', 'Your player card'],
+      [5, 'JV', 'Access to buy the ISO tee'],
+      [15, 'Varsity', 'Earned pathway patch + Varsity gear access'],
+      [35, 'D1', 'First access to The Court + invite-only dinners'],
+      [60, 'Pro', 'Eligible to apply as a coach in your pathway'],
+      [100, 'Hall of Fame', 'Jersey retired: numbered piece + your name on the wall']
+    ];
+    return {
+      tabs: ['Mission', 'Lingo', 'Ranks', 'Overall'].map((l) => ({ label: l, active: tab === l, inactive: tab !== l, pick: () => this.setState({ tab: l }) })),
+      showLingo: tab === 'Lingo',
+      showLadder: tab === 'Ranks',
+      showOverall: tab === 'Overall',
+      showStandard: tab === 'Mission',
+      lingo: [
+        { term: 'An ISO', meaning: 'Community coaching, in person: one coach, a few players, at an ISO Partner spot tied to their pathway. You see the area and time; the exact spot comes once you\'re confirmed.', example: '"There\'s a Founder ISO at the café at noon."' },
+        { term: 'I got next', meaning: 'How you claim a seat at an ISO. The coach confirms.', example: '"I got next at Marcus\'s ISO Tuesday."' },
+        { term: 'ISO Partner', meaning: 'A verified local spot that hosts ISOs: cafés, gyms, coworking spaces, libraries. Members get perks there.', example: '"Let\'s run it at the ISO Partner on Main."' },
+        { term: 'Coach', meaning: 'Someone who\'s walked the path, approved by the ISO advisory board.', example: '"She coaches Builder ISOs on weekends."' },
+        { term: 'Player', meaning: 'Anyone growing on ISO. Coaches are players too.', example: '"I\'m a Varsity player in Founder."' },
+        { term: 'Pathway', meaning: 'Your lane: Founder, Builder, Healer, Reformer, Warrior, or Seeker.', example: '"My pathway is Healer."' },
+        { term: 'Check-in code', meaning: 'Your 4-digit code once you\'re confirmed. Give it to the coach at the table to check in. No code, no seat.', example: '"Code\'s 4827, coach."' },
+        { term: 'The $5 hold', meaning: 'Saying "I got next" puts a $5 hold on your card, not a charge. Check in and it disappears. Cancel 24+ hours out and it\'s released. One late cancel a month is on us.', example: '"Don\'t trip, the hold drops when you check in."' },
+        { term: 'Community Pool', meaning: 'Where no-show holds go. ISO never keeps them: the pool funds free Court tickets and gear for students.', example: '"No-shows paid for 14 Court tickets this month."' },
+        { term: 'Overall', meaning: 'A coach\'s rating, built from ISOs hosted and player feedback.', example: '"He\'s an 87 Overall."' },
+        { term: 'The Court', meaning: 'Big events ISO curates for each pathway: dinners, panels, competitions, co-hosted by top coaches.', example: '"See you on The Court Saturday."' },
+        { term: 'The Locker', meaning: 'Gear you\'ve earned or unlocked by showing up.', example: '"Just got the patch in my Locker."' },
+        { term: 'Hall of Fame', meaning: '100 ISOs in your pathway. Your jersey gets retired.', example: '"She\'s Hall of Fame. Ask her anything."' }
+      ],
+      ladder: ladder.map((l, i) => ({ runs: l[0], name: l[1], unlock: l[2], line: i === ladder.length - 1 ? 'transparent' : '#1f1f1f' })),
+      overall: [
+        { title: 'ISOs hosted', desc: 'Every ISO where players check in moves it up.' },
+        { title: 'Player feedback', desc: 'Ratings and notes from players after each ISO.' },
+        { title: 'Show-up rate', desc: 'Coaches who cancel or no-show drop.' },
+        { title: 'The Court', desc: 'Co-hosting a curated event is a big boost.' }
+      ],
+      standard: [
+        { title: 'Discipline', desc: 'Show up when you said you would. Do the work between ISOs.' },
+        { title: 'Humility', desc: 'Coaches serve, they don\'t perform. Players listen before they speak.' },
+        { title: 'Respect', desc: 'For the table, the space, the people, and the values ISO stands on.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

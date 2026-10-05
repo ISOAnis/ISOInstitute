@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Drop a pin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+input::placeholder{color:#8f8f8f}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 112px; overflow-y: auto">
+    <div style="padding: 54px 12px 0; display: flex; align-items: center; justify-content: space-between">
+      <a href="Coach.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 22px; background: #141414; border: 1px solid #262626; display: flex; align-items: center; justify-content: center; color: #E0E0E0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+      <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.2em; color: #AAAAAA">COACH MODE</span>
+      <span style="width: 44px"></span>
+    </div>
+
+    <div style="padding: 14px 20px 24px; display: flex; flex-direction: column; gap: 20px">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 44px; line-height: 0.95; text-transform: uppercase; color: #FFFFFF">Drop a pin</h1>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <label for="topic" style="font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">WHAT'S YOUR ISO ABOUT?</label>
+        <input id="topic" type="text" value="From side hustle to storefront" style="height: 50px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">PICK AN ISO PARTNER SPOT</span>
+        <div role="radiogroup" aria-label="ISO Partner venue" style="display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{venues}}" as="v" hint-placeholder-count="3">
+            <sc-if value="{{v.active}}" hint-placeholder-val="{{false}}">
+              <button type="button" role="radio" aria-checked="true" onClick="{{v.pick}}" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 2px solid #C8873A; background: #1a140c; font-family: inherit; text-align: left; cursor: pointer">
+                <span style="width: 40px; height: 40px; flex: none; border-radius: 12px; background: #C8873A; display: flex; align-items: center; justify-content: center; color: #080808"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V7z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+                  <span style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap"><span style="font-size: 15px; font-weight: 800; color: #FFFFFF">{{v.name}}</span><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #C8873A">{{v.badge}}</span></span>
+                  <span style="font-size: 12px; color: #AAAAAA">{{v.meta}}</span>
+                </span>
+              </button>
+            </sc-if>
+            <sc-if value="{{v.inactive}}" hint-placeholder-val="{{true}}">
+              <button type="button" role="radio" aria-checked="false" onClick="{{v.pick}}" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid #333; background: #141414; font-family: inherit; text-align: left; cursor: pointer">
+                <span style="width: 40px; height: 40px; flex: none; border-radius: 12px; background: #1f1f1f; border: 1px solid #333; display: flex; align-items: center; justify-content: center; color: #AAAAAA"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V7z"/></svg></span>
+                <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+                  <span style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap"><span style="font-size: 15px; font-weight: 700; color: #E0E0E0">{{v.name}}</span><span style="font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #C8873A">{{v.badge}}</span></span>
+                  <span style="font-size: 12px; color: #AAAAAA">{{v.meta}}</span>
+                </span>
+              </button>
+            </sc-if>
+          </sc-for>
+        </div>
+        <span style="font-size: 12px; line-height: 1.45; color: #8f8f8f">ISOs happen only at verified ISO Partner spots. Want to add your gym or café? Nominate it and we'll reach out.</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #AAAAAA">WHEN</span>
+        <div style="display: flex; gap: 8px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="4">
+            <sc-if value="{{d.active}}" hint-placeholder-val="{{false}}">
+              <button type="button" onClick="{{d.pick}}" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #C8873A; background: #C8873A; color: #080808; font-family: inherit; font-weight: 800; font-size: 13px; cursor: pointer">{{d.label}}</button>
+            </sc-if>
+            <sc-if value="{{d.inactive}}" hint-placeholder-val="{{true}}">
+              <button type="button" onClick="{{d.pick}}" style="flex: 1; height: 44px; border-radius: 12px; border: 1px solid #333; background: #141414; color: #E0E0E0; font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer">{{d.label}}</button>
+            </sc-if>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; border-radius: 12px; border: 1px solid #333; background: #141414; font-size: 11px; color: #AAAAAA">Start<input type="text" value="12:00 PM" aria-label="Start time" style="border: none; background: transparent; padding: 0; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 700"></label>
+          <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; border-radius: 12px; border: 1px solid #333; background: #141414; font-size: 11px; color: #AAAAAA">End<input type="text" value="2:00 PM" aria-label="End time" style="border: none; background: transparent; padding: 0; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 700"></label>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: #141414; border: 1px solid #333">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 15px; font-weight: 800; color: #FFFFFF">Seats</span>
+          <span style="font-size: 12px; color: #AAAAAA">Keep it small. That's what makes it an ISO.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <button type="button" aria-label="Fewer seats" onClick="{{less}}" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid #333; background: #1c1c1c; color: #E0E0E0; font-size: 22px; font-weight: 700; cursor: pointer">−</button>
+          <span style="width: 26px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; color: #C8873A">{{seats}}</span>
+          <button type="button" aria-label="More seats" onClick="{{more}}" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid #333; background: #1c1c1c; color: #E0E0E0; font-size: 22px; font-weight: 700; cursor: pointer">+</button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; border-radius: 14px; background: #141414; border: 1px solid #333">
+        <sc-for list="{{toggles}}" as="t" hint-placeholder-count="2">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #222">
+            <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 700; color: #FFFFFF">{{t.label}}</span><span style="font-size: 12px; color: #AAAAAA">{{t.desc}}</span></span>
+            <sc-if value="{{t.on}}" hint-placeholder-val="{{true}}">
+              <button type="button" aria-pressed="true" aria-label="{{t.label}}" onClick="{{t.flip}}" style="width: 52px; height: 32px; flex: none; border-radius: 16px; border: none; background: #C8873A; position: relative; cursor: pointer"><span style="position: absolute; right: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: #080808"></span></button>
+            </sc-if>
+            <sc-if value="{{t.off}}" hint-placeholder-val="{{false}}">
+              <button type="button" aria-pressed="false" aria-label="{{t.label}}" onClick="{{t.flip}}" style="width: 52px; height: 32px; flex: none; border-radius: 16px; border: none; background: #333; position: relative; cursor: pointer"><span style="position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: #AAAAAA"></span></button>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 112px; box-sizing: border-box; padding: 12px 20px 28px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; flex-direction: column; gap: 8px">
+    <sc-if value="{{notDropped}}" hint-placeholder-val="{{true}}">
+      <button type="button" onClick="{{drop}}" style="height: 52px; border: none; border-radius: 14px; background: #C8873A; color: #080808; font-family: inherit; font-weight: 800; font-size: 15px; cursor: pointer">Drop pin · notify 41 followers</button>
+      <span style="font-size: 12px; text-align: center; color: #AAAAAA">Hosting counts toward your Overall once players check in.</span>
+    </sc-if>
+    <sc-if value="{{dropped}}" hint-placeholder-val="{{false}}">
+      <a href="Coach.dc.html" style="height: 52px; border-radius: 14px; border: 1px solid #C8873A; display: flex; align-items: center; justify-content: center; color: #C8873A; font-weight: 800; font-size: 15px; text-decoration: none">Pin is live. View your card</a>
+      <span style="font-size: 12px; text-align: center; color: #AAAAAA">41 followers notified · {{seats}} seats open</span>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { day: 'Tomorrow', seats: 3, approve: true, reveal: true, dropped: false, venue: 'cafe' };
+  }
+  renderVals() {
+    const s = this.state;
+    const days = ['Today', 'Tomorrow', 'Thu', 'Sat'];
+    const tg = [
+      ['approve', 'Approve each request', 'You pick who sits at the table'],
+      ['reveal', 'Reveal spot 24h before', 'Exact location only goes to confirmed players']
+    ];
+    const venues = [
+      { id: 'cafe', name: 'Partner café · Aurora', badge: 'CLOSEST TO YOU', meta: '0.4 mi · quiet 12–3 PM · table held for ISO' },
+      { id: 'cowork', name: 'Partner coworking space', badge: 'FOUNDER FAVORITE', meta: '1.2 mi · meeting room free before 10 AM' },
+      { id: 'library', name: 'Public library room', badge: 'FREE', meta: '1.6 mi · bookable, good for students' }
+    ];
+    return {
+      venues: venues.map((v) => ({ name: v.name, badge: v.badge, meta: v.meta, active: s.venue === v.id, inactive: s.venue !== v.id, pick: () => this.setState({ venue: v.id }) })),
+      days: days.map((d) => ({ label: d, active: s.day === d, inactive: s.day !== d, pick: () => this.setState({ day: d }) })),
+      seats: s.seats,
+      less: () => this.setState({ seats: Math.max(1, s.seats - 1) }),
+      more: () => this.setState({ seats: Math.min(6, s.seats + 1) }),
+      toggles: tg.map((t) => ({ label: t[1], desc: t[2], on: s[t[0]], off: !s[t[0]], flip: () => this.setState({ [t[0]]: !s[t[0]] }) })),
+      dropped: s.dropped,
+      notDropped: !s.dropped,
+      drop: () => this.setState({ dropped: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

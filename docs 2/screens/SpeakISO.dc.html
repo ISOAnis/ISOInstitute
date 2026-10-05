@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · Talk the ISO talk</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 112px; overflow-y: auto; padding: 64px 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.22em; color: #C8873A">THE QUICK RUNDOWN</span>
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 52px; line-height: 0.9; text-transform: uppercase; color: #FFFFFF">Talk the<br>ISO talk</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #AAAAAA">Four steps. That's the whole game.</p>
+    </div>
+
+    <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+        <li style="display: flex; gap: 14px">
+          <span style="display: flex; flex-direction: column; align-items: center; flex: none">
+            <span style="width: 40px; height: 40px; border-radius: 50%; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px">{{s.n}}</span>
+            <span style="width: 2px; flex: 1; min-height: 18px; background: {{s.line}}"></span>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 4px; padding: 4px 0 20px">
+            <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; color: #FFFFFF">{{s.title}}</span>
+            <span style="font-size: 14px; line-height: 1.45; color: #E0E0E0">{{s.body}}</span>
+            <span style="font-size: 13px; font-style: italic; color: #8f8f8f">{{s.say}}</span>
+          </span>
+        </li>
+      </sc-for>
+    </ol>
+
+    <div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 12px; background: #121212; border: 1px solid #222">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8873A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M4 5h11a3 3 0 0 1 3 3v12H7a3 3 0 0 1-3-3z"/><path d="M8 9h6M8 13h4"/></svg>
+      <span style="font-size: 12px; line-height: 1.45; color: #AAAAAA; flex: 1">The rest of the lingo lives in the Playbook, under Settings.</span>
+      <a href="Playbook.dc.html" style="min-height: 44px; display: flex; align-items: center; font-size: 13px; font-weight: 800; color: #C8873A; text-decoration: none">Open</a>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 112px; box-sizing: border-box; padding: 14px 20px 30px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; flex-direction: column; justify-content: center">
+    <a href="Main.dc.html" style="height: 52px; border-radius: 14px; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; text-decoration: none">It's not you vs you anymore. Jump In.</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const steps = [
+      { title: 'Find an ISO', body: 'A small, in-person session with a coach who\'s already walked your path. Pick one near you on the map.', say: '"There\'s a Founder ISO in Aurora Tuesday."' },
+      { title: 'Say "I got next"', body: 'Claim your seat. Once the coach confirms, you get the exact spot and your check-in code.', say: '"I got next at Marcus\'s ISO."' },
+      { title: 'Pull up, check in', body: 'Show up, find the table, and give the coach your 4-digit code.', say: '"Code\'s 4827, coach."' },
+      { title: 'Rank up', body: 'Every ISO in your pathway counts. Rank up to unlock gear in The Locker and nights on The Court.', say: '"Just hit Varsity. Patch is in my Locker."' }
+    ];
+    return {
+      steps: steps.map((s, i) => Object.assign({}, s, { n: i + 1, line: i === steps.length - 1 ? 'transparent' : '#3a3a3a' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

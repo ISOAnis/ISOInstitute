@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISO · ISOs near you</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#080808}
+a{color:#C8873A}a:hover{color:#E0A35A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #080808; color: #E0E0E0; font-family: 'Manrope', sans-serif">
+
+  <header style="position: absolute; top: 0; left: 0; right: 0; padding: 54px 20px 0; display: flex; flex-direction: column; gap: 14px; z-index: 3; background: #080808">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; align-items: baseline; gap: 8px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0.06em; color: #E0E0E0">ISO</span>
+        <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.22em; color: #AAAAAA">IN SEARCH OF</span>
+      </div>
+      <button type="button" aria-label="Change area" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid #2a2a2a; background: #141414; color: #E0E0E0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8873A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Denver metro
+      </button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 38px; line-height: 1; letter-spacing: 0.01em; text-transform: uppercase; color: #FFFFFF">ISOs near you</h1>
+      <p style="margin: 0; font-size: 13px; color: #AAAAAA">{{subline}}</p>
+    </div>
+    <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-right: -20px; padding-right: 20px">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="6">
+        <sc-if value="{{f.active}}" hint-placeholder-val="{{false}}">
+          <button type="button" aria-pressed="true" onClick="{{f.pick}}" style="flex: none; height: 36px; padding: 0 16px; border-radius: 18px; border: 1px solid {{f.fill}}; background: {{f.fill}}; color: {{f.ink}}; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px">{{f.label}}</button>
+        </sc-if>
+        <sc-if value="{{f.inactive}}" hint-placeholder-val="{{true}}">
+          <button type="button" aria-pressed="false" onClick="{{f.pick}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2a2a2a; background: #141414; color: #E0E0E0; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{f.dot}}"></span>{{f.label}}</button>
+        </sc-if>
+      </sc-for>
+    </div>
+  </header>
+
+  <!-- Map (Denver metro) -->
+  <div aria-label="Map of ISOs across the Denver metro" style="position: absolute; top: 236px; left: 0; right: 0; bottom: 84px; background: #0e0f11; overflow: hidden">
+    <div style="position: absolute; left: 0; top: 0; width: 780px; height: 900px; transform: translate({{tx}}px, {{ty}}px); transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1)">
+      <!-- terrain + roads -->
+      <div style="position: absolute; left: 0; top: 0; width: 780px; height: 900px; background: #0f1012"></div>
+      <div style="position: absolute; left: 250px; top: 230px; width: 170px; height: 160px; border-radius: 40% 50% 45% 55%; background: #141518"></div>
+      <div style="position: absolute; left: 470px; top: 300px; width: 240px; height: 300px; border-radius: 45%; background: #121316"></div>
+      <div style="position: absolute; left: 80px; top: 640px; width: 220px; height: 150px; border-radius: 50%; background: #111a14"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 330px; height: 6px; background: #1c1e22"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 560px; height: 5px; background: #1a1c20"></div>
+      <div style="position: absolute; top: 0; bottom: 0; left: 340px; width: 6px; background: #1c1e22"></div>
+      <div style="position: absolute; top: 0; bottom: 0; left: 560px; width: 4px; background: #1a1c20"></div>
+      <div style="position: absolute; left: -80px; top: 470px; width: 980px; height: 5px; background: #1b1d21; transform: rotate(-24deg)"></div>
+      <div style="position: absolute; left: -60px; top: 200px; width: 900px; height: 4px; background: #18191c; transform: rotate(14deg)"></div>
+
+      <!-- area labels -->
+      <span style="position: absolute; left: 110px; top: 70px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">WESTMINSTER</span>
+      <span style="position: absolute; left: 290px; top: 250px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">DOWNTOWN</span>
+      <span style="position: absolute; left: 80px; top: 380px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">LAKEWOOD</span>
+      <span style="position: absolute; left: 560px; top: 330px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">AURORA</span>
+      <span style="position: absolute; left: 380px; top: 470px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">GLENDALE</span>
+      <span style="position: absolute; left: 290px; top: 610px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">ENGLEWOOD</span>
+      <span style="position: absolute; left: 180px; top: 790px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">LITTLETON</span>
+      <span style="position: absolute; left: 470px; top: 740px; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; color: #3d3f44">CENTENNIAL</span>
+
+      <!-- ISO area bubbles (approximate; exact spot hidden until confirmed) -->
+      <sc-for list="{{bubbles}}" as="b" hint-placeholder-count="5">
+        <button type="button" aria-label="{{b.aria}}" onClick="{{b.pick}}" style="position: absolute; left: {{b.left}}px; top: {{b.top}}px; width: 140px; height: 140px; padding: 0; border-radius: 50%; border: 1.5px dashed {{b.fill}}; background: {{b.tint}}; opacity: {{b.op}}; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 250ms ease, transform 250ms ease; transform: scale({{b.scale}})">
+          <span style="width: {{b.size}}px; height: {{b.size}}px; border-radius: 50%; background: {{b.fill}}; color: {{b.ink}}; border: 2px solid #080808; box-shadow: 0 0 0 {{b.glow}}px {{b.tint2}}; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px">{{b.initials}}</span>
+        </button>
+      </sc-for>
+    </div>
+    <span style="position: absolute; left: 12px; top: 10px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 8px; background: rgba(8,8,8,0.85); border: 1px solid #2a2a2a; font-size: 11px; font-weight: 700; color: #E0E0E0"><span style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed #AAAAAA"></span>~5 mi area · exact spot after you're confirmed</span>
+  </div>
+
+  <!-- Bottom sheet -->
+  <section aria-label="Featured ISO" style="position: absolute; left: 0; right: 0; bottom: 84px; background: #121212; border-radius: 24px 24px 0 0; border-top: 1px solid #262626; padding: 10px 12px 18px; display: flex; flex-direction: column; gap: 12px; z-index: 2">
+    <div style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #333"></div>
+
+    <sc-if value="{{has}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button type="button" aria-label="Previous ISO" onClick="{{prev}}" style="width: 40px; height: 120px; flex: none; border-radius: 12px; border: 1px solid #262626; background: #161616; color: {{arrowColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: {{arrowOp}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 0 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.14em; color: #C8873A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.eyebrow}}</span>
+            <span style="flex: none; font-size: 11px; font-weight: 700; color: #8f8f8f">{{counter}}</span>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center">
+            <div style="width: 52px; height: 52px; flex: none; box-sizing: border-box; border-radius: 12px; background: #1f1f1f; border: 1px solid #3a3a3a; border-top: 4px solid {{it.fill}}; display: flex; flex-direction: column; align-items: center; justify-content: center">
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; color: #C8873A">{{it.ovr}}</span>
+              <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.14em; color: #AAAAAA">OVR</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+              <span style="font-size: 16px; font-weight: 800; line-height: 1.2; color: #FFFFFF">{{it.title}}</span>
+              <span style="font-size: 12px; color: #AAAAAA">{{it.coach}} · <span style="color: {{it.text}}; font-weight: 700">{{it.path}}</span></span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #E0E0E0">
+            <span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{it.time}}</span>
+            <span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="2"/></svg>{{it.area}} · <span style="font-weight: 700; color: {{it.text}}">{{it.seats}}</span></span>
+          </div>
+        </div>
+
+        <button type="button" aria-label="Next ISO" onClick="{{next}}" style="width: 40px; height: 120px; flex: none; border-radius: 12px; border: 1px solid #262626; background: #161616; color: {{arrowColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: {{arrowOp}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+
+      <sc-if value="{{it.hasWhy}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px">
+          <sc-for list="{{it.why}}" as="w" hint-placeholder-count="3">
+            <span style="padding: 4px 9px; border-radius: 10px; background: #1c1c1c; border: 1px solid #2e2e2e; font-size: 11px; font-weight: 600; color: #E0E0E0">{{w}}</span>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 8px">
+        <a href="Coach.dc.html" style="height: 48px; border-radius: 14px; border: 1px solid #444; display: flex; align-items: center; justify-content: center; gap: 8px; color: #FFFFFF; font-weight: 800; font-size: 15px; text-decoration: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M8 17c.8-1.6 2.2-2.5 4-2.5s3.2.9 4 2.5"/></svg>Coach card</a>
+        <a href="RunDetail.dc.html" style="height: 48px; border-radius: 14px; background: #C8873A; color: #080808; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; text-decoration: none; letter-spacing: 0.02em">View ISO</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 8px 22px; text-align: center">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: {{emptyFill}}"></span>
+        <span style="font-size: 16px; font-weight: 800; color: #FFFFFF">{{emptyTitle}}</span>
+        <span style="font-size: 13px; line-height: 1.45; color: #AAAAAA">Follow coaches in this pathway and you'll get pinged the moment one drops a pin.</span>
+        <a href="Coach.dc.html" style="margin-top: 6px; min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #444; display: flex; align-items: center; color: #FFFFFF; font-weight: 800; font-size: 14px; text-decoration: none">Browse coaches</a>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- Tab bar -->
+  <nav aria-label="Main" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #0b0b0b; border-top: 1px solid #1f1f1f; display: flex; justify-content: space-around; align-items: flex-start; padding-top: 8px; z-index: 4">
+    <a href="Main.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #C8873A; font-size: 11px; font-weight: 800"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</a>
+    <a href="Events.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Events</a>
+    <a href="Coach.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>Coaches</a>
+    <a href="Me.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; min-height: 44px; text-decoration: none; color: #8f8f8f; font-size: 11px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/></svg>Me</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { filter: 'Recommended', idx: 0, picked: null }; }
+  renderVals() {
+    const P = {
+      Builder: { fill: '#8e24aa', text: '#c77ddb', ink: '#FFFFFF', tint: 'rgba(142,36,170,0.14)', tint2: 'rgba(142,36,170,0.35)' },
+      Founder: { fill: '#e65100', text: '#ff8a50', ink: '#FFFFFF', tint: 'rgba(230,81,0,0.14)', tint2: 'rgba(230,81,0,0.35)' },
+      Warrior: { fill: '#e53935', text: '#ef7470', ink: '#FFFFFF', tint: 'rgba(229,57,53,0.14)', tint2: 'rgba(229,57,53,0.35)' },
+      Healer: { fill: '#1e88e5', text: '#64b5f6', ink: '#FFFFFF', tint: 'rgba(30,136,229,0.14)', tint2: 'rgba(30,136,229,0.35)' },
+      Seeker: { fill: '#1db954', text: '#4cd47b', ink: '#080808', tint: 'rgba(29,185,84,0.14)', tint2: 'rgba(29,185,84,0.35)' },
+      Reformer: { fill: '#00acc1', text: '#4dd0e1', ink: '#080808', tint: 'rgba(0,172,193,0.14)', tint2: 'rgba(0,172,193,0.35)' }
+    };
+    const isos = [
+      { key: 'sa', path: 'Builder', ovr: '82', initials: 'SA', title: 'Breaking into software', coach: 'Sami A.', time: 'Thu Oct 8 · 7:30–9 AM', area: 'Downtown Denver', seats: '1 of 3 open', x: 340, y: 300 },
+      { key: 'mr', path: 'Founder', ovr: '87', initials: 'MR', title: 'From side hustle to storefront', coach: 'Marcus Reid', time: 'Tue Oct 6 · 12–2 PM', area: 'Southeast Aurora', seats: '2 of 3 open', x: 610, y: 520 },
+      { key: 'dk', path: 'Warrior', ovr: '79', initials: 'DK', title: 'Discipline before motivation', coach: 'Dante K.', time: 'Today · 6–7 PM', area: 'Lakewood', seats: '2 of 4 open', x: 150, y: 450 },
+      { key: 'nh', path: 'Healer', ovr: '84', initials: 'NH', title: 'Med school, the honest version', coach: 'Nadia H.', time: 'Fri Oct 9 · 5–6:30 PM', area: 'Glendale', seats: 'Full', x: 430, y: 420 },
+      { key: 'jr', path: 'Reformer', ovr: '80', initials: 'JR', title: 'Law school or straight to work?', coach: 'Jordan R.', time: 'Sun Oct 11 · 2–3:30 PM', area: 'Westminster', seats: '1 of 3 open', x: 170, y: 140 }
+    ];
+    const f = this.state.filter;
+    let list;
+    if (f === 'Recommended') list = isos.filter((x) => x.key === 'sa' || x.key === 'mr');
+    else if (f === 'Following') list = isos.filter((x) => x.key === 'mr');
+    else list = isos.filter((x) => x.path === f);
+
+    const n = list.length;
+    const idx = n ? ((this.state.idx % n) + n) % n : 0;
+    let it = n ? Object.assign({}, list[idx]) : null;
+    if (it) {
+      const why = f === 'Recommended' ? (it.key === 'sa' ? ['Your pathway · priority seat', 'Coach gives straight feedback', 'Early career, like you'] : ['Coach you might click with', 'Outside your pathway']) : [];
+      const eyebrow = f === 'Recommended' ? (it.key === 'sa' ? 'RECOMMENDED · 94% MATCH' : 'RECOMMENDED · 76% MATCH') : (f === 'Following' ? 'FROM A COACH YOU FOLLOW' : f.toUpperCase() + ' · NEAR YOU');
+      Object.assign(it, P[it.path], { why: why, hasWhy: why.length > 0, eyebrow: eyebrow });
+    }
+
+    const focus = it || { x: 390, y: 450 };
+    const inList = {};
+    list.forEach((x) => { inList[x.key] = true; });
+
+    const labels = ['Recommended', 'Following', 'Builder', 'Founder', 'Warrior', 'Healer', 'Seeker', 'Reformer'];
+    return {
+      subline: f === 'Recommended' ? 'Picked for your pathway and how you show up' : (f === 'Following' ? 'Pins from coaches you follow' : f + ' ISOs across the Denver metro'),
+      tx: 195 - focus.x,
+      ty: 120 - focus.y,
+      has: !!it,
+      empty: !it,
+      it: it || {},
+      counter: n ? (idx + 1) + ' of ' + n : '',
+      arrowColor: n > 1 ? '#FFFFFF' : '#555555',
+      arrowOp: n > 1 ? 1 : 0.5,
+      prev: () => this.setState({ idx: idx - 1 }),
+      next: () => this.setState({ idx: idx + 1 }),
+      emptyTitle: 'No ' + f + ' ISOs this week',
+      emptyFill: (P[f] || {}).fill || '#555',
+      bubbles: isos.map((x) => {
+        const p = P[x.path];
+        const sel = it && it.key === x.key;
+        const pos = list.findIndex((y) => y.key === x.key);
+        return {
+          left: x.x - 70, top: x.y - 70,
+          fill: p.fill, ink: p.ink, tint: p.tint, tint2: p.tint2,
+          initials: x.initials,
+          size: sel ? 46 : 36,
+          glow: sel ? 6 : 0,
+          scale: sel ? 1.08 : 1,
+          op: inList[x.key] ? 1 : 0.22,
+          aria: x.path + ' ISO in ' + x.area + ', ' + x.time,
+          pick: () => { if (pos >= 0) this.setState({ idx: pos }); }
+        };
+      }),
+      filters: labels.map((l) => ({
+        label: l,
+        dot: P[l] ? P[l].fill : (l === 'Recommended' ? '#C8873A' : '#AAAAAA'),
+        fill: P[l] ? P[l].fill : '#C8873A',
+        ink: l === 'Builder' ? '#FFFFFF' : '#080808',
+        active: f === l,
+        inactive: f !== l,
+        pick: () => this.setState({ filter: l, idx: 0 })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
