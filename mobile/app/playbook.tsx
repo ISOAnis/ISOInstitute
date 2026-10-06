@@ -1,25 +1,51 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Card, Chip, Screen, Text, TopBar } from '@/components';
+import { Card, Chip, ListRow, Screen, Text, TopBar } from '@/components';
 import { getRanks, useData } from '@/data';
-import { colors, fonts, radius, statusColors, tracking } from '@/theme';
+import { colors, fonts, radius } from '@/theme';
 
 type Tab = 'Mission' | 'Lingo' | 'Ranks' | 'Overall';
 const TABS: Tab[] = ['Mission', 'Lingo', 'Ranks', 'Overall'];
 
 const LINGO = [
-  { term: 'An ISO', meaning: 'Community coaching, in person: one coach, a few players, at an ISO Partner spot tied to their pathway. You see the area and time; the exact spot comes once you’re confirmed.', example: '“There’s a Founder ISO at the café at noon.”' },
+  {
+    term: 'An ISO',
+    meaning:
+      'Community coaching, in person: one coach, a few players, at an ISO Partner spot tied to their pathway. You see the area and time; the exact spot comes once you’re confirmed.',
+    example: '“There’s a Founder ISO at the café at noon.”',
+  },
   { term: 'I got next', meaning: 'How you claim a seat at an ISO. The coach confirms.', example: '“I got next at Marcus’s ISO Tuesday.”' },
-  { term: 'ISO Partner', meaning: 'A verified local spot that hosts ISOs: cafés, gyms, coworking spaces, libraries. Members get perks there.', example: '“Let’s run it at the ISO Partner on Main.”' },
+  {
+    term: 'ISO Partner',
+    meaning: 'A verified local spot that hosts ISOs: cafés, gyms, coworking spaces, libraries. Members get perks there.',
+    example: '“Let’s run it at the ISO Partner on Main.”',
+  },
   { term: 'Coach', meaning: 'Someone who’s walked the path, approved by the ISO advisory board.', example: '“She coaches Builder ISOs on weekends.”' },
   { term: 'Player', meaning: 'Anyone growing on ISO. Coaches are players too.', example: '“I’m a Varsity player in Founder.”' },
   { term: 'Pathway', meaning: 'Your lane: Founder, Builder, Healer, Reformer, Warrior, or Seeker.', example: '“My pathway is Healer.”' },
-  { term: 'Check-in code', meaning: 'Your 4-digit code once you’re confirmed. Give it to the coach at the table to check in. No code, no seat.', example: '“Code’s 4827, coach.”' },
-  { term: 'The $5 hold', meaning: 'Once the coach confirms your seat, a $5 hold goes on your card, not a charge. Check in and it disappears. Cancel 24+ hours out and it’s released. One late cancel a month is on us.', example: '“Don’t trip, the hold drops when you check in.”' },
-  { term: 'Community Pool', meaning: 'Where no-show holds go. ISO never keeps them: the pool funds free Court tickets and gear for students.', example: '“No-shows paid for 14 Court tickets this month.”' },
+  {
+    term: 'Check-in code',
+    meaning: 'Your 4-digit code once you’re confirmed. Give it to the coach at the table to check in. No code, no seat.',
+    example: '“Code’s 4827, coach.”',
+  },
+  {
+    term: 'The $5 hold',
+    meaning:
+      'Once the coach confirms your seat, a $5 hold goes on your card, not a charge. Check in and it disappears. Cancel 24+ hours out and it’s released. One late cancel a month is on us.',
+    example: '“Don’t trip, the hold drops when you check in.”',
+  },
+  {
+    term: 'Community Pool',
+    meaning: 'Where no-show holds go. ISO never keeps them: the pool funds free Court tickets and gear for students.',
+    example: '“No-shows paid for 14 Court tickets this month.”',
+  },
   { term: 'Overall', meaning: 'A coach’s rating, built from ISOs hosted and player feedback.', example: '“He’s an 87 Overall.”' },
-  { term: 'The Court', meaning: 'Big events ISO curates for each pathway: dinners, panels, competitions, co-hosted by top coaches.', example: '“See you on The Court Saturday.”' },
+  {
+    term: 'The Court',
+    meaning: 'Big events ISO curates for each pathway: dinners, panels, competitions, co-hosted by top coaches.',
+    example: '“See you on The Court Saturday.”',
+  },
   { term: 'The Locker', meaning: 'Gear you’ve earned or unlocked by showing up.', example: '“Just got the patch in my Locker.”' },
   { term: 'Hall of Fame', meaning: '100 ISOs in your pathway. Your jersey gets retired.', example: '“She’s Hall of Fame. Ask her anything.”' },
 ];
@@ -49,36 +75,40 @@ export default function Playbook() {
 
   return (
     <Screen>
-      <TopBar label="SETTINGS" />
+      <TopBar label="Settings" />
       <View>
         <Text variant="titleLg">The Playbook</Text>
         <Text variant="subtitle">How ISO talks, ranks up, and carries itself.</Text>
       </View>
       <View style={styles.tabs}>
         {TABS.map((t) => (
-          <Chip key={t} label={t} active={tab === t} activeColor={colors.gold} onPress={() => setTab(t)} />
+          <Chip key={t} label={t} active={tab === t} onPress={() => setTab(t)} />
         ))}
       </View>
 
       {tab === 'Mission' ? (
-        <>
-          <Card style={{ borderColor: statusColors.goldLine }}>
-            <Text variant="eyebrow" color={colors.gold}>
-              OUR MISSION
-            </Text>
+        <View style={styles.group}>
+          <Card>
+            <Text variant="eyebrow">Our mission</Text>
             <Text style={styles.mission}>Inspire ambition, elevate overlooked talent, and rebuild community pathways to success.</Text>
             <Text variant="caption">Every ISO, every coach, and every Court night exists for this.</Text>
           </Card>
-          <Text variant="body" color={colors.textMuted}>
+          <Text variant="body" color={colors.textSecondary}>
             ISO is faith-driven in how it was built, not in what it asks of you. It’s open to everyone willing to grow by this standard.
           </Text>
-          {STANDARD.map((s) => (
-            <Card key={s.title}>
-              <Text variant="pathwayName">{s.title}</Text>
-              <Text variant="body">{s.desc}</Text>
-            </Card>
-          ))}
-          <Text variant="section">THE ISO STANDARD</Text>
+          <Card style={styles.list}>
+            {STANDARD.map((s, i) => (
+              <ListRow key={s.title} divider={i > 0} style={styles.stack}>
+                <Text variant="cardTitle">{s.title}</Text>
+                <Text variant="body" color={colors.textSecondary}>
+                  {s.desc}
+                </Text>
+              </ListRow>
+            ))}
+          </Card>
+          <Text variant="section" style={styles.sectionTop}>
+            The ISO standard
+          </Text>
           {RULES.map((r) => (
             <View key={r} style={styles.rule}>
               <View style={styles.ruleDot} />
@@ -87,35 +117,35 @@ export default function Playbook() {
               </Text>
             </View>
           ))}
-        </>
+        </View>
       ) : null}
 
-      {tab === 'Lingo'
-        ? LINGO.map((w) => (
-            <Card key={w.term}>
-              <Text variant="pathwayName" color={colors.gold}>
-                {w.term}
+      {tab === 'Lingo' ? (
+        <Card style={styles.list}>
+          {LINGO.map((w, i) => (
+            <ListRow key={w.term} divider={i > 0} style={styles.stack}>
+              <Text variant="cardTitle">{w.term}</Text>
+              <Text variant="body" color={colors.textSecondary}>
+                {w.meaning}
               </Text>
-              <Text variant="body">{w.meaning}</Text>
-              <Text variant="caption" style={styles.example}>
+              <Text variant="body" style={styles.example}>
                 {w.example}
               </Text>
-            </Card>
-          ))
-        : null}
+            </ListRow>
+          ))}
+        </Card>
+      ) : null}
 
       {tab === 'Ranks' ? (
-        <>
+        <View style={styles.group}>
           <Text variant="body">Your rank is how many ISOs you’ve checked into in your pathway. Show up, rank up.</Text>
           <Card style={styles.ladder}>
             {ladder.map((l, i) => (
               <View key={l.level} style={[styles.rung, i < ladder.length - 1 && styles.rungLine]}>
-                <Text style={styles.rungNum} color={colors.gold}>
-                  {l.minIsos}
-                </Text>
+                <Text style={styles.rungNum}>{l.minIsos}</Text>
                 <View style={styles.flex}>
                   <Text variant="bodyStrong">{l.level}</Text>
-                  <Text variant="tiny">{l.unlock}</Text>
+                  <Text variant="caption">{l.unlock}</Text>
                 </View>
               </View>
             ))}
@@ -123,28 +153,28 @@ export default function Playbook() {
           <Text variant="caption">
             ISOs outside your pathway earn crossover badges. Switching pathways starts that pathway’s count; your old progress waits for you.
           </Text>
-        </>
+        </View>
       ) : null}
 
       {tab === 'Overall' ? (
-        <>
+        <View style={styles.group}>
           <Text variant="body">Every coach has an Overall. It moves with how they serve, not their résumé.</Text>
-          {OVERALL.map((o) => (
-            <Card key={o.title}>
-              <Text variant="bodyStrong">{o.title}</Text>
-              <Text variant="caption">{o.desc}</Text>
-            </Card>
-          ))}
+          <Card style={styles.list}>
+            {OVERALL.map((o, i) => (
+              <ListRow key={o.title} divider={i > 0} style={styles.stack}>
+                <Text variant="bodyStrong">{o.title}</Text>
+                <Text variant="caption">{o.desc}</Text>
+              </ListRow>
+            ))}
+          </Card>
           <View style={styles.tiers}>
-            {['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'].map((t) => (
-              <View key={t} style={[styles.tier, t === 'GOLD' && { borderColor: colors.gold }]}>
-                <Text style={styles.tierText} color={t === 'GOLD' ? colors.gold : colors.textBody}>
-                  {t}
-                </Text>
+            {['Bronze', 'Silver', 'Gold', 'Platinum'].map((t) => (
+              <View key={t} style={styles.tier}>
+                <Text style={styles.tierText}>{t}</Text>
               </View>
             ))}
           </View>
-        </>
+        </View>
       ) : null}
     </Screen>
   );
@@ -152,23 +182,27 @@ export default function Playbook() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  group: { gap: 14 },
+  list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
+  stack: { flexDirection: 'column', alignItems: 'stretch', gap: 4, paddingVertical: 16 },
+  sectionTop: { marginTop: 14 },
   tabs: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  mission: { fontFamily: fonts.display, fontSize: 30, lineHeight: 32, color: colors.text },
+  mission: { fontFamily: fonts.display, fontSize: 30, lineHeight: 33, color: colors.text },
   rule: { flexDirection: 'row', gap: 10 },
-  ruleDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.gold, marginTop: 8 },
-  example: { fontFamily: fonts.semibold, color: colors.textBody },
+  ruleDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.textSecondary, marginTop: 9 },
+  example: { fontFamily: fonts.semibold, color: colors.text },
   ladder: { paddingVertical: 4, gap: 0 },
-  rung: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  rungLine: { borderBottomWidth: 1, borderBottomColor: colors.borderSoft },
-  rungNum: { fontFamily: fonts.display, fontSize: 24, width: 40, textAlign: 'center' },
+  rung: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
+  rungLine: { borderBottomWidth: 1, borderBottomColor: colors.hairline },
+  rungNum: { fontFamily: fonts.display, fontSize: 26, width: 40, textAlign: 'center', color: colors.text },
   tiers: { flexDirection: 'row', gap: 8 },
   tier: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.borderBox,
+    minHeight: 40,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  tierText: { fontFamily: fonts.display, fontSize: 18, letterSpacing: tracking(0.06, 18) },
+  tierText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.text },
 });

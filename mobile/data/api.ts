@@ -26,6 +26,7 @@ import type {
   IsoSummary,
   Pathway,
   PathwayId,
+  Photo,
   Player,
   Rank,
   Recommendation,
@@ -127,6 +128,18 @@ export async function getRevealedVenue(isoId: string): Promise<Venue | null> {
   if (!seat || !holdsSeat(seat)) return null;
   if (iso.revealSpot24h && hoursUntil(iso.startsAt) > 24) return null;
   return venueOrThrow(iso.venueId);
+}
+
+/**
+ * The table photo for a confirmed seat. `revealed` says whether the spot itself is out yet,
+ * so screens can blur the photo until then.
+ */
+export async function getTablePhoto(isoId: string): Promise<{ photo: Photo; revealed: boolean } | null> {
+  const seat = mySeat(isoId);
+  if (!seat || !holdsSeat(seat)) return null;
+  const photo = venueOrThrow(isoRecord(isoId).venueId).photo;
+  if (!photo) return null;
+  return { photo, revealed: (await getRevealedVenue(isoId)) !== null };
 }
 
 export async function getVenues(): Promise<Venue[]> {
@@ -433,9 +446,7 @@ export async function getRegulars(coachId: string): Promise<Regular[]> {
 
 /** Partner venues near the coach, closest first. */
 export async function getCoachVenues(): Promise<Venue[]> {
-  return db.venues
-    .filter((v) => v.isPartner && v.distanceMi !== undefined)
-    .sort((a, b) => (a.distanceMi ?? 0) - (b.distanceMi ?? 0));
+  return db.venues.filter((v) => v.isPartner && v.distanceMi !== undefined).sort((a, b) => (a.distanceMi ?? 0) - (b.distanceMi ?? 0));
 }
 
 /** Coach drops a pin. Only approved coaches can create ISOs. */

@@ -31,27 +31,17 @@ const base: Record<PathwayId, { fill: string; text: string; ink: string; pinInk:
 export const pathwayOrder: PathwayId[] = ['builder', 'founder', 'warrior', 'healer', 'seeker', 'reformer'];
 
 export const pathwayColors: Record<PathwayId, PathwayPalette> = Object.fromEntries(
-  Object.entries(base).map(([id, p]) => [
-    id,
-    { ...p, tint: alpha(p.fill, 0.14), glow: alpha(p.fill, 0.35), line: alpha(p.fill, 0.45) },
-  ]),
+  Object.entries(base).map(([id, p]) => [id, { ...p, tint: alpha(p.fill, 0.14), glow: alpha(p.fill, 0.35), line: alpha(p.fill, 0.45) }]),
 ) as Record<PathwayId, PathwayPalette>;
 
-/** Dark gradient stops and accents for the pathway-tinted coach card. */
+/** Pathway tint for the coach card: 14% fading to 3% over surface1, plus the small full-strength accents. */
 export function cardTint(id: PathwayId) {
   const { fill } = base[id];
   return {
-    gradient: [mix(fill, colors.bg, 0.17), mix(fill, colors.bg, 0.08), mix(fill, colors.bg, 0.02)] as const,
-    border: alpha(fill, 0.45),
-    shadow: alpha(fill, 0.14),
+    gradient: [mix(fill, colors.surface1, 0.14), mix(fill, colors.surface1, 0.07), mix(fill, colors.surface1, 0.03)] as const,
     topBar: fill,
-    topBarGlow: alpha(fill, 0.8),
-    watermark: alpha(fill, 0.13),
-    iconBg: alpha(fill, 0.28),
-    iconBorder: alpha(fill, 0.6),
-    divider: alpha(fill, 0.25),
-    tagBorder: mix(fill, colors.avatar, 0.09),
-    silhouette: mix(fill, colors.bg, 0.22),
-    footer: mix(fill, colors.borderBox, 0.08),
+    watermark: alpha(fill, 0.1),
+    iconBg: alpha(fill, 0.14),
+    photoFade: mix(fill, colors.surface1, 0.07),
   };
 }

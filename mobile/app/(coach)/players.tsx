@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Card, ModeSwitch, Screen, Text } from '@/components';
+import { Avatar, Card, ListRow, ModeSwitch, Screen, Text } from '@/components';
 import { getCoachIsos, getRegulars, getTable, useData, type Seat } from '@/data';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { dayLabel } from '@/lib/format';
@@ -32,7 +32,7 @@ export default function Players() {
       {tables.map(({ iso, seats }) => (
         <View key={iso.id} style={styles.section}>
           <Text variant="section">
-            {dayLabel(iso.startsAt).toUpperCase()} · {iso.title.toUpperCase()}
+            {dayLabel(iso.startsAt)} · {iso.title}
           </Text>
           <Card onPress={() => router.push(`/check-in/${iso.id}`)} accessibilityLabel={`Check in ${iso.title}`} style={styles.list}>
             {seats.length === 0 ? <Text variant="caption">No one confirmed yet.</Text> : null}
@@ -41,12 +41,12 @@ export default function Players() {
                 <Avatar initials={s.playerInitials} size={36} pathway={s.playerPathway} />
                 <View style={styles.flex}>
                   <Text variant="bodyStrong">{s.playerId === 'me' ? 'You' : s.playerName}</Text>
-                  <Text variant="tiny">
+                  <Text variant="caption">
                     {pathwayName(s.playerPathway)} · {s.playerRank}
                   </Text>
                 </View>
-                <Text style={styles.status} color={s.status === 'checked_in' ? statusColors.good : colors.textDim}>
-                  {s.status === 'checked_in' ? 'CHECKED IN' : 'CONFIRMED'}
+                <Text style={styles.status} color={s.status === 'checked_in' ? statusColors.good : colors.textSecondary}>
+                  {s.status === 'checked_in' ? 'Checked in' : 'Confirmed'}
                 </Text>
               </View>
             ))}
@@ -54,26 +54,31 @@ export default function Players() {
         </View>
       ))}
 
-      <Text variant="section">REGULARS</Text>
-      {regulars.map((r) => (
-        <Card key={r.playerId} style={styles.row}>
-          <Avatar initials={r.initials} size={40} pathway={r.pathway} />
-          <View style={styles.flex}>
-            <Text variant="bodyStrong">{r.name}</Text>
-            <Text variant="tiny">
-              {pathwayName(r.pathway)} · {r.rank} · {r.isosWithCoach ? `${r.isosWithCoach} of your ISOs` : 'first ISO with you'}
-            </Text>
-          </View>
+      <View style={styles.section}>
+        <Text variant="section">Regulars</Text>
+        <Card style={styles.rows}>
+          {regulars.map((r, i) => (
+            <ListRow key={r.playerId} divider={i > 0}>
+              <Avatar initials={r.initials} size={40} pathway={r.pathway} />
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{r.name}</Text>
+                <Text variant="caption">
+                  {pathwayName(r.pathway)} · {r.rank} · {r.isosWithCoach ? `${r.isosWithCoach} of your ISOs` : 'first ISO with you'}
+                </Text>
+              </View>
+            </ListRow>
+          ))}
         </Card>
-      ))}
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  section: { gap: 10 },
-  list: { gap: 12 },
+  section: { gap: 12 },
+  list: { gap: 14 },
+  rows: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  status: { fontFamily: fonts.extrabold, fontSize: 10, letterSpacing: 1.2 },
+  status: { fontFamily: fonts.bold, fontSize: 13 },
 });

@@ -43,9 +43,7 @@ export default function TalkTheTalk() {
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 24 }]}>
-      <Text variant="eyebrow" color={colors.gold}>
-        THE QUICK RUNDOWN
-      </Text>
+      <Text variant="eyebrow">The quick rundown</Text>
       <Text variant="titleLg">Talk the ISO talk</Text>
       <Text variant="subtitle">Four steps. That’s the whole game.</Text>
 
@@ -61,9 +59,11 @@ export default function TalkTheTalk() {
               {i < STEPS.length - 1 ? <View style={styles.line} /> : null}
             </View>
             <View style={styles.stepBody}>
-              <Text variant="pathwayName">{s.title}</Text>
-              <Text variant="body">{s.body}</Text>
-              <Text variant="caption" color={colors.gold} style={styles.say}>
+              <Text variant="cardTitle">{s.title}</Text>
+              <Text variant="body" color={colors.textSecondary}>
+                {s.body}
+              </Text>
+              <Text variant="body" style={styles.say}>
                 {s.say}
               </Text>
             </View>
@@ -76,9 +76,7 @@ export default function TalkTheTalk() {
           The rest of the lingo lives in the Playbook, under Settings.
         </Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Open the Playbook" onPress={() => router.push('/playbook')} hitSlop={10}>
-          <Text style={styles.open} color={colors.gold}>
-            Open
-          </Text>
+          <Text style={styles.open}>Open</Text>
         </Pressable>
       </View>
 
@@ -89,16 +87,16 @@ export default function TalkTheTalk() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  content: { paddingHorizontal: gutter, gap: 14 },
+  content: { paddingHorizontal: gutter, gap: 16 },
   flex: { flex: 1 },
   steps: { marginTop: 8 },
   step: { flexDirection: 'row', gap: 14 },
   rail: { alignItems: 'center', width: 36 },
   num: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  numText: { fontFamily: fonts.display, fontSize: 20 },
-  line: { flex: 1, width: 2, backgroundColor: colors.borderBox, marginVertical: 4 },
-  stepBody: { flex: 1, gap: 4, paddingBottom: 22 },
-  say: { fontFamily: fonts.semibold },
+  numText: { fontFamily: fonts.bold, fontSize: 15 },
+  line: { flex: 1, width: 2, backgroundColor: colors.hairline, marginVertical: 4 },
+  stepBody: { flex: 1, gap: 6, paddingBottom: 28 },
+  say: { fontFamily: fonts.semibold, color: colors.text },
   noteRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
-  open: { fontFamily: fonts.extrabold, fontSize: 14 },
+  open: { fontFamily: fonts.bold, fontSize: 15, color: colors.text, textDecorationLine: 'underline' },
 });

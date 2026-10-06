@@ -34,7 +34,6 @@ export const radius = {
 export const TAP = 44;
 
 export const layout = {
-  tabBarHeight: 84,
   actionBarHeight: 104,
   buttonHeight: 52,
   pillHeight: 36,

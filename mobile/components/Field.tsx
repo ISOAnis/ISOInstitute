@@ -8,13 +8,9 @@ import { Text } from './Text';
 export function Field({ label, multiline, style, ...rest }: TextInputProps & { label?: string }) {
   return (
     <View style={styles.wrap}>
-      {label ? (
-        <Text variant="caption" color={colors.textMuted} style={styles.label}>
-          {label}
-        </Text>
-      ) : null}
+      {label ? <Text variant="section">{label}</Text> : null}
       <TextInput
-        placeholderTextColor={colors.textDisabled}
+        placeholderTextColor={colors.textMeta}
         selectionColor={colors.gold}
         multiline={multiline}
         accessibilityLabel={label ?? rest.placeholder}
@@ -27,17 +23,14 @@ export function Field({ label, multiline, style, ...rest }: TextInputProps & { l
 
 const styles = StyleSheet.create({
   wrap: { gap: 6 },
-  label: { fontFamily: fonts.bold },
   input: {
     minHeight: 50,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.borderChip,
-    backgroundColor: colors.surfaceAlt,
-    paddingHorizontal: 14,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 16,
     color: colors.text,
     fontFamily: fonts.medium,
-    fontSize: 15,
+    fontSize: 16,
   },
   multi: { minHeight: 92, paddingTop: 12, textAlignVertical: 'top' },
 });

@@ -7,12 +7,7 @@ export { huddleMessages, quickReplies } from './huddle';
 export { isos, recommendations, type IsoSeed } from './isos';
 export { initialFollows, me, savedCard } from './me';
 export { pathways } from './pathways';
-export {
-  FREE_LATE_CANCELS_PER_MONTH,
-  HOLD_AMOUNT_USD,
-  MAX_PATHWAY_SWITCHES_PER_MONTH,
-  NO_SHOW_AFTER_MIN,
-  ranks,
-} from './ranks';
+export { coachPhotos, venuePhoto } from './photos';
+export { FREE_LATE_CANCELS_PER_MONTH, HOLD_AMOUNT_USD, MAX_PATHWAY_SWITCHES_PER_MONTH, NO_SHOW_AFTER_MIN, ranks } from './ranks';
 export { seats } from './seats';
 export { venues } from './venues';

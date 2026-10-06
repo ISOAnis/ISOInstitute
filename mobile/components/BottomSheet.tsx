@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, radius } from '@/theme';
+import { colors, radius, raisedShadow } from '@/theme';
 
 import { Text } from './Text';
 
@@ -14,7 +14,7 @@ export function BottomSheet({
   visible,
   onClose,
   eyebrow,
-  eyebrowColor = colors.gold,
+  eyebrowColor = colors.textSecondary,
   title,
   children,
 }: {
@@ -49,10 +49,7 @@ export function BottomSheet({
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
       </Animated.View>
       <View style={styles.anchor} pointerEvents="box-none">
-        <Animated.View
-          accessibilityViewIsModal
-          style={[styles.sheet, { paddingBottom: Math.max(34, insets.bottom + 12), transform: [{ translateY }] }]}
-        >
+        <Animated.View accessibilityViewIsModal style={[styles.sheet, { paddingBottom: Math.max(34, insets.bottom + 12), transform: [{ translateY }] }]}>
           <View style={styles.handle} />
           {eyebrow ? (
             <Text variant="eyebrow" color={eyebrowColor}>
@@ -75,21 +72,20 @@ const styles = StyleSheet.create({
   backdrop: { backgroundColor: colors.backdrop },
   anchor: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.surface1,
     borderTopLeftRadius: radius.sheet,
     borderTopRightRadius: radius.sheet,
-    borderTopWidth: 1,
-    borderColor: colors.borderStrong,
+    ...raisedShadow,
     paddingTop: 12,
     paddingHorizontal: 20,
-    gap: 12,
+    gap: 14,
   },
   handle: {
     alignSelf: 'center',
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.borderStrong,
+    backgroundColor: colors.surface3,
     marginBottom: 6,
   },
   title: { marginTop: -4 },

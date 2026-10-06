@@ -1,21 +1,13 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, Icon, Text, TopBar } from '@/components';
-import {
-  getHuddle,
-  getHuddleMembers,
-  getIso,
-  getQuickReplies,
-  getRevealedVenue,
-  sendHuddleMessage,
-  useData,
-} from '@/data';
+import { getHuddle, getHuddleMembers, getIso, getQuickReplies, getRevealedVenue, sendHuddleMessage, useData } from '@/data';
 import { clockTime, dayLabel, timeRange } from '@/lib/format';
 import { useAppStore } from '@/store';
-import { colors, fonts, gutter, pathwayColors, radius, tracking } from '@/theme';
+import { alpha, colors, fonts, gutter, pathwayColors, radius, raisedShadow } from '@/theme';
 
 /** Group chat for the coach and confirmed players only. */
 export default function Huddle() {
@@ -54,9 +46,9 @@ export default function Huddle() {
   if (!allowed) {
     return (
       <View style={[styles.root, styles.locked, { paddingTop: insets.top + 8 }]}>
-        <TopBar label="THE HUDDLE" />
+        <TopBar label="The Huddle" />
         <View style={styles.lockedBody}>
-          <Icon name="lock" size={32} color={colors.textMuted} />
+          <Icon name="lock" size={32} color={colors.textSecondary} />
           <Text variant="sheetTitle" align="center">
             Huddle’s for the table
           </Text>
@@ -72,7 +64,7 @@ export default function Huddle() {
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <TopBar
-          label="THE HUDDLE"
+          label="The Huddle"
           right={
             <View style={styles.stack}>
               {members.slice(0, 4).map((m, i) => (
@@ -89,25 +81,22 @@ export default function Huddle() {
       </View>
 
       <ScrollView contentContainerStyle={styles.thread}>
-        <View style={[styles.pinned, { borderColor: p.line, backgroundColor: p.tint }]}>
-          <Text style={styles.pinnedLabel} color={p.text}>
-            PINNED · FIND {first.toUpperCase()}
+        <View style={[styles.pinned, { backgroundColor: alpha(p.fill, 0.12) }]}>
+          <Text variant="eyebrow" color={p.text}>
+            Pinned · find {first}
           </Text>
           {venue ? (
             <>
               <Text variant="bodyStrong">{venue.name}</Text>
               <Text variant="body">{pinned?.body ?? venue.notes}</Text>
-              <View style={styles.photo}>
-                <Icon name="camera" size={22} color={colors.textDim} />
-                <Text variant="tiny">[TABLE PHOTO]</Text>
-              </View>
+              {venue.photo ? <Image source={venue.photo} style={styles.photo} resizeMode="cover" accessibilityLabel="Photo of the table" /> : null}
             </>
           ) : (
             <Text variant="body">The exact spot and where to find {first} drop here 24 hrs before.</Text>
           )}
         </View>
 
-        <Text variant="tiny" align="center" style={styles.divider}>
+        <Text variant="caption" align="center" style={styles.divider}>
           {venue ? 'Huddle opened · spot revealed' : 'Huddle opened'}
         </Text>
 
@@ -119,12 +108,12 @@ export default function Huddle() {
               {!me ? <Avatar initials={who?.initials ?? '?'} size={30} pathway={who?.isCoach ? iso.pathway : undefined} /> : null}
               <View style={styles.msgCol}>
                 {!me ? (
-                  <Text variant="tiny" color={colors.textDim}>
+                  <Text variant="caption" color={colors.textSecondary}>
                     {who?.name ?? 'Player'} · {clockTime(m.createdAt)}
                   </Text>
                 ) : null}
                 <View style={[styles.bubble, me ? styles.bubbleMine : styles.bubbleTheirs]}>
-                  <Text variant="body" color={me ? colors.onGold : colors.textBody}>
+                  <Text variant="body" color={colors.text}>
                     {m.body}
                   </Text>
                 </View>
@@ -147,7 +136,7 @@ export default function Huddle() {
             value={draft}
             onChangeText={setDraft}
             placeholder="Message the table"
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textMeta}
             selectionColor={colors.gold}
             style={styles.input}
             onSubmitEditing={() => send(draft)}
@@ -158,7 +147,7 @@ export default function Huddle() {
             <Icon name="send" size={20} color={colors.onGold} strokeWidth={2.4} />
           </Pressable>
         </View>
-        <Text variant="tiny" align="center">
+        <Text variant="caption" align="center">
           Only confirmed players and {first}. Closes 2 hrs after the ISO. Messages are saved for safety.
         </Text>
       </View>
@@ -170,51 +159,44 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   locked: { paddingHorizontal: gutter },
   lockedBody: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 12 },
-  header: { paddingHorizontal: gutter, gap: 6, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: colors.borderSoft },
+  header: { paddingHorizontal: gutter, gap: 6, paddingBottom: 10 },
   stack: { flexDirection: 'row', minWidth: 44, justifyContent: 'flex-end' },
   thread: { padding: gutter, gap: 12 },
-  pinned: { borderWidth: 1, borderRadius: radius.lg, padding: 14, gap: 6 },
-  pinnedLabel: { fontFamily: fonts.extrabold, fontSize: 11, letterSpacing: tracking(0.16, 11) },
+  pinned: { borderRadius: radius.card, padding: 18, gap: 6 },
   photo: {
-    height: 110,
-    marginTop: 6,
-    borderRadius: radius.md,
-    backgroundColor: colors.inset,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
+    height: 150,
+    width: '100%',
+    marginTop: 8,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface2,
   },
   divider: { marginVertical: 4 },
   msgRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-end', maxWidth: '86%' },
   msgRowMine: { alignSelf: 'flex-end' },
   msgCol: { gap: 4, flexShrink: 1 },
   bubble: { paddingHorizontal: 14, paddingVertical: 10 },
-  bubbleMine: { backgroundColor: colors.gold, borderRadius: 16, borderBottomRightRadius: 4 },
-  bubbleTheirs: { backgroundColor: colors.surfaceInset, borderRadius: 16, borderBottomLeftRadius: 4 },
-  composer: { paddingHorizontal: gutter, paddingTop: 10, gap: 10, borderTopWidth: 1, borderTopColor: colors.borderSoft, backgroundColor: colors.bgRaised },
+  bubbleMine: { backgroundColor: colors.surface3, borderRadius: 16, borderBottomRightRadius: 4 },
+  bubbleTheirs: { backgroundColor: colors.surface1, borderRadius: 16, borderBottomLeftRadius: 4 },
+  composer: { paddingHorizontal: gutter, paddingTop: 10, gap: 10, backgroundColor: colors.surface1, ...raisedShadow },
   replies: { gap: 8 },
   reply: {
     minHeight: 36,
     paddingHorizontal: 14,
-    borderRadius: radius.xxl,
-    borderWidth: 1,
-    borderColor: colors.borderChip,
-    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface2,
     justifyContent: 'center',
   },
-  replyText: { fontFamily: fonts.semibold, fontSize: 13, color: colors.textBody },
+  replyText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.text },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   input: {
     flex: 1,
     minHeight: 46,
     borderRadius: 23,
-    borderWidth: 1,
-    borderColor: colors.borderChip,
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: colors.surface2,
     paddingHorizontal: 16,
     color: colors.text,
     fontFamily: fonts.medium,
-    fontSize: 15,
+    fontSize: 16,
   },
   send: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
 });

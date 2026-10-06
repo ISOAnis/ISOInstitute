@@ -1,22 +1,10 @@
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import {
-  AreaBubble,
-  BottomSheet,
-  Button,
-  CoachCardFull,
-  CodeDisplay,
-  IconButton,
-  IsoCard,
-  ModeSwitch,
-  PathwayDot,
-  Pill,
-  Screen,
-  Text,
-} from '@/components';
+import { BottomSheet, Button, CoachCardFull, CodeDisplay, IconButton, IsoCard, ModeSwitch, PathwayDot, Pill, Screen, Text } from '@/components';
 import { getCoach, getIsos, getPathways, getSavedCard, useData, type IsoFilter } from '@/data';
+import { ClusterBubble, IsoDot } from '@/features/map/IsoDot';
 import { useAppStore } from '@/store';
 import { colors, pathwayColors, pathwayOrder, radius } from '@/theme';
 
@@ -54,29 +42,23 @@ export default function ComponentGallery() {
     <Screen>
       <View style={styles.header}>
         <IconButton icon="back" label="Back" onPress={() => router.back()} />
-        <Text variant="topLabel">PHASE 1 · COMPONENTS</Text>
+        <Text variant="topLabel">Phase 1 · Components</Text>
         <View style={styles.spacer} />
       </View>
 
-      <Section title="PILL + PATHWAYDOT">
+      <Section title="Pill and PathwayDot">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-          <Pill label="Recommended" dotColor={colors.gold} active={pill === 'recommended'} onPress={() => setPill('recommended')} />
-          <Pill label="Following" dotColor={colors.textMuted} active={pill === 'following'} onPress={() => setPill('following')} />
+          <Pill label="Recommended" active={pill === 'recommended'} onPress={() => setPill('recommended')} />
+          <Pill label="Following" dotColor={colors.textSecondary} active={pill === 'following'} onPress={() => setPill('following')} />
           {pathwayOrder.map((id) => (
-            <Pill
-              key={id}
-              pathway={id}
-              label={pathways.find((p) => p.id === id)?.name ?? id}
-              active={pill === id}
-              onPress={() => setPill(id)}
-            />
+            <Pill key={id} pathway={id} label={pathways.find((p) => p.id === id)?.name ?? id} active={pill === id} onPress={() => setPill(id)} />
           ))}
         </ScrollView>
         <View style={styles.row}>
           {pathwayOrder.map((id) => (
             <View key={id} style={styles.dotItem}>
               <PathwayDot pathway={id} size={12} />
-              <Text variant="tiny" color={pathwayColors[id].text}>
+              <Text variant="caption" color={pathwayColors[id].text}>
                 {id}
               </Text>
             </View>
@@ -84,23 +66,18 @@ export default function ComponentGallery() {
         </View>
       </Section>
 
-      <Section title="AREABUBBLE (DIMS OUTSIDE CURRENT PILL)">
+      <Section title="Map dots (dim outside current pill)">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
           {all.map((iso) => (
-            <AreaBubble
-              key={iso.id}
-              pathway={iso.pathway}
-              initials={iso.coach.initials}
-              selected={current?.id === iso.id}
-              dimmed={!shownIds.has(iso.id)}
-              accessibilityLabel={`${iso.title}, ${iso.areaName}`}
-              onPress={() => setSelected(iso.id)}
-            />
+            <Pressable key={iso.id} accessibilityRole="button" accessibilityLabel={`${iso.title}, ${iso.areaName}`} onPress={() => setSelected(iso.id)}>
+              <IsoDot pathway={iso.pathway} selected={current?.id === iso.id} dimmed={!shownIds.has(iso.id)} full={iso.seatsOpen === 0} />
+            </Pressable>
           ))}
+          <ClusterBubble count={4} />
         </ScrollView>
       </Section>
 
-      <Section title="ISOCARD">
+      <Section title="IsoCard">
         <View style={styles.sheetMock}>
           {current ? (
             <IsoCard
@@ -116,7 +93,7 @@ export default function ComponentGallery() {
         {notice ? <Text variant="caption">{notice}</Text> : null}
       </Section>
 
-      <Section title="COACHCARDFULL + FOLLOW (STORE)">
+      <Section title="CoachCardFull and follow (store)">
         {coach ? <CoachCardFull coach={coach} /> : null}
         <Button
           label={following ? 'Following · pins on' : `Follow ${coach?.firstName ?? ''}`}
@@ -130,16 +107,10 @@ export default function ComponentGallery() {
         </Text>
       </Section>
 
-      <Section title="BOTTOMSHEET + CODEDISPLAY (SEAT FLOW)">
-        <Text variant="caption">
-          Seat at “From side hustle to storefront”: {mySeat?.status ?? 'none'}
-        </Text>
-        {!mySeat || mySeat.status === 'cancelled' ? (
-          <Button label="I got next" onPress={() => setHoldOpen(true)} height={52} />
-        ) : null}
-        {mySeat?.status === 'requested' ? (
-          <Button label="Simulate: Marcus approves" variant="outline" onPress={() => confirmSeat(DEMO_ISO, 'me')} />
-        ) : null}
+      <Section title="BottomSheet and CodeDisplay (seat flow)">
+        <Text variant="caption">Seat at “From side hustle to storefront”: {mySeat?.status ?? 'none'}</Text>
+        {!mySeat || mySeat.status === 'cancelled' ? <Button label="I got next" onPress={() => setHoldOpen(true)} height={52} /> : null}
+        {mySeat?.status === 'requested' ? <Button label="Simulate: Marcus approves" variant="outline" onPress={() => confirmSeat(DEMO_ISO, 'me')} /> : null}
         {mySeat?.checkinCode && mySeat.status === 'confirmed' ? (
           <>
             <CodeDisplay
@@ -158,12 +129,12 @@ export default function ComponentGallery() {
         ) : null}
       </Section>
 
-      <Section title="MODESWITCH (STORE)">
+      <Section title="ModeSwitch (store)">
         <ModeSwitch mode={mode} onChange={setMode} badge={3} />
         <Text variant="caption">Mode in store: {mode}</Text>
       </Section>
 
-      <BottomSheet visible={holdOpen} onClose={() => setHoldOpen(false)} eyebrow="I GOT NEXT" title="Save your seat with a $5 hold">
+      <BottomSheet visible={holdOpen} onClose={() => setHoldOpen(false)} eyebrow="I got next" title="Save your seat with a $5 hold">
         <View style={styles.cardRow}>
           <Text variant="bodyStrong">$5.00 hold</Text>
           <Text variant="caption">Card ending {card?.last4} · not a charge</Text>
@@ -200,18 +171,14 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   dotItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   sheetMock: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface1,
     borderRadius: radius.sheet,
-    borderWidth: 1,
-    borderColor: colors.borderAlt,
     padding: 16,
   },
   cardRow: {
     padding: 14,
     borderRadius: radius.lg,
-    backgroundColor: colors.surfaceInset,
-    borderWidth: 1,
-    borderColor: colors.borderAlt,
+    backgroundColor: colors.surface2,
     gap: 2,
   },
   flex: { flex: 1 },

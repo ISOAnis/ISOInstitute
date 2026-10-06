@@ -10,13 +10,13 @@ const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 
 export const db = {
   pathways: mocks.pathways,
-  coaches: clone(mocks.coaches),
+  coaches: clone(mocks.coaches).map((c) => ({ ...c, photo: mocks.coachPhotos[c.id] })),
   coachPosts: mocks.coachPosts,
   coachFeedback: mocks.coachFeedback,
   coachMonths: mocks.coachMonths,
   advisoryNotes: mocks.advisoryNotes,
   regulars: mocks.regulars,
-  venues: mocks.venues,
+  venues: mocks.venues.map((v) => ({ ...v, photo: mocks.venuePhoto })),
   events: mocks.events,
   ranks: mocks.ranks,
   recommendations: mocks.recommendations,

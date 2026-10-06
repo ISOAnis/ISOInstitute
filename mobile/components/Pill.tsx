@@ -1,14 +1,14 @@
 import { Pressable, StyleSheet } from 'react-native';
 
 import type { PathwayId } from '@/data';
-import { colors, fonts, layout, pathwayColors, radius } from '@/theme';
+import { colors, fonts, layout, radius } from '@/theme';
 
 import { PathwayDot } from './PathwayDot';
 import { Text } from './Text';
 
 /**
- * Filter pill. Pathway pills fill with the pathway color when active;
- * non-pathway pills (Recommended, Following) pass `dotColor` and fill gold.
+ * Filter pill. Selected pills invert to a light capsule; the pathway dot stays
+ * as the only full-strength color so the selection never reads as a big color block.
  */
 export function Pill({
   label,
@@ -23,8 +23,6 @@ export function Pill({
   pathway?: PathwayId;
   dotColor?: string;
 }) {
-  const fill = pathway ? pathwayColors[pathway].fill : colors.gold;
-  const ink = pathway ? pathwayColors[pathway].ink : colors.onGold;
   return (
     <Pressable
       accessibilityRole="tab"
@@ -32,17 +30,10 @@ export function Pill({
       accessibilityLabel={label}
       onPress={onPress}
       hitSlop={{ top: 4, bottom: 4 }}
-      style={[
-        styles.pill,
-        active ? { backgroundColor: fill, borderColor: fill } : { backgroundColor: colors.surfaceAlt, borderColor: colors.borderChip },
-      ]}
+      style={({ pressed }) => [styles.pill, { backgroundColor: active ? colors.text : pressed ? colors.surface3 : colors.surface2 }]}
     >
-      {!active ? <PathwayDot pathway={pathway} color={dotColor} /> : null}
-      <Text
-        variant="caption"
-        style={[styles.label, { fontFamily: active ? fonts.extrabold : fonts.semibold }]}
-        color={active ? ink : colors.textBody}
-      >
+      {pathway || dotColor ? <PathwayDot pathway={pathway} color={dotColor} /> : null}
+      <Text variant="caption" style={[styles.label, { fontFamily: active ? fonts.bold : fonts.semibold }]} color={active ? colors.bg : colors.text}>
         {label}
       </Text>
     </Pressable>
@@ -53,12 +44,11 @@ const styles = StyleSheet.create({
   pill: {
     height: layout.pillHeight,
     minWidth: 44,
-    paddingHorizontal: 15,
-    borderRadius: radius.xxl,
-    borderWidth: 1,
+    paddingHorizontal: 16,
+    borderRadius: radius.pill,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
   },
-  label: { fontSize: 13 },
+  label: { fontSize: 14 },
 });

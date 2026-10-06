@@ -21,9 +21,7 @@ import {
   gutter,
   pathwayColors,
   pathwayOrder,
-  radius,
   statusColors,
-  tracking,
 } from "@/theme";
 
 import { useModeSwitch } from "./useModeSwitch";
@@ -58,8 +56,8 @@ export function CoachExplore() {
         <Text variant="title">Explore ISOs</Text>
         <Text variant="subtitle">Every pathway, near you</Text>
       </View>
-      <Card style={{ borderColor: statusColors.goldLine }}>
-        <Text variant="caption" color={colors.textBody}>
+      <Card>
+        <Text variant="caption" color={colors.text}>
           Coach access: join any pathway’s ISOs. Players in that pathway get
           seats first, so you take what’s open.
         </Text>
@@ -73,7 +71,6 @@ export function CoachExplore() {
       >
         <Pill
           label="All"
-          dotColor={colors.gold}
           active={filter === "all"}
           onPress={() => setFilter("all")}
         />
@@ -94,61 +91,65 @@ export function CoachExplore() {
         </Text>
       ) : null}
 
-      {isos.map((iso) => {
-        const p = pathwayColors[iso.pathway];
-        const mine = seats[iso.id];
-        const requested =
-          mine && mine.status !== "cancelled" && mine.status !== "declined";
-        const full = iso.seatsOpen === 0;
-        return (
-          <Card key={iso.id}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Open ${iso.title}`}
-              onPress={() => router.push(`/iso/${iso.id}`)}
-              style={styles.row}
-            >
-              <Avatar
-                initials={iso.coach.initials}
-                size={44}
-                pathway={iso.pathway}
-              />
-              <View style={styles.flex}>
-                <Text style={styles.tag} color={p.text}>
-                  {iso.pathway.toUpperCase()}
+      <View style={styles.list}>
+        {isos.map((iso) => {
+          const p = pathwayColors[iso.pathway];
+          const mine = seats[iso.id];
+          const requested =
+            mine && mine.status !== "cancelled" && mine.status !== "declined";
+          const full = iso.seatsOpen === 0;
+          return (
+            <Card key={iso.id}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${iso.title}`}
+                onPress={() => router.push(`/iso/${iso.id}`)}
+                style={styles.row}
+              >
+                <Avatar
+                  initials={iso.coach.initials}
+                  photo={iso.coach.photo}
+                  size={48}
+                  pathway={iso.pathway}
+                />
+                <View style={styles.flex}>
+                  <Text variant="caption" color={p.text} style={styles.tag}>
+                    {pathwayName(iso.pathway)}
+                  </Text>
+                  <Text variant="bodyStrong">{iso.title}</Text>
+                  <Text variant="caption">
+                    {dayLabel(iso.startsAt)} {startTime(iso.startsAt)} ·{" "}
+                    {iso.areaName} ·{" "}
+                    {full
+                      ? "full"
+                      : `${iso.seatsOpen} open ${iso.seatsOpen === 1 ? "seat" : "seats"}`}
+                  </Text>
+                </View>
+              </Pressable>
+              {full && !requested ? (
+                <Text variant="caption">
+                  Pathway players filled it. Follow the coach for the next one.
                 </Text>
-                <Text variant="bodyStrong">{iso.title}</Text>
-                <Text variant="tiny">
-                  {dayLabel(iso.startsAt)} {startTime(iso.startsAt)} ·{" "}
-                  {iso.areaName} ·{" "}
-                  {full
-                    ? "full"
-                    : `${iso.seatsOpen} open ${iso.seatsOpen === 1 ? "seat" : "seats"}`}
-                </Text>
-              </View>
-            </Pressable>
-            {full && !requested ? (
-              <Text variant="caption">
-                Pathway players filled it. Follow the coach for the next one.
-              </Text>
-            ) : requested ? (
-              <View style={styles.sent}>
-                <Text variant="caption" color={statusColors.good}>
-                  {mine.status === "confirmed"
-                    ? "You’re in. Your code is on the ISO page."
-                    : "You got next. The host will confirm."}
-                </Text>
-              </View>
-            ) : (
-              <Button
-                label="I got next"
-                height={44}
-                onPress={() => request(iso.id)}
-              />
-            )}
-          </Card>
-        );
-      })}
+              ) : requested ? (
+                <View style={styles.sent}>
+                  <Text variant="caption" color={statusColors.good}>
+                    {mine.status === "confirmed"
+                      ? "You’re in. Your code is on the ISO page."
+                      : "You got next. The host will confirm."}
+                  </Text>
+                </View>
+              ) : (
+                <Button
+                  label="I got next"
+                  variant="light"
+                  height={44}
+                  onPress={() => request(iso.id)}
+                />
+              )}
+            </Card>
+          );
+        })}
+      </View>
     </Screen>
   );
 }
@@ -158,10 +159,7 @@ const styles = StyleSheet.create({
   pillScroll: { marginHorizontal: -gutter },
   pills: { gap: 8, paddingHorizontal: gutter },
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
-  tag: {
-    fontFamily: fonts.extrabold,
-    fontSize: 10,
-    letterSpacing: tracking(0.16, 10),
-  },
-  sent: { paddingVertical: 4, borderRadius: radius.sm },
+  list: { gap: 12 },
+  tag: { fontFamily: fonts.bold },
+  sent: { paddingVertical: 4 },
 });

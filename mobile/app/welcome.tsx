@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import { Animated, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Text } from '@/components';
+import { Button, Text, Wordmark } from '@/components';
+import { SplashBackdrop } from '@/features/SplashBackdrop';
 import { useAppStore } from '@/store';
-import { colors, fonts, gutter, tracking } from '@/theme';
+import { colors, fonts, gutter } from '@/theme';
 
 const mark = require('../assets/iso-mark.png');
 
@@ -45,6 +46,7 @@ export default function Welcome() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top, paddingBottom: Math.max(insets.bottom, 20) }]}>
+      <SplashBackdrop />
       <View style={styles.stage}>
         <Animated.View style={logo}>
           <Pressable accessibilityRole="button" accessibilityLabel="ISO logo, tap to replay intro" onPress={() => setRun((r) => r + 1)}>
@@ -59,17 +61,19 @@ export default function Welcome() {
         </Animated.View>
 
         <Animated.View style={[styles.ready, ready]}>
-          <View style={styles.wordRow}>
-            <Text style={styles.word}>ISO</Text>
-            <Text style={styles.wordSub} color={colors.textMuted}>
-              IN SEARCH OF
-            </Text>
+          <View style={styles.wordStack}>
+            <Wordmark size={52} />
+            <Text variant="eyebrow">In search of</Text>
           </View>
           <Text style={styles.tagline} align="center">
-            Where culture, community,{'\n'}and <Text style={styles.tagline} color={colors.gold}>ambition</Text> intersect.
+            Where culture, community,{'\n'}and{' '}
+            <Text style={styles.tagline} color={colors.gold}>
+              ambition
+            </Text>{' '}
+            intersect.
           </Text>
           <Text variant="subtitle" align="center" style={styles.sub}>
-            Community coaching, in person, with people who’ve already done what you’re trying to do.
+            The person you want to meet is usually six people away. ISO makes it one.
           </Text>
         </Animated.View>
       </View>
@@ -77,7 +81,7 @@ export default function Welcome() {
       <Animated.View style={[styles.actions, ready]}>
         <Button label="Sign up" height={52} onPress={() => router.push('/onboarding/role')} />
         <Button label="Log in" variant="outline" height={52} onPress={logIn} />
-        <Text variant="tiny" align="center">
+        <Text variant="caption" align="center">
           By continuing you agree to ISO’s Terms and Privacy Policy.
         </Text>
       </Animated.View>
@@ -89,13 +93,11 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: gutter },
   stage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   mark: { width: 168, height: 130 },
-  intro: { position: 'absolute', top: '58%', left: 0, right: 0 },
-  introText: { fontFamily: fonts.display, fontSize: 46, lineHeight: 46, color: colors.text },
+  intro: { position: 'absolute', top: '50%', marginTop: 84, left: 0, right: 0 },
+  introText: { fontFamily: fonts.display, fontSize: 46, lineHeight: 50, color: colors.text },
   ready: { position: 'absolute', top: '42%', left: 0, right: 0, alignItems: 'center', gap: 10 },
-  wordRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
-  word: { fontFamily: fonts.display, fontSize: 40, letterSpacing: tracking(0.06, 40), color: colors.textBody },
-  wordSub: { fontFamily: fonts.bold, fontSize: 11, letterSpacing: tracking(0.22, 11) },
-  tagline: { fontFamily: fonts.display, fontSize: 34, lineHeight: 35, color: colors.text, marginTop: 12 },
+  wordStack: { alignItems: 'center', gap: 2 },
+  tagline: { fontFamily: fonts.display, fontSize: 34, lineHeight: 38, color: colors.text, marginTop: 12 },
   sub: { paddingHorizontal: 16 },
-  actions: { gap: 10 },
+  actions: { gap: 12 },
 });

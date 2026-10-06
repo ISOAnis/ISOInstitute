@@ -2,25 +2,13 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import {
-  Avatar,
-  BottomSheet,
-  Button,
-  Card,
-  Icon,
-  IconButton,
-  ModeSwitch,
-  Screen,
-  StatRow,
-  StatTile,
-  Text,
-} from '@/components';
+import { Avatar, BottomSheet, Button, Card, Icon, IconButton, ListRow, ModeSwitch, Screen, StatRow, StatTile, Text } from '@/components';
 import { getLocker, getMe, getPastIsos, getPathways, getRankStatus, getRanks, useData, type PathwayId } from '@/data';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { shortDate } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
-import { colors, fonts, pathwayColors, radius, statusColors, tracking } from '@/theme';
+import { alpha, colors, fonts, pathwayColors, radius } from '@/theme';
 
 export default function MeScreen() {
   const revision = useAppStore((s) => s.revision);
@@ -67,29 +55,29 @@ export default function MeScreen() {
 
       {coachStatus === 'approved' ? <ModeSwitch {...modeSwitch} /> : null}
 
-      <View style={[styles.level, { backgroundColor: p.tint, borderColor: p.line }]}>
+      <View style={[styles.level, { backgroundColor: alpha(p.fill, 0.12) }]}>
         <Text variant="eyebrow" color={p.text}>
-          CURRENT LEVEL
+          Current level
         </Text>
         <View style={styles.levelRow}>
           <Text style={styles.levelName}>{rank.current?.level ?? 'Walk-on'}</Text>
           <Text style={styles.levelCount} color={p.text}>
-            {rank.count} {name.toUpperCase()} ISOs
+            {rank.count} {name} ISOs
           </Text>
         </View>
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${Math.round(rank.progress * 100)}%`, backgroundColor: p.fill }]} />
         </View>
         <View style={styles.levelFoot}>
-          <Text variant="tiny">{rank.current ? `${rank.current.level} at ${rank.current.minIsos}` : 'Check in to start'}</Text>
-          <Text variant="tiny" color={colors.textBody}>
+          <Text variant="caption">{rank.current ? `${rank.current.level} at ${rank.current.minIsos}` : 'Check in to start'}</Text>
+          <Text variant="caption" color={colors.text}>
             {rank.next ? `${rank.isosToNext} more ISOs to ${rank.next.level}` : 'Top of the ranks'}
           </Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text variant="section">YOUR RANKS</Text>
+        <Text variant="section">Your ranks</Text>
         <Card style={styles.ladder}>
           {ladder.map((r, i) => {
             const reached = rank.count >= r.minIsos;
@@ -97,17 +85,17 @@ export default function MeScreen() {
             const next = rank.next?.level === r.level;
             return (
               <View key={r.level} style={[styles.rung, i < ladder.length - 1 && styles.rungLine]}>
-                <Text style={styles.rungNum} color={reached ? p.text : colors.textDim}>
+                <Text style={styles.rungNum} color={reached ? p.text : colors.textSecondary}>
                   {r.minIsos}
                 </Text>
                 <View style={styles.flex}>
-                  <Text variant="bodyStrong" color={reached ? colors.text : colors.textMuted}>
+                  <Text variant="bodyStrong" color={reached ? colors.text : colors.textSecondary}>
                     {r.level}
                   </Text>
-                  <Text variant="tiny">{r.unlock}</Text>
+                  <Text variant="caption">{r.unlock}</Text>
                 </View>
-                {here ? <Badge label="YOU ARE HERE" bg={p.fill} ink={p.ink} /> : null}
-                {next ? <Badge label="NEXT" bg={colors.surfaceBox} ink={colors.textBody} /> : null}
+                {here ? <Badge label="You’re here" bg={alpha(p.fill, 0.14)} ink={p.text} /> : null}
+                {next ? <Badge label="Next" bg={colors.surface2} ink={colors.text} /> : null}
               </View>
             );
           })}
@@ -124,22 +112,18 @@ export default function MeScreen() {
       <Card style={styles.pathRow}>
         <View style={[styles.pathBar, { backgroundColor: p.fill }]} />
         <View style={styles.flex}>
-          <Text variant="eyebrow">YOUR PATHWAY</Text>
-          <Text variant="pathwayName" color={p.text}>
+          <Text variant="section">Your pathway</Text>
+          <Text variant="cardTitle" color={p.text}>
             {name}
           </Text>
-          <Text variant="tiny">
-            {switchesLeft} of 2 switches left this month
-          </Text>
+          <Text variant="caption">{switchesLeft} of 2 switches left this month</Text>
         </View>
         <Button label="Switch" variant="outline" height={44} disabled={switchesLeft === 0} onPress={() => setSwitching(true)} />
       </Card>
 
       {rank.next ? (
-        <Card style={{ borderColor: statusColors.goldLine }}>
-          <Text variant="eyebrow" color={colors.gold}>
-            NEXT UNLOCK · {rank.next.level.toUpperCase()}
-          </Text>
+        <Card>
+          <Text variant="section">Next unlock · {rank.next.level}</Text>
           <Text variant="rowTitle">{rank.next.level === 'Varsity' ? `${name} Pathway Patch` : rank.next.unlock}</Text>
           <Text variant="caption">
             {rank.next.level === 'Varsity' ? 'Earned, never sold. Plus Varsity gear access.' : `${rank.isosToNext} more ${name} ISOs to get there.`}
@@ -148,24 +132,21 @@ export default function MeScreen() {
       ) : null}
 
       <View style={styles.section}>
-        <Text variant="section">THE LOCKER</Text>
+        <Text variant="section">The locker</Text>
         <View style={styles.locker}>
           {locker.map((item) => {
             const label = item.id === 'patch' ? `${name} Patch` : item.name;
             return (
-              <View
-                key={item.id}
-                style={[
-                  styles.lockerItem,
-                  item.status === 'unlocked' && { borderColor: colors.gold },
-                  item.status === 'locked' && styles.lockerLocked,
-                ]}
-              >
-                <Icon name={item.status === 'locked' ? 'lock' : 'tee'} size={28} color={item.status === 'locked' ? colors.textDim : item.status === 'unlocked' ? colors.gold : p.text} />
-                <Text variant="tiny" align="center" color={colors.textBody} style={styles.bold}>
+              <View key={item.id} style={[styles.lockerItem, item.status === 'locked' && styles.lockerLocked]}>
+                <Icon
+                  name={item.status === 'locked' ? 'lock' : 'tee'}
+                  size={28}
+                  color={item.status === 'locked' ? colors.textSecondary : item.status === 'unlocked' ? colors.text : p.text}
+                />
+                <Text variant="caption" align="center" color={colors.text} style={styles.bold}>
                   {label}
                 </Text>
-                <Text variant="tiny" align="center">
+                <Text variant="caption" align="center">
                   {item.note}
                 </Text>
               </View>
@@ -175,38 +156,38 @@ export default function MeScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text variant="section">RECENT</Text>
-        {recent.map((r) => (
-          <Card key={r.id} style={styles.recent}>
-            <Avatar initials={r.coachInitials} size={40} pathway={r.pathway} />
-            <View style={styles.flex}>
-              <Text variant="bodyStrong">{r.title}</Text>
-              <Text variant="tiny">
-                {pathwayName(r.pathway)} · {shortDate(r.date).split(' ').slice(1).join(' ')} · checked in
-              </Text>
-            </View>
-            {r.pathway === pathway ? (
-              <Text style={styles.plus} color={p.text}>
-                +1 ISO
-              </Text>
-            ) : (
-              <Text variant="tiny">Crossover</Text>
-            )}
-          </Card>
-        ))}
+        <Text variant="section">Recent</Text>
+        <Card style={styles.list}>
+          {recent.map((r, i) => (
+            <ListRow key={r.id} divider={i > 0}>
+              <Avatar initials={r.coachInitials} size={40} pathway={r.pathway} />
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{r.title}</Text>
+                <Text variant="caption">
+                  {pathwayName(r.pathway)} · {shortDate(r.date).split(' ').slice(1).join(' ')} · checked in
+                </Text>
+              </View>
+              {r.pathway === pathway ? (
+                <Text style={styles.plus} color={p.text}>
+                  +1 ISO
+                </Text>
+              ) : (
+                <Text variant="caption">Crossover</Text>
+              )}
+            </ListRow>
+          ))}
+        </Card>
       </View>
 
       {coachStatus !== 'approved' ? (
         <Card onPress={() => router.push(coachStatus === 'applied' ? '/coach-review' : '/coach-apply')} accessibilityLabel="Coach on ISO">
-          <Text variant="eyebrow" color={colors.gold}>
-            {coachStatus === 'applied' ? 'APPLICATION IN REVIEW' : 'PULL AS YOU CLIMB'}
-          </Text>
+          <Text variant="section">{coachStatus === 'applied' ? 'Application in review' : 'Pull as you climb'}</Text>
           <Text variant="rowTitle">{coachStatus === 'applied' ? 'See where your application stands' : 'Apply to coach on ISO'}</Text>
           <Text variant="caption">Every coach is approved by the ISO advisory board.</Text>
         </Card>
       ) : null}
 
-      <BottomSheet visible={switching} onClose={() => setSwitching(false)} eyebrow={`${switchesLeft} OF 2 SWITCHES LEFT`} title="Switch pathway">
+      <BottomSheet visible={switching} onClose={() => setSwitching(false)} eyebrow={`${switchesLeft} of 2 switches left`} title="Switch pathway">
         <Text variant="caption">Your {name} progress stays saved. The new pathway starts its own count.</Text>
         {pathways
           .filter((x) => x.id !== pathway)
@@ -217,11 +198,11 @@ export default function MeScreen() {
                 <Text variant="bodyStrong" color={pathwayColors[x.id].text}>
                   {x.name}
                 </Text>
-                <Text variant="tiny">
+                <Text variant="caption">
                   {x.field} · {me.rankProgress[x.id] ?? 0} ISOs
                 </Text>
               </View>
-              <Icon name="forward" size={18} color={colors.textMuted} />
+              <Icon name="forward" size={18} color={colors.textSecondary} />
             </Pressable>
           ))}
       </BottomSheet>
@@ -243,20 +224,21 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bold: { fontFamily: fonts.bold },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  section: { gap: 10 },
-  level: { borderWidth: 1, borderRadius: radius.xl, padding: 16, gap: 10 },
+  section: { gap: 12 },
+  list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
+  level: { borderRadius: radius.card, padding: 20, gap: 12 },
   levelRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  levelName: { fontFamily: fonts.display, fontSize: 56, lineHeight: 56, color: colors.text },
-  levelCount: { fontFamily: fonts.extrabold, fontSize: 12, letterSpacing: tracking(0.12, 12) },
-  track: { height: 8, borderRadius: 4, backgroundColor: colors.inset, overflow: 'hidden' },
+  levelName: { fontFamily: fonts.display, fontSize: 56, lineHeight: 61, color: colors.text },
+  levelCount: { fontFamily: fonts.bold, fontSize: 14 },
+  track: { height: 8, borderRadius: 4, backgroundColor: alpha(colors.text, 0.1), overflow: 'hidden' },
   fill: { height: 8, borderRadius: 4 },
   levelFoot: { flexDirection: 'row', justifyContent: 'space-between' },
-  ladder: { paddingVertical: 4, gap: 0 },
-  rung: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  rungLine: { borderBottomWidth: 1, borderBottomColor: colors.borderSoft },
+  ladder: { paddingVertical: 6, gap: 0 },
+  rung: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
+  rungLine: { borderBottomWidth: 1, borderBottomColor: colors.hairline },
   rungNum: { fontFamily: fonts.display, fontSize: 24, width: 36, textAlign: 'center' },
-  badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
-  badgeText: { fontFamily: fonts.extrabold, fontSize: 9, letterSpacing: 1 },
+  badge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: radius.pill },
+  badgeText: { fontFamily: fonts.bold, fontSize: 13 },
   pathRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   pathBar: { width: 8, alignSelf: 'stretch', borderRadius: 4 },
   locker: { flexDirection: 'row', gap: 8 },
@@ -264,15 +246,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     gap: 4,
-    padding: 12,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    padding: 14,
+    borderRadius: radius.card,
+    backgroundColor: colors.surface1,
   },
   lockerLocked: { opacity: 0.6 },
-  recent: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  plus: { fontFamily: fonts.extrabold, fontSize: 13 },
+  plus: { fontFamily: fonts.bold, fontSize: 14 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 },
   switchBar: { width: 8, height: 36, borderRadius: 4 },
 });

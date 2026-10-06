@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, ModeSwitch, OverallBox, Screen, StatTile, Text } from '@/components';
+import { Avatar, Button, Card, ListRow, ModeSwitch, OverallBox, Screen, StatTile, Text } from '@/components';
 import { getAdvisoryNote, getCoachFeedback, getCoachMonth, getMyCoach, getRegulars, useData } from '@/data';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
-import { colors, fonts, pathwayColors, radius, statusColors } from '@/theme';
+import { alpha, colors, fonts, pathwayColors, radius, statusColors } from '@/theme';
 
 /** CoachDash: private metrics, tier progress, feedback, board notes, regulars. */
 export default function Dashboard() {
@@ -39,14 +39,14 @@ export default function Dashboard() {
         </View>
         <Button label="Public card" variant="outline" height={44} onPress={() => router.push(`/coach/${coach.id}`)} />
       </View>
-      <Text variant="tiny" align="center">
+      <Text variant="caption" align="center">
         Everything below is private to you
       </Text>
 
       {month ? (
-        <>
+        <View style={styles.group}>
           <View style={styles.monthHead}>
-            <Text variant="section">THIS MONTH</Text>
+            <Text variant="section">This month</Text>
             <Text style={styles.delta} color={statusColors.good}>
               +{month.overallDelta} Overall
             </Text>
@@ -66,58 +66,66 @@ export default function Dashboard() {
             </View>
           </View>
 
-          <Card style={{ borderColor: statusColors.goldLine }}>
-            <Text variant="eyebrow" color={colors.gold}>
-              NEXT TIER: {month.nextTier.toUpperCase()} AT {month.nextTierAt}
+          <Card>
+            <Text variant="section">
+              Next tier: {month.nextTier} at {month.nextTierAt}
             </Text>
             <View style={styles.track}>
-              <View style={[styles.fill, { width: `${Math.min(100, (coach.overall / month.nextTierAt) * 100)}%` }]} />
+              <View style={[styles.fill, { width: `${Math.min(100, (coach.overall / month.nextTierAt) * 100)}%`, backgroundColor: p.fill }]} />
             </View>
-            <Text variant="caption" color={colors.textBody}>
+            <Text variant="caption" color={colors.text}>
               {coach.overall} / {month.nextTierAt}
             </Text>
             <Text variant="caption">{month.nextTierNote}</Text>
           </Card>
-        </>
+        </View>
       ) : null}
 
-      <View style={styles.monthHead}>
-        <Text variant="section">PLAYER FEEDBACK</Text>
-        <Text style={styles.delta} color={colors.gold}>
-          {avg.toFixed(1)} avg
-        </Text>
-      </View>
-      {feedback.map((f) => (
-        <Card key={f.id}>
-          <Text variant="body">“{f.quote}”</Text>
-          <Text variant="tiny">{f.fromLabel}</Text>
+      <View style={styles.group}>
+        <View style={styles.monthHead}>
+          <Text variant="section">Player feedback</Text>
+          <Text style={styles.delta} color={colors.text}>
+            {avg.toFixed(1)} avg
+          </Text>
+        </View>
+        <Card style={styles.list}>
+          {feedback.map((f, i) => (
+            <ListRow key={f.id} divider={i > 0} style={styles.stack}>
+              <Text variant="body">“{f.quote}”</Text>
+              <Text variant="caption">{f.fromLabel}</Text>
+            </ListRow>
+          ))}
         </Card>
-      ))}
+      </View>
 
       {note ? (
-        <Card style={{ backgroundColor: p.tint, borderColor: p.line }}>
+        <Card style={{ backgroundColor: alpha(p.fill, 0.12) }}>
           <Text variant="eyebrow" color={p.text}>
-            FROM THE ADVISORY BOARD
+            From the advisory board
           </Text>
           <Text variant="body">{note.body}</Text>
           {note.eventId ? <Button label="See the event" variant="outline" height={44} onPress={() => router.push('/coach-events')} /> : null}
         </Card>
       ) : null}
 
-      <Text variant="section">YOUR REGULARS</Text>
-      {regulars
-        .filter((r) => r.isosWithCoach > 1)
-        .map((r) => (
-          <Card key={r.playerId} style={styles.regular}>
-            <Avatar initials={r.initials} size={40} pathway={r.pathway} />
-            <View style={styles.flex}>
-              <Text variant="bodyStrong">{r.name}</Text>
-              <Text variant="tiny">
-                {pathwayName(r.pathway)} · {r.rank} · {r.isosWithCoach} of your ISOs
-              </Text>
-            </View>
-          </Card>
-        ))}
+      <View style={styles.group}>
+        <Text variant="section">Your regulars</Text>
+        <Card style={styles.list}>
+          {regulars
+            .filter((r) => r.isosWithCoach > 1)
+            .map((r, i) => (
+              <ListRow key={r.playerId} divider={i > 0}>
+                <Avatar initials={r.initials} size={40} pathway={r.pathway} />
+                <View style={styles.flex}>
+                  <Text variant="bodyStrong">{r.name}</Text>
+                  <Text variant="caption">
+                    {pathwayName(r.pathway)} · {r.rank} · {r.isosWithCoach} of your ISOs
+                  </Text>
+                </View>
+              </ListRow>
+            ))}
+        </Card>
+      </View>
     </Screen>
   );
 }
@@ -126,11 +134,13 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bold: { fontFamily: fonts.bold },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  group: { gap: 12 },
+  list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
+  stack: { flexDirection: 'column', alignItems: 'stretch', gap: 4, paddingVertical: 16 },
   monthHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  delta: { fontFamily: fonts.extrabold, fontSize: 13 },
+  delta: { fontFamily: fonts.bold, fontSize: 14 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
   cell: { width: '50%', padding: 4, flexDirection: 'row' },
-  track: { height: 8, borderRadius: 4, backgroundColor: colors.surfaceBox, overflow: 'hidden' },
-  fill: { height: 8, borderRadius: radius.pill, backgroundColor: colors.gold },
-  regular: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  track: { height: 8, borderRadius: 4, backgroundColor: colors.surface2, overflow: 'hidden' },
+  fill: { height: 8, borderRadius: radius.pill },
 });

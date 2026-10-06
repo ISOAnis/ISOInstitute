@@ -32,12 +32,10 @@ export function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
-    padding: 14,
-    gap: 10,
+    backgroundColor: colors.surface1,
+    borderRadius: radius.card,
+    padding: 18,
+    gap: 12,
   },
-  pressed: { backgroundColor: colors.surfaceHigh },
+  pressed: { backgroundColor: colors.surface2 },
 });

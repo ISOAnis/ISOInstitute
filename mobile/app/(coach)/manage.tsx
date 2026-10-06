@@ -2,13 +2,15 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, Icon, IsoMap, ModeSwitch, Screen, Text } from '@/components';
+import { Avatar, Button, Card, Icon, ListRow, ModeSwitch, Screen, Text } from '@/components';
+import { displayPoint, regionAround } from '@/features/map/geo';
+import { MapCanvas } from '@/features/map/MapCanvas';
 import { getCoachIsos, getCoachRequests, getMyCoach, useData, type CoachRequest } from '@/data';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { dateBlock, dayLabel, seatsLabel, startTime, timeRange } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
-import { colors, fonts, pathwayColors, radius, statusColors, tracking } from '@/theme';
+import { alpha, colors, fonts, pathwayColors, radius, raisedShadow, statusColors } from '@/theme';
 
 type Outcome = 'approved' | 'declined';
 
@@ -60,14 +62,14 @@ export default function ManageIsos() {
           <Card
             onPress={() => router.push(`/check-in/${next.id}`)}
             accessibilityLabel="Check in your table"
-            style={[styles.today, { backgroundColor: p.tint, borderColor: p.line }]}
+            style={[styles.today, { backgroundColor: alpha(p.fill, 0.12) }]}
           >
             <View style={styles.flex}>
               <Text variant="eyebrow" color={p.text}>
-                {dayLabel(next.startsAt).toUpperCase()} · {startTime(next.startsAt)}
+                {dayLabel(next.startsAt)} · {startTime(next.startsAt)}
               </Text>
-              <Text variant="pathwayName">Check in your table</Text>
-              <Text variant="caption" color={colors.textBody}>
+              <Text variant="cardTitle">Check in your table</Text>
+              <Text variant="caption" color={colors.text}>
                 Enter each player’s 4-digit code
               </Text>
             </View>
@@ -75,90 +77,91 @@ export default function ManageIsos() {
           </Card>
         ) : null}
 
-        <Text variant="section">WHO’S GOT NEXT</Text>
-        {cards.length === 0 ? <Text variant="caption">No requests right now. They’ll show up here the moment someone says “I got next.”</Text> : null}
-        {cards.map((r) => {
-          const outcome = done[key(r)];
-          const priority = !r.isCoach && r.playerPathway === r.iso.pathway;
-          const d = dateBlock(r.iso.startsAt);
-          return (
-            <Card key={key(r)}>
-              <View style={styles.reqHead}>
-                <Avatar initials={r.playerInitials} size={44} pathway={r.playerPathway} />
-                <View style={styles.flex}>
-                  <Text variant="bodyStrong">{r.isCoach ? `Coach ${r.playerName}` : r.playerName}</Text>
-                  <Text variant="tiny">
-                    {r.isCoach ? `${pathwayName(r.playerPathway)} coach` : r.playerRank} · {d.dow[0]}
-                    {d.dow.slice(1).toLowerCase()} ISO
+        <View style={styles.group}>
+          <Text variant="section">Who’s got next</Text>
+          {cards.length === 0 ? <Text variant="caption">No requests right now. They’ll show up here the moment someone says “I got next.”</Text> : null}
+          {cards.map((r) => {
+            const outcome = done[key(r)];
+            const priority = !r.isCoach && r.playerPathway === r.iso.pathway;
+            const d = dateBlock(r.iso.startsAt);
+            return (
+              <Card key={key(r)}>
+                <View style={styles.reqHead}>
+                  <Avatar initials={r.playerInitials} size={44} pathway={r.playerPathway} />
+                  <View style={styles.flex}>
+                    <Text variant="bodyStrong">{r.isCoach ? `Coach ${r.playerName}` : r.playerName}</Text>
+                    <Text variant="caption">
+                      {r.isCoach ? `${pathwayName(r.playerPathway)} coach` : r.playerRank} · {d.dow[0]}
+                      {d.dow.slice(1).toLowerCase()} ISO
+                    </Text>
+                  </View>
+                  <View
+                    style={[styles.tag, priority ? { backgroundColor: alpha(pathwayColors[r.iso.pathway].fill, 0.14) } : { backgroundColor: colors.surface2 }]}
+                  >
+                    <Text style={styles.tagText} color={priority ? pathwayColors[r.iso.pathway].text : colors.text}>
+                      {priority ? pathwayName(r.iso.pathway) : 'Open seat'}
+                    </Text>
+                  </View>
+                </View>
+                {r.note ? <Text variant="body">“{r.note}”</Text> : null}
+                {outcome ? (
+                  <Text variant="caption" color={outcome === 'approved' ? statusColors.good : colors.textSecondary}>
+                    {outcome === 'approved' ? 'Approved. Spot details go out 24 hrs before.' : 'Declined. They get a kind note and other ISOs to try.'}
                   </Text>
-                </View>
-                <View
-                  style={[
-                    styles.tag,
-                    priority ? { backgroundColor: pathwayColors[r.iso.pathway].fill } : { backgroundColor: colors.borderButton },
-                  ]}
-                >
-                  <Text style={styles.tagText} color={priority ? pathwayColors[r.iso.pathway].ink : colors.textBody}>
-                    {priority ? r.iso.pathway.toUpperCase() : 'OPEN SEAT'}
+                ) : (
+                  <View style={styles.row}>
+                    <Button label="Not this time" variant="outline" style={styles.flex} onPress={() => act(r, 'declined')} />
+                    <Button label="Approve" variant="light" style={styles.flex} onPress={() => act(r, 'approved')} />
+                  </View>
+                )}
+                {errors[key(r)] ? (
+                  <Text variant="caption" color={statusColors.bad}>
+                    {errors[key(r)]}
                   </Text>
-                </View>
-              </View>
-              {r.note ? <Text variant="body">“{r.note}”</Text> : null}
-              {outcome ? (
-                <Text variant="caption" color={outcome === 'approved' ? statusColors.good : colors.textMuted}>
-                  {outcome === 'approved'
-                    ? 'Approved. Spot details go out 24 hrs before.'
-                    : 'Declined. They get a kind note and other ISOs to try.'}
-                </Text>
-              ) : (
-                <View style={styles.row}>
-                  <Button label="Not this time" variant="outline" style={styles.flex} onPress={() => act(r, 'declined')} />
-                  <Button label="Approve" style={styles.flex} onPress={() => act(r, 'approved')} />
-                </View>
-              )}
-              {errors[key(r)] ? (
-                <Text variant="caption" color={statusColors.bad}>
-                  {errors[key(r)]}
-                </Text>
-              ) : null}
-            </Card>
-          );
-        })}
-
-        <Text variant="section">YOUR LIVE PINS</Text>
-        <View style={styles.mini}>
-          <IsoMap
-            isos={isos}
-            visibleIds={new Set(isos.map((i) => i.id))}
-            focusId={isos[0]?.id}
-            draggable={false}
-            onSelect={(id) => router.push(`/iso/${id}`)}
-          />
+                ) : null}
+              </Card>
+            );
+          })}
         </View>
-        {isos.map((iso) => {
-          const d = dateBlock(iso.startsAt);
-          return (
-            <Card key={iso.id} style={styles.pinRow}>
-              <View style={styles.date}>
-                <Text style={styles.dow} color={colors.gold}>
-                  {d.dow}
-                </Text>
-                <Text style={styles.day}>{d.day}</Text>
-              </View>
-              <View style={styles.flex}>
-                <Text variant="bodyStrong">{iso.title}</Text>
-                <Text variant="tiny">
-                  {timeRange(iso.startsAt, iso.endsAt)} · {iso.areaName} · {seatsLabel(iso.seatsOpen, iso.seats)}
-                </Text>
-              </View>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Open ${iso.title}`} hitSlop={10} onPress={() => router.push(`/iso/${iso.id}`)}>
-                <Text style={styles.edit} color={colors.gold}>
-                  View
-                </Text>
-              </Pressable>
+
+        <View style={styles.group}>
+          <Text variant="section">Your live pins</Text>
+          <View style={styles.mini}>
+            {isos[0] ? (
+              <MapCanvas
+                key={isos[0].id}
+                isos={isos}
+                interactive={false}
+                initialRegion={regionAround(displayPoint(isos[0]), 0.4, 2)}
+                onSelectIso={(id) => router.push(`/iso/${id}`)}
+              />
+            ) : null}
+          </View>
+          {isos.length ? (
+            <Card style={styles.list}>
+              {isos.map((iso, i) => {
+                const d = dateBlock(iso.startsAt);
+                return (
+                  <ListRow key={iso.id} divider={i > 0} onPress={() => router.push(`/iso/${iso.id}`)} accessibilityLabel={`Open ${iso.title}`}>
+                    <View style={styles.date}>
+                      <Text style={styles.dow} color={colors.textSecondary}>
+                        {d.dow}
+                      </Text>
+                      <Text style={styles.day}>{d.day}</Text>
+                    </View>
+                    <View style={styles.flex}>
+                      <Text variant="bodyStrong">{iso.title}</Text>
+                      <Text variant="caption">
+                        {timeRange(iso.startsAt, iso.endsAt)} · {iso.areaName} · {seatsLabel(iso.seatsOpen, iso.seats)}
+                      </Text>
+                    </View>
+                    <Icon name="forward" size={18} color={colors.textSecondary} />
+                  </ListRow>
+                );
+              })}
             </Card>
-          );
-        })}
+          ) : null}
+        </View>
       </Screen>
 
       <Pressable
@@ -180,32 +183,29 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1 },
   row: { flexDirection: 'row', gap: 10 },
+  group: { gap: 12 },
+  list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
   today: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   reqHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  tag: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.tag },
-  tagText: { fontFamily: fonts.extrabold, fontSize: 9, letterSpacing: tracking(0.12, 9) },
-  mini: { height: 200, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
-  pinRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  tag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: radius.pill },
+  tagText: { fontFamily: fonts.bold, fontSize: 13 },
+  mini: { height: 200, borderRadius: radius.card, overflow: 'hidden', backgroundColor: colors.surface1 },
   date: { width: 44, alignItems: 'center' },
-  dow: { fontFamily: fonts.extrabold, fontSize: 10, letterSpacing: 1.2 },
-  day: { fontFamily: fonts.display, fontSize: 28, lineHeight: 28, color: colors.text },
-  edit: { fontFamily: fonts.extrabold, fontSize: 13 },
+  dow: { fontFamily: fonts.semibold, fontSize: 13 },
+  day: { fontFamily: fonts.extrabold, fontSize: 22, lineHeight: 28, color: colors.text },
   fab: {
     position: 'absolute',
     right: 20,
     bottom: 16,
     minHeight: 52,
     paddingHorizontal: 20,
-    borderRadius: 26,
+    borderRadius: radius.lg,
     backgroundColor: colors.gold,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    shadowColor: colors.gold,
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    ...raisedShadow,
+    shadowOffset: { width: 0, height: 6 },
   },
-  fabText: { fontFamily: fonts.extrabold, fontSize: 15 },
+  fabText: { fontFamily: fonts.bold, fontSize: 16 },
 });

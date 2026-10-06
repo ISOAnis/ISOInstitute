@@ -1,11 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, CoachCardFull, IconButton, Screen, StatRow, StatTile, Text, TopBar } from '@/components';
+import { Avatar, Button, Card, CoachCardFull, IconButton, ListRow, Screen, StatRow, StatTile, Text, TopBar } from '@/components';
 import { getCoach, getCoachIsos, getCoachPosts, useData } from '@/data';
 import { ago, dateBlock, seatsLabel, timeRange } from '@/lib/format';
 import { useAppStore } from '@/store';
-import { colors, fonts, radius } from '@/theme';
+import { colors, fonts, pathwayColors, radius } from '@/theme';
 
 export default function CoachCardScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,10 +29,7 @@ export default function CoachCardScreen() {
 
   return (
     <Screen>
-      <TopBar
-        label="COACH CARD"
-        right={isMe ? <IconButton icon="plus" label="Drop a pin" onPress={() => router.push('/drop-pin')} /> : undefined}
-      />
+      <TopBar label="Coach card" right={isMe ? <IconButton icon="plus" label="Drop a pin" onPress={() => router.push('/drop-pin')} /> : undefined} />
 
       <CoachCardFull coach={coach} />
 
@@ -59,20 +56,18 @@ export default function CoachCardScreen() {
 
       {posts.length ? (
         <View style={styles.section}>
-          <Text variant="section">COACH UPDATES</Text>
+          <Text variant="section">Coach updates</Text>
           {posts.map((post) => (
             <Card key={post.id}>
               <View style={styles.postHead}>
-                <Avatar initials={coach.initials} size={32} pathway={coach.pathway} />
+                <Avatar initials={coach.initials} photo={coach.photo} size={36} pathway={coach.pathway} />
                 <View>
                   <Text style={styles.postName}>{coach.name}</Text>
-                  <Text variant="tiny" color={colors.textDim}>
-                    {ago(post.createdAt)} · to followers
-                  </Text>
+                  <Text variant="meta">{ago(post.createdAt)} · to followers</Text>
                 </View>
               </View>
               <Text variant="body">{post.body}</Text>
-              <Text variant="caption" color={colors.textDim}>
+              <Text variant="caption" color={colors.textSecondary}>
                 {post.reactions} players reacted
               </Text>
             </Card>
@@ -81,39 +76,41 @@ export default function CoachCardScreen() {
       ) : null}
 
       <View style={styles.section}>
-        <Text variant="section">UPCOMING ISOs</Text>
+        <Text variant="section">Upcoming ISOs</Text>
         {upcoming.length ? (
-          upcoming.map((iso) => {
-            const d = dateBlock(iso.startsAt);
-            return (
-              <Card key={iso.id} onPress={() => router.push(`/iso/${iso.id}`)} accessibilityLabel={iso.title} style={styles.isoRow}>
-                <View style={styles.date}>
-                  <Text style={styles.dow} color={colors.gold}>
-                    {d.dow}
-                  </Text>
-                  <Text style={styles.day}>{d.day}</Text>
-                </View>
-                <View style={styles.flex}>
-                  <Text variant="bodyStrong">{iso.title}</Text>
-                  <Text variant="caption">
-                    {timeRange(iso.startsAt, iso.endsAt)} · {iso.areaName} · {seatsLabel(iso.seatsOpen, iso.seats)}
-                  </Text>
-                </View>
-              </Card>
-            );
-          })
+          <Card style={styles.list}>
+            {upcoming.map((iso, i) => {
+              const d = dateBlock(iso.startsAt);
+              return (
+                <ListRow key={iso.id} divider={i > 0} onPress={() => router.push(`/iso/${iso.id}`)} accessibilityLabel={iso.title}>
+                  <View style={styles.date}>
+                    <Text style={styles.dow} color={colors.textSecondary}>
+                      {d.dow}
+                    </Text>
+                    <Text style={styles.day}>{d.day}</Text>
+                  </View>
+                  <View style={styles.flex}>
+                    <Text variant="bodyStrong">{iso.title}</Text>
+                    <Text variant="caption">
+                      {timeRange(iso.startsAt, iso.endsAt)} · {iso.areaName} · {seatsLabel(iso.seatsOpen, iso.seats)}
+                    </Text>
+                  </View>
+                </ListRow>
+              );
+            })}
+          </Card>
         ) : (
           <Text variant="caption">No pins up right now. Follow to hear the moment one drops.</Text>
         )}
       </View>
 
       <View style={styles.section}>
-        <Text variant="section">WHAT MOVES THE OVERALL</Text>
+        <Text variant="section">What moves the Overall</Text>
         <Card>
           {moves.map((m) => (
             <View key={m.label} style={styles.move}>
               <View style={styles.moveHead}>
-                <Text variant="caption" color={colors.textBody}>
+                <Text variant="caption" color={colors.text}>
                   {m.label}
                 </Text>
                 <Text variant="caption" color={colors.text} style={styles.bold}>
@@ -121,7 +118,7 @@ export default function CoachCardScreen() {
                 </Text>
               </View>
               <View style={styles.track}>
-                <View style={[styles.fill, { width: `${m.pct}%` }]} />
+                <View style={[styles.fill, { width: `${m.pct}%`, backgroundColor: pathwayColors[coach.pathway].fill }]} />
               </View>
             </View>
           ))}
@@ -135,15 +132,15 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   bold: { fontFamily: fonts.extrabold },
   follow: { gap: 8 },
-  section: { gap: 10 },
+  section: { gap: 12 },
+  list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
   postHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  postName: { fontFamily: fonts.extrabold, fontSize: 13, color: colors.text },
-  isoRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  postName: { fontFamily: fonts.bold, fontSize: 15, color: colors.text },
   date: { width: 46, alignItems: 'center' },
-  dow: { fontFamily: fonts.extrabold, fontSize: 10, letterSpacing: 1.2 },
-  day: { fontFamily: fonts.display, fontSize: 30, lineHeight: 30, color: colors.text },
+  dow: { fontFamily: fonts.semibold, fontSize: 13 },
+  day: { fontFamily: fonts.extrabold, fontSize: 22, lineHeight: 28, color: colors.text },
   move: { gap: 6 },
   moveHead: { flexDirection: 'row', justifyContent: 'space-between' },
-  track: { height: 6, borderRadius: 3, backgroundColor: colors.surfaceBox, overflow: 'hidden' },
-  fill: { height: 6, borderRadius: radius.pill, backgroundColor: colors.gold },
+  track: { height: 6, borderRadius: 3, backgroundColor: colors.surface2, overflow: 'hidden' },
+  fill: { height: 6, borderRadius: radius.pill },
 });

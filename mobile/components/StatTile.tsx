@@ -11,7 +11,7 @@ export function StatTile({ value, label, valueColor = colors.text }: { value: st
       <Text style={styles.value} color={valueColor}>
         {value}
       </Text>
-      <Text variant="tiny">{label}</Text>
+      <Text variant="caption">{label}</Text>
     </View>
   );
 }
@@ -25,12 +25,10 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8 },
   tile: {
     flex: 1,
-    padding: 12,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    padding: 16,
+    borderRadius: radius.card,
+    backgroundColor: colors.surface1,
     gap: 2,
   },
-  value: { fontFamily: fonts.display, fontSize: 28, lineHeight: 30 },
+  value: { fontFamily: fonts.extrabold, fontSize: 24, lineHeight: 32 },
 });

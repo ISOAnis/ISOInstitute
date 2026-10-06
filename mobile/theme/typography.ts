@@ -4,7 +4,8 @@ import { colors } from './colors';
 
 /**
  * Font family names as registered by useFonts in app/_layout.tsx.
- * Bebas Neue is the brand display face (caps only, single weight); Manrope carries body copy.
+ * Bebas Neue is only for big headlines (24px+), Overall numbers, rank numbers and the check-in code.
+ * Manrope carries everything else.
  */
 export const fonts = {
   display: 'BebasNeue_400Regular',
@@ -18,7 +19,8 @@ export const fonts = {
 /** CSS em letter-spacing to RN pixels. */
 export const tracking = (em: number, fontSize: number) => em * fontSize;
 
-const headline = (size: number, lineHeight = 1): TextStyle => ({
+/** Bebas caps sit high in the em box; a lineHeight at or below 1 clips them on device. */
+const headline = (size: number, lineHeight = 1.08): TextStyle => ({
   fontFamily: fonts.display,
   fontSize: size,
   lineHeight: Math.round(size * lineHeight),
@@ -27,11 +29,10 @@ const headline = (size: number, lineHeight = 1): TextStyle => ({
   color: colors.text,
 });
 
-const eyebrow = (size: number, em: number, color: string = colors.textMuted): TextStyle => ({
-  fontFamily: fonts.extrabold,
+const manrope = (family: string, size: number, color: string = colors.text): TextStyle => ({
+  fontFamily: family,
   fontSize: size,
-  letterSpacing: tracking(em, size),
-  textTransform: 'uppercase',
+  lineHeight: Math.round(size * 1.45),
   color,
 });
 
@@ -40,30 +41,39 @@ export const textStyles = {
   title: headline(38),
   titleLg: headline(44),
   /** Hero titles on detail screens. */
-  hero: headline(40, 0.98),
+  hero: headline(40, 1.05),
   /** Sheet titles: "SAVE YOUR SEAT WITH A $5 HOLD". */
   sheetTitle: headline(30),
-  /** Pathway names in lists. */
-  pathwayName: headline(24),
-  /** Big numerals: stats, dates, codes. */
+  /** Pathway names on the Me / pathway screens. */
+  pathwayName: headline(26),
+  /** Overall numbers, rank numbers, the check-in code. Size set per use. */
   numeral: { fontFamily: fonts.display, color: colors.text } as TextStyle,
-  wordmark: { fontFamily: fonts.display, fontSize: 30, letterSpacing: tracking(0.06, 30), color: colors.textBody } as TextStyle,
+  wordmark: { fontFamily: fonts.display, fontSize: 30, letterSpacing: tracking(0.06, 30), color: colors.gold } as TextStyle,
 
-  /** Section headers: "WHAT WE'LL TALK ABOUT". */
-  section: eyebrow(12, 0.18),
-  /** Small labels: "YOUR CHECK-IN CODE", "I GOT NEXT". */
-  eyebrow: eyebrow(11, 0.16),
-  /** Top-bar labels: "THE ISO", "COACH CARD". */
-  topLabel: eyebrow(12, 0.2),
-  micro: eyebrow(10, 0.14),
+  /** The one small-caps label a screen may have. */
+  eyebrow: {
+    fontFamily: fonts.bold,
+    fontSize: 13,
+    lineHeight: 18,
+    letterSpacing: tracking(0.08, 13),
+    textTransform: 'uppercase',
+    color: colors.textSecondary,
+  } as TextStyle,
+  /** Section and field labels, sentence case: "What we’ll talk about". */
+  section: manrope(fonts.semibold, 13, colors.textSecondary),
+  /** Centered top-bar label: "The ISO", "Coach card". */
+  topLabel: manrope(fonts.semibold, 15, colors.text),
 
-  body: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.textBody } as TextStyle,
-  bodyStrong: { fontFamily: fonts.bold, fontSize: 14, lineHeight: 20, color: colors.text } as TextStyle,
-  subtitle: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.textMuted } as TextStyle,
-  caption: { fontFamily: fonts.body, fontSize: 12, lineHeight: 17, color: colors.textMuted } as TextStyle,
-  tiny: { fontFamily: fonts.body, fontSize: 11, lineHeight: 15, color: colors.textMuted } as TextStyle,
-  rowTitle: { fontFamily: fonts.extrabold, fontSize: 15, color: colors.text } as TextStyle,
-  button: { fontFamily: fonts.extrabold, fontSize: 15 } as TextStyle,
+  body: manrope(fonts.body, 15, colors.text),
+  bodyStrong: manrope(fonts.bold, 15, colors.text),
+  subtitle: manrope(fonts.body, 15, colors.textSecondary),
+  caption: manrope(fonts.body, 13, colors.textSecondary),
+  /** Timestamps and other meta. */
+  meta: manrope(fonts.medium, 13, colors.textMeta),
+  /** Card titles. */
+  cardTitle: manrope(fonts.bold, 17, colors.text),
+  rowTitle: manrope(fonts.bold, 16, colors.text),
+  button: { fontFamily: fonts.bold, fontSize: 16 } as TextStyle,
 } as const;
 
 export type TypeVariant = keyof typeof textStyles;

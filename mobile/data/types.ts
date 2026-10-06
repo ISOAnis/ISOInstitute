@@ -8,6 +8,9 @@ export type PathwayId = 'founder' | 'builder' | 'healer' | 'reformer' | 'warrior
 
 export type Mode = 'player' | 'coach';
 
+/** A bundled asset (mocks) or a remote image (backend). */
+export type Photo = number | { uri: string };
+
 export interface Pathway {
   id: PathwayId;
   name: string;
@@ -32,7 +35,7 @@ export interface Coach {
   subtitle: string;
   credentials: [Credential, Credential, Credential];
   tags: string[];
-  photoUrl?: string;
+  photo?: Photo;
   overall: number;
   tier: CoachTier;
   isosHosted: number;
@@ -66,6 +69,7 @@ export interface Venue {
   badge?: string;
   /** Distance from the signed-in coach, for "closest first" sorting. */
   distanceMi?: number;
+  photo?: Photo;
 }
 
 export interface CoachMonth {

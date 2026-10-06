@@ -32,7 +32,7 @@ export default function QuestionsStep() {
       <OnboardingHeader step={3} accent={accent.fill} />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
         <Pressable accessibilityRole="button" onPress={() => next(false)} style={styles.skip} hitSlop={8}>
-          <Text style={styles.skipText} color={colors.textMuted}>
+          <Text style={styles.skipText} color={colors.textSecondary}>
             Skip for now
           </Text>
         </Pressable>
@@ -44,14 +44,7 @@ export default function QuestionsStep() {
             <Text variant="bodyStrong">{q}</Text>
             <View style={styles.options}>
               {options.map((o) => (
-                <Chip
-                  key={o}
-                  label={o}
-                  active={answers[i] === o}
-                  activeColor={accent.fill}
-                  activeInk={accent.ink}
-                  onPress={() => setAnswers((a) => a.map((v, j) => (j === i ? o : v)))}
-                />
+                <Chip key={o} label={o} active={answers[i] === o} onPress={() => setAnswers((a) => a.map((v, j) => (j === i ? o : v)))} />
               ))}
             </View>
           </View>
@@ -65,9 +58,9 @@ export default function QuestionsStep() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: gutter, gap: 14 },
+  content: { padding: gutter, gap: 16 },
   skip: { alignSelf: 'flex-end', minHeight: 44, justifyContent: 'center' },
   skipText: { fontFamily: fonts.bold, fontSize: 14 },
-  question: { gap: 10, marginTop: 6 },
+  question: { gap: 12, marginTop: 12 },
   options: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
 });

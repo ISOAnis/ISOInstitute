@@ -5,18 +5,10 @@ import { colors, fonts, radius } from '@/theme';
 import { Text } from './Text';
 
 /** The player's 4-digit check-in code, shown once their seat is confirmed. */
-export function CodeDisplay({
-  code,
-  label = 'YOUR CHECK-IN CODE',
-  caption,
-}: {
-  code: string;
-  label?: string;
-  caption?: string;
-}) {
+export function CodeDisplay({ code, label = 'Your check-in code', caption }: { code: string; label?: string; caption?: string }) {
   return (
     <View style={styles.card} accessible accessibilityLabel={`${label}: ${code.split('').join(' ')}`}>
-      <Text variant="eyebrow" color={colors.gold} align="center">
+      <Text variant="section" align="center">
         {label}
       </Text>
       <View style={styles.row}>
@@ -27,7 +19,7 @@ export function CodeDisplay({
         ))}
       </View>
       {caption ? (
-        <Text variant="caption" align="center" color={colors.textMuted}>
+        <Text variant="caption" align="center" color={colors.textSecondary}>
           {caption}
         </Text>
       ) : null}
@@ -37,23 +29,19 @@ export function CodeDisplay({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1.5,
-    borderColor: colors.gold,
-    borderRadius: radius.xl,
-    padding: 18,
+    backgroundColor: colors.surface1,
+    borderRadius: radius.card,
+    padding: 20,
     gap: 14,
   },
   row: { flexDirection: 'row', justifyContent: 'center', gap: 10 },
   box: {
     width: 48,
     height: 58,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceBox,
-    borderWidth: 1,
-    borderColor: colors.borderBox,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  digit: { fontFamily: fonts.display, fontSize: 34, color: colors.text },
+  digit: { fontFamily: fonts.display, fontSize: 38, color: colors.text },
 });

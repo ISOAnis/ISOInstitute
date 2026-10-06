@@ -8,7 +8,7 @@ import { getPathways, useData, type PathwayId } from '@/data';
 import { OnboardingHeader } from '@/features/OnboardingHeader';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
-import { colors, gutter, pathwayColors, radius } from '@/theme';
+import { alpha, colors, gutter, pathwayColors, radius } from '@/theme';
 
 /** Onboard2: pick a pathway. Accents recolor live. */
 export default function PathwayStep() {
@@ -44,14 +44,14 @@ export default function PathwayStep() {
                 accessibilityState={{ selected: active }}
                 accessibilityLabel={`${path.name}, ${path.field}`}
                 onPress={() => setPicked(path.id)}
-                style={[styles.row, active ? { borderWidth: 2, borderColor: c.fill, backgroundColor: c.tint } : styles.rowIdle]}
+                style={[styles.row, active ? { backgroundColor: alpha(c.fill, 0.12) } : styles.rowIdle]}
               >
                 <View style={[styles.bar, { backgroundColor: c.fill, opacity: active ? 1 : 0.55 }]} />
                 <View style={styles.flex}>
-                  <Text variant="pathwayName" color={active ? c.text : colors.textBody}>
+                  <Text variant="cardTitle" color={active ? c.text : colors.text}>
                     {path.name}
                   </Text>
-                  <Text variant="subtitle" color={active ? colors.textBody : colors.textMuted}>
+                  <Text variant="caption" color={active ? colors.text : colors.textSecondary}>
                     {path.field}
                   </Text>
                 </View>
@@ -61,9 +61,7 @@ export default function PathwayStep() {
           })}
         </View>
 
-        <Text variant="caption">
-          Commit to it. You can switch pathways twice a month, so your coaches and crew know where you’re headed.
-        </Text>
+        <Text variant="caption">Commit to it. You can switch pathways twice a month, so your coaches and crew know where you’re headed.</Text>
         <Button label={`Lock in ${pathwayName(picked)}`} height={52} onPress={lockIn}>
           <View style={[styles.ctaDot, { backgroundColor: p.fill }]} />
         </Button>
@@ -74,11 +72,11 @@ export default function PathwayStep() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: gutter, gap: 14 },
+  content: { padding: gutter, gap: 16 },
   list: { gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16, borderRadius: radius.xl },
-  rowIdle: { borderWidth: 1, borderColor: colors.borderChip, backgroundColor: colors.surface },
-  bar: { width: 12, height: 40, borderRadius: 6 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 16, paddingHorizontal: 18, borderRadius: radius.card },
+  rowIdle: { backgroundColor: colors.surface1 },
+  bar: { width: 4, height: 40, borderRadius: 2 },
   flex: { flex: 1, gap: 2 },
   ctaDot: { width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: colors.bg },
 });

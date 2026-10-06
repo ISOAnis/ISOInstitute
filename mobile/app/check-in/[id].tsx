@@ -40,17 +40,17 @@ export default function CheckIn() {
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
-        <TopBar label="COACH MODE" />
+        <TopBar label="Coach mode" />
         <View>
           <Text variant="eyebrow" color={p.text}>
-            {dayLabel(iso.startsAt).toUpperCase()} · {startTime(iso.startsAt)}
+            {dayLabel(iso.startsAt)} · {startTime(iso.startsAt)}
           </Text>
           <Text variant="titleLg">Check in your table</Text>
           <Text variant="subtitle">Ask each player for their 4-digit code. No code means no RSVP.</Text>
         </View>
 
         <Card>
-          <Text variant="eyebrow">ENTER CODE</Text>
+          <Text variant="section">Enter code</Text>
           <TextInput
             value={code}
             onChangeText={(t) => {
@@ -60,7 +60,7 @@ export default function CheckIn() {
             keyboardType="number-pad"
             maxLength={4}
             placeholder="0000"
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textMeta}
             selectionColor={colors.gold}
             style={styles.codeInput}
             accessibilityLabel="Player check-in code"
@@ -68,58 +68,58 @@ export default function CheckIn() {
           />
           <Button label="Check in" height={52} disabled={code.length !== 4} onPress={submit} />
           {result?.kind === 'ok' ? (
-            <View style={[styles.notice, { backgroundColor: statusColors.goodTint, borderColor: statusColors.goodLine }]}>
+            <View style={[styles.notice, { backgroundColor: statusColors.goodTint }]}>
               <Text variant="caption" color={statusColors.good}>
                 {result.name} {result.name === 'You' ? 'are' : 'is'} checked in. Their $5 hold is released and the ISO counts toward their rank.
               </Text>
             </View>
           ) : null}
           {result?.kind === 'already' ? (
-            <Text variant="caption" color={colors.textMuted}>
+            <Text variant="caption" color={colors.textSecondary}>
               That player is already checked in.
             </Text>
           ) : null}
           {result?.kind === 'bad' ? (
-            <View style={[styles.notice, { backgroundColor: statusColors.badTint, borderColor: statusColors.badLine }]}>
+            <View style={[styles.notice, { backgroundColor: statusColors.badTint }]}>
               <Text variant="bodyStrong" color={statusColors.bad}>
                 No RSVP for this code.
               </Text>
-              <Text variant="caption" color={colors.textBody}>
+              <Text variant="caption" color={colors.text}>
                 They’re not on your list, so you can kindly let them know to say “I got next” on your next ISO. Walk-ins throw off your ISO’s numbers.
               </Text>
             </View>
           ) : null}
-          {sampleCodes.length ? (
-            <Text variant="tiny">Prototype: try {sampleCodes.join(', ')}, or any other code</Text>
-          ) : null}
+          {sampleCodes.length ? <Text variant="caption">Prototype: try {sampleCodes.join(', ')}, or any other code</Text> : null}
         </Card>
 
-        <View style={styles.tableHead}>
-          <Text variant="section">YOUR TABLE</Text>
-          <Text variant="caption" color={colors.textBody}>
-            {inCount} of {iso.seats} in
-          </Text>
-        </View>
-        <Card style={styles.roster}>
-          {table.length === 0 ? <Text variant="caption">No confirmed players yet. Approve requests on My ISOs.</Text> : null}
-          {table.map((s, i) => {
-            const isIn = s.status === 'checked_in';
-            return (
-              <View key={s.playerId} style={[styles.player, i < table.length - 1 && styles.line]}>
-                <Avatar initials={s.playerInitials} size={40} pathway={s.playerPathway} />
-                <View style={styles.flex}>
-                  <Text variant="bodyStrong">{s.playerId === 'me' ? 'You' : s.playerName}</Text>
-                  <Text variant="tiny">
-                    {pathwayName(s.playerPathway)} · {s.playerRank}
+        <View style={styles.group}>
+          <View style={styles.tableHead}>
+            <Text variant="section">Your table</Text>
+            <Text variant="caption" color={colors.text}>
+              {inCount} of {iso.seats} in
+            </Text>
+          </View>
+          <Card style={styles.roster}>
+            {table.length === 0 ? <Text variant="caption">No confirmed players yet. Approve requests on My ISOs.</Text> : null}
+            {table.map((s, i) => {
+              const isIn = s.status === 'checked_in';
+              return (
+                <View key={s.playerId} style={[styles.player, i < table.length - 1 && styles.line]}>
+                  <Avatar initials={s.playerInitials} size={40} pathway={s.playerPathway} />
+                  <View style={styles.flex}>
+                    <Text variant="bodyStrong">{s.playerId === 'me' ? 'You' : s.playerName}</Text>
+                    <Text variant="caption">
+                      {pathwayName(s.playerPathway)} · {s.playerRank}
+                    </Text>
+                  </View>
+                  <Text style={styles.status} color={isIn ? statusColors.good : colors.textSecondary}>
+                    {isIn ? 'Checked in' : 'Waiting'}
                   </Text>
                 </View>
-                <Text style={styles.status} color={isIn ? statusColors.good : colors.textDim}>
-                  {isIn ? 'CHECKED IN' : 'WAITING'}
-                </Text>
-              </View>
-            );
-          })}
-        </Card>
+              );
+            })}
+          </Card>
+        </View>
 
         {started ? (
           <Text variant="bodyStrong" align="center" color={statusColors.good}>
@@ -147,20 +147,20 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   codeInput: {
     height: 72,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.borderBox,
-    backgroundColor: colors.surfaceBox,
+    paddingVertical: 0,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface2,
     textAlign: 'center',
     color: colors.text,
     fontFamily: fonts.display,
     fontSize: 44,
     letterSpacing: tracking(0.4, 44),
   },
-  notice: { padding: 12, borderRadius: radius.md, borderWidth: 1, gap: 4 },
+  notice: { padding: 14, borderRadius: radius.lg, gap: 4 },
+  group: { gap: 12 },
   tableHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   roster: { paddingVertical: 4, gap: 0 },
   player: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
-  line: { borderBottomWidth: 1, borderBottomColor: colors.borderSoft },
-  status: { fontFamily: fonts.extrabold, fontSize: 10, letterSpacing: tracking(0.12, 10) },
+  line: { borderBottomWidth: 1, borderBottomColor: colors.hairline },
+  status: { fontFamily: fonts.bold, fontSize: 13 },
 });

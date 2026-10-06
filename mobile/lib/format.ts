@@ -65,7 +65,7 @@ export function seatsLabel(open: number, total: number): string {
 /** "TUE" and "6" for date blocks. */
 export function dateBlock(iso: string): { dow: string; day: string } {
   const d = new Date(iso);
-  return { dow: DAYS[d.getDay()].toUpperCase(), day: String(d.getDate()) };
+  return { dow: DAYS[d.getDay()], day: String(d.getDate()) };
 }
 
 /** "2h", "3d" for post timestamps. */

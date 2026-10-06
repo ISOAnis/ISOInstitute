@@ -10,9 +10,9 @@ type Variant = 'primary' | 'outline' | 'muted' | 'light';
 
 const look: Record<Variant, { bg: string; pressed: string; border: string; ink: string }> = {
   primary: { bg: colors.gold, pressed: colors.goldPressed, border: colors.gold, ink: colors.onGold },
-  outline: { bg: 'transparent', pressed: colors.surfaceHigh, border: colors.borderButton, ink: colors.text },
-  muted: { bg: colors.avatar, pressed: colors.avatar, border: colors.avatar, ink: colors.textDim },
-  light: { bg: colors.textBody, pressed: colors.text, border: colors.textBody, ink: colors.onGold },
+  outline: { bg: colors.surface2, pressed: colors.surface3, border: colors.surface2, ink: colors.text },
+  muted: { bg: colors.surface2, pressed: colors.surface2, border: colors.surface2, ink: colors.textDisabled },
+  light: { bg: colors.text, pressed: colors.textSecondary, border: colors.text, ink: colors.bg },
 };
 
 export function Button({
@@ -42,11 +42,7 @@ export function Button({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        { height: Math.max(TAP, height), backgroundColor: pressed ? v.pressed : v.bg, borderColor: v.border },
-        style,
-      ]}
+      style={({ pressed }) => [styles.base, { height: Math.max(TAP, height), backgroundColor: pressed ? v.pressed : v.bg, borderColor: v.border }, style]}
     >
       <View style={styles.row}>
         {icon ? <Icon name={icon} size={18} color={v.ink} /> : null}
@@ -62,7 +58,7 @@ export function Button({
 const styles = StyleSheet.create({
   base: {
     borderRadius: radius.lg,
-    borderWidth: 1.5,
+    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,

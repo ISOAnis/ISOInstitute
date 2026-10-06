@@ -7,14 +7,14 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#080808",
+    "backgroundColor": "#141416",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.isoinstitute.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#080808",
+        "backgroundColor": "#141416",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -30,9 +30,15 @@
       "expo-status-bar",
       "expo-font",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ISO uses your location to center the map near you."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "backgroundColor": "#080808"
+          "backgroundColor": "#141416"
         }
       ]
     ],

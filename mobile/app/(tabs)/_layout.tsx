@@ -19,7 +19,7 @@ export default function PlayerTabsLayout() {
   const items = isCoach ? coachPlayerTabs : playerTabs;
   return (
     <Tabs
-      tabBar={(props) => <TabBar {...props} items={items} />}
+      tabBar={(props) => <TabBar {...props} items={items} floatOn={isCoach ? [] : ['map']} />}
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
     >
       <Tabs.Screen name="map" />

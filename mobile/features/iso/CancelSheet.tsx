@@ -45,11 +45,11 @@ export function CancelSheet({
     <BottomSheet
       visible={visible}
       onClose={onClose}
-      eyebrow={needsReason ? 'LESS THAN 24 HOURS OUT' : 'GIVE UP YOUR SPOT'}
-      eyebrowColor={needsReason ? statusColors.bad : colors.gold}
+      eyebrow={needsReason ? 'Less than 24 hours out' : 'Give up your spot'}
+      eyebrowColor={needsReason ? statusColors.bad : colors.textSecondary}
       title="Give up your spot?"
     >
-      <Text variant="body" color={colors.textMuted}>
+      <Text variant="body" color={colors.textSecondary}>
         Your seat goes to the next player waiting. Let {coachFirstName} know what came up.
       </Text>
       {needsReason ? (
@@ -66,12 +66,7 @@ export function CancelSheet({
         onChangeText={setNote}
         multiline
       />
-      <View
-        style={[
-          styles.notice,
-          { backgroundColor: released ? statusColors.goodTint : statusColors.badTint, borderColor: released ? statusColors.goodLine : statusColors.badLine },
-        ]}
-      >
+      <View style={[styles.notice, { backgroundColor: released ? statusColors.goodTint : statusColors.badTint }]}>
         <Text variant="caption" color={released ? statusColors.good : statusColors.bad}>
           {notice}
         </Text>
@@ -93,7 +88,7 @@ export function CancelSheet({
 
 const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  notice: { padding: 12, borderRadius: radius.md, borderWidth: 1 },
+  notice: { padding: 14, borderRadius: radius.lg },
   row: { flexDirection: 'row', gap: 10, marginTop: 4 },
   flex: { flex: 1 },
 });

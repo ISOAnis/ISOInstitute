@@ -96,4 +96,28 @@ export const seats: Seat[] = [
       status: 'confirmed',
     }),
   ),
+  ...(['DA', 'LP', 'OM'] as const).map(
+    (initials, i): Seat => ({
+      isoId: 'iso-jr-wed',
+      playerId: `jw-${i}`,
+      playerName: `${initials[0]}. ${initials[1]}.`,
+      playerInitials: initials,
+      playerPathway: 'reformer',
+      playerRank: 'JV',
+      isCoach: false,
+      status: 'confirmed',
+    }),
+  ),
+  ...(['HQ', 'ZR'] as const).map(
+    (initials, i): Seat => ({
+      isoId: 'iso-im-thu',
+      playerId: `im-${i}`,
+      playerName: `${initials[0]}. ${initials[1]}.`,
+      playerInitials: initials,
+      playerPathway: 'seeker',
+      playerRank: 'Freshman',
+      isCoach: false,
+      status: 'confirmed',
+    }),
+  ),
 ];

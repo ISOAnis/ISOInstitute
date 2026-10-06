@@ -1,70 +1,69 @@
-/** Core palette from docs 2/ISO_BUILD_SPEC.md §2. Gold = brand + main actions. */
+/**
+ * Core palette. Depth comes from lighter surfaces, not outlines:
+ * bg → surface1 (cards, sheets, tab bar) → surface2 (cards on cards, inputs, pills) → surface3 (pressed / selected).
+ * Gold is reserved for the one primary button per screen, the wordmark, Overall numbers and the active tab.
+ */
 export const colors = {
-  bg: '#080808',
-  bgRaised: '#0b0b0b',
-  mapBg: '#0e0f11',
+  bg: '#141416',
+  surface1: '#1C1C20',
+  surface2: '#242429',
+  surface3: '#2E2E34',
 
-  surface: '#121212',
-  surfaceAlt: '#141414',
-  surfaceHigh: '#161616',
-  surfaceInset: '#1a1a1a',
-  surfaceInput: '#1c1c1c',
-  surfaceBox: '#1f1f1f',
-  avatar: '#2a2a2a',
+  /** The only border: where two same-color surfaces touch, and list dividers. */
+  hairline: 'rgba(255,255,255,0.06)',
 
-  border: '#222222',
-  borderAlt: '#262626',
-  borderStrong: '#333333',
-  borderSoft: '#1f1f1f',
-  borderChip: '#2a2a2a',
-  borderBox: '#3a3a3a',
-  borderButton: '#444444',
-
-  text: '#FFFFFF',
-  textBody: '#E0E0E0',
-  textMuted: '#AAAAAA',
-  textDim: '#8f8f8f',
-  textDisabled: '#555555',
+  /** 4.5:1+ on every surface. */
+  text: '#F2F2F2',
+  /** Anything people need to read that isn't primary. Never go darker. */
+  textSecondary: '#B4B4B8',
+  /** Timestamps only. */
+  textMeta: '#8A8A90',
+  /** Disabled controls (exempt from contrast rules). */
+  textDisabled: '#6A6A70',
 
   gold: '#C8873A',
   goldPressed: '#E0A35A',
-  onGold: '#080808',
+  onGold: '#141416',
 
-  borderChipAlt: '#2e2e2e',
-
-  backdrop: 'rgba(0,0,0,0.7)',
-  overlay: 'rgba(8,8,8,0.85)',
-  scrim: 'rgba(0,0,0,0.55)',
-  inset: 'rgba(0,0,0,0.3)',
-  sheen: 'rgba(255,255,255,0.02)',
+  backdrop: 'rgba(0,0,0,0.6)',
+  overlay: 'rgba(20,20,22,0.88)',
+  /** Floating controls over the map (header, tab bar, recenter). */
+  glass: 'rgba(20,20,22,0.85)',
+  /** The same charcoal, lighter, layered on an iOS blur. */
+  glassOverBlur: 'rgba(20,20,22,0.55)',
+  scrim: 'rgba(0,0,0,0.45)',
+  shadow: '#000000',
   transparent: 'transparent',
 } as const;
 
 export type ColorToken = keyof typeof colors;
 
-/** Stylized Denver metro map art. */
+/** Real map styling (Android / Google Maps). iOS uses Apple's dark style. */
+/** Brushed-silver stops for the ISO wordmark, matched to the logo mark. */
+export const metal = ['#FFFFFF', '#C9CACF', '#8E8F96', '#E6E7EA', '#7A7B82'] as const;
+
 export const mapColors = {
-  ground: '#0f1012',
-  frame: '#0e0f11',
-  parkA: '#141518',
-  parkB: '#121316',
-  green: '#111a14',
-  roadMajor: '#1c1e22',
-  roadMinor: '#1a1c20',
-  roadDiagA: '#1b1d21',
-  roadDiagB: '#18191c',
-  label: '#3d3f44',
+  land: '#1a1a1d',
+  water: '#0f1012',
+  road: '#2a2a2f',
+  label: '#8a8a90',
+  labelHalo: '#141416',
+  cluster: '#2E2E34',
 } as const;
 
 /** Status colors used in rules copy (green = released, red = captured). */
 export const statusColors = {
-  good: '#4cd47b',
-  goodTint: 'rgba(76,212,123,0.1)',
-  goodLine: 'rgba(76,212,123,0.35)',
-  bad: '#ef7470',
-  badTint: 'rgba(239,116,112,0.1)',
-  badLine: 'rgba(239,116,112,0.35)',
-  goldTint: 'rgba(200,135,58,0.12)',
-  goldLine: 'rgba(200,135,58,0.45)',
-  goldDeep: '#1a140c',
+  good: '#5ad888',
+  goodTint: 'rgba(90,216,136,0.12)',
+  bad: '#f08a86',
+  badTint: 'rgba(240,138,134,0.12)',
+} as const;
+
+/** Soft top shadow for the tab bar and bottom sheets. */
+export const raisedShadow = {
+  shadowColor: colors.shadow,
+  shadowOpacity: 0.35,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: -4 },
+  elevation: 12,
 } as const;

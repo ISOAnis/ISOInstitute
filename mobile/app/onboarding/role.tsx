@@ -54,7 +54,7 @@ export default function RoleStep() {
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]} keyboardShouldPersistTaps="handled">
         <Text variant="titleLg">You’re not lost. You’re in search of.</Text>
 
-        <Text variant="section">I’M HERE TO</Text>
+        <Text variant="section">I’m here to</Text>
         <View style={styles.roles}>
           {roles.map((r) => {
             const active = role === r.id;
@@ -68,10 +68,8 @@ export default function RoleStep() {
                 style={[styles.role, active && styles.roleActive]}
               >
                 <View style={styles.roleHead}>
-                  <Text variant="pathwayName" color={active ? colors.gold : colors.textBody}>
-                    {r.title}
-                  </Text>
-                  {active ? <Icon name="check" size={18} color={colors.gold} /> : null}
+                  <Text variant="cardTitle">{r.title}</Text>
+                  {active ? <Icon name="check" size={18} color={colors.text} /> : null}
                 </View>
                 <Text variant="caption">{r.body}</Text>
               </Pressable>
@@ -84,9 +82,7 @@ export default function RoleStep() {
         <Field label="City" value={city} onChangeText={setCity} textContentType="addressCity" />
         <Field label="Birthday" value={birthday} onChangeText={setBirthday} placeholder="MM/DD/YYYY" keyboardType="numbers-and-punctuation" />
 
-        <Text variant="caption">
-          ISOs are 18+ and happen only at verified ISO Partner spots. Real names and verified phones keep every table safe.
-        </Text>
+        <Text variant="caption">ISOs are 18+ and happen only at verified ISO Partner spots. Real names and verified phones keep every table safe.</Text>
         {error ? (
           <Text variant="caption" color={statusColors.bad}>
             {error}
@@ -100,17 +96,15 @@ export default function RoleStep() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: gutter, gap: 14 },
+  content: { padding: gutter, gap: 16 },
   roles: { flexDirection: 'row', gap: 10 },
   role: {
     flex: 1,
-    padding: 14,
+    padding: 16,
     gap: 6,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: colors.borderChip,
-    backgroundColor: colors.surface,
+    borderRadius: radius.card,
+    backgroundColor: colors.surface1,
   },
-  roleActive: { borderWidth: 2, borderColor: colors.gold, backgroundColor: statusColors.goldDeep },
+  roleActive: { backgroundColor: colors.surface3 },
   roleHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 });

@@ -5,17 +5,7 @@ import { colors } from '@/theme';
 import { Text } from './Text';
 
 /** Settings row with a 52×32 switch. */
-export function Toggle({
-  title,
-  subtitle,
-  value,
-  onChange,
-}: {
-  title: string;
-  subtitle?: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-}) {
+export function Toggle({ title, subtitle, value, onChange }: { title: string; subtitle?: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
     <Pressable
       accessibilityRole="switch"
@@ -42,11 +32,11 @@ const styles = StyleSheet.create({
     width: 52,
     height: 32,
     borderRadius: 16,
-    backgroundColor: colors.avatar,
+    backgroundColor: colors.surface3,
     padding: 3,
     justifyContent: 'center',
   },
-  trackOn: { backgroundColor: colors.gold },
-  knob: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.textMuted },
+  trackOn: { backgroundColor: colors.text },
+  knob: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.textSecondary },
   knobOn: { alignSelf: 'flex-end', backgroundColor: colors.bg },
 });
