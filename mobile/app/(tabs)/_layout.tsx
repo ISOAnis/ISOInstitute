@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
 
 import { TabBar, type TabItems } from '@/components';
-import { useAppStore } from '@/store';
 import { colors } from '@/theme';
 
 const playerTabs: TabItems = {
@@ -11,15 +10,10 @@ const playerTabs: TabItems = {
   me: { label: 'Me', icon: 'user' },
 };
 
-/** Approved coaches in player mode explore every pathway instead of the map. */
-const coachPlayerTabs: TabItems = { ...playerTabs, map: { label: 'Explore', icon: 'search' } };
-
 export default function PlayerTabsLayout() {
-  const isCoach = useAppStore((s) => s.coachStatus === 'approved');
-  const items = isCoach ? coachPlayerTabs : playerTabs;
   return (
     <Tabs
-      tabBar={(props) => <TabBar {...props} items={items} floatOn={isCoach ? [] : ['map']} />}
+      tabBar={(props) => <TabBar {...props} items={playerTabs} floatOn={['map']} />}
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
     >
       <Tabs.Screen name="map" />

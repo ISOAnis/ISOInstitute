@@ -6,9 +6,9 @@ import { Image, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions
 import { FlatList } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Glass, Icon, PathwayDot, Pill, Text, useTabBarHeight, Wordmark } from '@/components';
+import { Button, Glass, Icon, ModeSwitch, PathwayDot, Pill, Text, useTabBarHeight, Wordmark } from '@/components';
 import { getIsos, useData, type IsoFilter, type IsoListItem, type PathwayId } from '@/data';
-import { CoachExplore } from '@/features/CoachExplore';
+import { useModeSwitch } from '@/features/useModeSwitch';
 import { DENVER_METRO, displayPoint, focusRegion, regionAround } from '@/features/map/geo';
 import { IsoPeek } from '@/features/map/IsoPeek';
 import { MapCanvas } from '@/features/map/MapCanvas';
@@ -28,8 +28,6 @@ const toFilter = (k: PillKey): IsoFilter =>
 const PEEK_GUESS = 340;
 
 export default function MapScreen() {
-  const isCoach = useAppStore((s) => s.coachStatus === 'approved');
-  if (isCoach) return <CoachExplore />;
   return <PlayerMap />;
 }
 
@@ -39,6 +37,10 @@ function PlayerMap() {
   const tabH = useTabBarHeight();
   const params = useLocalSearchParams<{ pill?: string }>();
   const revision = useAppStore((s) => s.revision);
+  const coachStatus = useAppStore((s) => s.coachStatus);
+  const approved = coachStatus === 'approved';
+  const applied = coachStatus === 'applied';
+  const modeSwitch = useModeSwitch();
 
   const map = useRef<MapCanvasHandle>(null);
   const sheet = useRef<BottomSheet>(null);
@@ -147,6 +149,11 @@ function PlayerMap() {
       />
 
       <Glass style={[styles.header, { paddingTop: insets.top + 6 }]} onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)}>
+        {approved ? (
+          <View style={styles.switchRow}>
+            <ModeSwitch {...modeSwitch} />
+          </View>
+        ) : null}
         <View style={styles.brandRow}>
           <View style={styles.lockup} accessible accessibilityRole="header" accessibilityLabel="ISO">
             <Image source={mark} style={styles.mark} resizeMode="contain" />
@@ -165,6 +172,11 @@ function PlayerMap() {
             <Pill key={id} pathway={id} label={pathwayName(id)} active={pill === id} onPress={() => pick(id)} />
           ))}
         </ScrollView>
+        {applied ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="Coach application in review" onPress={() => router.push('/coach-review')} style={styles.review}>
+            <Text style={styles.reviewText}>Coach application in review</Text>
+          </Pressable>
+        ) : null}
       </Glass>
 
       {!sheetOpen ? (
@@ -240,6 +252,9 @@ const styles = StyleSheet.create({
   header: { position: 'absolute', top: 0, left: 0, right: 0, gap: 8, paddingBottom: 10 },
   lockup: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   mark: { width: 36, height: 28 },
+  switchRow: { paddingHorizontal: gutter },
+  review: { marginHorizontal: gutter, minHeight: TAP, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.surface2 },
+  reviewText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.gold },
   brandRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: gutter },
   areaChip: {
     flexDirection: 'row',

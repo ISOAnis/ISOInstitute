@@ -17,6 +17,11 @@ const LINGO = [
   },
   { term: 'I got next', meaning: 'How you claim a seat at an ISO. The coach confirms.', example: '“I got next at Marcus’s ISO Tuesday.”' },
   {
+    term: 'The Guide',
+    meaning: 'Prompts for the coach and a way in for players, once you’re confirmed. Everyone at the ISO knows about it. Using it out loud is normal.',
+    example: '“Can we use the Guide?”',
+  },
+  {
     term: 'Who’s in',
     meaning: 'You see seat counts on every ISO. Names of who else is coming stay private unless you’re confirmed, and only drop 24 hours before.',
     example: '“I don’t know who’s pulling up until tomorrow.”',

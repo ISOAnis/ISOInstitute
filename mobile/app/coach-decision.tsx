@@ -57,12 +57,11 @@ function Bullet({ children }: { children: string }) {
 function YoureIn() {
   const preview = useData(getCoachPreview, []).data;
   const cohort = useData(getCohortInfo, []).data;
-  const { approveCoachDemo, completeOnboarding, setMode } = useAppStore.getState();
+  const { approveCoachDemo, enterApp } = useAppStore.getState();
 
   const dropFirstPin = async () => {
     await approveCoachDemo();
-    completeOnboarding();
-    setMode('coach');
+    enterApp('coach');
     router.replace('/manage');
     router.push('/drop-pin');
   };
@@ -96,14 +95,14 @@ function YoureNext() {
   const app = useData(getApplication, []).data;
   const me = useData(getMe, []).data;
   const needs = useData(getCoachNeeds, []).data ?? [];
-  const { requestAreaReview, completeOnboarding } = useAppStore.getState();
+  const { requestAreaReview, enterApp } = useAppStore.getState();
 
   const pathway: PathwayId = app?.pathway ?? me?.pathway ?? 'founder';
   const name = pathwayName(pathway);
   const need = needs.find((n) => n.needed && n.pathway === pathway);
 
   const asPlayer = () => {
-    completeOnboarding();
+    enterApp('player');
     router.replace('/map');
   };
 
@@ -170,14 +169,14 @@ function NeedCard({ area, pathway, onRequest }: { area: string; pathway: Pathway
 
 function PathIn() {
   const path = useData(getPathIn, []).data;
-  const { completeOnboarding } = useAppStore.getState();
+  const { enterApp } = useAppStore.getState();
   if (!path) return null;
   const name = pathwayName(path.pathway);
   const p = pathwayColors[path.pathway];
   const done = path.attended >= path.needed;
 
   const findIso = () => {
-    completeOnboarding();
+    enterApp('player');
     router.replace(`/map?pill=${path.pathway}`);
   };
 

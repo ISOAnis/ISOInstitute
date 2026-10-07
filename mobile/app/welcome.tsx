@@ -13,7 +13,8 @@ const mark = require('../assets/iso-mark.png');
 /** Logo + "You're not lost" intro, then the tagline and Sign up / Log in. */
 export default function Welcome() {
   const insets = useSafeAreaInsets();
-  const completeOnboarding = useAppStore((s) => s.completeOnboarding);
+  const coachStatus = useAppStore((s) => s.coachStatus);
+  const enterApp = useAppStore((s) => s.enterApp);
   const [t] = useState(() => new Animated.Value(0));
   const [run, setRun] = useState(0);
 
@@ -40,8 +41,9 @@ export default function Welcome() {
   };
 
   const logIn = () => {
-    completeOnboarding();
-    router.replace('/map');
+    const coach = coachStatus === 'approved';
+    enterApp(coach ? 'coach' : 'player');
+    router.replace(coach ? '/manage' : '/map');
   };
 
   return (

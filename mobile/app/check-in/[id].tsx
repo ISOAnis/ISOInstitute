@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, Button, Card, Screen, Text, TopBar } from '@/components';
+import { Avatar, Button, Card, Icon, Screen, Text, TopBar } from '@/components';
 import { getIso, getTable, useData } from '@/data';
 import { dayLabel, startTime } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
@@ -48,6 +48,17 @@ export default function CheckIn() {
           <Text variant="titleLg">Check in your players</Text>
           <Text variant="subtitle">Ask each player for their 4-digit code. No code means no RSVP.</Text>
         </View>
+
+        <Card onPress={() => router.push(`/guide/${iso.id}`)} accessibilityLabel="Open the Guide">
+          <View style={styles.guide}>
+            <Icon name="book" size={22} color={colors.gold} />
+            <View style={styles.flex}>
+              <Text variant="bodyStrong">The Guide</Text>
+              <Text variant="caption">Questions to open the room, and what to do if it gets quiet.</Text>
+            </View>
+            <Icon name="forward" size={18} color={colors.textSecondary} />
+          </View>
+        </Card>
 
         <Card>
           <Text variant="section">Enter code</Text>
@@ -157,6 +168,7 @@ const styles = StyleSheet.create({
     letterSpacing: tracking(0.4, 44),
   },
   notice: { padding: 14, borderRadius: radius.lg, gap: 4 },
+  guide: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   group: { gap: 12 },
   tableHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   roster: { paddingVertical: 4, gap: 0 },

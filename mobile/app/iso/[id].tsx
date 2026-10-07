@@ -33,6 +33,7 @@ export default function IsoDetail() {
   const revision = useAppStore((s) => s.revision);
   const myPathway = useAppStore((s) => s.pathway);
   const myCoachId = useAppStore((s) => s.coachId);
+  const asCoach = useAppStore((s) => s.coachStatus === 'approved');
   const lateCancelsLeft = useAppStore((s) => s.lateCancelsLeft);
   const mine = useAppStore((s) => s.seats[id]);
   const { gotNext, giveUpSeat } = useAppStore.getState();
@@ -167,6 +168,21 @@ export default function IsoDetail() {
             />
           ) : null}
 
+          {hosting || confirmed ? (
+            <Card onPress={() => router.push(`/guide/${iso.id}`)} accessibilityLabel="Open the Guide">
+              <View style={styles.detailRow}>
+                <Icon name="book" size={22} color={colors.gold} />
+                <View style={styles.flex}>
+                  <Text variant="bodyStrong">The Guide</Text>
+                  <Text variant="caption">
+                    {hosting ? 'Questions for the room, and a way through a quiet stretch.' : 'A way to walk in. Using it out loud is normal.'}
+                  </Text>
+                </View>
+                <Icon name="forward" size={18} color={colors.textSecondary} />
+              </View>
+            </Card>
+          ) : null}
+
           {confirmed ? (
             <Card onPress={() => router.push(`/huddle/${iso.id}`)} accessibilityLabel="Open the Huddle" style={{ backgroundColor: alpha(p.fill, 0.12) }}>
               <View style={styles.detailRow}>
@@ -203,7 +219,7 @@ export default function IsoDetail() {
           </View>
         ) : null}
 
-        <SeatsSection iso={iso} seats={seats} mine={mine} myPathway={myPathway} namesOn={namesOn} />
+        <SeatsSection iso={iso} seats={seats} mine={mine} myPathway={myPathway} namesOn={namesOn} asCoach={asCoach && !hosting} />
 
         <View style={styles.section}>
           <Text variant="section">How it works</Text>
@@ -249,7 +265,21 @@ export default function IsoDetail() {
   );
 }
 
-function SeatsSection({ iso, seats, mine, myPathway, namesOn }: { iso: IsoSummary; seats: Seat[]; mine?: MySeat; myPathway: string; namesOn: boolean }) {
+function SeatsSection({
+  iso,
+  seats,
+  mine,
+  myPathway,
+  namesOn,
+  asCoach,
+}: {
+  iso: IsoSummary;
+  seats: Seat[];
+  mine?: MySeat;
+  myPathway: string;
+  namesOn: boolean;
+  asCoach: boolean;
+}) {
   const p = pathwayColors[iso.pathway];
   const taken = seats.filter((s) => s.status === 'confirmed' || s.status === 'checked_in');
   const others = taken.filter((s) => s.playerId !== 'me' && s.playerName);
@@ -273,6 +303,11 @@ function SeatsSection({ iso, seats, mine, myPathway, namesOn }: { iso: IsoSummar
         Seats · {iso.seatsTaken} of {iso.seats} taken
       </Text>
       <Text variant="caption">{caption}</Text>
+      {asCoach ? (
+        <Text variant="caption" color={colors.text}>
+          You’re here as a coach. {pathwayName(iso.pathway)} players get seats first.
+        </Text>
+      ) : null}
       <View style={styles.seats}>
         {others.map((s) => (
           <View key={s.playerId} style={styles.seat}>

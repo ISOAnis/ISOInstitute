@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Field, Icon, Text } from '@/components';
 import { now, updateProfile } from '@/data';
 import { OnboardingHeader } from '@/features/OnboardingHeader';
+import { useAppStore } from '@/store';
 import { colors, gutter, radius, statusColors } from '@/theme';
 
 type Role = 'player' | 'coach';
@@ -37,6 +38,8 @@ export default function RoleStep() {
   const [city, setCity] = useState('Denver');
   const [birthday, setBirthday] = useState('');
   const [error, setError] = useState('');
+  const coachStatus = useAppStore((s) => s.coachStatus);
+  const enterApp = useAppStore((s) => s.enterApp);
 
   const submit = async () => {
     if (!name.trim()) return setError('Add your first name.');
@@ -45,6 +48,11 @@ export default function RoleStep() {
     if (age === null) return setError('Birthday should look like 04/18/2001.');
     if (age < 18) return setError('ISOs are 18+. Come back on your 18th birthday.');
     await updateProfile({ name: name.trim(), phone, city: city.trim() || 'Denver', birthday });
+    if (role === 'coach' && coachStatus === 'approved') {
+      enterApp('coach');
+      router.replace('/manage');
+      return;
+    }
     router.push(role === 'coach' ? '/coach-cohorts' : '/onboarding/pathway');
   };
 

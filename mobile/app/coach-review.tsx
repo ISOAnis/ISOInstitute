@@ -9,7 +9,7 @@ import { colors } from '@/theme';
 
 export default function CoachReview() {
   const me = useData(getMe, []).data;
-  const { approveCoachDemo, completeOnboarding, setMode } = useAppStore.getState();
+  const { approveCoachDemo, enterApp } = useAppStore.getState();
   const submitted = me?.appliedAt ? `${dayLabel(me.appliedAt)}, ${clockTime(me.appliedAt)}` : 'Just now';
 
   const steps = [
@@ -19,14 +19,13 @@ export default function CoachReview() {
   ];
 
   const explore = () => {
-    completeOnboarding();
+    enterApp('player');
     router.replace('/map');
   };
 
   const approveNow = async () => {
     await approveCoachDemo();
-    completeOnboarding();
-    setMode('coach');
+    enterApp('coach');
     router.replace('/manage');
   };
 
@@ -75,7 +74,7 @@ export default function CoachReview() {
         </Card>
       </View>
 
-      <Button label="Explore ISO" height={52} onPress={explore} />
+      <Button label="Browse ISOs while you wait" height={52} onPress={explore} />
 
       <Card>
         <Text variant="section">Prototype</Text>

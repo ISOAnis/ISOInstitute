@@ -10,7 +10,7 @@ import { colors, statusColors } from '@/theme';
 /** Settings: matching preferences, your ISO profile, and the Playbook. */
 export default function Settings() {
   const revision = useAppStore((s) => s.revision);
-  const { setMatchPrefs, clearMatchSection } = useAppStore.getState();
+  const { setMatchPrefs, clearMatchSection, logOut } = useAppStore.getState();
   const data = useData(getMatch, [revision]).data;
   const status = useData(() => getProfileStatus('player'), [revision]).data;
   const [cleared, setCleared] = useState(false);
@@ -62,7 +62,12 @@ export default function Settings() {
       <View style={styles.group}>
         <Text variant="section">Your profile</Text>
         <Card style={styles.list}>
-          <Row icon="user" title="Profile basics" sub={status.basicsDone ? 'Name, neighborhood, where you’re at' : 'Not finished'} onPress={() => router.push('/profile/basics')} />
+          <Row
+            icon="user"
+            title="Profile basics"
+            sub={status.basicsDone ? 'Name, neighborhood, where you’re at' : 'Not finished'}
+            onPress={() => router.push('/profile/basics')}
+          />
           <Row
             icon="sparkle"
             title="Refine your ISO profile"
@@ -86,6 +91,19 @@ export default function Settings() {
         <Text variant="section">More</Text>
         <Card style={styles.list}>
           <Row icon="book" title="Playbook" sub="Mission, lingo, ranks, and Overall" onPress={() => router.push('/playbook')} />
+          <ListRow
+            divider
+            onPress={() => {
+              logOut();
+              router.replace('/welcome');
+            }}
+            accessibilityLabel="Log out"
+          >
+            <Icon name="close" size={18} color={statusColors.bad} />
+            <Text variant="bodyStrong" color={statusColors.bad} style={styles.flex}>
+              Log out
+            </Text>
+          </ListRow>
         </Card>
       </View>
     </Screen>

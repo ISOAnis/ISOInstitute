@@ -43,6 +43,9 @@ interface AppState {
 
   hydrate: () => Promise<void>;
   completeOnboarding: () => void;
+  /** Signs into the app in one update, so the gate can't send a coach to the player map in between. */
+  enterApp: (mode: Mode) => void;
+  logOut: () => void;
   setMode: (mode: Mode) => void;
   choosePathway: (pathway: PathwayId, opts?: { initial?: boolean }) => Promise<void>;
   saveAnswers: (answers: string[]) => Promise<void>;
@@ -114,6 +117,8 @@ export const useAppStore = create<AppState>((set, get) => {
     },
 
     completeOnboarding: () => set({ onboarded: true }),
+    enterApp: (mode) => set({ onboarded: true, mode }),
+    logOut: () => set({ onboarded: false, mode: 'player' }),
 
     setMode: (mode) => set({ mode }),
 

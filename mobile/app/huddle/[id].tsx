@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -81,6 +81,11 @@ export default function Huddle() {
           {dayLabel(iso.startsAt)} {timeRange(iso.startsAt, iso.endsAt)} · {first} + {players.length} {players.length === 1 ? 'player' : 'players'}
           {namesOn ? '' : ' · names drop 24 hrs before'}
         </Text>
+        <Pressable accessibilityRole="button" accessibilityLabel="Open the Guide" onPress={() => router.push(`/guide/${id}`)} style={styles.guide}>
+          <Text variant="bodyStrong" color={p.text}>
+            The Guide
+          </Text>
+        </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.thread}>
@@ -163,6 +168,7 @@ const styles = StyleSheet.create({
   locked: { paddingHorizontal: gutter },
   lockedBody: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 12 },
   header: { paddingHorizontal: gutter, gap: 6, paddingBottom: 10 },
+  guide: { alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
   stack: { flexDirection: 'row', minWidth: 44, justifyContent: 'flex-end' },
   thread: { padding: gutter, gap: 12 },
   pinned: { borderRadius: radius.card, padding: 18, gap: 6 },
