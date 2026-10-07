@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Rect } from 'react-native-svg';
 
-import { Button, PathwayDot, Text } from '@/components';
+import { Button, Icon, Text } from '@/components';
 import { getEvents, useData, type IsoEvent } from '@/data';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -77,7 +77,7 @@ export function EventsScreen() {
               }}
               style={[styles.tab, active && { backgroundColor: alpha(p.fill, 0.16), borderColor: alpha(p.fill, 0.5) }]}
             >
-              <PathwayDot pathway={e.pathway} />
+              <Icon name={e.pathway} size={15} color={pathwayColors[e.pathway].text} />
               <Text style={[styles.tabText, { fontFamily: active ? fonts.bold : fonts.semibold }]} color={active ? p.text : colors.textSecondary}>
                 {pathwayName(e.pathway)}
               </Text>
@@ -138,7 +138,7 @@ function EventPage({ event }: { event: IsoEvent }) {
           <Rect x={278} y={45} width={52} height={60} stroke={alpha(p.fill, 0.35)} strokeWidth={2} fill="none" />
         </Svg>
         <View style={styles.tag}>
-          <PathwayDot pathway={event.pathway} />
+          <Icon name={event.pathway} size={15} color={pathwayColors[event.pathway].text} />
           <Text variant="caption" color={p.text} style={styles.bold}>
             {pathwayName(event.pathway)} pathway event
           </Text>

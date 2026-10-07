@@ -5,7 +5,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Card, Icon, ListRow, ModeSwitch, Screen, Text } from '@/components';
 import { displayPoint, regionAround } from '@/features/map/geo';
 import { MapCanvas } from '@/features/map/MapCanvas';
-import { getCoachIsos, getCoachRequests, getMyCoach, useData, type CoachRequest } from '@/data';
+import { getCoachIsos, getCoachRequests, getMyCoach, getShortTables, useData, type CoachRequest } from '@/data';
+import { ShortTableCard } from '@/features/ShortTableCard';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { dateBlock, dayLabel, seatsLabel, startTime, timeRange } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
@@ -26,6 +27,7 @@ export default function ManageIsos() {
   const coach = useData(getMyCoach, []).data;
   const isos = useData(() => getCoachIsos(coachId), [coachId, revision]).data ?? [];
   const requests = useData(() => getCoachRequests(coachId), [coachId, revision]).data ?? [];
+  const short = useData(() => getShortTables(coachId), [coachId, revision]).data ?? [];
   const [resolved, setResolved] = useState<CoachRequest[]>([]);
 
   const next = isos[0];
@@ -58,17 +60,21 @@ export default function ManageIsos() {
           </Text>
         </View>
 
+        {short.map((t) => (
+          <ShortTableCard key={t.iso.id} table={t} />
+        ))}
+
         {next ? (
           <Card
             onPress={() => router.push(`/check-in/${next.id}`)}
-            accessibilityLabel="Check in your table"
+            accessibilityLabel="Check in your players"
             style={[styles.today, { backgroundColor: alpha(p.fill, 0.12) }]}
           >
             <View style={styles.flex}>
               <Text variant="eyebrow" color={p.text}>
                 {dayLabel(next.startsAt)} · {startTime(next.startsAt)}
               </Text>
-              <Text variant="cardTitle">Check in your table</Text>
+              <Text variant="cardTitle">Check in your players</Text>
               <Text variant="caption" color={colors.text}>
                 Enter each player’s 4-digit code
               </Text>

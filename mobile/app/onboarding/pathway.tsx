@@ -46,7 +46,9 @@ export default function PathwayStep() {
                 onPress={() => setPicked(path.id)}
                 style={[styles.row, active ? { backgroundColor: alpha(c.fill, 0.12) } : styles.rowIdle]}
               >
-                <View style={[styles.bar, { backgroundColor: c.fill, opacity: active ? 1 : 0.55 }]} />
+                <View style={[styles.mark, { backgroundColor: alpha(c.fill, active ? 0.22 : 0.12) }]}>
+                  <Icon name={path.id} size={24} color={c.text} />
+                </View>
                 <View style={styles.flex}>
                   <Text variant="cardTitle" color={active ? c.text : colors.text}>
                     {path.name}
@@ -61,7 +63,9 @@ export default function PathwayStep() {
           })}
         </View>
 
-        <Text variant="caption">Commit to it. You can switch pathways twice a month, so your coaches and crew know where you’re headed.</Text>
+        <Text variant="caption">
+          Commit to it. You can switch pathways once a month. You can still say “I got next” on any pathway, you just won’t get priority.
+        </Text>
         <Button label={`Lock in ${pathwayName(picked)}`} height={52} onPress={lockIn}>
           <View style={[styles.ctaDot, { backgroundColor: p.fill }]} />
         </Button>
@@ -76,7 +80,7 @@ const styles = StyleSheet.create({
   list: { gap: 10 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 16, paddingHorizontal: 18, borderRadius: radius.card },
   rowIdle: { backgroundColor: colors.surface1 },
-  bar: { width: 4, height: 40, borderRadius: 2 },
+  mark: { width: 46, height: 46, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1, gap: 2 },
   ctaDot: { width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: colors.bg },
 });

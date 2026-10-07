@@ -1,4 +1,4 @@
-import type { Iso, Recommendation } from '@/data/types';
+import type { Iso } from '@/data/types';
 
 /** `displayLat`/`displayLng` are filled in by the data layer (privacy offset). */
 export type IsoSeed = Omit<Iso, 'displayLat' | 'displayLng'>;
@@ -10,11 +10,7 @@ export const isos: IsoSeed[] = [
     venueId: 'aurora-cafe',
     pathway: 'founder',
     title: 'From side hustle to storefront',
-    topics: [
-      'How I left a 9–5 to open my shop',
-      'Picking your first location and your first hire',
-      'Bring your idea. We’ll pressure-test it together.',
-    ],
+    topics: ['How I left a 9–5 to open my shop', 'Picking your first location and your first hire', 'Bring your idea. We’ll pressure-test it together.'],
     startsAt: '2026-10-06T12:00:00',
     endsAt: '2026-10-06T14:00:00',
     seats: 3,
@@ -91,6 +87,7 @@ export const isos: IsoSeed[] = [
     seats: 3,
     approveRequests: true,
     revealSpot24h: true,
+    groupFor: 'women',
     status: 'live',
   },
   {
@@ -147,6 +144,7 @@ export const isos: IsoSeed[] = [
     seats: 4,
     approveRequests: true,
     revealSpot24h: true,
+    groupFor: 'men',
     status: 'live',
   },
   {
@@ -177,23 +175,60 @@ export const isos: IsoSeed[] = [
     revealSpot24h: true,
     status: 'live',
   },
-];
-
-/** Recommended feed for the current player (from Main.dc.html). */
-export const recommendations: Recommendation[] = [
   {
-    isoId: 'iso-sa-thu',
-    match: 94,
-    reasons: ['Your pathway · priority seat', 'Coach gives straight feedback', 'Early career, like you'],
+    id: 'iso-mr-mon',
+    coachId: 'marcus',
+    venueId: 'aurora-library',
+    pathway: 'founder',
+    title: 'Pricing your first product',
+    topics: ['Cost, value, and what people will actually pay', 'Raising prices without losing regulars', 'Bring a product you’re pricing now'],
+    startsAt: '2026-10-05T18:30:00',
+    endsAt: '2026-10-05T20:00:00',
+    seats: 3,
+    approveRequests: true,
+    revealSpot24h: true,
+    status: 'live',
   },
   {
-    isoId: 'iso-rt-wed',
-    match: 88,
-    reasons: ['Your pathway · priority seat', 'Evening slot, after class'],
+    id: 'iso-sa-sat',
+    coachId: 'sami',
+    venueId: 'aurora-cafe',
+    pathway: 'builder',
+    title: 'Your first portfolio project',
+    topics: ['Picking a project that gets interviews', 'Shipping it in a month', 'How hiring managers read a repo'],
+    startsAt: '2026-10-10T12:00:00',
+    endsAt: '2026-10-10T13:30:00',
+    seats: 3,
+    approveRequests: true,
+    revealSpot24h: true,
+    status: 'live',
   },
   {
-    isoId: 'iso-mr-tue',
-    match: 81,
-    reasons: ['Coach you might click with', 'Outside your pathway'],
+    id: 'iso-nh-sat',
+    coachId: 'nadia',
+    venueId: 'aurora-cafe',
+    pathway: 'healer',
+    title: 'Nursing school, real talk',
+    topics: ['Prereqs and how to stack them', 'Paying for it', 'Your first clinical rotation'],
+    startsAt: '2026-10-10T12:30:00',
+    endsAt: '2026-10-10T14:00:00',
+    seats: 4,
+    approveRequests: true,
+    revealSpot24h: true,
+    status: 'live',
+  },
+  {
+    id: 'iso-jr-sat',
+    coachId: 'jordan',
+    venueId: 'aurora-library',
+    pathway: 'reformer',
+    title: 'How a bill really moves',
+    topics: ['Where a bill actually gets written', 'Testifying at the Capitol', 'Internships that open doors'],
+    startsAt: '2026-10-10T11:30:00',
+    endsAt: '2026-10-10T13:00:00',
+    seats: 3,
+    approveRequests: true,
+    revealSpot24h: true,
+    status: 'live',
   },
 ];

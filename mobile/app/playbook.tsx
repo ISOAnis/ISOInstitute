@@ -17,6 +17,11 @@ const LINGO = [
   },
   { term: 'I got next', meaning: 'How you claim a seat at an ISO. The coach confirms.', example: '“I got next at Marcus’s ISO Tuesday.”' },
   {
+    term: 'Who’s in',
+    meaning: 'You see seat counts on every ISO. Names of who else is coming stay private unless you’re confirmed, and only drop 24 hours before.',
+    example: '“I don’t know who’s pulling up until tomorrow.”',
+  },
+  {
     term: 'ISO Partner',
     meaning: 'A verified local spot that hosts ISOs: cafés, gyms, coworking spaces, libraries. Members get perks there.',
     example: '“Let’s run it at the ISO Partner on Main.”',
@@ -26,7 +31,7 @@ const LINGO = [
   { term: 'Pathway', meaning: 'Your lane: Founder, Builder, Healer, Reformer, Warrior, or Seeker.', example: '“My pathway is Healer.”' },
   {
     term: 'Check-in code',
-    meaning: 'Your 4-digit code once you’re confirmed. Give it to the coach at the table to check in. No code, no seat.',
+    meaning: 'Your 4-digit code once you’re confirmed. Give it to the coach when you pull up to check in. No code, no seat.',
     example: '“Code’s 4827, coach.”',
   },
   {
@@ -60,13 +65,13 @@ const OVERALL = [
 const STANDARD = [
   { title: 'Discipline', desc: 'Show up when you said you would. Do the work between ISOs.' },
   { title: 'Humility', desc: 'Coaches serve, they don’t perform. Players listen before they speak.' },
-  { title: 'Respect', desc: 'For the table, the space, the people, and the values ISO stands on.' },
+  { title: 'Respect', desc: 'For the ISO, the space, the people, and the values ISO stands on.' },
 ];
 
 const RULES = [
   'ISOs stay on the pathway: careers, skills, and the real journey.',
   'No ISO is used to push any political, social, or personal agenda.',
-  'Everyone at the table gets the same respect. And respect the venue: everyone buys something.',
+  'Everyone at the ISO gets the same respect. And respect the venue: everyone buys something.',
 ];
 
 export default function Playbook() {
@@ -151,7 +156,8 @@ export default function Playbook() {
             ))}
           </Card>
           <Text variant="caption">
-            ISOs outside your pathway earn crossover badges. Switching pathways starts that pathway’s count; your old progress waits for you.
+            ISOs outside your pathway earn crossover badges. You can switch pathways once a month. Switching starts that pathway’s count; your old progress
+            waits for you.
           </Text>
         </View>
       ) : null}

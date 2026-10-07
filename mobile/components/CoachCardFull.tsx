@@ -1,34 +1,38 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import type { Coach } from '@/data';
+import { isRookie, type Coach } from '@/data';
 import { pathwayName } from '@/lib/pathway';
 import { alpha, cardTint, colors, fonts, pathwayColors, radius, tracking } from '@/theme';
 
 import { Icon } from './Icon';
+import { RookieBadge } from './RookieBadge';
 import { Text } from './Text';
+
+const STAGE_H = 270;
 
 /**
  * The collectible coach card: soft pathway tint, gold Overall, pathway mark,
- * watermark, photo, name, credentials and tags.
+ * the coach's cutout headshot over their pathway name, credentials and tags.
  */
 export function CoachCardFull({ coach }: { coach: Coach }) {
   const p = pathwayColors[coach.pathway];
   const t = cardTint(coach.pathway);
+  const rookie = isRookie(coach);
+  const name = pathwayName(coach.pathway);
+  const [stageW, setStageW] = useState(340);
+  const markSize = Math.min(150, (stageW - 24) / (name.length * 0.44));
 
   return (
     <View
       accessible
-      accessibilityLabel={`Coach card: ${coach.name}, ${coach.pathway}, ${coach.overall} Overall`}
+      accessibilityLabel={`Coach card: ${coach.name}, ${coach.pathway}, ${coach.overall} Overall${rookie ? ', rookie' : ''}`}
       style={[styles.shadow, { shadowColor: p.fill }]}
     >
       <LinearGradient colors={t.gradient} locations={[0, 0.48, 1]} style={styles.card}>
         <View style={[styles.topBar, { backgroundColor: t.topBar, shadowColor: p.fill }]} />
-        <Text style={[styles.watermark, { color: t.watermark }]} numberOfLines={1} adjustsFontSizeToFit>
-          {coach.pathway.toUpperCase()}
-        </Text>
 
         <View style={styles.header}>
           <View style={styles.center}>
@@ -47,18 +51,27 @@ export function CoachCardFull({ coach }: { coach: Coach }) {
           </View>
         </View>
 
-        <View style={styles.photo}>
-          {coach.photo ? (
-            <>
-              <Image source={coach.photo} style={styles.photoImg} resizeMode="cover" accessibilityIgnoresInvertColors />
-              <LinearGradient colors={[alpha(t.photoFade, 0), t.photoFade]} locations={[0.55, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
-            </>
+        <View style={styles.stage} onLayout={(e) => setStageW(e.nativeEvent.layout.width)}>
+          <Text
+            style={[styles.watermark, { color: alpha(p.fill, 0.22), fontSize: markSize, lineHeight: markSize * 1.06, letterSpacing: tracking(0.02, markSize) }]}
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+          {coach.cutout ? (
+            <Image source={coach.cutout} style={styles.cutout} resizeMode="contain" accessibilityIgnoresInvertColors />
           ) : (
-            <Svg width={190} height={200} viewBox="0 0 190 200">
-              <Circle cx={95} cy={56} r={34} fill={colors.surface3} />
-              <Path d="M20 200c4-62 34-92 75-92s71 30 75 92z" fill={colors.surface3} />
+            <Svg width={200} height={210} viewBox="0 0 190 200" style={styles.silhouette}>
+              <Circle cx={95} cy={62} r={36} fill={colors.surface3} />
+              <Path d="M18 200c4-62 34-94 77-94s73 32 77 94z" fill={colors.surface3} />
             </Svg>
           )}
+          <LinearGradient colors={[alpha(t.photoFade, 0), t.photoFade]} style={styles.fade} pointerEvents="none" />
+          {rookie ? (
+            <View style={styles.rookie}>
+              <RookieBadge />
+            </View>
+          ) : null}
         </View>
 
         <Text style={styles.name}>{coach.name}</Text>
@@ -93,10 +106,6 @@ export function CoachCardFull({ coach }: { coach: Coach }) {
             </View>
           ))}
         </View>
-
-        <Text variant="eyebrow" style={styles.footer}>
-          ISO · The Assist
-        </Text>
       </LinearGradient>
     </View>
   );
@@ -114,7 +123,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 18,
+    paddingBottom: 20,
     overflow: 'hidden',
   },
   topBar: {
@@ -129,18 +138,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 8,
   },
-  watermark: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 28,
-    textAlign: 'center',
-    fontFamily: fonts.display,
-    fontSize: 92,
-    lineHeight: 100,
-    letterSpacing: tracking(0.02, 92),
-  },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 1 },
   center: { alignItems: 'center' },
   bold: { fontFamily: fonts.bold },
   overall: { fontFamily: fonts.display, fontSize: 64, lineHeight: 70 },
@@ -151,17 +149,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  photo: {
-    height: 230,
-    marginTop: 4,
-    borderRadius: radius.xl,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+  stage: { height: STAGE_H, marginTop: -28, marginHorizontal: -20, alignItems: 'center', justifyContent: 'flex-end' },
+  watermark: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    top: 46,
+    textAlign: 'center',
+    fontFamily: fonts.display,
+    textTransform: 'uppercase',
   },
-  photoImg: { width: '100%', height: '100%' },
+  cutout: { width: STAGE_H * 0.98, height: STAGE_H - 16 },
+  silhouette: { marginBottom: 0 },
+  fade: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 56 },
+  rookie: { position: 'absolute', left: 20, bottom: 14 },
   name: {
-    marginTop: 14,
+    marginTop: 10,
     fontFamily: fonts.display,
     fontSize: 40,
     lineHeight: 44,
@@ -181,5 +184,4 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: alpha(colors.text, 0.06),
   },
-  footer: { marginTop: 16 },
 });

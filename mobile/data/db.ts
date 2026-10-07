@@ -10,7 +10,7 @@ const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 
 export const db = {
   pathways: mocks.pathways,
-  coaches: clone(mocks.coaches).map((c) => ({ ...c, photo: mocks.coachPhotos[c.id] })),
+  coaches: clone(mocks.coaches).map((c) => ({ ...c, photo: mocks.coachPhotos[c.id], cutout: mocks.coachCutouts[c.id], match: clone(mocks.coachMatch[c.id]) })),
   coachPosts: mocks.coachPosts,
   coachFeedback: mocks.coachFeedback,
   coachMonths: mocks.coachMonths,
@@ -19,7 +19,6 @@ export const db = {
   venues: mocks.venues.map((v) => ({ ...v, photo: mocks.venuePhoto })),
   events: mocks.events,
   ranks: mocks.ranks,
-  recommendations: mocks.recommendations,
   quickReplies: mocks.quickReplies,
   savedCard: mocks.savedCard,
   pastIsos: mocks.pastIsos,
@@ -31,6 +30,11 @@ export const db = {
   follows: new Set<string>(mocks.initialFollows),
   rsvps: new Set<string>(),
   applications: [] as CoachApplication[],
+  nextCohort: mocks.nextCohort,
+  cohortTaken: { ...mocks.cohortTaken },
+  waitlistPosition: mocks.waitlistPosition,
+  pathInReason: mocks.pathInReason,
+  reviewAreaRequests: new Set<string>(),
   communityPoolUsd: 0,
 };
 
@@ -39,6 +43,10 @@ export const rules = {
   freeLateCancelsPerMonth: mocks.FREE_LATE_CANCELS_PER_MONTH,
   maxPathwaySwitchesPerMonth: mocks.MAX_PATHWAY_SWITCHES_PER_MONTH,
   noShowAfterMin: mocks.NO_SHOW_AFTER_MIN,
+  rookieIsos: mocks.ROOKIE_ISOS,
+  activeWindowDays: mocks.ACTIVE_WINDOW_DAYS,
+  minSeats: mocks.MIN_SEATS,
+  maxSeats: mocks.MAX_SEATS,
 };
 
 export const DEMO_NOW = mocks.DEMO_NOW;

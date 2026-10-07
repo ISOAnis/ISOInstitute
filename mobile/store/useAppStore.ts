@@ -6,10 +6,14 @@ import type {
   CheckInResult,
   CoachApplication,
   IsoSummary,
+  MatchPrefs,
+  MatchProfile,
+  MatchSection,
   Mode,
   NewIsoInput,
   PathwayId,
   Player,
+  ProfileOwner,
   Seat,
   SeatStatus,
 } from '@/data';
@@ -52,6 +56,13 @@ interface AppState {
   applyToCoach: (app: CoachApplication) => Promise<void>;
   approveCoachDemo: () => Promise<void>;
   dropPin: (input: NewIsoInput) => Promise<IsoSummary>;
+  moveIso: (isoId: string, days: number) => Promise<IsoSummary>;
+  cancelShortIso: (isoId: string) => Promise<void>;
+  requestAreaReview: (areaName: string) => Promise<void>;
+  updateBasics: (input: { name: string; neighborhood: string; stage: string }) => Promise<void>;
+  saveMatchSection: (who: ProfileOwner, section: MatchSection, patch: Partial<MatchProfile>) => Promise<void>;
+  clearMatchSection: (who: ProfileOwner, section: MatchSection | 'all') => Promise<void>;
+  setMatchPrefs: (patch: Partial<MatchPrefs>) => Promise<void>;
 }
 
 const toMySeat = (s: Seat): MySeat => ({ status: s.status, checkinCode: s.checkinCode });
@@ -187,6 +198,43 @@ export const useAppStore = create<AppState>((set, get) => {
       const iso = await api.createIso(input);
       bump();
       return iso;
+    },
+
+    moveIso: async (isoId, days) => {
+      const iso = await api.moveIso(isoId, days);
+      bump();
+      return iso;
+    },
+
+    cancelShortIso: async (isoId) => {
+      await api.cancelShortIso(isoId);
+      await syncSeat(isoId);
+      bump();
+    },
+
+    requestAreaReview: async (areaName) => {
+      await api.requestAreaReview(areaName);
+      bump();
+    },
+
+    updateBasics: async (input) => {
+      await api.updateBasics(input);
+      bump();
+    },
+
+    saveMatchSection: async (who, section, patch) => {
+      await api.saveMatchSection(who, section, patch);
+      bump();
+    },
+
+    clearMatchSection: async (who, section) => {
+      await api.clearMatchSection(who, section);
+      bump();
+    },
+
+    setMatchPrefs: async (patch) => {
+      await api.setMatchPrefs(patch);
+      bump();
     },
   };
 });

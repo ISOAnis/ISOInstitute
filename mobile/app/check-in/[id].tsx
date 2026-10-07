@@ -45,7 +45,7 @@ export default function CheckIn() {
           <Text variant="eyebrow" color={p.text}>
             {dayLabel(iso.startsAt)} · {startTime(iso.startsAt)}
           </Text>
-          <Text variant="titleLg">Check in your table</Text>
+          <Text variant="titleLg">Check in your players</Text>
           <Text variant="subtitle">Ask each player for their 4-digit code. No code means no RSVP.</Text>
         </View>
 
@@ -94,7 +94,7 @@ export default function CheckIn() {
 
         <View style={styles.group}>
           <View style={styles.tableHead}>
-            <Text variant="section">Your table</Text>
+            <Text variant="section">Your players</Text>
             <Text variant="caption" color={colors.text}>
               {inCount} of {iso.seats} in
             </Text>

@@ -15,7 +15,7 @@ export default function CoachReview() {
   const steps = [
     { title: 'Submitted', sub: submitted, state: 'done' as const },
     { title: 'Advisory board review', sub: 'Experience, story, and fit with the ISO Standard', state: 'current' as const },
-    { title: 'Approved: your coach card goes live', sub: 'Start at Bronze. Every ISO moves your Overall.', state: 'todo' as const },
+    { title: 'Decision: you join a cohort', sub: 'Start as a Rookie at Bronze. Every ISO moves your Overall.', state: 'todo' as const },
   ];
 
   const explore = () => {
@@ -79,8 +79,13 @@ export default function CoachReview() {
 
       <Card>
         <Text variant="section">Prototype</Text>
-        <Text variant="caption">Skip the review and sign in to the coach side as Marcus Reid, the demo coach account.</Text>
-        <Button label="Approve me now" variant="outline" height={44} onPress={approveNow} />
+        <Text variant="caption">Skip ahead to one of the board’s three decisions, or sign in to the coach side as Marcus Reid, the demo coach account.</Text>
+        <View style={styles.outcomes}>
+          <Button label="You’re in" variant="outline" height={44} style={styles.flex} onPress={() => router.push('/coach-decision?outcome=in')} />
+          <Button label="You’re next" variant="outline" height={44} style={styles.flex} onPress={() => router.push('/coach-decision?outcome=next')} />
+          <Button label="Path in" variant="outline" height={44} style={styles.flex} onPress={() => router.push('/coach-decision?outcome=path')} />
+        </View>
+        <Button label="Sign in as Marcus" variant="muted" height={44} onPress={approveNow} />
       </Card>
     </Screen>
   );
@@ -90,6 +95,7 @@ const styles = StyleSheet.create({
   hero: { gap: 6, marginTop: 24 },
   flex: { flex: 1, gap: 2 },
   group: { gap: 12 },
+  outcomes: { flexDirection: 'row', gap: 8 },
   list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
   step: { flexDirection: 'row', gap: 12 },
   rail: { alignItems: 'center', width: 24 },

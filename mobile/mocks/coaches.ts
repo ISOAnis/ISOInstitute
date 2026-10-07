@@ -22,6 +22,8 @@ export const coaches: Coach[] = [
     showUpRate: 100,
     eventsCoHosted: 1,
     followers: 41,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-10-02T12:00:00',
   },
   {
     id: 'sami',
@@ -44,6 +46,8 @@ export const coaches: Coach[] = [
     showUpRate: 96,
     eventsCoHosted: 0,
     followers: 27,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-09-29T07:30:00',
   },
   {
     id: 'dante',
@@ -66,6 +70,8 @@ export const coaches: Coach[] = [
     showUpRate: 91,
     eventsCoHosted: 0,
     followers: 19,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-10-01T18:00:00',
   },
   {
     id: 'nadia',
@@ -88,6 +94,8 @@ export const coaches: Coach[] = [
     showUpRate: 98,
     eventsCoHosted: 1,
     followers: 35,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-09-25T17:00:00',
   },
   {
     id: 'jordan',
@@ -110,6 +118,8 @@ export const coaches: Coach[] = [
     showUpRate: 95,
     eventsCoHosted: 0,
     followers: 16,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-09-27T14:00:00',
   },
   {
     id: 'rahim',
@@ -132,6 +142,8 @@ export const coaches: Coach[] = [
     showUpRate: 100,
     eventsCoHosted: 0,
     followers: 8,
+    cohort: 'Cohort 1 · Spring 2026',
+    lastIsoAt: '2026-09-23T18:00:00',
   },
   {
     id: 'imani',
@@ -143,17 +155,19 @@ export const coaches: Coach[] = [
     credentials: [
       { value: '12 yrs', label: 'Mentoring' },
       { value: 'M.Div', label: 'Iliff School' },
-      { value: 'Silver', label: 'ISO tier', highlight: true },
+      { value: 'Bronze', label: 'ISO tier', highlight: true },
     ],
-    tags: ['Purpose', 'First-gen', 'Mentorship', 'Season 1 coach'],
-    overall: 79,
-    tier: 'Silver',
-    isosHosted: 11,
-    playersMet: 29,
-    rating: 4.9,
-    showUpRate: 98,
+    tags: ['Purpose', 'First-gen', 'Mentorship', 'Cohort 2 coach'],
+    overall: 66,
+    tier: 'Bronze',
+    isosHosted: 1,
+    playersMet: 3,
+    rating: 5.0,
+    showUpRate: 100,
     eventsCoHosted: 0,
-    followers: 19,
+    followers: 4,
+    cohort: 'Cohort 2 · Fall 2026',
+    lastIsoAt: '2026-09-30T19:00:00',
   },
 ];
 

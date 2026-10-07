@@ -14,6 +14,7 @@ export { ListRow } from './ListRow';
 export { ModeSwitch } from './ModeSwitch';
 export { PathwayDot } from './PathwayDot';
 export { Pill } from './Pill';
+export { RookieBadge } from './RookieBadge';
 export { Screen } from './Screen';
 export { StatRow, StatTile } from './StatTile';
 export { TabBar, useTabBarHeight, type TabItems } from './TabBar';

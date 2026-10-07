@@ -4,7 +4,7 @@ import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleShee
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, Icon, Text, TopBar } from '@/components';
-import { getHuddle, getHuddleMembers, getIso, getQuickReplies, getRevealedVenue, sendHuddleMessage, useData } from '@/data';
+import { getHuddle, getHuddleMembers, getIso, getNamesVisible, getQuickReplies, getRevealedVenue, sendHuddleMessage, useData } from '@/data';
 import { clockTime, dayLabel, timeRange } from '@/lib/format';
 import { useAppStore } from '@/store';
 import { alpha, colors, fonts, gutter, pathwayColors, radius, raisedShadow } from '@/theme';
@@ -22,6 +22,7 @@ export default function Huddle() {
   const iso = useData(() => getIso(id), [id, revision]).data;
   const venue = useData(() => getRevealedVenue(id), [id, revision]).data;
   const members = useData(() => getHuddleMembers(id), [id, revision]).data ?? [];
+  const namesOn = useData(() => getNamesVisible(id), [id, revision]).data ?? false;
   const messages = useData(() => getHuddle(id), [id, tick]).data ?? [];
   const replies = useData(getQuickReplies, []).data ?? [];
 
@@ -32,6 +33,7 @@ export default function Huddle() {
   const p = pathwayColors[iso.pathway];
   const first = iso.coach.firstName;
   const players = members.filter((m) => !m.isCoach);
+  const faces = members.filter((m) => m.initials);
   const pinned = messages.find((m) => m.pinned);
   const thread = messages.filter((m) => !m.pinned);
   const author = (userId: string) => members.find((m) => m.id === userId);
@@ -50,7 +52,7 @@ export default function Huddle() {
         <View style={styles.lockedBody}>
           <Icon name="lock" size={32} color={colors.textSecondary} />
           <Text variant="sheetTitle" align="center">
-            Huddle’s for the table
+            Huddle’s for your group
           </Text>
           <Text variant="subtitle" align="center">
             Only confirmed players and {first} can see it. Say “I got next” and it opens once you’re in.
@@ -67,7 +69,7 @@ export default function Huddle() {
           label="The Huddle"
           right={
             <View style={styles.stack}>
-              {members.slice(0, 4).map((m, i) => (
+              {faces.slice(0, 4).map((m, i) => (
                 <View key={m.id} style={{ marginLeft: i ? -10 : 0 }}>
                   <Avatar initials={m.initials} size={30} pathway={m.isCoach ? iso.pathway : undefined} ringColor={m.isCoach ? undefined : colors.bg} />
                 </View>
@@ -77,6 +79,7 @@ export default function Huddle() {
         />
         <Text variant="caption" align="center">
           {dayLabel(iso.startsAt)} {timeRange(iso.startsAt, iso.endsAt)} · {first} + {players.length} {players.length === 1 ? 'player' : 'players'}
+          {namesOn ? '' : ' · names drop 24 hrs before'}
         </Text>
       </View>
 
@@ -89,7 +92,7 @@ export default function Huddle() {
             <>
               <Text variant="bodyStrong">{venue.name}</Text>
               <Text variant="body">{pinned?.body ?? venue.notes}</Text>
-              {venue.photo ? <Image source={venue.photo} style={styles.photo} resizeMode="cover" accessibilityLabel="Photo of the table" /> : null}
+              {venue.photo ? <Image source={venue.photo} style={styles.photo} resizeMode="cover" accessibilityLabel="Photo of the spot" /> : null}
             </>
           ) : (
             <Text variant="body">The exact spot and where to find {first} drop here 24 hrs before.</Text>
@@ -105,11 +108,11 @@ export default function Huddle() {
           const me = m.userId === 'me' || who?.isMe || (isHost && m.userId === iso.coachId);
           return (
             <View key={m.id} style={[styles.msgRow, me && styles.msgRowMine]}>
-              {!me ? <Avatar initials={who?.initials ?? '?'} size={30} pathway={who?.isCoach ? iso.pathway : undefined} /> : null}
+              {!me ? <Avatar initials={who?.initials || (who?.isCoach ? first[0] : '')} size={30} pathway={who?.isCoach ? iso.pathway : undefined} /> : null}
               <View style={styles.msgCol}>
                 {!me ? (
                   <Text variant="caption" color={colors.textSecondary}>
-                    {who?.name ?? 'Player'} · {clockTime(m.createdAt)}
+                    {who?.isCoach || namesOn ? (who?.name ?? first) : 'Player'} · {clockTime(m.createdAt)}
                   </Text>
                 ) : null}
                 <View style={[styles.bubble, me ? styles.bubbleMine : styles.bubbleTheirs]}>
@@ -135,7 +138,7 @@ export default function Huddle() {
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder="Message the table"
+            placeholder="Message the group"
             placeholderTextColor={colors.textMeta}
             selectionColor={colors.gold}
             style={styles.input}

@@ -5,7 +5,7 @@ import { getSavedCard, useData } from '@/data';
 import { colors, fonts, radius, statusColors } from '@/theme';
 
 const bullets = [
-  { color: statusColors.good, text: 'Check in at the table and the hold disappears.' },
+  { color: statusColors.good, text: 'Check in when you pull up and the hold disappears.' },
   { color: statusColors.good, text: 'Cancel 24+ hours before and it’s released, no questions.' },
   { color: colors.textSecondary, text: 'Life happens: one late cancel a month is on us.' },
   { color: statusColors.bad, text: 'No-show? The $5 goes to the Community Pool, which funds free Court tickets for students.' },

@@ -4,8 +4,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, BottomSheet, Button, Card, Icon, IconButton, ListRow, ModeSwitch, Screen, StatRow, StatTile, Text } from '@/components';
 import { getLocker, getMe, getPastIsos, getPathways, getRankStatus, getRanks, useData, type PathwayId } from '@/data';
+import { ProfileNudge } from '@/features/ProfileNudge';
 import { useModeSwitch } from '@/features/useModeSwitch';
-import { shortDate } from '@/lib/format';
+import { shortDate, switchesLeftLabel } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
 import { alpha, colors, fonts, pathwayColors, radius } from '@/theme';
@@ -47,13 +48,15 @@ export default function MeScreen() {
             <Text variant="caption" color={p.text} style={styles.bold}>
               {name} pathway
             </Text>{' '}
-            · {me.city}
+            · {me.neighborhood || me.city}
           </Text>
         </View>
-        <IconButton icon="gear" label="Settings and Playbook" onPress={() => router.push('/playbook')} />
+        <IconButton icon="gear" label="Settings" onPress={() => router.push('/settings')} />
       </View>
 
       {coachStatus === 'approved' ? <ModeSwitch {...modeSwitch} /> : null}
+
+      <ProfileNudge />
 
       <View style={[styles.level, { backgroundColor: alpha(p.fill, 0.12) }]}>
         <Text variant="eyebrow" color={p.text}>
@@ -110,13 +113,15 @@ export default function MeScreen() {
       </StatRow>
 
       <Card style={styles.pathRow}>
-        <View style={[styles.pathBar, { backgroundColor: p.fill }]} />
+        <View style={[styles.pathMark, { backgroundColor: alpha(p.fill, 0.14) }]}>
+          <Icon name={pathway} size={24} color={p.text} />
+        </View>
         <View style={styles.flex}>
           <Text variant="section">Your pathway</Text>
           <Text variant="cardTitle" color={p.text}>
             {name}
           </Text>
-          <Text variant="caption">{switchesLeft} of 2 switches left this month</Text>
+          <Text variant="caption">{switchesLeftLabel(switchesLeft)}</Text>
         </View>
         <Button label="Switch" variant="outline" height={44} disabled={switchesLeft === 0} onPress={() => setSwitching(true)} />
       </Card>
@@ -180,20 +185,25 @@ export default function MeScreen() {
       </View>
 
       {coachStatus !== 'approved' ? (
-        <Card onPress={() => router.push(coachStatus === 'applied' ? '/coach-review' : '/coach-apply')} accessibilityLabel="Coach on ISO">
+        <Card onPress={() => router.push(coachStatus === 'applied' ? '/coach-review' : '/coach-cohorts')} accessibilityLabel="Coach on ISO">
           <Text variant="section">{coachStatus === 'applied' ? 'Application in review' : 'Pull as you climb'}</Text>
           <Text variant="rowTitle">{coachStatus === 'applied' ? 'See where your application stands' : 'Apply to coach on ISO'}</Text>
           <Text variant="caption">Every coach is approved by the ISO advisory board.</Text>
         </Card>
       ) : null}
 
-      <BottomSheet visible={switching} onClose={() => setSwitching(false)} eyebrow={`${switchesLeft} of 2 switches left`} title="Switch pathway">
-        <Text variant="caption">Your {name} progress stays saved. The new pathway starts its own count.</Text>
+      <BottomSheet visible={switching} onClose={() => setSwitching(false)} eyebrow={switchesLeftLabel(switchesLeft)} title="Switch pathway">
+        <Text variant="caption">
+          Your {name} progress stays saved. The new pathway starts its own count. You can still say “I got next” on any pathway, you just won’t get priority
+          there.
+        </Text>
         {pathways
           .filter((x) => x.id !== pathway)
           .map((x) => (
             <Pressable key={x.id} accessibilityRole="button" accessibilityLabel={`Switch to ${x.name}`} onPress={() => pick(x.id)} style={styles.switchRow}>
-              <View style={[styles.switchBar, { backgroundColor: pathwayColors[x.id].fill }]} />
+              <View style={[styles.switchMark, { backgroundColor: alpha(pathwayColors[x.id].fill, 0.14) }]}>
+                <Icon name={x.id} size={20} color={pathwayColors[x.id].text} />
+              </View>
               <View style={styles.flex}>
                 <Text variant="bodyStrong" color={pathwayColors[x.id].text}>
                   {x.name}
@@ -240,7 +250,7 @@ const styles = StyleSheet.create({
   badge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: radius.pill },
   badgeText: { fontFamily: fonts.bold, fontSize: 13 },
   pathRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  pathBar: { width: 8, alignSelf: 'stretch', borderRadius: 4 },
+  pathMark: { width: 48, height: 48, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
   locker: { flexDirection: 'row', gap: 8 },
   lockerItem: {
     flex: 1,
@@ -253,5 +263,5 @@ const styles = StyleSheet.create({
   lockerLocked: { opacity: 0.6 },
   plus: { fontFamily: fonts.bold, fontSize: 14 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 },
-  switchBar: { width: 8, height: 36, borderRadius: 4 },
+  switchMark: { width: 40, height: 40, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
 });

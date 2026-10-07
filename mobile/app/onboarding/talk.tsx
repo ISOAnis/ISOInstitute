@@ -19,7 +19,7 @@ const STEPS = [
   },
   {
     title: 'Pull up, check in',
-    body: 'Show up, find the table, and give the coach your 4-digit code.',
+    body: 'Pull up, find your coach, and give them your 4-digit code.',
     say: '“Code’s 4827, coach.”',
   },
   {

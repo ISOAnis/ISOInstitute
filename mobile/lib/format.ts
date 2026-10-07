@@ -99,3 +99,18 @@ export function clockTime(iso: string): string {
   const d = new Date(iso);
   return `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')} ${meridiem(d)}`;
 }
+
+/** "1 switch left this month" / "0 switches left until Nov 1" (switches reset on the 1st). */
+export function switchesLeftLabel(left: number): string {
+  if (left > 0) return `${left} ${left === 1 ? 'switch' : 'switches'} left this month`;
+  const n = now();
+  const reset = new Date(n.getFullYear(), n.getMonth() + 1, 1);
+  return `0 switches left until ${MONTHS[reset.getMonth()]} ${reset.getDate()}`;
+}
+
+/** "13:30" → "1:30 PM" (the Drop a Pin time field format). */
+export function clockLabel(hhmm: string): string {
+  const h = Number(hhmm.slice(0, 2));
+  const m = hhmm.slice(3, 5);
+  return `${h % 12 || 12}:${m} ${h < 12 ? 'AM' : 'PM'}`;
+}

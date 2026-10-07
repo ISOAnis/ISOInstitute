@@ -9,7 +9,7 @@ import { useAppStore } from '@/store';
 import { colors, fonts, gutter, pathwayColors } from '@/theme';
 
 const QUESTIONS: [string, string[]][] = [
-  ['At a table, you are usually…', ['The listener', 'The question asker', 'The storyteller']],
+  ['In a group, you are usually…', ['The listener', 'The question asker', 'The storyteller']],
   ['You learn best from…', ['Real stories', 'Straight feedback', 'Working a problem']],
   ['Where you are right now', ['In school', 'Early career', 'Switching paths', 'Starting something']],
 ];
@@ -37,7 +37,7 @@ export default function QuestionsStep() {
           </Text>
         </Pressable>
         <Text variant="titleLg">Three quick ones</Text>
-        <Text variant="subtitle">So we can match you with coaches and tables that fit how you show up.</Text>
+        <Text variant="subtitle">So we can match you with coaches and ISOs that fit how you show up.</Text>
 
         {QUESTIONS.map(([q, options], i) => (
           <View key={q} style={styles.question}>

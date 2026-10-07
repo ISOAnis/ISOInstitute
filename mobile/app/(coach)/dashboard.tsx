@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, ListRow, ModeSwitch, OverallBox, Screen, StatTile, Text } from '@/components';
-import { getAdvisoryNote, getCoachFeedback, getCoachMonth, getMyCoach, getRegulars, useData } from '@/data';
+import { Avatar, Button, Card, ListRow, ModeSwitch, OverallBox, RookieBadge, Screen, StatTile, Text } from '@/components';
+import { ACTIVE_WINDOW_DAYS, getAdvisoryNote, getCoachFeedback, getCoachMonth, getMyCoach, getRegulars, isRookie, now, ROOKIE_ISOS, useData } from '@/data';
+import { ProfileNudge } from '@/features/ProfileNudge';
 import { useModeSwitch } from '@/features/useModeSwitch';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -21,6 +22,10 @@ export default function Dashboard() {
   if (!coach) return <Screen>{null}</Screen>;
   const p = pathwayColors[coach.pathway];
   const avg = feedback.length ? feedback.reduce((a, f) => a + f.rating, 0) / feedback.length : coach.rating;
+  const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const sinceLast = coach.lastIsoAt ? Math.max(0, Math.round((dayStart(now()) - dayStart(new Date(coach.lastIsoAt))) / 86_400_000)) : null;
+  const active = sinceLast !== null && sinceLast < ACTIVE_WINDOW_DAYS;
+  const lastLabel = sinceLast === null ? 'No ISOs yet' : sinceLast === 0 ? 'Last ISO today' : `Last ISO ${sinceLast} ${sinceLast === 1 ? 'day' : 'days'} ago`;
 
   return (
     <Screen>
@@ -36,12 +41,47 @@ export default function Dashboard() {
             </Text>{' '}
             · {coach.tier}
           </Text>
+          <Text variant="caption">{coach.cohort}</Text>
+          {isRookie(coach) ? (
+            <View style={styles.rookie}>
+              <RookieBadge small />
+              <Text variant="caption">
+                {coach.isosHosted} of {ROOKIE_ISOS} ISOs
+              </Text>
+            </View>
+          ) : null}
         </View>
         <Button label="Public card" variant="outline" height={44} onPress={() => router.push(`/coach/${coach.id}`)} />
       </View>
       <Text variant="caption" align="center">
         Everything below is private to you
       </Text>
+
+      <ProfileNudge who="coach" />
+
+      <Card>
+        <View style={styles.monthHead}>
+          <View style={styles.activeHead}>
+            <View style={[styles.liveDot, { backgroundColor: active ? statusColors.good : colors.textMeta }]} />
+            <Text variant="section">{active ? 'Active coach' : 'Card resting'}</Text>
+          </View>
+          <Text style={styles.delta} color={colors.text}>
+            {lastLabel}
+          </Text>
+        </View>
+        <View style={styles.track}>
+          <View
+            style={[
+              styles.fill,
+              { width: `${Math.max(0, 100 - ((sinceLast ?? ACTIVE_WINDOW_DAYS) / ACTIVE_WINDOW_DAYS) * 100)}%`, backgroundColor: statusColors.good },
+            ]}
+          />
+        </View>
+        <Text variant="caption">
+          Host at least once every {ACTIVE_WINDOW_DAYS} days or your card rests until your next pin.
+          {active && sinceLast !== null ? ` ${ACTIVE_WINDOW_DAYS - sinceLast} days left in this window.` : ''}
+        </Text>
+      </Card>
 
       {month ? (
         <View style={styles.group}>
@@ -133,6 +173,9 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   bold: { fontFamily: fonts.bold },
+  rookie: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  activeHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  liveDot: { width: 8, height: 8, borderRadius: 4 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   group: { gap: 12 },
   list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },

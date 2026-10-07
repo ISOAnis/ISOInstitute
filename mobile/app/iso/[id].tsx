@@ -3,8 +3,20 @@ import { useState, type ReactNode } from 'react';
 import { Image, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Avatar, Button, Card, CodeDisplay, Icon, IconButton, PathwayDot, Text, TopBar } from '@/components';
-import { getHuddle, getIso, getRevealedVenue, getSeats, getTablePhoto, isLateCancel, useData, type CancelResult, type IsoSummary, type Seat } from '@/data';
+import { Avatar, Button, Card, CodeDisplay, Icon, IconButton, Text, TopBar } from '@/components';
+import {
+  getHuddle,
+  getIso,
+  getNamesVisible,
+  getRevealedVenue,
+  getSeats,
+  getTablePhoto,
+  isLateCancel,
+  useData,
+  type CancelResult,
+  type IsoSummary,
+  type Seat,
+} from '@/data';
 import { CancelSheet } from '@/features/iso/CancelSheet';
 import { HoldSheet } from '@/features/iso/HoldSheet';
 import { dayLabel, timeRange } from '@/lib/format';
@@ -27,6 +39,7 @@ export default function IsoDetail() {
 
   const iso = useData(() => getIso(id), [id, revision]).data;
   const seats = useData(() => getSeats(id), [id, revision]).data ?? [];
+  const namesOn = useData(() => getNamesVisible(id), [id, revision]).data ?? false;
   const venue = useData(() => getRevealedVenue(id), [id, revision]).data;
   const table = useData(() => getTablePhoto(id), [id, revision]).data;
   const pinned = (useData(() => getHuddle(id), [id, revision]).data ?? []).find((m) => m.pinned);
@@ -89,13 +102,13 @@ export default function IsoDetail() {
         />
 
         {table ? (
-          <View style={styles.photo} accessible accessibilityLabel={table.revealed ? 'Photo of your table' : 'Table photo, revealed 24 hrs before'}>
+          <View style={styles.photo} accessible accessibilityLabel={table.revealed ? 'Photo of your spot' : 'Spot photo, revealed 24 hrs before'}>
             <Image source={table.photo} style={styles.photoImg} resizeMode="cover" blurRadius={table.revealed ? 0 : 18} />
             {table.revealed ? null : (
               <View style={styles.photoVeil}>
                 <Icon name="lock" size={18} color={colors.text} />
                 <Text variant="caption" color={colors.text} style={styles.bold}>
-                  Your table shows up 24 hrs before
+                  Your spot shows up 24 hrs before
                 </Text>
               </View>
             )}
@@ -104,7 +117,7 @@ export default function IsoDetail() {
 
         <View style={styles.headGroup}>
           <View style={[styles.tag, { backgroundColor: alpha(p.fill, 0.12) }]}>
-            <PathwayDot pathway={iso.pathway} />
+            <Icon name={iso.pathway} size={15} color={pathwayColors[iso.pathway].text} />
             <Text variant="caption" color={p.text} style={styles.bold}>
               {pathwayName(iso.pathway)} pathway
             </Text>
@@ -150,7 +163,7 @@ export default function IsoDetail() {
           {confirmed && mine?.checkinCode && mine.status === 'confirmed' ? (
             <CodeDisplay
               code={mine.checkinCode}
-              caption={`Give this to ${first} at the table. It checks you in, releases your $5 hold, and counts toward your rank.`}
+              caption={`Give this to ${first} when you pull up. It checks you in, releases your $5 hold, and counts toward your rank.`}
             />
           ) : null}
 
@@ -161,7 +174,11 @@ export default function IsoDetail() {
                 <View style={styles.flex}>
                   <Text variant="bodyStrong">The Huddle</Text>
                   <Text variant="caption" color={colors.text}>
-                    {venue && pinned ? `${first}: “${pinned.body.split('.')[0]}.”` : 'Opens with the exact spot 24 hrs before'}
+                    {venue && pinned
+                      ? `${first}: “${pinned.body.split('.')[0]}.”`
+                      : namesOn
+                        ? 'Opens with the exact spot 24 hrs before'
+                        : 'Spot and who’s in drop 24 hrs before'}
                   </Text>
                 </View>
                 <Icon name="forward" size={18} color={colors.textSecondary} />
@@ -186,7 +203,7 @@ export default function IsoDetail() {
           </View>
         ) : null}
 
-        <SeatsSection iso={iso} seats={seats} mine={mine} myPathway={myPathway} />
+        <SeatsSection iso={iso} seats={seats} mine={mine} myPathway={myPathway} namesOn={namesOn} />
 
         <View style={styles.section}>
           <Text variant="section">How it works</Text>
@@ -232,21 +249,30 @@ export default function IsoDetail() {
   );
 }
 
-function SeatsSection({ iso, seats, mine, myPathway }: { iso: IsoSummary; seats: Seat[]; mine?: MySeat; myPathway: string }) {
+function SeatsSection({ iso, seats, mine, myPathway, namesOn }: { iso: IsoSummary; seats: Seat[]; mine?: MySeat; myPathway: string; namesOn: boolean }) {
   const p = pathwayColors[iso.pathway];
-  const others = seats.filter((s) => s.playerId !== 'me' && (s.status === 'confirmed' || s.status === 'checked_in'));
+  const taken = seats.filter((s) => s.status === 'confirmed' || s.status === 'checked_in');
+  const others = taken.filter((s) => s.playerId !== 'me' && s.playerName);
+  const hidden = namesOn ? 0 : taken.filter((s) => s.playerId !== 'me').length;
   const meIn = mine && (mine.status === 'requested' || mine.status === 'confirmed' || mine.status === 'checked_in');
-  const open = Math.max(0, iso.seats - others.length - (meIn ? 1 : 0));
+  const open = Math.max(0, iso.seats - taken.length - (mine?.status === 'requested' ? 1 : 0));
   const yourPath = myPathway === iso.pathway;
+  const inIso = mine?.status === 'confirmed' || mine?.status === 'checked_in';
+
+  const caption = namesOn
+    ? yourPath
+      ? `You’re ${pathwayName(iso.pathway)}, so you get first call on these seats.`
+      : `${pathwayName(iso.pathway)} players get first call on seats. Every other pathway can request any seat still open.`
+    : inIso
+      ? 'Who else is coming drops 24 hrs before. Privacy first.'
+      : 'Seat count only. Names stay private unless you’re in, and only 24 hrs before.';
 
   return (
     <View style={styles.section}>
-      <Text variant="section">At the table · {iso.seats} seats</Text>
-      <Text variant="caption">
-        {yourPath
-          ? `You’re ${pathwayName(iso.pathway)}, so you get first call on these seats.`
-          : `${pathwayName(iso.pathway)} players get first call on seats. Every other pathway can request any seat still open.`}
+      <Text variant="section">
+        Seats · {iso.seatsTaken} of {iso.seats} taken
       </Text>
+      <Text variant="caption">{caption}</Text>
       <View style={styles.seats}>
         {others.map((s) => (
           <View key={s.playerId} style={styles.seat}>
@@ -254,6 +280,12 @@ function SeatsSection({ iso, seats, mine, myPathway }: { iso: IsoSummary; seats:
             <Text variant="caption" color={colors.text}>
               {s.playerName.split(' ')[0]} · {s.playerRank}
             </Text>
+          </View>
+        ))}
+        {Array.from({ length: hidden }, (_, i) => (
+          <View key={`taken-${i}`} style={styles.seat}>
+            <View style={styles.takenSeat} />
+            <Text variant="caption">Taken</Text>
           </View>
         ))}
         {meIn ? (
@@ -266,7 +298,7 @@ function SeatsSection({ iso, seats, mine, myPathway }: { iso: IsoSummary; seats:
         ) : null}
         {Array.from({ length: open }, (_, i) => (
           <View key={`open-${i}`} style={styles.seat}>
-            <View style={[styles.openSeat, { borderColor: p.line }]} />
+            <View style={[styles.openSeat, { borderColor: alpha(p.fill, 0.55) }]} />
             <Text variant="caption">Open</Text>
           </View>
         ))}
@@ -304,7 +336,7 @@ function ActionBar({
   if (hosting) {
     line = 'You’re hosting this one';
     sub = `${iso.seatsTaken} of ${iso.seats} seats confirmed`;
-    action = <Button label="Check in table" height={52} onPress={() => router.push(`/check-in/${iso.id}`)} />;
+    action = <Button label="Check in players" height={52} onPress={() => router.push(`/check-in/${iso.id}`)} />;
   } else if (mine?.status === 'checked_in') {
     line = 'Checked in · $5 released';
     sub = `+1 ${pathwayName(iso.pathway)} ISO toward your rank`;
@@ -322,7 +354,7 @@ function ActionBar({
     sub = lastCancel.usedLatePass ? `Late-cancel pass used for ${MONTH.format(new Date(iso.startsAt))}` : 'Thanks for the heads up';
     action = <Button label="I got next" height={52} disabled={iso.seatsOpen === 0} onPress={onGotNext} />;
   } else if (iso.seatsOpen === 0) {
-    line = 'This table is full';
+    line = 'This ISO is full';
     sub = `Follow ${first} to catch the next one`;
     action = <Button label="Full" height={52} disabled />;
   } else {
@@ -378,6 +410,7 @@ const styles = StyleSheet.create({
   seats: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
   seat: { alignItems: 'center', gap: 6, minWidth: 64 },
   openSeat: { width: 52, height: 52, borderRadius: 26, borderWidth: 2, borderStyle: 'dashed' },
+  takenSeat: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.surface2 },
   steps: { flexDirection: 'row', gap: 8 },
   step: { flex: 1, alignItems: 'center', gap: 6 },
   stepNum: {

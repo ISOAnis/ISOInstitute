@@ -8,13 +8,17 @@ export const me: Player = {
   city: 'Denver',
   birthday: '',
   pathway: 'builder',
-  pathwaySwitchesThisMonth: 1,
+  pathwaySwitchesThisMonth: 0,
   coachStatus: 'none',
   rankProgress: { builder: 7 },
   coachesMet: 5,
   eventsAttended: 1,
   lateCancelsUsedThisMonth: 0,
   matchAnswers: [],
+  neighborhood: '',
+  stage: '',
+  match: { values: [], from: [], firstGen: [], languages: [], done: [] },
+  prefs: { sameGender: false, similarBackground: false },
 };
 
 /** Coaches the player already follows. */

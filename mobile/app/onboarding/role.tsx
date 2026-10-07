@@ -45,7 +45,7 @@ export default function RoleStep() {
     if (age === null) return setError('Birthday should look like 04/18/2001.');
     if (age < 18) return setError('ISOs are 18+. Come back on your 18th birthday.');
     await updateProfile({ name: name.trim(), phone, city: city.trim() || 'Denver', birthday });
-    router.push(role === 'coach' ? '/coach-apply' : '/onboarding/pathway');
+    router.push(role === 'coach' ? '/coach-cohorts' : '/onboarding/pathway');
   };
 
   return (
@@ -82,7 +82,7 @@ export default function RoleStep() {
         <Field label="City" value={city} onChangeText={setCity} textContentType="addressCity" />
         <Field label="Birthday" value={birthday} onChangeText={setBirthday} placeholder="MM/DD/YYYY" keyboardType="numbers-and-punctuation" />
 
-        <Text variant="caption">ISOs are 18+ and happen only at verified ISO Partner spots. Real names and verified phones keep every table safe.</Text>
+        <Text variant="caption">ISOs are 18+ and happen only at verified ISO Partner spots. Real names and verified phones keep every ISO safe.</Text>
         {error ? (
           <Text variant="caption" color={statusColors.bad}>
             {error}

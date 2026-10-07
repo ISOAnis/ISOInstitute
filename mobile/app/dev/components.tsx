@@ -115,7 +115,7 @@ export default function ComponentGallery() {
           <>
             <CodeDisplay
               code={mySeat.checkinCode}
-              caption="Give this to Marcus at the table. It checks you in, releases your $5 hold, and counts toward your rank."
+              caption="Give this to Marcus when you pull up. It checks you in, releases your $5 hold, and counts toward your rank."
             />
             <Button
               label="Give up my spot"

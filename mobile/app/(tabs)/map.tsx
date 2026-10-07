@@ -2,7 +2,7 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,6 +16,8 @@ import type { LatLng, MapCanvasHandle } from '@/features/map/types';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
 import { colors, fonts, gutter, pathwayColors, pathwayOrder, radius, raisedShadow, TAP } from '@/theme';
+
+const mark = require('../../assets/iso-mark.png');
 
 type PillKey = 'all' | 'recommended' | 'following' | PathwayId;
 
@@ -146,7 +148,10 @@ function PlayerMap() {
 
       <Glass style={[styles.header, { paddingTop: insets.top + 6 }]} onLayout={(e) => setHeaderH(e.nativeEvent.layout.height)}>
         <View style={styles.brandRow}>
-          <Wordmark size={30} />
+          <View style={styles.lockup} accessible accessibilityRole="header" accessibilityLabel="ISO">
+            <Image source={mark} style={styles.mark} resizeMode="contain" />
+            <Wordmark size={30} />
+          </View>
           <Pressable accessibilityRole="button" accessibilityLabel="Area: Denver metro" style={styles.areaChip}>
             <Icon name="pin" size={15} color={colors.textSecondary} />
             <Text style={styles.areaText}>Denver metro</Text>
@@ -233,6 +238,8 @@ function PlayerMap() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   header: { position: 'absolute', top: 0, left: 0, right: 0, gap: 8, paddingBottom: 10 },
+  lockup: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  mark: { width: 36, height: 28 },
   brandRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: gutter },
   areaChip: {
     flexDirection: 'row',

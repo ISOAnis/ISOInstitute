@@ -1,6 +1,6 @@
 import type { Venue } from '@/data/types';
 
-/** Verified ISO Partner spots. Exact coordinates are never shown before confirmation. */
+/** Verified ISO Partner spots. Exact coordinates are never shown before confirmation. Tables: café 2, coworking 1, library 2, gym 1. */
 export const venues: Venue[] = [
   {
     id: 'aurora-cafe',
@@ -10,6 +10,7 @@ export const venues: Venue[] = [
     lng: -104.7791,
     type: 'cafe',
     isPartner: true,
+    maxTables: 2,
     notes: 'Quiet 12–3 PM · table held for ISO',
     badge: 'CLOSEST TO YOU',
     distanceMi: 0.4,
@@ -22,6 +23,7 @@ export const venues: Venue[] = [
     lng: -104.8012,
     type: 'coworking',
     isPartner: true,
+    maxTables: 1,
     notes: 'Meeting room free before 10 AM',
     badge: 'FOUNDER FAVORITE',
     distanceMi: 1.2,
@@ -34,6 +36,7 @@ export const venues: Venue[] = [
     lng: -104.8105,
     type: 'library',
     isPartner: true,
+    maxTables: 2,
     notes: 'Bookable, good for students',
     badge: 'FREE',
     distanceMi: 1.6,
@@ -46,6 +49,7 @@ export const venues: Venue[] = [
     lng: -104.9341,
     type: 'coworking',
     isPartner: true,
+    maxTables: 1,
     notes: 'Open floor on weekends',
   },
   {
@@ -56,6 +60,7 @@ export const venues: Venue[] = [
     lng: -104.9997,
     type: 'cafe',
     isPartner: true,
+    maxTables: 2,
     notes: 'Opens 6:30 AM · back room for ISOs',
   },
   {
@@ -66,6 +71,7 @@ export const venues: Venue[] = [
     lng: -105.0838,
     type: 'gym',
     isPartner: true,
+    maxTables: 1,
     notes: 'Turf area after 5 PM',
   },
   {
@@ -76,6 +82,7 @@ export const venues: Venue[] = [
     lng: -104.9503,
     type: 'cafe',
     isPartner: true,
+    maxTables: 2,
     notes: 'Corner booth reserved',
   },
   {
@@ -86,6 +93,7 @@ export const venues: Venue[] = [
     lng: -105.0372,
     type: 'library',
     isPartner: true,
+    maxTables: 2,
     notes: 'Study room B',
   },
   {
@@ -96,6 +104,7 @@ export const venues: Venue[] = [
     lng: -104.9877,
     type: 'library',
     isPartner: true,
+    maxTables: 2,
     notes: 'Study room on the 5th floor',
   },
   {
@@ -106,6 +115,7 @@ export const venues: Venue[] = [
     lng: -104.8319,
     type: 'gym',
     isPartner: true,
+    maxTables: 1,
     notes: 'Back court open Saturday mornings',
   },
   {
@@ -116,6 +126,7 @@ export const venues: Venue[] = [
     lng: -104.9878,
     type: 'coworking',
     isPartner: true,
+    maxTables: 1,
     notes: 'Glass room off the lobby',
   },
   {
@@ -126,6 +137,7 @@ export const venues: Venue[] = [
     lng: -105.0166,
     type: 'cafe',
     isPartner: true,
+    maxTables: 2,
     notes: 'Long table by the fireplace',
   },
   {
@@ -136,6 +148,7 @@ export const venues: Venue[] = [
     lng: -104.8772,
     type: 'library',
     isPartner: true,
+    maxTables: 2,
     notes: 'Bookable meeting room',
   },
   {
@@ -146,6 +159,7 @@ export const venues: Venue[] = [
     lng: -105.11,
     type: 'cafe',
     isPartner: true,
+    maxTables: 2,
     notes: 'Patio tables when it’s warm',
   },
 ];

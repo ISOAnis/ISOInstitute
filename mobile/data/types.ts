@@ -35,7 +35,16 @@ export interface Coach {
   subtitle: string;
   credentials: [Credential, Credential, Credential];
   tags: string[];
+  /** Square face crop for avatars. */
   photo?: Photo;
+  /** Head-and-shoulders cutout (transparent background) for the coach card. */
+  cutout?: Photo;
+  /** Coaching cohort the board approved them in, e.g. "Cohort 1 · Spring 2026". */
+  cohort: string;
+  /** Start of their most recent hosted ISO. Hosting every 90 days keeps the card active. */
+  lastIsoAt?: string;
+  /** Private matching answers. Used to suggest ISOs, never shown to players. */
+  match?: MatchProfile;
   overall: number;
   tier: CoachTier;
   isosHosted: number;
@@ -64,6 +73,8 @@ export interface Venue {
   lng: number;
   type: VenueType;
   isPartner: boolean;
+  /** ISO tables the venue can hold at once in a time slot. */
+  maxTables: number;
   notes: string;
   /** Venue picker badge for coaches ("CLOSEST TO YOU", "FREE"). */
   badge?: string;
@@ -127,6 +138,7 @@ export interface NewIsoInput {
   seats: number;
   approveRequests: boolean;
   revealSpot24h: boolean;
+  groupFor?: GroupFor;
 }
 
 export interface CoachApplication {
@@ -175,6 +187,8 @@ export interface Iso {
   status: IsoStatus;
   /** Where to find the coach once you're in (shown in the Huddle). */
   findMe?: string;
+  /** Set by the coach when the ISO is a women's or men's ISO. */
+  groupFor?: GroupFor;
 }
 
 export type SeatStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled' | 'checked_in' | 'no_show';
@@ -244,6 +258,12 @@ export interface Player {
   coachId?: string;
   appliedAt?: string;
   matchAnswers: string[];
+  /** Neighborhood they'd pull up from, e.g. "Aurora". */
+  neighborhood: string;
+  /** Where they are right now, e.g. "Early career". */
+  stage: string;
+  match: MatchProfile;
+  prefs: MatchPrefs;
   /** Checked-in ISO count per pathway. Switching keeps old progress. */
   rankProgress: Partial<Record<PathwayId, number>>;
   coachesMet: number;
@@ -257,4 +277,35 @@ export interface IsoSummary extends Iso {
   areaName: string;
   seatsTaken: number;
   seatsOpen: number;
+}
+
+export type FeedbackStyle = 'straight' | 'encourage' | 'mix';
+export type PaceStyle = 'plan' | 'flow';
+export type Drive = 'exploring' | 'committed' | 'all-in';
+export type FirstGen = 'college' | 'business' | 'field';
+export type Gender = 'woman' | 'man';
+export type GroupFor = 'women' | 'men';
+export type MatchSection = 'style' | 'values' | 'from' | 'story' | 'faith' | 'gender';
+
+/** Private answers used only to suggest ISOs. Never shown on a card, at an ISO, or to a coach. */
+export interface MatchProfile {
+  feedback?: FeedbackStyle;
+  pace?: PaceStyle;
+  drive?: Drive;
+  values: string[];
+  /** Up to 3 places, for mixed heritage or people who've moved around. */
+  from: string[];
+  firstGen: FirstGen[];
+  immigrantFamily?: boolean;
+  languages: string[];
+  faith?: string;
+  gender?: Gender;
+  /** Sections answered, or passed on with "Prefer not to say". */
+  done: MatchSection[];
+}
+
+/** Matching preferences. They boost suggestions; they never hide ISOs. */
+export interface MatchPrefs {
+  sameGender: boolean;
+  similarBackground: boolean;
 }

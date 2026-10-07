@@ -2,8 +2,16 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
-import { Avatar, Card, OverallBox, Pill, Screen, Text } from "@/components";
-import { getCoaches, useData, type PathwayId } from "@/data";
+import {
+  Avatar,
+  Card,
+  OverallBox,
+  Pill,
+  RookieBadge,
+  Screen,
+  Text,
+} from "@/components";
+import { getCoaches, isRookie, useData, type PathwayId } from "@/data";
 import { pathwayName } from "@/lib/pathway";
 import { useAppStore } from "@/store";
 import {
@@ -74,7 +82,10 @@ export default function CoachesScreen() {
                   pathway={c.pathway}
                 />
                 <View style={styles.flex}>
-                  <Text variant="rowTitle">{c.name}</Text>
+                  <View style={styles.nameRow}>
+                    <Text variant="rowTitle">{c.name}</Text>
+                    {isRookie(c) ? <RookieBadge small /> : null}
+                  </View>
                   <Text variant="caption">
                     <Text
                       variant="caption"
@@ -116,6 +127,7 @@ export default function CoachesScreen() {
 }
 
 const styles = StyleSheet.create({
+  nameRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   flex: { flex: 1, gap: 2 },
   bold: { fontFamily: fonts.bold },
   head: { gap: 8 },
