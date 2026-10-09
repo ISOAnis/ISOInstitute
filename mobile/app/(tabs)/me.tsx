@@ -2,10 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, BottomSheet, Button, Card, Icon, IconButton, ListRow, ModeSwitch, Screen, StatRow, StatTile, Text } from '@/components';
+import { Avatar, BottomSheet, Button, Card, Icon, IconButton, ListRow, Screen, StatRow, StatTile, Text } from '@/components';
 import { getLocker, getMe, getPastIsos, getPathways, getRankStatus, getRanks, useData, type PathwayId } from '@/data';
 import { ProfileNudge } from '@/features/ProfileNudge';
-import { useModeSwitch } from '@/features/useModeSwitch';
 import { shortDate, switchesLeftLabel } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -17,7 +16,6 @@ export default function MeScreen() {
   const switchesLeft = useAppStore((s) => s.switchesLeft);
   const coachStatus = useAppStore((s) => s.coachStatus);
   const choosePathway = useAppStore((s) => s.choosePathway);
-  const modeSwitch = useModeSwitch();
   const [switching, setSwitching] = useState(false);
 
   const me = useData(getMe, [revision]).data;
@@ -53,8 +51,6 @@ export default function MeScreen() {
         </View>
         <IconButton icon="gear" label="Settings" onPress={() => router.push('/settings')} />
       </View>
-
-      {coachStatus === 'approved' ? <ModeSwitch {...modeSwitch} /> : null}
 
       <ProfileNudge />
 

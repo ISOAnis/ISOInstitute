@@ -4,7 +4,8 @@
  * without changing call sites.
  */
 import { hoursUntil, now } from './clock';
-import { db, DEMO_COACH_ID, rules } from './db';
+import { getCoachCardPreview } from './coachApplication';
+import { COACH_HOME, db, DEMO_COACH_ID, rules } from './db';
 import { emptyMatch, MATCH_SECTIONS, scoreIso, SECTION_RESET } from './matching';
 import { makeCheckinCode, offsetLocation } from './privacy';
 import { rankFor, type RankStatus } from './ranks';
@@ -528,18 +529,19 @@ export async function getHuddleMembers(isoId: string): Promise<HuddleMember[]> {
 
 // ---------------------------------------------------------------- coach side
 
-export async function submitCoachApplication(app: CoachApplication): Promise<Player> {
-  db.applications.push(app);
-  db.me.coachStatus = 'applied';
-  db.me.appliedAt = now().toISOString().slice(0, 19);
-  return getMe();
-}
-
-/** Prototype only: stands in for the advisory board approving the application. */
+/** Prototype only: stands in for the advisory board approving the application. The demo coach account is already ID-verified. */
 export async function approveCoachForDemo(): Promise<Player> {
   db.me.coachStatus = 'approved';
   db.me.coachId = DEMO_COACH_ID;
+  db.me.idCheck ??= { status: 'verified', referenceId: 'demo', provider: 'mock', checkedAt: now().toISOString().slice(0, 19) };
   return getMe();
+}
+
+/** Why this account can't drop a pin yet, or null when it can. */
+export async function getPinBlocker(): Promise<string | null> {
+  if (db.me.coachStatus !== 'approved') return 'Your coach application has to be approved before you can drop a pin.';
+  if (db.me.idCheck?.status !== 'verified') return 'Verify your ID before you drop your first pin.';
+  return null;
 }
 
 export async function getMyCoach(): Promise<Coach | null> {
@@ -578,15 +580,29 @@ export async function getRegulars(coachId: string): Promise<Regular[]> {
   return db.regulars.filter((r) => r.coachId === coachId);
 }
 
-/** Partner venues near the coach, closest first. */
+/** Straight-line miles between two points. */
+function milesBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const dLat = rad(b.lat - a.lat);
+  const dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 3959 * 2 * Math.asin(Math.sqrt(h));
+}
+
+/** Every partner spot with its distance from the coach, closest first. Coaches see exact spots; players never do before confirming. */
 export async function getCoachVenues(): Promise<Venue[]> {
-  return db.venues.filter((v) => v.isPartner && v.distanceMi !== undefined).sort((a, b) => (a.distanceMi ?? 0) - (b.distanceMi ?? 0));
+  return db.venues
+    .filter((v) => v.isPartner)
+    .map((v) => ({ ...v, distanceMi: Math.round(milesBetween(COACH_HOME, v) * 10) / 10 }))
+    .sort((a, b) => a.distanceMi - b.distanceMi);
 }
 
 /** Coach drops a pin. Only approved coaches can create ISOs, in an open table slot, for 2 to 4 players. */
 export async function createIso(input: NewIsoInput): Promise<IsoSummary> {
   const coach = await getMyCoach();
-  if (!coach || db.me.coachStatus !== 'approved') throw new DataError('Only approved coaches can drop a pin.');
+  const blocker = await getPinBlocker();
+  if (blocker) throw new DataError(blocker);
+  if (!coach) throw new DataError('Only approved coaches can drop a pin.');
   const title = input.title.trim();
   if (!title) throw new DataError('Give your ISO a topic.');
   if (input.end <= input.start) throw new DataError('End time has to be after the start.');
@@ -810,6 +826,8 @@ export async function getAreaReviewRequests(): Promise<string[]> {
 
 /** A rookie card for an approved applicant, built from their application. */
 export async function getCoachPreview(): Promise<Coach> {
+  const fromDraft = await getCoachCardPreview();
+  if (fromDraft) return fromDraft;
   const app = db.applications[db.applications.length - 1];
   const pathway = app?.pathway ?? db.me.pathway;
   const first = db.me.name.split(/\s+/)[0];

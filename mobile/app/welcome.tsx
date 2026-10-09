@@ -43,7 +43,7 @@ export default function Welcome() {
   const logIn = () => {
     const coach = coachStatus === 'approved';
     enterApp(coach ? 'coach' : 'player');
-    router.replace(coach ? '/manage' : '/map');
+    router.replace(coach ? '/spots' : '/map');
   };
 
   return (

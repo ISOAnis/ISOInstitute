@@ -4,7 +4,14 @@ import * as api from '@/data';
 import type {
   CancelReason,
   CheckInResult,
-  CoachApplication,
+  CoachBackground,
+  CoachBasics,
+  CoachExtras,
+  CoachHosting,
+  CoachPath,
+  CoachWhy,
+  IdCheck,
+  IdCheckInput,
   IsoSummary,
   MatchPrefs,
   MatchProfile,
@@ -56,7 +63,16 @@ interface AppState {
   declineSeat: (isoId: string, playerId: string) => Promise<Seat>;
   giveUpSeat: (isoId: string, reason?: CancelReason, note?: string) => Promise<api.CancelResult>;
   checkIn: (isoId: string, code: string) => Promise<CheckInResult>;
-  applyToCoach: (app: CoachApplication) => Promise<void>;
+  saveCoachBasics: (basics: CoachBasics) => Promise<void>;
+  saveCoachPath: (path: CoachPath) => Promise<void>;
+  saveCoachBackground: (background: CoachBackground) => Promise<void>;
+  saveCoachWhy: (why: CoachWhy) => Promise<void>;
+  saveCoachTopics: (topics: string[]) => Promise<void>;
+  saveCoachHosting: (hosting: CoachHosting) => Promise<void>;
+  agreeCoachGuidelines: () => Promise<void>;
+  verifyCoachId: (input: IdCheckInput) => Promise<IdCheck>;
+  saveCoachExtras: (extras: CoachExtras) => Promise<void>;
+  submitCoachApplication: () => Promise<void>;
   approveCoachDemo: () => Promise<void>;
   dropPin: (input: NewIsoInput) => Promise<IsoSummary>;
   moveIso: (isoId: string, days: number) => Promise<IsoSummary>;
@@ -112,6 +128,7 @@ export const useAppStore = create<AppState>((set, get) => {
       const mine = await Promise.all(isos.map((i) => api.getMySeat(i.id)));
       const seats: Record<string, MySeat> = {};
       mine.forEach((s) => s && (seats[s.isoId] = toMySeat(s)));
+      await api.restoreCoachApplication();
       await syncMe();
       set({ follows, rsvps, seats, ready: true });
     },
@@ -188,9 +205,56 @@ export const useAppStore = create<AppState>((set, get) => {
       return result;
     },
 
-    applyToCoach: async (app) => {
-      await api.submitCoachApplication(app);
+    saveCoachBasics: async (basics) => {
+      await api.saveCoachBasics(basics);
+      bump();
+    },
+
+    saveCoachPath: async (path) => {
+      await api.saveCoachPath(path);
+      bump();
+    },
+
+    saveCoachBackground: async (background) => {
+      await api.saveCoachBackground(background);
+      bump();
+    },
+
+    saveCoachWhy: async (why) => {
+      await api.saveCoachWhy(why);
+      bump();
+    },
+
+    saveCoachTopics: async (topics) => {
+      await api.saveCoachTopics(topics);
+      bump();
+    },
+
+    saveCoachHosting: async (hosting) => {
+      await api.saveCoachHosting(hosting);
+      bump();
+    },
+
+    agreeCoachGuidelines: async () => {
+      await api.agreeCoachGuidelines();
+      bump();
+    },
+
+    verifyCoachId: async (input) => {
+      const check = await api.verifyCoachId(input);
+      bump();
+      return check;
+    },
+
+    saveCoachExtras: async (extras) => {
+      await api.saveCoachExtras(extras);
+      bump();
+    },
+
+    submitCoachApplication: async () => {
+      await api.submitCoachDraft();
       await syncMe();
+      bump();
     },
 
     approveCoachDemo: async () => {

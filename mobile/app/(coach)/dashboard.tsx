@@ -1,10 +1,9 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, ListRow, ModeSwitch, OverallBox, RookieBadge, Screen, StatTile, Text } from '@/components';
+import { Avatar, Button, Card, IconButton, ListRow, OverallBox, RookieBadge, Screen, StatTile, Text } from '@/components';
 import { ACTIVE_WINDOW_DAYS, getAdvisoryNote, getCoachFeedback, getCoachMonth, getMyCoach, getRegulars, isRookie, now, ROOKIE_ISOS, useData } from '@/data';
 import { ProfileNudge } from '@/features/ProfileNudge';
-import { useModeSwitch } from '@/features/useModeSwitch';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
 import { alpha, colors, fonts, pathwayColors, radius, statusColors } from '@/theme';
@@ -12,7 +11,6 @@ import { alpha, colors, fonts, pathwayColors, radius, statusColors } from '@/the
 /** CoachDash: private metrics, tier progress, feedback, board notes, regulars. */
 export default function Dashboard() {
   const coachId = useAppStore((s) => s.coachId) ?? '';
-  const modeSwitch = useModeSwitch();
   const coach = useData(getMyCoach, []).data;
   const month = useData(() => getCoachMonth(coachId), [coachId]).data;
   const feedback = useData(() => getCoachFeedback(coachId), [coachId]).data ?? [];
@@ -29,7 +27,10 @@ export default function Dashboard() {
 
   return (
     <Screen>
-      <ModeSwitch {...modeSwitch} />
+      <View style={styles.topRow}>
+        <Text variant="title">Me</Text>
+        <IconButton icon="gear" label="Settings" onPress={() => router.push('/settings')} />
+      </View>
 
       <View style={styles.head}>
         <OverallBox value={coach.overall} pathway={coach.pathway} size={64} />
@@ -177,6 +178,7 @@ const styles = StyleSheet.create({
   activeHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   liveDot: { width: 8, height: 8, borderRadius: 4 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   group: { gap: 12 },
   list: { paddingVertical: 0, gap: 0, overflow: 'hidden' },
   stack: { flexDirection: 'column', alignItems: 'stretch', gap: 4, paddingVertical: 16 },

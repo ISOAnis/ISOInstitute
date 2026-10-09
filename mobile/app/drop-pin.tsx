@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 
@@ -6,6 +6,7 @@ import { Button, Card, Chip, Field, Icon, ListRow, Screen, Text, Toggle, TopBar 
 import {
   getCoachVenues,
   getMyCoach,
+  getPinBlocker,
   getSlotAvailability,
   getSlotSuggestions,
   now,
@@ -17,6 +18,7 @@ import {
   type Venue,
   type GroupFor,
 } from '@/data';
+import { applyStepHref } from '@/features/apply/steps';
 import { clockLabel, isoDate, parseClock, startTime, timeRange } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -60,10 +62,12 @@ export default function DropPin() {
   const revision = useAppStore((s) => s.revision);
   const coach = useData(getMyCoach, []).data;
   const venues = useData(getCoachVenues, []).data ?? [];
+  const blocker = useData(getPinBlocker, [revision]).data;
   const days = dayOptions();
 
   const [title, setTitle] = useState('');
-  const [venueId, setVenueId] = useState<string | null>(null);
+  const params = useLocalSearchParams<{ venue?: string }>();
+  const [venueId, setVenueId] = useState<string | null>(params.venue ?? null);
   const [day, setDay] = useState(3);
   const [start, setStart] = useState('12:00 PM');
   const [end, setEnd] = useState('2:00 PM');
@@ -120,10 +124,30 @@ export default function DropPin() {
     }
   };
 
+  if (blocker) {
+    return (
+      <Screen>
+        <TopBar label="Coach account" onBack={() => router.back()} />
+        <View style={styles.done}>
+          <View style={styles.doneIcon}>
+            <Icon name="idCard" size={32} color={colors.gold} />
+          </View>
+          <Text variant="titleLg" align="center">
+            One more step
+          </Text>
+          <Text variant="subtitle" align="center">
+            {blocker}
+          </Text>
+        </View>
+        {coach ? <Button label="Verify your ID" height={52} onPress={() => router.push(applyStepHref('verify', { edit: true }))} /> : null}
+      </Screen>
+    );
+  }
+
   if (created) {
     return (
       <Screen>
-        <TopBar label="Coach mode" onBack={() => router.back()} />
+        <TopBar label="Coach account" onBack={() => router.back()} />
         <View style={styles.done}>
           <View style={styles.doneIcon}>
             <Icon name="check" size={34} color={statusColors.good} strokeWidth={2.6} />
@@ -144,7 +168,7 @@ export default function DropPin() {
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
-        <TopBar label="Coach mode" />
+        <TopBar label="Coach account" onBack={() => router.back()} />
         <Text variant="titleLg">Drop a pin</Text>
 
         <Field label="Topic" value={title} onChangeText={setTitle} placeholder="From side hustle to storefront" />
@@ -169,7 +193,7 @@ export default function DropPin() {
         <View style={styles.group}>
           <Text variant="section">ISO Partner spot · closest first</Text>
           <Card style={styles.list}>
-            {venues.map((v, i) => {
+            {(params.venue ? [...venues].sort((a, b) => Number(b.id === params.venue) - Number(a.id === params.venue)) : venues).map((v, i) => {
               const active = chosenVenue === v.id;
               const slot = slotOf(v.id);
               return (

@@ -149,6 +149,109 @@ export interface CoachApplication {
   link: string;
 }
 
+/** Coach application steps, in order. */
+export type CoachApplyStep = 'basics' | 'path' | 'experience' | 'why' | 'topics' | 'hosting' | 'guidelines' | 'verify' | 'extras' | 'review';
+
+/** Step 1. Name and photo go on the coach card; email and phone stay with the ISO team. */
+export interface CoachBasics {
+  fullName: string;
+  /** Picked from the photo library. Shows on the coach card. */
+  photoUri?: string;
+  email: string;
+  phone: string;
+  city: string;
+  neighborhood: string;
+}
+
+/** Step 2. The pathway is chosen once and locks when the coach is approved. */
+export interface CoachPath {
+  pathway?: PathwayId;
+  /** Current role or title, e.g. "Owner" or "ER nurse". */
+  role: string;
+  organization: string;
+}
+
+/** One past or current job. Feeds the back of the coach card. */
+export interface CoachExperience {
+  role: string;
+  organization: string;
+  years: number;
+}
+
+/** Step 3. Up to 3 experience entries, optional education, and up to 8 skills. */
+export interface CoachBackground {
+  experience: CoachExperience[];
+  education?: { school: string; field: string };
+  skills: string[];
+}
+
+/** Step 4. Only `cardLine` is ever shown to players, and only when `showCardLine` is on. */
+export interface CoachWhy {
+  motivation: string;
+  /** "Who helped you get where you are, or who do you wish had?" Skipped when absent. */
+  helpedBy?: string;
+  /** "What do you wish you knew at 20?" Skipped when absent. */
+  wishKnewAt20?: string;
+  showCardLine: boolean;
+  cardLine: string;
+}
+
+/** Broad windows a coach can host or a player can pull up. Shared by both onboardings. */
+export type Availability = 'weekday-mornings' | 'lunch' | 'evenings' | 'weekends';
+
+export type HostFrequency = 'few-a-month' | 'monthly' | 'when-i-can';
+
+/** Step 6. Where and when they'd host. Never a time commitment. */
+export interface CoachHosting {
+  /** Neighborhoods they'd host in. */
+  areas: string[];
+  /** Specific ISO Partner spots they like, optional. */
+  venueIds: string[];
+  availability: Availability[];
+  frequency?: HostFrequency;
+  /** Players per ISO, 2 to 4. */
+  groupSize?: number;
+}
+
+export type IdCheckStatus = 'verified' | 'in_review' | 'failed';
+
+/** Outcome of an ID check. ID and selfie images are never stored, only this. */
+export interface IdCheck {
+  status: IdCheckStatus;
+  /** The verification provider's reference for this check. */
+  referenceId: string;
+  provider: string;
+  checkedAt: string;
+}
+
+/** Step 9. All optional. */
+export interface CoachExtras {
+  linkedIn?: string;
+  /** Name of the First Believer who invited them. */
+  invitedBy?: string;
+  heardFrom?: string;
+}
+
+/** A coach application in progress. Saved on every Continue so the coach can resume where they left off. */
+export interface CoachApplicationDraft {
+  basics?: CoachBasics;
+  path?: CoachPath;
+  background?: CoachBackground;
+  why?: CoachWhy;
+  /** Step 5. Up to 5 tags from the catalog or custom. Shown on the coach card and used for matching. */
+  topics?: string[];
+  hosting?: CoachHosting;
+  /** Step 7. When they agreed to all five community guidelines. */
+  guidelinesAgreedAt?: string;
+  /** Step 8. Status and reference only. */
+  idCheck?: IdCheck;
+  extras?: CoachExtras;
+  submittedAt?: string;
+  /** Steps saved at least once. */
+  saved: CoachApplyStep[];
+  updatedAt?: string;
+}
+
 export interface CoachRequest extends Seat {
   iso: IsoSummary;
 }
@@ -257,6 +360,8 @@ export interface Player {
   /** Coach profile tied to this account once approved. */
   coachId?: string;
   appliedAt?: string;
+  /** Latest ID check. A coach can't drop a pin until it's verified. */
+  idCheck?: IdCheck;
   matchAnswers: string[];
   /** Neighborhood they'd pull up from, e.g. "Aurora". */
   neighborhood: string;

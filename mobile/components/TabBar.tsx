@@ -8,7 +8,7 @@ import { Glass } from './Glass';
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
-export type TabItems = Record<string, { label: string; icon: IconName }>;
+export type TabItems = Record<string, { label: string; icon: IconName; onLongPress?: () => void; hint?: string }>;
 
 const CONTENT_HEIGHT = 56;
 
@@ -45,7 +45,12 @@ export function TabBar({ state, navigation, items, floatOn = [] }: BottomTabBarP
         accessibilityRole="tab"
         accessibilityState={{ selected: focused }}
         accessibilityLabel={item.label}
+        accessibilityHint={item.hint}
+        accessibilityActions={item.onLongPress ? [{ name: 'longpress', label: item.hint }] : undefined}
+        onAccessibilityAction={item.onLongPress}
         onPress={onPress}
+        onLongPress={item.onLongPress}
+        delayLongPress={350}
         style={styles.tab}
       >
         <Icon name={item.icon} size={24} color={tint} />

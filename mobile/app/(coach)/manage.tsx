@@ -2,12 +2,11 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, Card, Icon, ListRow, ModeSwitch, Screen, Text } from '@/components';
+import { Avatar, Button, Card, Icon, ListRow, Screen, Text } from '@/components';
 import { displayPoint, regionAround } from '@/features/map/geo';
 import { MapCanvas } from '@/features/map/MapCanvas';
 import { getCoachIsos, getCoachRequests, getMyCoach, getShortTables, useData, type CoachRequest } from '@/data';
 import { ShortTableCard } from '@/features/ShortTableCard';
-import { useModeSwitch } from '@/features/useModeSwitch';
 import { dateBlock, dayLabel, seatsLabel, startTime, timeRange } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -20,7 +19,6 @@ export default function ManageIsos() {
   const revision = useAppStore((s) => s.revision);
   const coachId = useAppStore((s) => s.coachId) ?? '';
   const { confirmSeat, declineSeat } = useAppStore.getState();
-  const modeSwitch = useModeSwitch();
   const [done, setDone] = useState<Record<string, Outcome>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -52,7 +50,6 @@ export default function ManageIsos() {
   return (
     <View style={styles.root}>
       <Screen contentStyle={{ paddingBottom: 110 }}>
-        <ModeSwitch {...modeSwitch} />
         <View>
           <Text variant="title">Manage your ISOs</Text>
           <Text variant="subtitle">

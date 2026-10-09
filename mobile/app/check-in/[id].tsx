@@ -40,7 +40,7 @@ export default function CheckIn() {
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen>
-        <TopBar label="Coach mode" />
+        <TopBar label="Coach account" />
         <View>
           <Text variant="eyebrow" color={p.text}>
             {dayLabel(iso.startsAt)} · {startTime(iso.startsAt)}

@@ -1,5 +1,8 @@
 import type { Venue } from '@/data/types';
 
+/** Where the demo coach lives, in Southeast Aurora. Partner spots are sorted by distance from here. */
+export const COACH_HOME = { lat: 39.644, lng: -104.785 };
+
 /** Verified ISO Partner spots. Exact coordinates are never shown before confirmation. Tables: café 2, coworking 1, library 2, gym 1. */
 export const venues: Venue[] = [
   {

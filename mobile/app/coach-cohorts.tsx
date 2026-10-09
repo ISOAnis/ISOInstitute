@@ -67,7 +67,7 @@ export default function CoachCohorts() {
         <Text variant="caption">Based on open seats at upcoming ISOs. Needed means players are filling the ISOs that exist.</Text>
       </View>
 
-      <Button label="Join the list" height={52} onPress={() => router.push('/coach-apply')} />
+      <Button label="Join the list" height={52} onPress={() => router.push('/apply')} />
       <Pressable accessibilityRole="link" onPress={asPlayer} style={styles.link}>
         <Text variant="bodyStrong" color={colors.textSecondary} align="center">
           Not yet? Pull up as a player

@@ -51,3 +51,4 @@ export const rules = {
 
 export const DEMO_NOW = mocks.DEMO_NOW;
 export const DEMO_COACH_ID = mocks.DEMO_COACH_ID;
+export const COACH_HOME = mocks.COACH_HOME;

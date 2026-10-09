@@ -6,6 +6,7 @@ import { alpha, mapColors, pathwayColors } from '@/theme';
 
 import { AREA_RADIUS_M, DENVER_METRO, displayPoint } from './geo';
 import { DOT_BOX, IsoDot } from './IsoDot';
+import { SpotPin } from './SpotPin';
 import type { LatLng, MapCanvasProps, Region } from './types';
 
 const M_PER_DEG_LAT = 111_000;
@@ -15,7 +16,18 @@ const M_PER_DEG_LAT = 111_000;
  * flat projection of the same fuzzed points with the same selection and camera
  * behavior. iOS and Android render the real map in MapCanvas.tsx.
  */
-export function MapCanvas({ ref, isos, visibleIds, selectedId, onSelectIso, onPressMap, initialRegion = DENVER_METRO }: MapCanvasProps) {
+export function MapCanvas({
+  ref,
+  isos = [],
+  visibleIds,
+  selectedId,
+  onSelectIso,
+  venues = [],
+  selectedVenueId,
+  onSelectVenue,
+  onPressMap,
+  initialRegion = DENVER_METRO,
+}: MapCanvasProps) {
   const [size, setSize] = useState({ w: 390, h: 844 });
   const [region, setRegion] = useState<Region>(initialRegion);
 
@@ -25,7 +37,9 @@ export function MapCanvas({ ref, isos, visibleIds, selectedId, onSelectIso, onPr
       if (!points.length) return;
       const lats = points.map((p) => p.latitude);
       const lngs = points.map((p) => p.longitude);
-      const latitudeDelta = Math.max(0.25, (Math.max(...lats) - Math.min(...lats)) * 2.2);
+      const midLat = (Math.max(...lats) + Math.min(...lats)) / 2;
+      const lngFit = (Math.max(...lngs) - Math.min(...lngs)) * Math.cos((midLat * Math.PI) / 180) * (size.h / size.w) * 1.3;
+      const latitudeDelta = Math.max(0.25, (Math.max(...lats) - Math.min(...lats)) * 2.2, lngFit);
       setRegion({
         latitude: (Math.max(...lats) + Math.min(...lats)) / 2 - latitudeDelta * 0.12,
         longitude: (Math.max(...lngs) + Math.min(...lngs)) / 2,
@@ -48,7 +62,7 @@ export function MapCanvas({ ref, isos, visibleIds, selectedId, onSelectIso, onPr
       style={styles.frame}
       onPress={onPressMap}
       onLayout={(e) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
-      accessibilityLabel="Map of ISOs across the Denver metro"
+      accessibilityLabel={venues.length ? 'Map of ISO partner spots across the Denver metro' : 'Map of ISOs across the Denver metro'}
     >
       {selected
         ? (() => {
@@ -91,6 +105,20 @@ export function MapCanvas({ ref, isos, visibleIds, selectedId, onSelectIso, onPr
               dimmed={visibleIds ? !visibleIds.has(iso.id) : false}
               full={iso.seatsOpen === 0 || iso.status === 'full'}
             />
+          </Pressable>
+        );
+      })}
+      {venues.map((v) => {
+        const c = project({ latitude: v.lat, longitude: v.lng });
+        return (
+          <Pressable
+            key={v.id}
+            accessibilityRole="button"
+            accessibilityLabel={`Partner spot: ${v.name}, ${v.areaName}`}
+            onPress={() => onSelectVenue?.(v.id)}
+            style={[styles.abs, { left: c.x - DOT_BOX / 2, top: c.y - DOT_BOX / 2, zIndex: v.id === selectedVenueId ? 3 : 2 }]}
+          >
+            <SpotPin selected={v.id === selectedVenueId} />
           </Pressable>
         );
       })}

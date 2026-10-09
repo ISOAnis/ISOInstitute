@@ -10,6 +10,7 @@ import { alpha, pathwayColors } from '@/theme';
 import { AREA_RADIUS_M, DENVER_METRO, displayPoint, MAX_ZOOM } from './geo';
 import { ClusterBubble, IsoDot } from './IsoDot';
 import { darkMapStyle } from './mapStyle';
+import { SpotPin } from './SpotPin';
 import type { MapCanvasProps } from './types';
 
 const CENTER = { x: 0.5, y: 0.5 };
@@ -21,10 +22,13 @@ type ClusterInfo = { id: number; geometry: { coordinates: [number, number] }; pr
 /** Apple Maps on iOS, Google Maps on Android, both in the app's dark style. */
 export function MapCanvas({
   ref,
-  isos,
+  isos = [],
   visibleIds,
   selectedId,
   onSelectIso,
+  venues = [],
+  selectedVenueId,
+  onSelectVenue,
   onPressMap,
   showsUserLocation,
   interactive = true,
@@ -81,7 +85,7 @@ export function MapCanvas({
           anchor={CENTER}
           onPress={c.onPress}
           tracksViewChanges={false}
-          accessibilityLabel={`${c.properties.point_count} ISOs here. Zoom in`}
+          accessibilityLabel={`${c.properties.point_count} ${venues.length ? 'partner spots' : 'ISOs'} here. Zoom in`}
         >
           <ClusterBubble count={c.properties.point_count} />
         </Marker>
@@ -116,6 +120,24 @@ export function MapCanvas({
               dimmed={visibleIds ? !visibleIds.has(iso.id) : false}
               full={iso.seatsOpen === 0 || iso.status === 'full'}
             />
+          </Marker>
+        );
+      })}
+      {venues.map((v) => {
+        const isSelected = v.id === selectedVenueId;
+        return (
+          <Marker
+            key={v.id}
+            coordinate={{ latitude: v.lat, longitude: v.lng }}
+            anchor={CENTER}
+            zIndex={isSelected ? 3 : 2}
+            stopPropagation
+            tracksViewChanges={Platform.OS === 'android'}
+            onPress={() => onSelectVenue?.(v.id)}
+            accessibilityLabel={`Partner spot: ${v.name}, ${v.areaName}`}
+            {...(isSelected ? UNCLUSTERED : null)}
+          >
+            <SpotPin selected={isSelected} />
           </Marker>
         );
       })}

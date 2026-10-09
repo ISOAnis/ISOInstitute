@@ -36,6 +36,14 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "ISO uses your photos so you can add one to your coach card.",
+          "cameraPermission": "ISO uses your camera to photograph your ID and take a selfie so we can verify you.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#141416"

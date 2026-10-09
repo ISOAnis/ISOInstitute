@@ -1,14 +1,15 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, Card, Icon, ListRow, Screen, Text } from '@/components';
-import { getMe, useData } from '@/data';
+import { Button, Card, CoachCardFull, Icon, ListRow, Screen, Text } from '@/components';
+import { getCoachCardPreview, getMe, useData } from '@/data';
 import { clockTime, dayLabel } from '@/lib/format';
 import { useAppStore } from '@/store';
 import { colors } from '@/theme';
 
 export default function CoachReview() {
   const me = useData(getMe, []).data;
+  const card = useData(getCoachCardPreview, []).data;
   const { approveCoachDemo, enterApp } = useAppStore.getState();
   const submitted = me?.appliedAt ? `${dayLabel(me.appliedAt)}, ${clockTime(me.appliedAt)}` : 'Just now';
 
@@ -26,15 +27,17 @@ export default function CoachReview() {
   const approveNow = async () => {
     await approveCoachDemo();
     enterApp('coach');
-    router.replace('/manage');
+    router.replace('/spots');
   };
 
   return (
     <Screen>
       <View style={styles.hero}>
-        <Text variant="titleLg">Application in</Text>
-        <Text variant="subtitle">The ISO advisory board reviews every coach. You’ll hear back within 24–48 hours.</Text>
+        <Text variant="titleLg">Application under review</Text>
+        <Text variant="subtitle">We review every application. You’ll hear from us within a few days.</Text>
       </View>
+
+      {card ? <CoachCardFull coach={card} pending /> : null}
 
       <Card>
         {steps.map((s, i) => (

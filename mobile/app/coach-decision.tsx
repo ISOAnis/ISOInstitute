@@ -62,7 +62,7 @@ function YoureIn() {
   const dropFirstPin = async () => {
     await approveCoachDemo();
     enterApp('coach');
-    router.replace('/manage');
+    router.replace('/spots');
     router.push('/drop-pin');
   };
 
@@ -213,7 +213,7 @@ function PathIn() {
           icon={done ? undefined : 'lock'}
           height={44}
           disabled={!done}
-          onPress={() => router.replace('/coach-apply')}
+          onPress={() => router.replace('/apply')}
         />
       </Card>
 

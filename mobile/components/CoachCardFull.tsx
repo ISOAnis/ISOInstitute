@@ -17,10 +17,10 @@ const STAGE_H = 270;
  * The collectible coach card: soft pathway tint, gold Overall, pathway mark,
  * the coach's cutout headshot over their pathway name, credentials and tags.
  */
-export function CoachCardFull({ coach }: { coach: Coach }) {
+export function CoachCardFull({ coach, pending }: { coach: Coach; pending?: boolean }) {
   const p = pathwayColors[coach.pathway];
   const t = cardTint(coach.pathway);
-  const rookie = isRookie(coach);
+  const rookie = !pending && isRookie(coach);
   const name = pathwayName(coach.pathway);
   const [stageW, setStageW] = useState(340);
   const markSize = Math.min(150, (stageW - 24) / (name.length * 0.44));
@@ -28,19 +28,28 @@ export function CoachCardFull({ coach }: { coach: Coach }) {
   return (
     <View
       accessible
-      accessibilityLabel={`Coach card: ${coach.name}, ${coach.pathway}, ${coach.overall} Overall${rookie ? ', rookie' : ''}`}
+      accessibilityLabel={`Coach card: ${coach.name}, ${coach.pathway}, ${pending ? 'pending review' : `${coach.overall} Overall`}${rookie ? ', rookie' : ''}`}
       style={[styles.shadow, { shadowColor: p.fill }]}
     >
       <LinearGradient colors={t.gradient} locations={[0, 0.48, 1]} style={styles.card}>
         <View style={[styles.topBar, { backgroundColor: t.topBar, shadowColor: p.fill }]} />
 
         <View style={styles.header}>
-          <View style={styles.center}>
-            <Text style={styles.overall} color={colors.gold}>
-              {coach.overall}
-            </Text>
-            <Text variant="caption">Overall</Text>
-          </View>
+          {pending ? (
+            <View style={styles.pending}>
+              <Text style={styles.pendingText} color={colors.gold}>
+                Pending
+              </Text>
+              <Text variant="caption">Under review</Text>
+            </View>
+          ) : (
+            <View style={styles.center}>
+              <Text style={styles.overall} color={colors.gold}>
+                {coach.overall}
+              </Text>
+              <Text variant="caption">Overall</Text>
+            </View>
+          )}
           <View style={[styles.center, { gap: 6 }]}>
             <View style={[styles.mark, { backgroundColor: t.iconBg }]}>
               <Icon name={coach.pathway} size={26} color={p.text} />
@@ -142,6 +151,8 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center' },
   bold: { fontFamily: fonts.bold },
   overall: { fontFamily: fonts.display, fontSize: 64, lineHeight: 70 },
+  pending: { paddingTop: 14, paddingBottom: 10 },
+  pendingText: { fontFamily: fonts.display, fontSize: 34, lineHeight: 40, letterSpacing: tracking(0.03, 34), textTransform: 'uppercase' },
   mark: {
     width: 50,
     height: 50,

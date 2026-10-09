@@ -14,18 +14,28 @@ export function ListRow({
   onPress,
   accessibilityLabel,
   divider,
+  checked,
   style,
 }: {
   children: ReactNode;
   onPress?: () => void;
   accessibilityLabel?: string;
   divider?: boolean;
+  /** Makes the row a checkbox for screen readers. */
+  checked?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   const body = (pressed: boolean) => [styles.row, divider && styles.divider, pressed && styles.pressed, style];
   if (!onPress) return <View style={body(false)}>{children}</View>;
+  const checkbox = checked !== undefined;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={({ pressed }) => body(pressed)}>
+    <Pressable
+      accessibilityRole={checkbox ? 'checkbox' : 'button'}
+      accessibilityState={checkbox ? { checked } : undefined}
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={({ pressed }) => body(pressed)}
+    >
       {children}
     </Pressable>
   );

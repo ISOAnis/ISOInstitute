@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { BottomSheet, Button, CoachCardFull, CodeDisplay, IconButton, IsoCard, ModeSwitch, PathwayDot, Pill, Screen, Text } from '@/components';
+import { BottomSheet, Button, CoachCardFull, CodeDisplay, IconButton, IsoCard, PathwayDot, Pill, Screen, Text } from '@/components';
 import { getCoach, getIsos, getPathways, getSavedCard, useData, type IsoFilter } from '@/data';
 import { ClusterBubble, IsoDot } from '@/features/map/IsoDot';
 import { useAppStore } from '@/store';
@@ -20,8 +20,7 @@ export default function ComponentGallery() {
   const revision = useAppStore((s) => s.revision);
   const follows = useAppStore((s) => s.follows);
   const mySeat = useAppStore((s) => s.seats[DEMO_ISO]);
-  const mode = useAppStore((s) => s.mode);
-  const { setMode, toggleFollow, gotNext, confirmSeat, giveUpSeat } = useAppStore.getState();
+  const { toggleFollow, gotNext, confirmSeat, giveUpSeat } = useAppStore.getState();
 
   const [pill, setPill] = useState<PillKey>('recommended');
   const [selected, setSelected] = useState<string | null>(null);
@@ -127,11 +126,6 @@ export default function ComponentGallery() {
             />
           </>
         ) : null}
-      </Section>
-
-      <Section title="ModeSwitch (store)">
-        <ModeSwitch mode={mode} onChange={setMode} badge={3} />
-        <Text variant="caption">Mode in store: {mode}</Text>
       </Section>
 
       <BottomSheet visible={holdOpen} onClose={() => setHoldOpen(false)} eyebrow="I got next" title="Save your seat with a $5 hold">

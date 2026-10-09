@@ -50,7 +50,7 @@ export default function RoleStep() {
     await updateProfile({ name: name.trim(), phone, city: city.trim() || 'Denver', birthday });
     if (role === 'coach' && coachStatus === 'approved') {
       enterApp('coach');
-      router.replace('/manage');
+      router.replace('/spots');
       return;
     }
     router.push(role === 'coach' ? '/coach-cohorts' : '/onboarding/pathway');

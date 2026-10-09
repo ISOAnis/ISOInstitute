@@ -22,4 +22,4 @@ export {
   ROOKIE_ISOS,
 } from './ranks';
 export { seats } from './seats';
-export { venues } from './venues';
+export { COACH_HOME, venues } from './venues';

@@ -1,9 +1,8 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Avatar, Card, ListRow, ModeSwitch, Screen, Text } from '@/components';
+import { Avatar, Card, ListRow, Screen, Text } from '@/components';
 import { getCoachIsos, getRegulars, getTable, useData, type Seat } from '@/data';
-import { useModeSwitch } from '@/features/useModeSwitch';
 import { dayLabel } from '@/lib/format';
 import { pathwayName } from '@/lib/pathway';
 import { useAppStore } from '@/store';
@@ -13,7 +12,6 @@ import { colors, fonts, statusColors } from '@/theme';
 export default function Players() {
   const coachId = useAppStore((s) => s.coachId) ?? '';
   const revision = useAppStore((s) => s.revision);
-  const modeSwitch = useModeSwitch();
   const regulars = useData(() => getRegulars(coachId), [coachId]).data ?? [];
   const tables =
     useData(async () => {
@@ -23,7 +21,6 @@ export default function Players() {
 
   return (
     <Screen>
-      <ModeSwitch {...modeSwitch} />
       <View>
         <Text variant="title">Your players</Text>
         <Text variant="subtitle">Confirmed seats at your live pins, and the players who keep coming back.</Text>
