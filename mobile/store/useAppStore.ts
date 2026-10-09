@@ -47,6 +47,9 @@ interface AppState {
   seats: Record<string, MySeat>;
   /** Bumps after every write so screens can refetch derived data. */
   revision: number;
+  /** Show the coach tab tour on the next visit to the coach side. Set once, right after approval. */
+  coachTour: boolean;
+  setCoachTour: (on: boolean) => void;
 
   hydrate: () => Promise<void>;
   completeOnboarding: () => void;
@@ -122,6 +125,8 @@ export const useAppStore = create<AppState>((set, get) => {
     rsvps: [],
     seats: {},
     revision: 0,
+    coachTour: false,
+    setCoachTour: (coachTour) => set({ coachTour }),
 
     hydrate: async () => {
       const [follows, rsvps, isos] = await Promise.all([api.getFollows(), api.getRsvps(), api.getIsos()]);

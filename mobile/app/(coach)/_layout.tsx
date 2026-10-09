@@ -1,13 +1,17 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { TabBar, type TabItems } from '@/components';
 import { AccountSwitcher } from '@/features/AccountSwitcher';
+import { CoachTour } from '@/features/CoachTour';
 import { useAppStore } from '@/store';
 import { colors } from '@/theme';
 
 export default function CoachTabsLayout() {
   const approved = useAppStore((s) => s.coachStatus === 'approved');
+  const tour = useAppStore((s) => s.coachTour);
+  const setCoachTour = useAppStore((s) => s.setCoachTour);
   const [switching, setSwitching] = useState(false);
   if (!approved) return <Redirect href="/map" />;
 
@@ -20,7 +24,7 @@ export default function CoachTabsLayout() {
   };
 
   return (
-    <>
+    <View style={styles.root}>
       <Tabs
         tabBar={(props) => <TabBar {...props} items={coachTabs} floatOn={['spots']} />}
         screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
@@ -31,7 +35,12 @@ export default function CoachTabsLayout() {
         <Tabs.Screen name="coach-events" />
         <Tabs.Screen name="dashboard" />
       </Tabs>
+      {tour ? <CoachTour onDone={() => setCoachTour(false)} /> : null}
       <AccountSwitcher visible={switching} onClose={() => setSwitching(false)} />
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.bg },
+});

@@ -57,13 +57,13 @@ function Bullet({ children }: { children: string }) {
 function YoureIn() {
   const preview = useData(getCoachPreview, []).data;
   const cohort = useData(getCohortInfo, []).data;
-  const { approveCoachDemo, enterApp } = useAppStore.getState();
+  const { approveCoachDemo, enterApp, setCoachTour } = useAppStore.getState();
 
-  const dropFirstPin = async () => {
+  const openCoachAccount = async () => {
     await approveCoachDemo();
+    setCoachTour(true);
     enterApp('coach');
     router.replace('/spots');
-    router.push('/drop-pin');
   };
 
   return (
@@ -85,7 +85,7 @@ function YoureIn() {
         <Bullet>{`Host at least once every ${ACTIVE_WINDOW_DAYS} days to stay active.`}</Bullet>
       </Card>
 
-      <Button label="Drop your first pin" height={52} onPress={dropFirstPin} />
+      <Button label="Open your coach account" height={52} onPress={openCoachAccount} />
     </>
   );
 }

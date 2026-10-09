@@ -36,8 +36,6 @@ function PlayerMap() {
   const tabH = useTabBarHeight();
   const params = useLocalSearchParams<{ pill?: string }>();
   const revision = useAppStore((s) => s.revision);
-  const applied = useAppStore((s) => s.coachStatus === 'applied');
-
   const map = useRef<MapCanvasHandle>(null);
   const sheet = useRef<BottomSheet>(null);
   const pager = useRef<FlatList<IsoListItem>>(null);
@@ -163,16 +161,6 @@ function PlayerMap() {
             <Pill key={id} pathway={id} label={pathwayName(id)} active={pill === id} onPress={() => pick(id)} />
           ))}
         </ScrollView>
-        {applied ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Coach application in review"
-            onPress={() => router.push('/coach-review')}
-            style={styles.review}
-          >
-            <Text style={styles.reviewText}>Coach application in review</Text>
-          </Pressable>
-        ) : null}
       </Glass>
 
       {!sheetOpen ? (
@@ -248,15 +236,6 @@ const styles = StyleSheet.create({
   header: { position: 'absolute', top: 0, left: 0, right: 0, gap: 8, paddingBottom: 10 },
   lockup: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   mark: { width: 36, height: 28 },
-  review: {
-    marginHorizontal: gutter,
-    minHeight: TAP,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
-  },
-  reviewText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.gold },
   brandRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: gutter },
   areaChip: {
     flexDirection: 'row',
