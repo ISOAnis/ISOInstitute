@@ -116,7 +116,7 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
             <h1 className="about-hero-title">It's not you vs you anymore.</h1>
             <p className="about-hero-sub">
               Fear makes role players. Courage makes stars. It's time to{' '}
-              <strong>Call an ISO</strong>.
+              <strong>Call Next</strong>.
             </p>
           </section>
 

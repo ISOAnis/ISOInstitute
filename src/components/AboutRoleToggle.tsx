@@ -1,3 +1,5 @@
+import { AboutCardRail } from './AboutCardRail';
+
 const AUDIENCE_CARDS: { label: string; title: string; body: string; highlights: string[] }[] = [
   {
     label: 'For Players',
@@ -25,7 +27,7 @@ export function AboutRoleToggle() {
       <div className="about-eyebrow">Who It's For</div>
       <p className="about-section-lede about-role-intro">Three sides. One city. Everyone's In Search Of something.</p>
 
-      <div className="about-role-grid">
+      <AboutCardRail label="Who it's for" itemCount={AUDIENCE_CARDS.length} gridClassName="about-role-grid">
         {AUDIENCE_CARDS.map((card) => (
           <div key={card.label} className="about-role-panel">
             <div className="about-role-panel-label">{card.label}</div>
@@ -38,7 +40,7 @@ export function AboutRoleToggle() {
             </ul>
           </div>
         ))}
-      </div>
+      </AboutCardRail>
 
       <p className="about-role-culture">
         Rewarding player progress, celebrating coaches like superstars, and putting local spots on the map. <strong>That's the culture.</strong>

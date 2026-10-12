@@ -998,6 +998,16 @@
     justify-content: center;
   }
 
+  .about-card-rail-wrap .about-role-grid.about-card-rail {
+    max-width: none;
+  }
+
+  .about-card-rail-wrap .about-role-grid.about-card-rail > .about-role-panel {
+    flex: 0 0 min(85vw, 300px);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
   .about-card-rail-wrap .about-team-grid.about-card-rail > .about-team-card {
     flex: 0 0 min(72vw, 260px);
     scroll-snap-align: start;

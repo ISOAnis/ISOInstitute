@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="236 0 968 310" preserveAspectRatio="xMidYMid meet">
+      <style>@keyframes isoDrift{to{stroke-dashoffset:-60}}@keyframes isoGlow{0%,100%{opacity:.45}50%{opacity:1}}.iso-drift{animation:isoDrift 3.2s linear infinite}.iso-glow{animation:isoGlow 2.8s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.iso-drift,.iso-glow{animation:none}}</style>
+      <defs>
+        <linearGradient id="isoArcG" x1="0" x2="1"><stop offset="0" stop-color="#cfcfd4"/><stop offset=".45" stop-color="#C8873A"/><stop offset="1" stop-color="#E0A35A"/></linearGradient>
+        <filter id="isoArcGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+      </defs>
+      <path d="M264.0 280.0 C 534.0 -60, 906.0 -60, 1176.0 280.0" fill="none" stroke="#C8873A" stroke-width="8" opacity=".18" filter="url(#isoArcGlow)"/>
+      <path d="M264.0 280.0 C 534.0 -60, 906.0 -60, 1176.0 280.0" fill="none" stroke="url(#isoArcG)" stroke-width="2.2" opacity=".85"/>
+      <path class="iso-drift" d="M264.0 280.0 C 534.0 -60, 906.0 -60, 1176.0 280.0" fill="none" stroke="#FFE2B8" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round" opacity=".9"/>
+      <circle cx="264.0" cy="280.0" r="7" fill="#EDEDF0"/><circle cx="264.0" cy="280.0" r="16" fill="none" stroke="#6a6a72" stroke-width="1.2"/>
+      <circle class="iso-glow" cx="1176.0" cy="280.0" r="8" fill="#C8873A"/><circle cx="1176.0" cy="280.0" r="17" fill="none" stroke="#C8873A" stroke-width="1.2" opacity=".6"/>
+    </svg>

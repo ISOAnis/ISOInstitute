@@ -30,7 +30,11 @@ function RotatingPhrase() {
 export function SplashHero({ onWaitlistClick, onBrowseSeasonClick }: SplashHeroProps) {
   return (
     <section id="top" className="splash-hero">
-      <img src="/hero-bg.svg" alt="" aria-hidden="true" className="splash-hero-bg" />
+      <picture>
+        <source media="(max-width: 640px)" srcSet="/hero-bg-mobile.svg" />
+        <img src="/hero-bg.svg" alt="" aria-hidden="true" className="splash-hero-bg" />
+      </picture>
+      <img src="/hero-arc.svg" alt="" aria-hidden="true" className="splash-hero-arc" />
       <div className="splash-hero-glow" aria-hidden="true" />
 
       <div className="splash-hero-inner">

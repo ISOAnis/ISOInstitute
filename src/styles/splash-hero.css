@@ -21,6 +21,11 @@
   pointer-events: none;
 }
 
+/* On narrow screens the sliced artwork pushes the arc off both edges, so it is drawn separately at a size that fits. */
+.splash-hero-arc {
+  display: none;
+}
+
 .splash-hero-glow {
   position: absolute;
   left: 50%;
@@ -189,6 +194,17 @@
 @media (max-width: 640px) {
   .splash-hero {
     padding: 150px 20px 48px;
+  }
+
+  .splash-hero-arc {
+    display: block;
+    position: absolute;
+    top: 78px;
+    left: 12px;
+    width: calc(100% - 24px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
   }
 
   .splash-hero-inner {
