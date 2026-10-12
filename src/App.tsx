@@ -21,7 +21,7 @@ import { About } from './components/About';
 import { FAQPage } from './components/FAQPage';
 import { AssistPage } from './components/AssistPage';
 
-const WAITLIST_FORM_URL = 'https://forms.gle/A4RZXCqNptBGkLE39';
+const WAITLIST_FORM_URL = 'https://tally.so/r/Y5Ee75';
 
 type SplashView = 'splash' | 'about' | 'faq' | 'assist';
 

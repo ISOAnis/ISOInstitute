@@ -53,11 +53,11 @@ export function SplashNavigation({
               className="text-lg font-semibold tracking-wide transition-opacity hover:opacity-80"
               style={{ ...brandStyle, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              ISO Institute
+              ISO
             </button>
           ) : (
             <span className="text-lg font-semibold tracking-wide" style={brandStyle}>
-              ISO Institute
+              ISO
             </span>
           )}
 

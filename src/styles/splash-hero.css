@@ -1,0 +1,234 @@
+.splash-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: clamp(720px, calc(100vh - 90px), 940px);
+  padding: 150px 24px 56px;
+  background: #1a1a1c;
+  color: #f2f2f2;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Starts below the fixed nav; min height of 62.5vw keeps the 1440x900 artwork from cropping its top, where the arc peaks. */
+.splash-hero-bg {
+  position: absolute;
+  top: 76px;
+  left: 0;
+  width: 100%;
+  height: max(calc(100% - 76px), 62.5vw);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.splash-hero-glow {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  width: 1000px;
+  height: 700px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.055) 0%, rgba(26, 26, 28, 0) 62%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.splash-hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.splash-hero-logo {
+  height: 92px;
+  width: auto;
+  object-fit: contain;
+}
+
+.splash-hero-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.splash-hero-kicker {
+  font-size: clamp(28px, 4.2vw, 60px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: #b4b4ba;
+}
+
+.splash-hero-chrome {
+  font-size: clamp(60px, 8.6vw, 124px);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  background: linear-gradient(100deg, #9a9a9a 0%, #f0f0f0 45%, #a8a8a8 70%, #dcdcdc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.splash-hero-rotator {
+  display: block;
+  min-height: 1.05em;
+  font-size: clamp(30px, 5vw, 72px);
+  line-height: 1.05;
+  color: #c8873a;
+}
+
+.splash-hero-phrase {
+  display: inline-block;
+  animation: splashHeroRise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.splash-hero-sub {
+  margin: 0;
+  max-width: 620px;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #a8a8ae;
+}
+
+.splash-hero-ctas {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+}
+
+.splash-hero-cta-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.splash-hero-btn {
+  min-height: 56px;
+  padding: 16px 34px;
+  border-radius: 999px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.splash-hero-btn:hover {
+  transform: translateY(-1px);
+}
+
+.splash-hero-btn:focus-visible {
+  outline: 2px solid #f2f2f2;
+  outline-offset: 3px;
+}
+
+.splash-hero-btn--primary {
+  border: 1.5px solid #c8873a;
+  background: #c8873a;
+  color: #141416;
+  box-shadow: 0 10px 40px rgba(200, 135, 58, 0.35);
+}
+
+.splash-hero-btn--primary:hover {
+  background: #d4954a;
+  box-shadow: 0 12px 48px rgba(200, 135, 58, 0.45);
+}
+
+.splash-hero-btn--outline {
+  border: 1.5px solid #ededed;
+  background: transparent;
+  color: #f2f2f2;
+}
+
+.splash-hero-btn--outline:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.splash-hero-audience {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #8a8a90;
+}
+
+.splash-hero-launch {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  color: #6e6e76;
+}
+
+@keyframes splashHeroRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .splash-hero {
+    padding: 150px 20px 48px;
+  }
+
+  .splash-hero-inner {
+    gap: 24px;
+  }
+
+  .splash-hero-logo {
+    height: 72px;
+  }
+
+  .splash-hero-rotator {
+    min-height: 2.1em;
+  }
+
+  .splash-hero-sub {
+    font-size: 17px;
+  }
+
+  .splash-hero-ctas {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .splash-hero-cta-col {
+    width: 100%;
+  }
+
+  .splash-hero-btn {
+    width: 100%;
+  }
+
+  .splash-hero-launch {
+    letter-spacing: 0.24em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-hero-phrase {
+    animation: none;
+  }
+}

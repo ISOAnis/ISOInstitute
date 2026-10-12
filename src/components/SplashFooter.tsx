@@ -8,6 +8,8 @@ const SOCIAL_LINKS = {
   linkedin: 'https://www.linkedin.com/company/isoinstitute/',
 };
 
+const SHOW_FAQ_LINK = false;
+
 interface SplashFooterProps {
   onNavigateToAbout?: () => void;
   onNavigateToFAQ?: () => void;
@@ -75,7 +77,7 @@ export function SplashFooter({
                   <FooterLink onClick={onNavigateToAssist}>The Assist</FooterLink>
                 </li>
               )}
-              {onNavigateToFAQ && (
+              {SHOW_FAQ_LINK && onNavigateToFAQ && (
                 <li>
                   <FooterLink onClick={onNavigateToFAQ}>FAQ</FooterLink>
                 </li>
