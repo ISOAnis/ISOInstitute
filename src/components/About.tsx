@@ -108,30 +108,33 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
       />
 
       <div className="about-splash-content">
-        {/* Hero */}
-        <section className="about-hero">
-          <img src="/ISO OFFICIAL.png" alt="ISO" className="about-hero-logo" />
-          <h1 className="about-hero-title">It's not you vs you anymore.</h1>
-          <p className="about-hero-sub">
-            Fear makes role players. Courage makes stars. It's time to{' '}
-            <strong>Call an ISO</strong>.
-          </p>
-        </section>
+        <div className="about-hero-backdrop">
+          <img src="/about-hero-bg.svg" alt="" aria-hidden="true" className="about-hero-bg" />
+          {/* Hero */}
+          <section className="about-hero">
+            <img src="/ISO OFFICIAL.png" alt="ISO" className="about-hero-logo" />
+            <h1 className="about-hero-title">It's not you vs you anymore.</h1>
+            <p className="about-hero-sub">
+              Fear makes role players. Courage makes stars. It's time to{' '}
+              <strong>Call an ISO</strong>.
+            </p>
+          </section>
 
-        {/* The Problem */}
-        <section className="about-section about-section-tight">
-          <div className="about-eyebrow">The Challenge</div>
-          <h2 className="about-heading about-heading-cards">Three Problems. One Mission.</h2>
-          <AboutCardRail label="Three problems" itemCount={PROBLEMS.length} gridClassName="about-problem-grid">
-            {PROBLEMS.map((problem) => (
-              <div key={problem.num} className="about-problem-card">
-                <div className="about-problem-num">Problem {problem.num}</div>
-                <div className="about-problem-title">{problem.title}</div>
-                <div className="about-problem-desc">{problem.desc}</div>
-              </div>
-            ))}
-          </AboutCardRail>
-        </section>
+          {/* The Problem */}
+          <section className="about-section about-section-tight">
+            <div className="about-eyebrow">The Challenge</div>
+            <h2 className="about-heading about-heading-cards">Three Problems. One Mission.</h2>
+            <AboutCardRail label="Three problems" itemCount={PROBLEMS.length} gridClassName="about-problem-grid">
+              {PROBLEMS.map((problem) => (
+                <div key={problem.num} className="about-problem-card">
+                  <div className="about-problem-num">Problem {problem.num}</div>
+                  <div className="about-problem-title">{problem.title}</div>
+                  <div className="about-problem-desc">{problem.desc}</div>
+                </div>
+              ))}
+            </AboutCardRail>
+          </section>
+        </div>
 
         {/* Mission — scroll-scrub zoom */}
         <AboutMissionScroll />
@@ -164,10 +167,10 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
             </div>
 
             <p className="about-reframe-close">
-              In basketball, an ISO isn't isolation — it's a one-on-one against someone who sharpens you in real
+              In basketball, an ISO isn’t isolation. It’s a matchup against someone who sharpens you in real
               time. <strong>We took that definition and applied it to real-world pathways.</strong> Every coach
-              on ISO is that defender. You don't get better in isolation. You get better in proximity to someone
-              who won't let you stay the same.
+              on ISO is that defender. And because nobody grows alone, every ISO is a small group: one coach, two
+              to four players, all getting better in proximity to someone who won’t let them stay the same.
             </p>
 
             <div className="about-beliefs">
@@ -241,11 +244,8 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
           <div className="about-eyebrow">The Impact</div>
           <h2 className="about-heading about-heading-cards">Why ISO Matters</h2>
           <AboutCardRail label="Why ISO matters" itemCount={IMPACTS.length} gridClassName="about-impact-grid">
-            {IMPACTS.map((impact, index) => (
-              <div
-                key={impact}
-                className={`about-impact-bubble${index === 2 ? ' full' : ''}`}
-              >
+            {IMPACTS.map((impact) => (
+              <div key={impact} className="about-impact-bubble">
                 {impact}
               </div>
             ))}

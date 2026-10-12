@@ -5,7 +5,7 @@
   align-items: center;
   min-height: clamp(720px, calc(100vh - 90px), 940px);
   padding: 150px 24px 56px;
-  background: #1a1a1c;
+  background: #161618;
   color: #f2f2f2;
   font-family: 'Manrope', sans-serif;
 }

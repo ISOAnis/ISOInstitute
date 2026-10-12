@@ -57,7 +57,7 @@ export function EventSplashPage({
   };
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#1a1a1c' }}>
+    <div className="relative min-h-screen" style={{ background: '#161618' }}>
       <AnimatePresence>
         {showIntroOverlay && (
           <SplashIntroOverlay
