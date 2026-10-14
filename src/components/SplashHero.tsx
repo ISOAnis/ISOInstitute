@@ -47,7 +47,7 @@ export function SplashHero({ onWaitlistClick, onBrowseSeasonClick }: SplashHeroP
         </h1>
 
         <p className="splash-hero-sub">
-          Find successful professionals on your path, in your city, at the places you go most: coffee shops, restaurants, gyms, and other third&nbsp;spaces.
+          Find successful professionals on your path, in your city, at the places you go&nbsp;most.
         </p>
 
         <div className="splash-hero-ctas">
