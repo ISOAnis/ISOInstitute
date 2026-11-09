@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SplashNavigation } from '../components/SplashNavigation';
 import { SplashFooter } from '../components/SplashFooter';
 import { SplashHero } from '../components/SplashHero';
+import { HomeSections } from '../components/HomeSections';
 import {
   SplashIntroOverlay,
   hasSeenSplashIntro,
@@ -81,6 +82,8 @@ export function EventSplashPage({
       />
 
       <SplashHero onWaitlistClick={openWaitlistForm} onBrowseSeasonClick={() => onNavigateToAssist?.()} />
+
+      <HomeSections />
 
       <SplashFooter
         onNavigateToAbout={onNavigateToAbout}
