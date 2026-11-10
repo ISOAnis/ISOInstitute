@@ -122,7 +122,7 @@ const SAFETY = [
 const FAQS = [
   {
     q: 'Is ISO free?',
-    a: 'Yes. Finding a coach and claiming a seat is free for players, and coaches host for free. ISO is built for access, so the core experience is meant to stay that way.',
+    a: "Yes, there's a free tier for players, so everyone has a way in. It comes with some limits, and coaches host for free. ISO is built for access, so the core experience is meant to stay that way.",
   },
   {
     q: 'Why not just message people on LinkedIn?',
