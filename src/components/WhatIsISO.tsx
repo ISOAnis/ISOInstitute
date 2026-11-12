@@ -19,7 +19,7 @@ export function WhatIsISO() {
             {/* Right: Description */}
             <div>
               <p className="text-lg sm:text-xl text-slate-300 leading-relaxed" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                ISO Institute bridges the gap between spiritual guidance and professional development, 
+                ISO bridges the gap between spiritual guidance and professional development, 
                 using basketball as the universal language that connects coaches and players.
               </p>
             </div>
@@ -53,7 +53,7 @@ export function WhatIsISO() {
                   It's about trusting your skills, relying on your preparation, and taking control of the moment.
                 </p>
                 <p className="text-lg sm:text-xl text-slate-300 leading-relaxed">
-                  At ISO Institute, "Calling an ISO" means connecting with a coach who understands your unique 
+                  At ISO, "Calling an ISO" means connecting with a coach who understands your unique 
                   journey. It's about finding guidance in faith, direction in career, and courage in personal growth. 
                   Your coach helps you navigate life's court with confidence and purpose.
                 </p>

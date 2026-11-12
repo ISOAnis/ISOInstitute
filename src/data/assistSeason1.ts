@@ -13,7 +13,7 @@ export type AssistEpisode = {
 
 export const ASSIST_PLATFORM_LINKS = {
   applePodcastsShow: 'https://podcasts.apple.com/us/podcast/the-assist/id1896897320',
-  spotifyShow: 'https://open.spotify.com/search/The%20Assist%20ISO%20Institute/podcasts',
+  spotifyShow: 'https://open.spotify.com/search/The%20Assist%20ISO/podcasts',
   youtubeChannel: 'https://www.youtube.com/@ISO-1v',
 };
 

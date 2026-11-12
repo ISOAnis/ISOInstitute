@@ -419,7 +419,7 @@ export function Pricing() {
                       {company.highlight ? (
                         <img
                           src="/ISOMetallic.png"
-                          alt="ISO Institute"
+                          alt="ISO"
                           style={{ height: '42px', width: 'auto', margin: '0 auto' }}
                         />
                       ) : (

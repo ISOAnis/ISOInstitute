@@ -835,7 +835,7 @@ export function MentorModal({ category, onClose, onNavigateToCallIso }: MentorMo
               { year: '2019', role: 'Software Engineer', company: 'Apple' },
               { year: '2021', role: 'Senior Engineer', company: 'Zoox' },
               { year: '2023', role: 'Lead Engineer', company: 'Zoox' },
-              { year: '2024', role: 'Mentor & Community Builder', company: 'ISO Institute' }
+              { year: '2024', role: 'Mentor & Community Builder', company: 'ISO' }
             ],
             photo:
               typeof window !== 'undefined' &&

@@ -3,9 +3,9 @@ import { Instagram, Linkedin } from 'lucide-react';
 import '../styles/splash-footer.css';
 
 const SOCIAL_LINKS = {
-  instagram: 'https://www.instagram.com/isoinstitute/',
-  tiktok: 'https://tiktok.com/@iso_institute',
-  linkedin: 'https://www.linkedin.com/company/isoinstitute/',
+  instagram: 'https://www.instagram.com/isoapp.co/',
+  tiktok: 'https://www.tiktok.com/@isoapp.co',
+  linkedin: 'https://www.linkedin.com/company/isoapp/',
 };
 
 const SHOW_FAQ_LINK = false;
@@ -64,7 +64,7 @@ export function SplashFooter({
     <footer className="splash-footer">
       <div className="splash-footer-inner">
         <div className="splash-footer-brand">
-          <img src="/ISO OFFICIAL.png" alt="ISO Institute" className="splash-footer-logo" />
+          <img src="/ISO OFFICIAL.png" alt="ISO" className="splash-footer-logo" />
           <p className="splash-footer-tagline">A movement, a system, a community.</p>
         </div>
 
@@ -139,7 +139,7 @@ export function SplashFooter({
         </div>
 
         <div className="splash-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} ISO Institute. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} ISO. All rights reserved.</p>
         </div>
       </div>
     </footer>

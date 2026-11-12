@@ -162,7 +162,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
                 className="flex items-center gap-2 px-6 py-3 rounded-full border border-orange-500/30 bg-slate-950/60 backdrop-blur-md text-white text-lg font-medium hover:border-orange-500/50 hover:bg-slate-950/80 transition-all"
                 style={{ fontFamily: "'Bebas Neue', sans-serif" }}
               >
-                Welcome to ISO Institute
+                Welcome to ISO
                 <ArrowRight size={16} className="opacity-70" />
               </button>
         </motion.div>
@@ -205,7 +205,7 @@ export function Hero({ onNavigate }: HeroProps = {}) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
-              The ISO Institute is a faith-rooted cultural movement designed to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
+              ISO is a faith-rooted cultural movement designed to inspire ambition, elevate overlooked talent, and rebuild community pathways to success.
         </motion.p>
 
             {/* CTA Button with Flowing Border */}

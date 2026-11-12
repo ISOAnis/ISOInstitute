@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { SplashNavigation } from './SplashNavigation';
+import { IsoNav } from './IsoNav';
 import { SplashFooter } from './SplashFooter';
 import {
   ASSIST_PLATFORM_LINKS,
@@ -105,15 +105,11 @@ export function AssistPage({
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation
-        mode={onBack ? 'about' : 'splash'}
-        onBack={onBack}
-        onNavigateToAssist={onNavigateToAssist}
-      />
+      <IsoNav />
 
       <div className="assist-splash-content">
         <header className="assist-hero">
-          <p className="assist-hero-kicker">ISO Institute</p>
+          <p className="assist-hero-kicker">ISO</p>
           <h1 className="assist-hero-title">The Assist</h1>
           <p className="assist-hero-sub">
             A weekly talk dedicated to the ones our communities don&apos;t celebrate enough.
@@ -247,7 +243,7 @@ export function AssistPage({
           <p className="assist-season-two-kicker">What&apos;s Next</p>
           <h2 className="assist-season-two-title">Season 2 Coming Soon</h2>
           <p className="assist-season-two-text">
-            We&apos;re lining up the next roster of guests. Follow @isoinstitute to hear it first.
+            We&apos;re lining up the next roster of guests. Follow @isoapp.co to hear it first.
           </p>
           {onWaitlistClick && (
             <button type="button" className="about-close-btn" onClick={onWaitlistClick}>

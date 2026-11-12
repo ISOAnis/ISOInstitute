@@ -36,7 +36,7 @@ export function Footer({ onNavigate }: FooterProps) {
               </div>
             </div>
             <p className="text-white/70">
-              Muslim-founded coaching institute helping you strengthen faith, discipline, and purpose.
+              Muslim-founded coaching platform helping you strengthen faith, discipline, and purpose.
             </p>
           </div>
 

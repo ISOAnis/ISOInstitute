@@ -117,7 +117,7 @@ export function CoachTradingCard({ mentor, category, onClose, onBookSession }: C
     { year: '2019', role: 'Software Engineer', company: 'Apple' },
     { year: '2021', role: 'Senior Engineer', company: 'Zoox' },
     { year: '2023', role: 'Lead Engineer', company: 'Zoox' },
-    { year: '2024', role: 'Coach & Community Builder', company: 'ISO Institute' }
+    { year: '2024', role: 'Coach & Community Builder', company: 'ISO' }
   ];
 
   const getImageSrc = () => {

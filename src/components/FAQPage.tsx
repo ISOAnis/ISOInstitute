@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SplashNavigation } from './SplashNavigation';
+import { IsoNav } from './IsoNav';
 import { SplashFooter } from './SplashFooter';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { FAQ_PATHWAYS, FAQ_SECTIONS } from '../data/faqContent';
@@ -50,17 +50,13 @@ export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigate
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation
-        mode={onBack ? 'about' : 'splash'}
-        onBack={onBack}
-        onNavigateToAssist={onNavigateToAssist}
-      />
+      <IsoNav />
 
       <div className="faq-splash-content">
         <header className="faq-hero">
           <h1 className="faq-hero-title">Frequently Asked Questions</h1>
           <p className="faq-hero-sub">
-            Everything you need to know about ISO, the Institute, and The Assist.
+            Everything you need to know about ISO and The Assist.
           </p>
         </header>
 
@@ -100,7 +96,7 @@ export function FAQPage({ onBack, onWaitlistClick, onNavigateToAbout, onNavigate
         ))}
 
         <section className="faq-close">
-          <p className="faq-close-text">Still have questions? Reach out on Instagram @isoinstitute.</p>
+          <p className="faq-close-text">Still have questions? Reach out on Instagram @isoapp.co.</p>
           {onWaitlistClick && (
             <>
               <button type="button" className="about-close-btn" onClick={onWaitlistClick}>

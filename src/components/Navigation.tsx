@@ -129,7 +129,7 @@ export function Navigation({ onOpenCommunityPortal, currentPage, onNavigate, onM
                   <span className="text-white text-lg">☪️</span> 
                 </div> 
                 <span className="text-white text-lg font-semibold tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                  ISO Institute
+                  ISO
                 </span>
               </button>
             </div>

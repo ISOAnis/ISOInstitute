@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Moon, Dumbbell, Globe, Activity, Rocket, Settings, type LucideIcon } from 'lucide-react';
-import { SplashNavigation } from './SplashNavigation';
+import { IsoNav } from './IsoNav';
 import { SplashFooter } from './SplashFooter';
 import { AboutCardRail } from './AboutCardRail';
 import { AboutRoleToggle } from './AboutRoleToggle';
@@ -101,11 +101,7 @@ export function About({ onNavigate, onWaitlistClick, onBack, onNavigateToAbout, 
         <div className="about-splash-bg-glow" />
       </div>
 
-      <SplashNavigation
-        mode={onBack ? 'about' : 'splash'}
-        onBack={onBack}
-        onNavigateToAssist={onNavigateToAssist}
-      />
+      <IsoNav />
 
       <div className="about-splash-content">
         <div className="about-hero-backdrop">

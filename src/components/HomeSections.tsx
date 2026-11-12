@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import { Settings } from 'lucide-react';
 import '../styles/home-sections.css';
 
 const WAITLIST_URL = 'https://tally.so/r/Y5Ee75';
@@ -190,7 +191,15 @@ function WalkView({
   const flow = FLOWS[viewKey];
   const [active, setActive] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const beatsRef = useRef<HTMLOListElement>(null);
   const allId = `all-${viewKey}`;
+
+  useEffect(() => {
+    const list = beatsRef.current;
+    const item = list?.children[active] as HTMLElement | undefined;
+    if (!list || !item || list.scrollWidth <= list.clientWidth) return;
+    list.scrollTo({ left: item.offsetLeft - parseFloat(getComputedStyle(list).paddingLeft), behavior: 'smooth' });
+  }, [active]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -234,7 +243,7 @@ function WalkView({
           />
         </div>
         <div className="walk-side">
-          <ol className="beats">
+          <ol className="beats" ref={beatsRef}>
             {flow.beats.map((beat, i) => (
               <li key={beat.title} className={i === active ? 'on' : undefined}>
                 <button type="button" onClick={() => seek(i)}>
@@ -247,6 +256,7 @@ function WalkView({
               </li>
             ))}
           </ol>
+          <p className="beat-now">{flow.beats[active].body}</p>
           <button
             type="button"
             className="expand"
@@ -346,7 +356,12 @@ function HowItWorks() {
           <button type="button" aria-pressed={view === 'players'} onClick={() => switchTo('players')}>
             I'm a player
           </button>
-          <button type="button" aria-pressed={view === 'coaches'} onClick={() => switchTo('coaches')}>
+          <button
+            type="button"
+            id="tab-coaches"
+            aria-pressed={view === 'coaches'}
+            onClick={() => switchTo('coaches')}
+          >
             I'm a coach
           </button>
         </div>
@@ -485,7 +500,7 @@ export function HomeSections() {
         <div className="wrap">
           <div>
             <div className="eyebrow">ISO · In Search Of</div>
-            <h2>Your city's best, on the map.</h2>
+            <h2>Your city's best. ISO puts them on the map.</h2>
             <div className="ctas">
               <a className="btn ghost" href="#first-iso">
                 See the first ISO
@@ -496,7 +511,7 @@ export function HomeSections() {
                 <i className="dot" />
                 Launching in Denver
               </span>
-              <span>Free for players</span>
+              <span>Free tier for players</span>
               <span>Small groups, public spots</span>
             </div>
           </div>
@@ -635,7 +650,7 @@ export function HomeSections() {
         </div>
       </section>
 
-      <section>
+      <section id="pathways">
         <div className="wrap">
           <div className="eyebrow">Six pathways</div>
           <h2>Find your path. Meet who's already on it.</h2>
@@ -643,6 +658,11 @@ export function HomeSections() {
           <div className="paths">
             {PATHS.map((path) => (
               <div key={path.name} className={`path${path.live ? ' live' : ''}`}>
+                {path.live && (
+                  <span className="path-icon" aria-hidden="true">
+                    <Settings size={20} strokeWidth={1.75} />
+                  </span>
+                )}
                 <span className="tag">{path.live ? 'Going live soon in Denver' : 'Coming'}</span>
                 <h3>{path.name}</h3>
                 <p>{path.field}</p>

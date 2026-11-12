@@ -16,7 +16,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { SplashNavigation } from '../components/SplashNavigation';
+import { IsoNav } from '../components/IsoNav';
 import { SplashFooter } from '../components/SplashFooter';
 import { SplashHero } from '../components/SplashHero';
 import { HomeSections } from '../components/HomeSections';
@@ -76,10 +76,7 @@ export function EventSplashPage({
         }}
         transition={{ duration: 0.65, ease: 'easeOut' }}
       >
-      <SplashNavigation
-        onNavigateToAbout={onNavigateToAbout}
-        onNavigateToAssist={onNavigateToAssist}
-      />
+      <IsoNav />
 
       <SplashHero onWaitlistClick={openWaitlistForm} onBrowseSeasonClick={() => onNavigateToAssist?.()} />
 

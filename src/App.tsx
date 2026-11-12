@@ -20,6 +20,7 @@ import EventSplashPage from './pages/EventSplashPage';
 import { About } from './components/About';
 import { FAQPage } from './components/FAQPage';
 import { AssistPage } from './components/AssistPage';
+import { homeSectionForHash } from './components/IsoNav';
 
 const WAITLIST_FORM_URL = 'https://tally.so/r/Y5Ee75';
 
@@ -63,15 +64,18 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const sectionId = view === 'splash' ? homeSectionForHash(window.location.hash.slice(1)) : null;
+    const section = sectionId ? document.getElementById(sectionId) : null;
+    if (section) section.scrollIntoView();
+    else window.scrollTo(0, 0);
     document.title =
       view === 'about'
-        ? 'About · ISO Institute'
+        ? 'About · ISO'
         : view === 'faq'
-          ? 'FAQ · ISO Institute'
+          ? 'FAQ · ISO'
           : view === 'assist'
-            ? 'The Assist · ISO Institute'
-            : 'In Search Of · ISO Institute';
+            ? 'The Assist · ISO'
+            : 'ISO - In Search Of';
   }, [view]);
 
   const openWaitlistForm = () => {

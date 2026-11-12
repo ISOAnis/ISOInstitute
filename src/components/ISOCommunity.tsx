@@ -65,7 +65,7 @@ export function ISOCommunity() {
           </p>
           <p className="text-slate-400 max-w-2xl mx-auto mb-8">
             ISO also offers an optional community module for imams, chaplains, and leaders to manage counseling sessions, 
-            meetings, and community requests with the same structure and discipline that drives our mentorship institute.
+            meetings, and community requests with the same structure and discipline that drives ISO.
           </p>
           <p className="text-slate-400 max-w-2xl mx-auto">
             Streamlines scheduling, integrates prayer times, ensures privacy, and allows for optional donation-based bookings — 

@@ -1,0 +1,301 @@
+/* ===== ISO NAV: THE BENCH ===== */
+/* Tokens live on the nav elements, not :root, so they don't override the site's shared --muted token. */
+.iso-nav,
+.iso-scrim,
+.iso-drawer {
+  --bg: #121214;
+  --line: #2c2c32;
+  --fg: #f2eee8;
+  --muted: #a3a3ab;
+  --dim: #6f6f78;
+  --gold: #c8873a;
+  --display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
+  --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--body);
+  color: var(--fg);
+  box-sizing: border-box;
+}
+
+.iso-nav *,
+.iso-drawer * {
+  box-sizing: border-box;
+}
+
+/* Fixed rather than sticky: every page is already padded to clear a fixed bar of this height. The intro overlay (z 200) still covers it. */
+.iso-nav {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background: rgba(18, 18, 20, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(44, 44, 50, 0.6);
+}
+
+.iso-nav .wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+
+.iso-nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.iso-nav .brand img {
+  height: 30px;
+  width: auto;
+}
+
+.iso-nav .brand b {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+
+.iso-nav .links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iso-nav .btn {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gold);
+  color: #121214;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 12px;
+}
+
+.iso-drawer .eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 420px) {
+  .iso-nav .btn {
+    display: none;
+  }
+}
+
+.iso-nav .mbtn,
+.iso-drawer .mbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid var(--fg);
+  background: transparent;
+  color: var(--fg);
+  padding: 8px 14px;
+  font: 800 14px var(--body);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.iso-nav .mbtn svg,
+.iso-drawer .mbtn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.iso-nav .mbtn:focus-visible,
+.iso-drawer .mbtn:focus-visible,
+.iso-nav .brand:focus-visible,
+.iso-nav .btn:focus-visible,
+.iso-drawer .dcta:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Above every modal on the site (highest is 10004). */
+.iso-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.iso-scrim.on {
+  opacity: 1;
+}
+
+.iso-drawer {
+  position: fixed;
+  z-index: 10041;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: max(10px, env(safe-area-inset-right, 0px));
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  width: min(460px, calc(100% - 20px));
+  background: #1a1a1d;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 26px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  transform: translateX(calc(100% + 24px));
+  visibility: hidden;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1), visibility 0s 0.45s;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.iso-drawer.on {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.iso-drawer .dtop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iso-drawer .eyebrow.dk {
+  color: var(--dim);
+}
+
+.iso-drawer ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.iso-drawer ol li a {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg);
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.iso-drawer .jn {
+  font-family: var(--display);
+  font-size: 30px;
+  color: transparent;
+  -webkit-text-stroke: 1.2px var(--dim);
+  transition: color 0.2s, -webkit-text-stroke-color 0.2s;
+}
+
+.iso-drawer .lb {
+  font-family: var(--display);
+  font-size: clamp(38px, 6vw, 56px);
+  line-height: 1;
+  transition: transform 0.25s;
+}
+
+.iso-drawer .ar {
+  color: var(--gold);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.2s, transform 0.2s;
+  font-weight: 800;
+}
+
+.iso-drawer li a:hover .jn,
+.iso-drawer li a:focus-visible .jn {
+  color: var(--gold);
+  -webkit-text-stroke-color: var(--gold);
+}
+
+.iso-drawer li a:hover .lb,
+.iso-drawer li a:focus-visible .lb {
+  transform: translateX(8px);
+}
+
+.iso-drawer li a:hover .ar,
+.iso-drawer li a:focus-visible .ar {
+  opacity: 1;
+  transform: none;
+}
+
+.iso-drawer ol li a:focus-visible {
+  outline: none;
+}
+
+.iso-drawer .dfoot {
+  display: grid;
+  gap: 16px;
+}
+
+.iso-drawer .dsocial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.iso-drawer .dsocial ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.iso-drawer .dsocial a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.iso-drawer .dsocial a:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.iso-drawer .dsocial a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.iso-drawer .dcta {
+  display: block;
+  text-align: center;
+  background: var(--gold);
+  color: #121214;
+  text-decoration: none;
+  font-weight: 800;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iso-drawer,
+  .iso-drawer.on,
+  .iso-scrim {
+    transition: none;
+  }
+}
