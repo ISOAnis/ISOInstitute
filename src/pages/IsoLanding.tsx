@@ -112,6 +112,7 @@ const SAFETY = [
   { title: 'Always a small group', body: 'One coach and 2–4 players at the table.' },
   { title: 'Spot shared late', body: 'The exact location goes only to confirmed players, 24 hours before.' },
   { title: 'Check in with a code', body: 'Everyone checks in on arrival, and anyone can report a problem.' },
+  { title: 'Record for safety', body: 'Anyone can voice record an ISO. Everyone is told, it stays locked on your phone and only the safety team hears it, if you report.' },
 ];
 
 const FAQS = [
