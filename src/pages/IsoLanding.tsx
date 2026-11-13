@@ -133,8 +133,24 @@ const MENU = [
   { href: '#first-iso', label: 'The first ISO' },
   { href: '#pathways', label: 'Pathways' },
   { href: '#coaches', label: 'Coach on ISO' },
+  { href: '#assist', label: 'The Assist' },
+  { href: '#about', label: 'About' },
   { href: '#faq', label: 'FAQ' },
 ];
+
+/** Hashes that open their own page (handled by App) rather than a section here. */
+const PAGE_HASHES = new Set(['about', 'assist']);
+
+const PAGE_LINKS = [
+  { href: '#about', label: 'About' },
+  { href: '#assist', label: 'The Assist' },
+];
+
+/** Switch to another page: App listens for popstate and swaps the view. */
+function openPage(href: string) {
+  window.history.pushState(null, '', href);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
 
 const SOCIALS = [
   { label: 'Instagram', href: INSTAGRAM_URL },
@@ -522,6 +538,10 @@ export function IsoLanding() {
     e.preventDefault();
     setMenuOpen(false);
     const hash = href.slice(1);
+    if (PAGE_HASHES.has(hash)) {
+      openPage(href);
+      return;
+    }
     if (hash === 'coaches') setRole('coaches');
     history.replaceState(null, '', href);
     scrollToId(SECTION_ALIASES[hash] ?? hash);
@@ -586,7 +606,7 @@ export function IsoLanding() {
         aria-hidden={!menuOpen}
       >
         <div className="dtop">
-          <span className="eyebrow dk">Starting five</span>
+          <span className="eyebrow dk">The lineup</span>
           <button type="button" className="mbtn" onClick={() => setMenuOpen(false)}>
             <span>Close</span>
             <CloseIcon />
@@ -1006,6 +1026,19 @@ export function IsoLanding() {
             <b>ISO</b>
           </a>
           <div className="social">
+            {PAGE_LINKS.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                  e.preventDefault();
+                  openPage(l.href);
+                }}
+              >
+                {l.label}
+              </a>
+            ))}
             {SOCIALS.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer">
                 {s.label}
