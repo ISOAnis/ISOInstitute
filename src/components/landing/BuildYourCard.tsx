@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
-import { initBuildCard } from './buildCard';
+import { Activity, Dumbbell, Globe, Moon, Rocket, Settings, type LucideIcon } from 'lucide-react';
+import { initBuildCard, PATHWAYS } from './buildCard';
 
 const PERKS = [
   { title: 'Players on your path find you', detail: 'on the map, by your card' },
@@ -10,10 +11,48 @@ const PERKS = [
   { title: 'A free player membership', detail: 'when you host consistently' },
 ];
 
+/** Same icons the About page uses for each pathway. */
+const PATH_ICONS: Record<(typeof PATHWAYS)[number], LucideIcon> = {
+  Builder: Settings,
+  Founder: Rocket,
+  Healer: Activity,
+  Reformer: Globe,
+  Warrior: Dumbbell,
+  Seeker: Moon,
+};
+
+/** All six icons are rendered; CSS shows the one matching the card's data-path. */
+function PathIcon() {
+  return (
+    <span className="bc-icon" aria-hidden="true">
+      {PATHWAYS.map((path) => {
+        const Icon = PATH_ICONS[path];
+        return <Icon key={path} data-i={path} size={20} strokeWidth={1.8} />;
+      })}
+    </span>
+  );
+}
+
+function Chevron({ dir }: { dir: 'left' | 'right' }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+      <path
+        d={dir === 'left' ? 'M8.5 3 4.5 7l4 4' : 'M5.5 3l4 4-4 4'}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /**
- * "Build your card" coach section, from ISO_Coach_Card/coach-card.html.
- * The card is updated by initBuildCard directly in the DOM, so this component is memoized
- * and never re-renders over those changes.
+ * "Build your card" coach section. The card itself is the editor: every line is tap-to-edit,
+ * the pathway changes by swiping the card (or the arrows), and the photo box opens the picker.
+ * initBuildCard drives it directly in the DOM, so this component is memoized and never
+ * re-renders over those changes.
  */
 export const BuildYourCard = memo(function BuildYourCard() {
   const rootRef = useRef<HTMLElement>(null);
@@ -33,9 +72,10 @@ export const BuildYourCard = memo(function BuildYourCard() {
         </div>
         <div className="bc">
           <div className="bc-left">
+            <input type="file" id="bcPhoto" accept="image/*" className="bc-file" aria-label="Add a photo to your card" />
             <div className="bc-flip">
               <div className="bc-flip-inner" id="bcFlip">
-                <div className="bc-card bc-card-front" id="bcCard" data-path="Builder" aria-live="polite">
+                <div className="bc-card bc-card-front" id="bcCard" data-path="Builder">
                   <span className="bc-water" id="bcWater" aria-hidden="true">
                     Builder
                   </span>
@@ -47,66 +87,87 @@ export const BuildYourCard = memo(function BuildYourCard() {
                       Bronze
                     </span>
                   </div>
+                  <PathIcon />
                   <span className="bc-prev" id="bcPrev" hidden>
                     Preview
                   </span>
-                  <label className="bc-photo" htmlFor="bcPhoto" id="bcPhotoBox">
-                    <img id="bcPhotoImg" alt="" hidden />
-                    <span className="bc-add" id="bcAdd">
-                      <svg
-                        width="26"
-                        height="26"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
-                        <circle cx="12" cy="13" r="3.5" />
+                  <div className="bc-photo-wrap">
+                    <label className="bc-photo" htmlFor="bcPhoto" id="bcPhotoBox">
+                      <img id="bcPhotoImg" alt="" hidden />
+                      <span className="bc-add" id="bcAdd">
+                        <svg
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+                          <circle cx="12" cy="13" r="3.5" />
+                        </svg>
+                        Add photo<small>No background works best</small>
+                      </span>
+                    </label>
+                    <button type="button" className="bc-clear" id="bcClear" aria-label="Remove photo" hidden>
+                      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                        <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                      Add photo<small>No background works best</small>
-                    </span>
-                  </label>
-                  <p className="bc-path" id="bcPathLbl">
-                    Builder
+                    </button>
+                  </div>
+                  <div className="bc-path-row">
+                    <p className="bc-path" id="bcPathLbl" aria-live="polite">
+                      Builder
+                    </p>
+                    <div className="bc-path-arrows">
+                      <button type="button" className="bc-path-arrow" data-dir="-1" aria-label="Previous pathway">
+                        <Chevron dir="left" />
+                      </button>
+                      <button type="button" className="bc-path-arrow" data-dir="1" aria-label="Next pathway">
+                        <Chevron dir="right" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="bc-name">
+                    <span className="bc-edit" data-field="name" data-ph="Your name" data-max="24" />
                   </p>
-                  <p className="bc-name" id="bcName" data-ph="Your name">
-                    Your name
-                  </p>
-                  <p className="bc-meta" id="bcMeta" data-ph="Your role, Company · Denver, CO">
-                    Your role, Company · Denver, CO
+                  <p className="bc-meta">
+                    <span className="bc-edit" data-field="role" data-ph="Your role" data-max="28" />
+                    {', '}
+                    <span className="bc-edit" data-field="co" data-ph="Company" data-max="24" data-label="Company" />
+                    {' · '}
+                    <span className="bc-edit" data-field="city" data-ph="Denver, CO" data-max="20" data-label="City" />
                   </p>
                   <div className="bc-boxes">
-                    <div className="bc-box">
-                      <b id="bcB1" data-ph="Company">
-                        Company
-                      </b>
-                      <span id="bcS1" data-ph="Your role">
-                        Your role
-                      </span>
-                    </div>
-                    <div className="bc-box">
-                      <b id="bcB2" data-ph="School">
-                        School
-                      </b>
-                      <span id="bcS2" data-ph="Major">
-                        Major
-                      </span>
-                    </div>
-                    <div className="bc-box">
-                      <b id="bcB3" data-ph="Group">
-                        Group
-                      </b>
-                      <span id="bcS3" data-ph="Title">
-                        Title
-                      </span>
-                    </div>
+                    {[
+                      ['b1', 'Company', 's1', 'Your role'],
+                      ['b2', 'School', 's2', 'Major'],
+                      ['b3', 'Group', 's3', 'Title'],
+                    ].map(([b, bPh, d, dPh], i) => (
+                      <div className="bc-box" key={b}>
+                        <b
+                          className="bc-edit"
+                          data-field={b}
+                          data-ph={bPh}
+                          data-max="12"
+                          data-label={`Key box ${i + 1}: ${bPh.toLowerCase()}`}
+                        />
+                        <span
+                          className="bc-edit"
+                          data-field={d}
+                          data-ph={dPh}
+                          data-max="16"
+                          data-label={`Key box ${i + 1}: ${dPh.toLowerCase()}`}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="bc-card bc-card-back" id="bcCardBack" data-path="Builder" aria-hidden="true">
+                  <PathIcon />
                   <div className="bc-back-head">
                     <span className="bc-back-eyebrow">For ISO coaches</span>
                     <p className="bc-back-title">What comes with your card</p>
@@ -133,6 +194,9 @@ export const BuildYourCard = memo(function BuildYourCard() {
                 </div>
               </div>
             </div>
+            <p className="bc-hint" id="bcHint">
+              Tap any line on the card to edit it. Swipe the card or use the arrows to change your pathway.
+            </p>
             <div className="bc-flip-row">
               <button
                 type="button"
@@ -221,67 +285,21 @@ export const BuildYourCard = memo(function BuildYourCard() {
               Tap a rank to see where your card is headed.
             </p>
           </div>
-          <form className="bc-form" id="bcForm" noValidate>
-            <div className="bc-grid">
-              <label className="bc-f">
-                <span>Name</span>
-                <input id="bcInName" maxLength={24} autoComplete="name" placeholder="Your name" />
-              </label>
-              <label className="bc-f">
-                <span>City</span>
-                <input id="bcInCity" maxLength={20} autoComplete="address-level2" placeholder="Denver, CO" />
-              </label>
-              <label className="bc-f">
-                <span>Role</span>
-                <input id="bcInRole" maxLength={28} autoComplete="organization-title" placeholder="Software engineer" />
-              </label>
-              <label className="bc-f">
-                <span>Company</span>
-                <input id="bcInCo" maxLength={24} autoComplete="organization" placeholder="Where you work now" />
-              </label>
-            </div>
-            <fieldset className="bc-paths">
-              <legend>Your pathway</legend>
-              <div className="bc-chips" id="bcChips">
-                {['Builder', 'Founder', 'Healer', 'Reformer', 'Warrior', 'Seeker'].map((path) => (
-                  <label key={path}>
-                    <input type="radio" name="bcPath" value={path} defaultChecked={path === 'Builder'} />
-                    <span>{path}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset className="bc-keys">
-              <legend>
-                Key boxes <em>A company, school or group. Short words fit best.</em>
-              </legend>
-              <div className="bc-keyrow">
-                <div className="bc-key">
-                  <input id="bcInB1" maxLength={12} placeholder="Google" aria-label="Box 1 name" />
-                  <input id="bcInS1" maxLength={16} placeholder="Software eng" aria-label="Box 1 detail" />
-                </div>
-                <div className="bc-key">
-                  <input id="bcInB2" maxLength={12} placeholder="CU Boulder" aria-label="Box 2 name" />
-                  <input id="bcInS2" maxLength={16} placeholder="Computer sci" aria-label="Box 2 detail" />
-                </div>
-                <div className="bc-key">
-                  <input id="bcInB3" maxLength={12} placeholder="SHPE" aria-label="Box 3 name" />
-                  <input id="bcInS3" maxLength={16} placeholder="Chapter lead" aria-label="Box 3 detail" />
-                </div>
-              </div>
-            </fieldset>
-            <div className="bc-photo-row">
-              <input type="file" id="bcPhoto" accept="image/*" className="bc-file" />
-              <label htmlFor="bcPhoto" className="btn ghost bc-photo-btn">
-                Add a photo
-              </label>
-              <button type="button" className="bc-clear" id="bcClear" hidden>
-                Remove photo
-              </button>
-              <span className="bc-note">
-                Use a photo with no background for the most accurate results. Optional, and it stays on your device.
-              </span>
-            </div>
+          <div className="bc-side">
+            <ol className="bc-steps">
+              <li>
+                <b>Tap a line to type</b>
+                <span>Your name, role, city and three key boxes, right on the card.</span>
+              </li>
+              <li>
+                <b>Swipe to pick your pathway</b>
+                <span>Six pathways, each with its own color and icon.</span>
+              </li>
+              <li>
+                <b>Tap the center to add a photo</b>
+                <span>Optional. A photo with no background looks best, and it stays on your device.</span>
+              </li>
+            </ol>
             <div className="bc-cta">
               <a className="btn" id="bcClaim" href="https://tally.so/r/Y5Ee75" target="_blank" rel="noopener">
                 Claim your card
@@ -291,7 +309,7 @@ export const BuildYourCard = memo(function BuildYourCard() {
                 map.
               </p>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </section>

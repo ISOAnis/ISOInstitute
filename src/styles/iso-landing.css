@@ -652,18 +652,25 @@ body:has(.iso-lp) {
 
 /* ---------- phone frame ---------- */
 .iso-lp .phone {
+  --bezel: 8px;
   position: relative;
   width: 100%;
   aspect-ratio: 393 / 852;
   border-radius: 44px;
-  padding: 8px;
+  padding: var(--bezel);
   background: #050506;
   box-shadow: 0 0 0 1.5px #2e2e35, 0 40px 90px rgba(0, 0, 0, 0.6);
 }
+/* Pinned to the bezel: iOS Safari can size a video by its own aspect ratio instead of
+   height:100%, which let the walkthrough video spill past the bottom of the frame. */
 .iso-lp .phone img,
 .iso-lp .phone video {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: var(--bezel);
+  left: var(--bezel);
+  width: calc(100% - 2 * var(--bezel));
+  height: calc(100% - 2 * var(--bezel));
+  max-width: none;
   object-fit: cover;
   border-radius: 36px;
   display: block;
@@ -734,30 +741,20 @@ body:has(.iso-lp) {
 .iso-lp .dg .cardimg {
   filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 30px rgba(142, 36, 170, 0.25));
 }
-.iso-lp .caps {
-  list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 10px;
-}
-.iso-lp .caps li {
+.iso-lp .dg-cta {
+  margin-top: 22px;
   display: flex;
-  gap: 12px;
-  align-items: baseline;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--dim);
-  transition: color 0.4s;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  opacity: 0;
+  transform: translateY(8px);
 }
-.iso-lp .caps li b {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 22px;
-  letter-spacing: 0.04em;
-  color: var(--dim);
-  min-width: 22px;
-  transition: color 0.4s;
+.iso-lp .dg-cta p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fg);
 }
 @keyframes lpDraw { to { stroke-dashoffset: 0; } }
 @keyframes lpShow { to { opacity: 1; } }
@@ -782,12 +779,8 @@ body:has(.iso-lp) {
 .iso-lp .dg.play .s3 text { transition: opacity 0.4s 3.1s; opacity: 0; }
 .iso-lp .dg.play .rip { animation: lpRip 1.1s ease-out forwards 3.2s; }
 .iso-lp .dg.play .s3 circle.o { transition: stroke 0.4s 3.1s; stroke: var(--gold); }
-.iso-lp .caps.play li:nth-child(1) { color: var(--fg); transition-delay: 0.2s; }
-.iso-lp .caps.play li:nth-child(1) b { color: var(--gold); transition-delay: 0.2s; }
-.iso-lp .caps.play li:nth-child(2) { color: var(--fg); transition-delay: 1.6s; }
-.iso-lp .caps.play li:nth-child(2) b { color: var(--gold); transition-delay: 1.6s; }
-.iso-lp .caps.play li:nth-child(3) { color: var(--fg); transition-delay: 3.1s; }
-.iso-lp .caps.play li:nth-child(3) b { color: var(--gold); transition-delay: 3.1s; }
+.iso-lp .dg.play .dg-cta { animation: lpCtaIn 0.5s ease forwards 3.4s; }
+@keyframes lpCtaIn { to { opacity: 1; transform: none; } }
 @media (max-width: 860px) {
   .iso-lp .how-top { grid-template-columns: minmax(0, 1fr); }
   .iso-lp .dg { justify-self: start; }
@@ -931,7 +924,7 @@ body:has(.iso-lp) {
   gap: 36px 20px;
 }
 .iso-lp .shot { margin: 0; min-width: 0; }
-.iso-lp .shot .phone { border-radius: 32px; padding: 6px; }
+.iso-lp .shot .phone { --bezel: 6px; border-radius: 32px; }
 .iso-lp .shot .phone img { border-radius: 27px; }
 .iso-lp .shot figcaption {
   margin-top: 16px;
@@ -974,6 +967,71 @@ body:has(.iso-lp) {
   }
   .iso-lp .shots::-webkit-scrollbar { display: none; }
   .iso-lp .shot { flex: none; width: min(62vw, 240px); scroll-snap-align: start; }
+}
+
+.iso-lp .how-promise {
+  margin-top: 14px;
+  color: var(--fg);
+  font-weight: 600;
+}
+.iso-lp .walk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 0 18px;
+}
+.iso-lp .walk-actions .expand { margin: 0; }
+.iso-lp .beat-now { display: none; }
+/* Phones: the steps become a sideways row of pills above the video, with the current
+   step's line underneath, so the steps and the video stay on screen together. */
+@media (max-width: 860px) {
+  .iso-lp .walk { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+  .iso-lp .walk-side { display: contents; }
+  .iso-lp .beats {
+    order: 1;
+    position: relative;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-left: calc(-1 * var(--gut-l));
+    margin-right: calc(-1 * var(--gut-r));
+    padding: 2px var(--gut-r) 4px var(--gut-l);
+    scroll-padding-left: var(--gut-l);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .iso-lp .beats::-webkit-scrollbar { display: none; }
+  .iso-lp .beats li { flex: none; }
+  .iso-lp .beats button {
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border-color: var(--line);
+  }
+  .iso-lp .beats li.on button { border-color: var(--gold); }
+  .iso-lp .beats .k { padding-top: 0; }
+  .iso-lp .beats b { font-size: 19px; white-space: nowrap; }
+  .iso-lp .beats li em,
+  .iso-lp .beats li.on em { display: none; }
+  .iso-lp .beat-now {
+    order: 2;
+    display: block;
+    min-height: 3em;
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  /* sized so the toggle, pills, step line and the whole phone fit on one screen */
+  .iso-lp .walk .phone {
+    order: 3;
+    width: min(100%, 240px, calc((100svh - 290px) * 0.46));
+    min-width: 170px;
+    max-width: none;
+    margin: 0 auto;
+  }
+  .iso-lp .walk-actions { order: 4; justify-content: center; margin: 8px 0 0; }
 }
 
 /* ---------- the first ISO ---------- */
@@ -1042,23 +1100,95 @@ body:has(.iso-lp) {
   display: block;
 }
 .iso-lp .g-reel { grid-row: span 2; aspect-ratio: 9 / 16; }
-.iso-lp .snd {
+/* The reel's controls: play/pause, a scrub bar showing what's buffered and played, time and
+   sound. They fade out while it plays so the whole video shows, and come back on hover or tap. */
+.iso-lp .g-reel video { cursor: pointer; }
+.iso-lp .g-tag.reel-tag { top: 14px; bottom: auto; }
+.iso-lp .reel-bar {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 40px;
-  height: 40px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 4px;
+  border-radius: 999px;
+  background: rgba(18, 18, 20, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.iso-lp .reel-tag,
+.iso-lp .reel-bar { transition: opacity 0.35s ease, transform 0.35s ease; }
+.iso-lp .g-reel.is-idle .reel-tag,
+.iso-lp .g-reel.is-idle .reel-bar { opacity: 0; pointer-events: none; }
+.iso-lp .g-reel.is-idle .reel-bar { transform: translateY(8px); }
+.iso-lp .g-reel.is-idle video { cursor: none; }
+.iso-lp .reel-btn {
+  flex: none;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 0;
   display: grid;
   place-items: center;
+  padding: 0;
   color: #fff;
-  background: rgba(18, 18, 20, 0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: transparent;
   cursor: pointer;
 }
-.iso-lp .snd:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.iso-lp .reel-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.iso-lp .reel-btn:focus-visible,
+.iso-lp .reel-scrub:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.iso-lp .reel-time {
+  flex: none;
+  min-width: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.iso-lp .reel-scrub {
+  flex: 1;
+  min-width: 0;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: none;
+}
+.iso-lp .reel-scrub::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold) var(--p, 0%), rgba(255, 255, 255, 0.42) var(--p, 0%), rgba(255, 255, 255, 0.42) var(--b, 0%), rgba(255, 255, 255, 0.16) var(--b, 0%));
+}
+.iso-lp .reel-scrub::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold) var(--p, 0%), rgba(255, 255, 255, 0.42) var(--p, 0%), rgba(255, 255, 255, 0.42) var(--b, 0%), rgba(255, 255, 255, 0.16) var(--b, 0%));
+}
+.iso-lp .reel-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+}
+.iso-lp .reel-scrub::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .iso-lp .reel-tag,
+  .iso-lp .reel-bar { transition: none; }
+}
 .iso-lp .g-tag {
   position: absolute;
   left: 14px;
@@ -1221,9 +1351,27 @@ body:has(.iso-lp) {
   background: linear-gradient(160deg, rgba(142, 36, 170, 0.28), rgba(142, 36, 170, 0.06) 60%), var(--panel);
 }
 .iso-lp .path.live .tag { color: var(--purple-l); }
+/* Narrower cards: the tag sits above the title so a longer tag can't run into it. */
+@media (max-width: 1000px) {
+  .iso-lp .path .tag { position: static; display: block; margin-bottom: 6px; }
+}
+/* Phones: the six pathways swipe sideways instead of stacking in a grid. */
 @media (max-width: 760px) {
-  .iso-lp .paths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .iso-lp .path h3 { font-size: 28px; }
+  .iso-lp .paths {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-left: calc(-1 * var(--gut-l));
+    margin-right: calc(-1 * var(--gut-r));
+    padding: 0 var(--gut-r) 6px var(--gut-l);
+    scroll-padding-left: var(--gut-l);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .iso-lp .paths::-webkit-scrollbar { display: none; }
+  .iso-lp .path { flex: none; width: min(68vw, 250px); scroll-snap-align: start; }
+  .iso-lp .path h3 { font-size: 30px; }
   .iso-lp .path .tag { position: static; display: block; margin-bottom: 6px; }
 }
 
@@ -1273,6 +1421,59 @@ body:has(.iso-lp) {
 .iso-lp details[open] summary::after { transform: rotate(45deg); }
 .iso-lp details p { margin: 0 0 22px; color: var(--muted); max-width: 62ch; }
 @media (max-width: 860px) { .iso-lp .faq { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- atmosphere ----------
+   Soft glows in the same spirit as the Invitationals one, placed where each section's focus is.
+   Kept to a few sections and alternated in position and color so they read as light, not decoration. */
+#how,
+.iso-lp .proof,
+#pathways {
+  position: relative;
+  overflow: hidden;
+}
+#how > .wrap,
+.iso-lp .proof > .wrap,
+.iso-lp .proof > .revs-head,
+.iso-lp .proof > .marquee,
+#pathways > .wrap {
+  position: relative;
+}
+#how::before,
+.iso-lp .proof::before,
+#pathways::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+/* behind the seat diagram, picking up the gold "you" seat */
+#how::before {
+  top: -12%;
+  right: -12%;
+  width: 55%;
+  height: 70%;
+  background: radial-gradient(closest-side, rgba(200, 135, 58, 0.11), transparent 70%);
+}
+/* low and warm under the reel and photos */
+.iso-lp .proof::before {
+  right: -18%;
+  bottom: 8%;
+  width: 62%;
+  height: 55%;
+  background: radial-gradient(closest-side, rgba(214, 140, 70, 0.1), transparent 70%);
+}
+/* behind the live Builder card */
+#pathways::before {
+  left: -12%;
+  top: 18%;
+  width: 46%;
+  height: 80%;
+  background: radial-gradient(closest-side, rgba(142, 36, 170, 0.16), transparent 70%);
+}
+@media (max-width: 760px) {
+  #how::before { width: 110%; height: 45%; right: -45%; }
+  .iso-lp .proof::before { width: 120%; right: -50%; }
+  #pathways::before { width: 120%; height: 70%; left: -50%; top: 35%; }
+}
 
 /* ---------- closing + footer ---------- */
 .iso-lp .close { text-align: center; position: relative; overflow: hidden; }
@@ -1329,6 +1530,5 @@ body:has(.iso-lp) {
   .iso-lp .dg .s3 text { opacity: 0; }
   .iso-lp .dg .rip { display: none; }
   .iso-lp .dg * { animation: none !important; transition: none !important; }
-  .iso-lp .caps li,
-  .iso-lp .caps li b { color: var(--fg); }
+  .iso-lp .dg-cta { opacity: 1; transform: none; }
 }

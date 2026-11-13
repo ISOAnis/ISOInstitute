@@ -2,7 +2,7 @@
 /* ISO BUILD YOUR CARD */
 .iso-lp .bc-sec{background:var(--bg2);border-block:1px solid var(--line)}
 .iso-lp .bc-head{max-width:640px}
-.iso-lp .bc{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"card form";column-gap:clamp(32px,5vw,72px);row-gap:28px;margin-top:44px;align-items:start}
+.iso-lp .bc{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"card side";column-gap:clamp(32px,5vw,72px);row-gap:28px;margin-top:44px;align-items:start}
 .iso-lp .bc-sec [hidden]{display:none!important}
 .iso-lp .bc-left{grid-area:card;position:relative;width:min(360px,100%);justify-self:center}
 .iso-lp .bc-card{--rank:#b87333;--a:#c77ddb;--a2:rgba(199,125,219,.38);--g1:#4b1f5e;--g2:#24132c;
@@ -19,52 +19,27 @@
 .iso-lp .bc-top{display:flex;flex-direction:column;gap:2px;position:relative}
 .iso-lp .bc-ovr{font-family:var(--display);font-size:34px;line-height:1;color:var(--fg)}
 .iso-lp .bc-ovl{font-size:10px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:#d69a63}
-.iso-lp .bc-photo{position:relative;align-self:center;margin-top:8px;width:76%;height:47%;flex:none;border-radius:18px;border:2px dashed var(--a);display:grid;place-items:center;cursor:pointer;overflow:hidden;background:rgba(0,0,0,.16)}
+.iso-lp .bc-photo-wrap{position:relative;align-self:center;margin-top:8px;width:76%;height:47%;flex:none}
+.iso-lp .bc-photo{position:relative;width:100%;height:100%;border-radius:18px;border:2px dashed var(--a);display:grid;place-items:center;cursor:pointer;overflow:hidden;background:rgba(0,0,0,.16)}
 .iso-lp .bc-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 14px 24px rgba(0,0,0,.45))}
 .iso-lp .bc-photo.has{border-color:transparent;background:transparent}
 .iso-lp .bc-add{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px;font-weight:800;color:var(--a);text-align:center}
 .iso-lp .bc-add small{font-size:11px;font-weight:600;color:rgba(242,238,232,.6)}
-.iso-lp .bc-path{margin:auto 0 0;padding-top:8px;font-size:15px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--a);position:relative}
+.iso-lp .bc-path{margin:0;font-size:15px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--a);position:relative}
 .iso-lp .bc-name{margin:2px 0 0;font-family:var(--display);font-size:clamp(34px,3.4vw,42px);line-height:.95;text-transform:uppercase;position:relative;overflow-wrap:anywhere}
 .iso-lp .bc-meta{margin:6px 0 0;font-size:13px;color:rgba(242,238,232,.7);position:relative;padding-bottom:12px;border-bottom:1px solid var(--a2);overflow-wrap:anywhere}
 .iso-lp .bc-boxes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;position:relative}
 .iso-lp .bc-box{border:1px solid var(--a2);border-radius:10px;padding:8px 4px;text-align:center;background:rgba(0,0,0,.18);min-width:0}
 .iso-lp .bc-box b{display:block;font-family:var(--display);font-weight:400;font-size:19px;line-height:1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .iso-lp .bc-box span{display:block;margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,238,232,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.iso-lp .bc-card .ph{opacity:.45}
-.iso-lp .bc-form{grid-area:form;display:flex;flex-direction:column;gap:22px;min-width:0}
-.iso-lp .bc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.iso-lp .bc-f{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;transition:border-color .2s}
-.iso-lp .bc-f:focus-within{border-color:var(--gold)}
-.iso-lp .bc-f span,.iso-lp .bc-form legend{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-.iso-lp .bc-form input:not([type]),.iso-lp .bc-form input[type="text"]{all:unset;font:600 17px var(--body);color:var(--fg);width:100%;box-sizing:border-box}
-.iso-lp .bc-form input::placeholder{color:var(--dim)}
-.iso-lp .bc-form fieldset{border:0;margin:0;padding:0;min-width:0}
-.iso-lp .bc-form legend{padding:0;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
-.iso-lp .bc-form legend em{font-style:normal;font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--dim)}
-.iso-lp .bc-chips{display:flex;flex-wrap:wrap;gap:8px}
-.iso-lp .bc-chips label{position:relative}
-.iso-lp .bc-chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.iso-lp .bc-chips span{display:inline-block;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-weight:700;font-size:14px;color:var(--muted);transition:all .2s}
-.iso-lp .bc-chips input:checked+span{border-color:var(--gold);color:var(--fg);background:rgba(200,135,58,.12)}
-.iso-lp .bc-chips input[value="Builder"]:checked+span{border-color:var(--purple-l);background:rgba(142,36,170,.18)}
-.iso-lp .bc-chips input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
-.iso-lp .bc-keyrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.iso-lp .bc-key{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;transition:border-color .2s;min-width:0}
-.iso-lp .bc-key:focus-within{border-color:var(--gold)}
-.iso-lp .bc-key input:first-child{font-family:var(--display)!important;font-size:22px!important;font-weight:400!important;text-transform:uppercase}
-.iso-lp .bc-key input:last-child{font-size:12px!important;font-weight:700!important;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)!important}
-.iso-lp .bc-photo-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .iso-lp .bc-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.iso-lp .bc-photo-btn{cursor:pointer;padding:11px 18px;font-size:14px}
-.iso-lp .bc-file:focus-visible+.bc-photo-btn{outline:2px solid var(--gold);outline-offset:3px}
-.iso-lp .bc-clear{all:unset;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);text-decoration:underline}
+.iso-lp .bc-file:focus-visible~.bc-flip .bc-photo{outline:2px solid var(--gold);outline-offset:3px}
 .iso-lp .bc-note{margin:0;font-size:13px;color:var(--dim);line-height:1.5}
 .iso-lp .bc-cta{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-top:6px;border-top:1px solid var(--line);padding-top:22px}
 .iso-lp .bc-link{text-decoration:none;border-color:rgba(200,135,58,.6)!important;color:var(--gold)!important}
 .iso-lp .bc-link:hover{background:rgba(200,135,58,.1)!important}
-@media (max-width:860px){.iso-lp .bc{grid-template-columns:minmax(0,1fr);grid-template-areas:"card" "form"}}
-@media (max-width:520px){.iso-lp .bc-grid{grid-template-columns:minmax(0,1fr)}.iso-lp .bc-keyrow{grid-template-columns:minmax(0,1fr)}.iso-lp .bc-card{padding:18px}}
+@media (max-width:860px){.iso-lp .bc{grid-template-columns:minmax(0,1fr);grid-template-areas:"card" "side"}}
+@media (max-width:520px){.iso-lp .bc-card{padding:18px}}
 /* /ISO BUILD YOUR CARD */
 
 /* Rank previews */
@@ -92,7 +67,7 @@
 @media (prefers-reduced-motion:reduce){.iso-lp .bc-card[data-rank]{animation:none!important}}
 .iso-lp .bc-card{transition:box-shadow .3s,border-color .35s}
 .iso-lp .bc-card .bc-ovl{color:color-mix(in srgb,var(--rank) 80%,#fff)}
-.iso-lp .bc-prev{position:absolute;right:16px;top:16px;font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#121214;background:var(--rank);border-radius:999px;padding:4px 9px}
+.iso-lp .bc-prev{position:absolute;right:66px;top:26px;font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#121214;background:var(--rank);border-radius:999px;padding:4px 9px}
 .iso-lp .bc-ranks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:14px}
 .iso-lp .bc-ranks button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px 8px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:800 13px var(--body);cursor:pointer;transition:border-color .2s,background .2s}
 .iso-lp .bc-ranks button small{font-size:10px;font-weight:600;color:var(--dim)}
@@ -122,7 +97,7 @@
 .iso-lp .bc-flip-inner.is-flipped{transform:rotateY(180deg)}
 .iso-lp .bc-flip-inner>.bc-card{-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .iso-lp .bc-card.bc-card-back{position:absolute;inset:0;transform:rotateY(180deg);cursor:pointer}
-.iso-lp .bc-back-head{position:relative}
+.iso-lp .bc-back-head{position:relative;padding-right:52px}
 .iso-lp .bc-back-eyebrow{display:block;font-size:10px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--a)}
 .iso-lp .bc-back-title{margin:6px 0 0;font-family:var(--display);font-size:30px;line-height:.95;text-transform:uppercase;color:var(--fg)}
 .iso-lp .bc-back-list{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:11px;position:relative}
@@ -141,3 +116,52 @@
 .iso-lp .bc-left.is-flipped .bc-q{opacity:0;visibility:hidden;pointer-events:none}
 @media (max-width:520px){.iso-lp .bc-back-title{font-size:28px}.iso-lp .bc-back-list{margin-top:14px;gap:10px}}
 @media (prefers-reduced-motion:reduce){.iso-lp .bc-flip-inner{transition:none}}
+/* The card is the editor: tap a line to type, swipe (or the arrows) to change pathway */
+.iso-lp .bc-card-front{touch-action:pan-y}
+.iso-lp .bc-edit{display:inline-block;min-width:1ch;max-width:100%;border-radius:4px;outline:none;cursor:text;caret-color:var(--a);
+  background-image:linear-gradient(90deg,color-mix(in srgb,var(--a) 55%,transparent) 50%,transparent 0);background-size:6px 1px;background-repeat:repeat-x;background-position:0 100%;
+  transition:background-color .2s,box-shadow .2s}
+.iso-lp .bc-edit:empty::before{content:attr(data-ph);opacity:.45;pointer-events:none}
+.iso-lp .bc-edit:hover{background-color:rgba(255,255,255,.06)}
+.iso-lp .bc-edit:focus{background-color:rgba(255,255,255,.08);background-image:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--a) 70%,transparent)}
+.iso-lp .bc-name .bc-edit{display:inline;padding:0 2px}
+.iso-lp .bc-box .bc-edit{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iso-lp .bc-box span.bc-edit{margin-top:3px}
+.iso-lp .bc-icon{position:absolute;right:16px;top:16px;z-index:2;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;color:var(--a);
+  background:color-mix(in srgb,var(--a) 20%,rgba(0,0,0,.25));border:1px solid var(--a2);box-shadow:0 0 18px color-mix(in srgb,var(--a) 25%,transparent)}
+.iso-lp .bc-icon svg{display:none}
+.iso-lp .bc-card[data-path="Builder"] .bc-icon [data-i="Builder"],
+.iso-lp .bc-card[data-path="Founder"] .bc-icon [data-i="Founder"],
+.iso-lp .bc-card[data-path="Healer"] .bc-icon [data-i="Healer"],
+.iso-lp .bc-card[data-path="Reformer"] .bc-icon [data-i="Reformer"],
+.iso-lp .bc-card[data-path="Warrior"] .bc-icon [data-i="Warrior"],
+.iso-lp .bc-card[data-path="Seeker"] .bc-icon [data-i="Seeker"]{display:block}
+.iso-lp .bc-path-row{margin:auto 0 0;padding-top:8px;display:flex;align-items:center;gap:10px;position:relative}
+.iso-lp .bc-path-arrows{margin-left:auto;display:flex;gap:6px}
+.iso-lp .bc-path-arrow{width:28px;height:28px;border-radius:50%;border:1px solid var(--a2);background:rgba(0,0,0,.2);color:var(--a);display:grid;place-items:center;cursor:pointer;padding:0;transition:background-color .2s,border-color .2s}
+.iso-lp .bc-path-arrow:hover{border-color:var(--a);background:color-mix(in srgb,var(--a) 18%,transparent)}
+.iso-lp .bc-path-arrow:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@keyframes bcSwapNext{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes bcSwapPrev{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.iso-lp .bc-card.swap-next .bc-path,.iso-lp .bc-card.swap-next .bc-icon{animation:bcSwapNext .3s ease}
+.iso-lp .bc-card.swap-prev .bc-path,.iso-lp .bc-card.swap-prev .bc-icon{animation:bcSwapPrev .3s ease}
+.iso-lp .bc-clear{position:absolute;right:8px;top:8px;z-index:2;width:28px;height:28px;border-radius:50%;border:1px solid rgba(242,238,232,.35);background:rgba(18,18,20,.75);color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.iso-lp .bc-clear:hover{border-color:var(--gold);color:var(--gold)}
+.iso-lp .bc-clear:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.iso-lp .bc-hint{margin:14px 0 0;text-align:center;font-size:13px;line-height:1.5;color:var(--muted);transition:opacity .4s}
+.iso-lp .bc-hint.used{opacity:.6}
+.iso-lp .bc-side{grid-area:side;display:flex;flex-direction:column;gap:28px;min-width:0;align-self:center}
+.iso-lp .bc-steps{list-style:none;margin:0;padding:0;display:grid;gap:20px;counter-reset:bcstep}
+.iso-lp .bc-steps li{position:relative;padding-left:52px;counter-increment:bcstep}
+.iso-lp .bc-steps li::before{content:counter(bcstep);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--display);font-size:20px;color:var(--gold);border:1px solid rgba(200,135,58,.45);background:rgba(200,135,58,.08)}
+.iso-lp .bc-steps b{display:block;font-family:var(--display);font-weight:400;font-size:28px;line-height:1;color:var(--fg);letter-spacing:.01em}
+.iso-lp .bc-steps span{display:block;margin-top:6px;font-size:15px;line-height:1.5;color:var(--muted)}
+@media (max-width:860px){.iso-lp .bc-steps{display:none}.iso-lp .bc-side{align-self:stretch}}
+@media (prefers-reduced-motion:reduce){.iso-lp .bc-card.swap-next .bc-path,.iso-lp .bc-card.swap-next .bc-icon,.iso-lp .bc-card.swap-prev .bc-path,.iso-lp .bc-card.swap-prev .bc-icon{animation:none}}
+/* Atmosphere: a soft glow behind the card in the current pathway's color (set from buildCard.ts) */
+@property --bc-glow{syntax:"<color>";inherits:true;initial-value:#c77ddb}
+.iso-lp .bc-left{isolation:isolate;--bc-glow:#c77ddb;transition:--bc-glow .6s ease}
+.iso-lp .bc-left::before{content:"";position:absolute;z-index:-1;left:-30%;right:-30%;top:-14%;height:80%;pointer-events:none;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--bc-glow) 22%,transparent),transparent 72%)}
+@media (prefers-reduced-motion:reduce){.iso-lp .bc-left{transition:none}}

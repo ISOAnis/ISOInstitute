@@ -28,7 +28,7 @@ const BODY_FONT = 'Manrope, system-ui, sans-serif';
 type Pt = { x: number; y: number };
 type Layout = {
   W: number; H: number; m: boolean; gx: number; gy: number; R: number; Z: number;
-  ph: number; pw: number; pts: Pt[]; C: Pt; S: Pt;
+  ph: number; pw: number; pts: Pt[]; C: Pt; S: Pt; bh: number;
 };
 
 export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolean) => void): () => void {
@@ -124,6 +124,24 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
   const proj = geoOrthographic().clipAngle(90);
   const path = geoPath(proj, bctx);
 
+  // ---------- stage height ----------
+  // Sized to the visible viewport: on iOS Safari 100svh can come out taller than what is
+  // actually on screen, which cropped the bottom of the story.
+  let stageH = 0;
+  const fitStage = () => {
+    const h = window.innerHeight;
+    if (h === stageH) return;
+    stageH = h;
+    stage.style.height = h + 'px';
+  };
+  fitStage();
+  window.addEventListener('resize', fitStage);
+  window.visualViewport?.addEventListener('resize', fitStage);
+  cleanups.push(() => {
+    window.removeEventListener('resize', fitStage);
+    window.visualViewport?.removeEventListener('resize', fitStage);
+  });
+
   // ---------- layout ----------
   let L = {} as Layout;
   let dpr = 1;
@@ -142,23 +160,31 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
       c.height = Math.round(H * dpr);
     }
     const m = W < 760;
+    // Phones stack the copy above the visuals, so the chain, globe, phone and card share the
+    // band between the tallest copy block and the bottom of the stage instead of fixed fractions.
+    const bottomOf = (el: HTMLElement) => el.offsetTop + el.offsetHeight;
+    const bandTop = m ? Math.min(Math.max(...blocks.map((b) => bottomOf(b.el))) + 20, H * 0.62) : 0;
+    const bandBot = m ? H - 24 : H;
+    const bh = bandBot - bandTop;
     const gx = m ? W * 0.5 : W * 0.7;
-    const gy = m ? H * 0.76 : H * 0.52;
-    const R = m ? Math.min(W * 0.4, H * 0.22) : Math.min(W * 0.25, H * 0.38);
+    const gy = m ? bandTop + bh / 2 : H * 0.52;
+    const R = m ? Math.min(W * 0.4, bh * 0.4) : Math.min(W * 0.25, H * 0.38);
     const Z = ((m ? 1.55 : 1.15) * W) / R;
-    const ph = m ? Math.min(H * 0.4, 480) : Math.min(H * 0.8, 700);
+    const ph = m ? Math.min(bh, 480) : Math.min(H * 0.8, 700);
     const pw = (ph * 540) / 1168;
     // Seven people, six equal links, one even zigzag
     const x0 = W * 0.08;
     const x1 = W * (m ? 0.92 : 0.7);
     const step = (x1 - x0) / 6;
     const amp = step * 0.3;
-    const base = H * (m ? 0.7 : 0.67);
+    const base = m ? bandTop + bh * 0.55 : H * 0.67;
     const pts = Array.from({ length: 7 }, (_, i) => ({ x: x0 + step * i, y: base + (i % 2 ? -amp : amp) }));
+    // the opening dot sits below the opening lines, clear of the scroll hint
+    const sceneBottom = bottomOf(scene);
     L = {
-      W, H, m, gx, gy, R, Z, ph, pw, pts,
+      W, H, m, gx, gy, R, Z, ph, pw, pts, bh,
       C: { x: W / 2, y: H / 2 },
-      S: m ? { x: W / 2, y: H * (H < 740 ? 0.9 : 0.82) } : { x: W * 0.7, y: H / 2 },
+      S: m ? { x: W / 2, y: Math.min(H - 110, Math.max(sceneBottom + 48, H * 0.66)) } : { x: W * 0.7, y: H / 2 },
     };
     phone.style.width = pw + 'px';
     phone.style.height = ph + 'px';
@@ -178,7 +204,7 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
   const arcCtrl = () => {
     const A = L.pts[0];
     const F = L.pts[6];
-    return { x: (A.x + F.x) / 2, y: Math.min(A.y, F.y) - L.H * (L.m ? 0.16 : 0.24) };
+    return { x: (A.x + F.x) / 2, y: Math.min(A.y, F.y) - (L.m ? L.bh * 0.32 : L.H * 0.24) };
   };
   const globeCenter = (p: number) => {
     const F = L.pts[6];
@@ -532,6 +558,9 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
   let raf = 0;
   let running = false;
   function tick(time: number) {
+    // Safari's toolbars can change the visible height without a resize event
+    fitStage();
+    layout();
     RAW = progress();
     const p = seg(RAW, 0.16, 1);
     if (RAW !== lastP) {
@@ -577,8 +606,10 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
 
   if (document.fonts) {
     document.fonts.ready.then(() => {
-      lastP = -1;
-      if (!running && !disposed) tick(performance.now());
+      if (disposed) return;
+      // copy heights change once the display font loads, and the phone band depends on them
+      layout(true);
+      if (!running) tick(performance.now());
     });
   }
 

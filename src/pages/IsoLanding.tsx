@@ -41,13 +41,13 @@ const WALKS: Record<
     note: 'Every step a player sees, from the map to ranking up.',
     beats: [
       { t: 0, title: 'Find a coach near you', body: 'Pins show coaches on your path at cafés and gyms around your city.' },
-      { t: 5.0, title: 'Check their coach card', body: "Where they work now, their path here and what they're open to." },
-      { t: 9.4, title: 'Say "I got next"', body: 'A one-time 18+ ID check, then you commit to showing up.' },
-      { t: 19.4, title: 'Your seat is locked in', body: 'The exact spot unlocks 24 hours before, only for confirmed players.' },
-      { t: 24.3, title: 'Pull up and check in', body: 'Show the coach your four-digit code. No code, no seat.' },
-      { t: 27.3, title: 'Ask what you came to ask', body: 'Guided questions keep it easy, and your notes save to My ISOs.' },
-      { t: 33.7, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
-      { t: 38.5, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
+      { t: 4.7, title: 'Check their coach card', body: "Where they work now, their path here and what they're open to." },
+      { t: 8.4, title: 'Say "I got next"', body: 'A one-time 18+ ID check, then you commit to showing up.' },
+      { t: 17.2, title: 'Your seat is locked in', body: 'The exact spot unlocks 24 hours before, only for confirmed players.' },
+      { t: 21.4, title: 'Pull up and check in', body: 'Show the coach your four-digit code. No code, no seat.' },
+      { t: 24.1, title: 'Ask what you came to ask', body: 'Guided questions keep it easy, and your notes save to My ISOs.' },
+      { t: 29.5, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
+      { t: 34.0, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
     ],
     shots: [
       { src: 's3-P1-Map.webp', alt: 'Map with coach pins around Denver', title: 'Find a coach', body: 'The map shows coaches on your path near you.' },
@@ -72,12 +72,12 @@ const WALKS: Record<
     beats: [
       { t: 0, title: 'Pick your usual spot', body: 'Partner cafés, gyms and coworking spots on the map.' },
       { t: 1.8, title: 'Set a time and seats', body: "Your schedule, 2–4 seats and the topics you're open to." },
-      { t: 8.2, title: 'Review your pin', body: 'Players only see the area until 24 hours before.' },
-      { t: 10.8, title: 'Your ISO is live', body: 'Players on your path and your followers get a ping.' },
-      { t: 15.9, title: 'Check players in', body: 'Each player shows a code when they pull up. No code, no seat.' },
-      { t: 20.0, title: 'Run it with the ISO Guide', body: "A timed plan, prompts to steer the room and notes on who's there." },
-      { t: 25.1, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
-      { t: 35.4, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
+      { t: 6.5, title: 'Review your pin', body: 'Players only see the area until 24 hours before.' },
+      { t: 8.7, title: 'Your ISO is live', body: 'Players on your path and your followers get a ping.' },
+      { t: 12.9, title: 'Check players in', body: 'Each player shows a code when they pull up. No code, no seat.' },
+      { t: 16.2, title: 'Run it with the ISO Guide', body: "A timed plan, prompts to steer the room and notes on who's there." },
+      { t: 21.3, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
+      { t: 29.9, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
     ],
     shots: [
       { src: 's3-K13-CoachMap.webp', alt: 'Coach map of partner spots', title: 'Pick a spot', body: "Partner spots near you, with when they're quiet." },
@@ -247,6 +247,200 @@ function InViewVideo({
 }
 
 // ---------------------------------------------------------------------------
+// The reel: plays while on screen, with a scrub bar that fades out while it plays
+// ---------------------------------------------------------------------------
+
+const formatTime = (sec: number) => {
+  const s = Math.max(0, Math.floor(sec));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
+
+/** Seconds of quiet before the controls fade while the reel is playing. */
+const REEL_IDLE_MS = 2500;
+
+function ReelPlayer() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const userPaused = useRef(false);
+  const idleTimer = useRef(0);
+  const [playing, setPlaying] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [buffered, setBuffered] = useState(0);
+  const [scrubbing, setScrubbing] = useState(false);
+  const [active, setActive] = useState(true);
+
+  // the controls stay up while paused or scrubbing, and fade after a short idle while playing
+  const wake = useCallback(() => {
+    setActive(true);
+    window.clearTimeout(idleTimer.current);
+    idleTimer.current = window.setTimeout(() => setActive(false), REEL_IDLE_MS);
+  }, []);
+  useEffect(() => () => window.clearTimeout(idleTimer.current), []);
+  // start the fade countdown as soon as it plays, so an untouched reel still clears its controls
+  useEffect(() => {
+    if (playing) wake();
+  }, [playing, wake]);
+  const shown = active || !playing || scrubbing;
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const sync = () => {
+      setPlaying(!v.paused);
+      setTime(v.currentTime);
+      if (Number.isFinite(v.duration)) setDuration(v.duration);
+      let end = 0;
+      for (let i = 0; i < v.buffered.length; i++) {
+        if (v.buffered.start(i) <= v.currentTime + 0.5) end = Math.max(end, v.buffered.end(i));
+      }
+      setBuffered(end);
+    };
+    const events = ['play', 'pause', 'timeupdate', 'progress', 'loadedmetadata', 'durationchange', 'seeked'] as const;
+    events.forEach((n) => v.addEventListener(n, sync));
+    // play while on screen, unless the viewer paused it themselves
+    let io: IntersectionObserver | null = null;
+    if (!reducedMotion()) {
+      io = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting && !userPaused.current) playSafe(v);
+          else if (!e.isIntersecting) v.pause();
+        },
+        { threshold: 0.15 },
+      );
+      io.observe(v);
+    }
+    return () => {
+      events.forEach((n) => v.removeEventListener(n, sync));
+      io?.disconnect();
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      userPaused.current = false;
+      playSafe(v);
+    } else {
+      userPaused.current = true;
+      v.pause();
+    }
+    wake();
+  };
+
+  // a tap on the video first brings the controls back; once they're up it plays or pauses
+  const onVideoClick = () => {
+    if (!shown) wake();
+    else togglePlay();
+  };
+
+  const toggleSound = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const next = v.muted;
+    v.muted = !next;
+    setSoundOn(next);
+    if (next) {
+      userPaused.current = false;
+      playSafe(v);
+    }
+    wake();
+  };
+
+  const seek = (value: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = value;
+    setTime(value);
+  };
+
+  const pct = (n: number) => (duration ? `${Math.min(100, (n / duration) * 100)}%` : '0%');
+
+  return (
+    <div
+      className={`g g-reel${shown ? '' : ' is-idle'}`}
+      onPointerMove={(e) => e.pointerType === 'mouse' && wake()}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && playing && setActive(false)}
+      onFocus={wake}
+    >
+      <video
+        ref={videoRef}
+        src={IMG + 'reel.mp4'}
+        poster={IMG + 'reel-poster.jpg'}
+        muted
+        loop
+        playsInline
+        preload="none"
+        onClick={onVideoClick}
+        aria-label="ISO promo reel: a Builder coach drops a pin, the first ISO at Coffee Story, and ranking up"
+      />
+      <span className="g-tag reel-tag">The reel</span>
+      <div className="reel-bar" onPointerDown={wake}>
+        <button
+          type="button"
+          className="reel-btn"
+          aria-label={playing ? 'Pause the reel' : 'Play the reel'}
+          onClick={togglePlay}
+          tabIndex={shown ? 0 : -1}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            {playing ? (
+              <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" />
+            ) : (
+              <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+            )}
+          </svg>
+        </button>
+        <input
+          type="range"
+          className="reel-scrub"
+          min={0}
+          max={duration || 0}
+          step={0.1}
+          value={time}
+          onChange={(e) => seek(Number(e.target.value))}
+          onPointerDown={() => setScrubbing(true)}
+          onPointerUp={() => {
+            setScrubbing(false);
+            wake();
+          }}
+          onBlur={() => setScrubbing(false)}
+          tabIndex={shown ? 0 : -1}
+          aria-label="Scrub through the reel"
+          aria-valuetext={`${formatTime(time)} of ${formatTime(duration)}`}
+          style={{ '--p': pct(time), '--b': pct(buffered) } as React.CSSProperties}
+        />
+        <span className="reel-time">{formatTime(time)}</span>
+        <button
+          type="button"
+          className="reel-btn"
+          aria-pressed={soundOn}
+          aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
+          onClick={toggleSound}
+          tabIndex={shown ? 0 : -1}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+            {soundOn ? (
+              <path
+                d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            ) : (
+              <path d="M17 9l5 6M22 9l-5 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            )}
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Walkthrough: a looping phone video with beats that follow along
 // ---------------------------------------------------------------------------
 
@@ -264,7 +458,16 @@ function Walkthrough({ role, active }: { role: Role; active: boolean }) {
   const inView = useRef(false);
   const [beat, setBeat] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const beatsRef = useRef<HTMLOListElement>(null);
   const allId = `all-${role}`;
+
+  // on phones the steps are a sideways row of pills; keep the current one in view
+  useEffect(() => {
+    const list = beatsRef.current;
+    const item = list?.children[beat] as HTMLElement | undefined;
+    if (!list || !item || list.scrollWidth <= list.clientWidth) return;
+    list.scrollTo({ left: item.offsetLeft - parseFloat(getComputedStyle(list).paddingLeft), behavior: 'smooth' });
+  }, [beat]);
 
   // highlight the beat that matches the video's current time
   useEffect(() => {
@@ -342,7 +545,7 @@ function Walkthrough({ role, active }: { role: Role; active: boolean }) {
           />
         </div>
         <div className="walk-side">
-          <ol className="beats">
+          <ol className="beats" ref={beatsRef}>
             {walk.beats.map((b, i) => (
               <li key={b.title} className={i === beat ? 'on' : undefined}>
                 <button type="button" onClick={() => jump(i)} aria-current={i === beat ? 'step' : undefined}>
@@ -355,31 +558,34 @@ function Walkthrough({ role, active }: { role: Role; active: boolean }) {
               </li>
             ))}
           </ol>
-          <button
-            type="button"
-            className="expand"
-            aria-expanded={expanded}
-            aria-controls={allId}
-            onClick={() => setExpanded((x) => !x)}
-          >
-            <span>{expanded ? 'Hide screens' : 'See every screen'}</span>
-            <Chevron />
-          </button>
-          {role === 'coaches' && (
-            <a className="expand bc-link" href="#build-card" onClick={onBuildCardLink}>
-              <span>Build your card</span>
-              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-                <path
-                  d="M3 7h8M8 4l3 3-3 3"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          )}
+          <p className="beat-now">{walk.beats[beat].body}</p>
+          <div className="walk-actions">
+            <button
+              type="button"
+              className="expand"
+              aria-expanded={expanded}
+              aria-controls={allId}
+              onClick={() => setExpanded((x) => !x)}
+            >
+              <span>{expanded ? 'Hide screens' : 'See every screen'}</span>
+              <Chevron />
+            </button>
+            {role === 'coaches' && (
+              <a className="expand bc-link" href="#build-card" onClick={onBuildCardLink}>
+                <span>Build your card</span>
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                  <path
+                    d="M3 7h8M8 4l3 3-3 3"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            )}
+          </div>
         </div>
       </div>
       <div className="all" id={allId} hidden={!expanded}>
@@ -477,17 +683,12 @@ function SeatDiagram() {
         </g>
         <circle className="rip" cx="430" cy="230" r="24" />
       </svg>
-      <ol className={`caps${play ? ' play' : ''}`}>
-        <li>
-          <b>1</b>In basketball, an ISO is one-on-one.
-        </li>
-        <li>
-          <b>4</b>On ISO, one coach opens up to 4 seats.
-        </li>
-        <li>
-          <b>&rarr;</b>You call next on one of them.
-        </li>
-      </ol>
+      <div className="dg-cta">
+        <p>If you see an open seat, call next.</p>
+        <a className="btn" href={WAITLIST_URL} target="_blank" rel="noopener noreferrer">
+          Call next
+        </a>
+      </div>
     </div>
   );
 }
@@ -500,12 +701,10 @@ export function IsoLanding() {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
-  const reelRef = useRef<HTMLVideoElement | null>(null);
   const [quiet, setQuiet] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrim, setScrim] = useState<'hidden' | 'shown' | 'on'>('hidden');
   const [role, setRole] = useState<Role>(() => (window.location.hash === '#coaches' ? 'coaches' : 'players'));
-  const [soundOn, setSoundOn] = useState(false);
   const menuWasOpened = useRef(false);
 
   // splash scroll story
@@ -584,15 +783,6 @@ export function IsoLanding() {
     e.preventDefault();
     history.replaceState(null, '', '#how');
     scrollToId('how');
-  };
-
-  const toggleSound = () => {
-    const reel = reelRef.current;
-    if (!reel) return;
-    const next = reel.muted;
-    reel.muted = !next;
-    setSoundOn(next);
-    if (next) playSafe(reel);
   };
 
   return (
@@ -768,6 +958,9 @@ export function IsoLanding() {
                   In basketball, an ISO is one-on-one against someone built to challenge you. Here, it&rsquo;s with a
                   coach at a spot in your city, built to do the same.
                 </p>
+                <p className="lede how-promise">
+                  No cold messages. No favors to ask. Just a coach opening their seats for you.
+                </p>
               </div>
               <SeatDiagram />
             </div>
@@ -823,38 +1016,7 @@ export function IsoLanding() {
 
           <div className="wrap">
             <div className="gallery">
-              <div className="g g-reel">
-                <InViewVideo
-                  src="reel.mp4"
-                  poster="reel-poster.jpg"
-                  preload="none"
-                  label="ISO promo reel: a Builder coach drops a pin, the first ISO at Coffee Story, and ranking up"
-                  videoRef={reelRef}
-                />
-                <span className="g-tag">The reel</span>
-                <button
-                  type="button"
-                  className="snd"
-                  aria-pressed={soundOn}
-                  aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-                  onClick={toggleSound}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
-                    {soundOn ? (
-                      <path
-                        d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    ) : (
-                      <path d="M17 9l5 6M22 9l-5 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    )}
-                  </svg>
-                </button>
-              </div>
+              <ReelPlayer />
               <div className="g">
                 <img
                   src={IMG + 'p-talk.webp'}
@@ -1003,7 +1165,7 @@ export function IsoLanding() {
             <div className="paths">
               {PATHWAYS.map((p) => (
                 <div className={`path${p.live ? ' live' : ''}`} key={p.name}>
-                  <span className="tag">{p.live ? 'Live in Denver' : 'Coming'}</span>
+                  <span className="tag">{p.live ? 'Live in Denver soon' : 'Coming'}</span>
                   <h3>{p.name}</h3>
                   <p>{p.field}</p>
                 </div>
