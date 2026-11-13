@@ -5,8 +5,11 @@
  * src/components/landing/splashStory.ts. Media lives in public/iso/.
  */
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { Instagram, Linkedin, Youtube } from 'lucide-react';
 import { initSplashStory } from '../components/landing/splashStory';
 import '../styles/iso-landing.css';
+import '../styles/coach-card.css';
+import { BuildYourCard } from '../components/landing/BuildYourCard';
 
 const WAITLIST_URL = 'https://tally.so/r/Y5Ee75';
 const DISCORD_URL = 'https://discord.gg/X3hvk4vZd';
@@ -132,9 +135,13 @@ const MENU = [
   { href: '#how', label: 'How it works' },
   { href: '#first-iso', label: 'The first ISO' },
   { href: '#pathways', label: 'Pathways' },
-  { href: '#coaches', label: 'Coach on ISO' },
+  { href: '#assist', label: 'The Assist' },
+  { href: '#about', label: 'About' },
   { href: '#faq', label: 'FAQ' },
 ];
+
+/** Menu hashes that open their own page (App routes these) instead of scrolling the landing page. */
+const PAGE_HASHES = new Set(['about', 'assist']);
 
 const SOCIALS = [
   { label: 'Instagram', href: INSTAGRAM_URL },
@@ -148,6 +155,17 @@ const SECTION_ALIASES: Record<string, string> = { coaches: 'how', questions: 'fa
 // ---------------------------------------------------------------------------
 // Small pieces
 // ---------------------------------------------------------------------------
+
+function SocialIcon({ label }: { label: string }) {
+  if (label === 'Instagram') return <Instagram size={18} aria-hidden="true" />;
+  if (label === 'LinkedIn') return <Linkedin size={18} aria-hidden="true" />;
+  if (label === 'YouTube') return <Youtube size={18} aria-hidden="true" />;
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
+}
 
 function MenuIcon() {
   return (
@@ -231,6 +249,13 @@ function InViewVideo({
 // ---------------------------------------------------------------------------
 // Walkthrough: a looping phone video with beats that follow along
 // ---------------------------------------------------------------------------
+
+function onBuildCardLink(e: MouseEvent<HTMLAnchorElement>) {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault();
+  history.replaceState(null, '', '#build-card');
+  document.getElementById('build-card')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' });
+}
 
 function Walkthrough({ role, active }: { role: Role; active: boolean }) {
   const walk = WALKS[role];
@@ -340,6 +365,21 @@ function Walkthrough({ role, active }: { role: Role; active: boolean }) {
             <span>{expanded ? 'Hide screens' : 'See every screen'}</span>
             <Chevron />
           </button>
+          {role === 'coaches' && (
+            <a className="expand bc-link" href="#build-card" onClick={onBuildCardLink}>
+              <span>Build your card</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                <path
+                  d="M3 7h8M8 4l3 3-3 3"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          )}
         </div>
       </div>
       <div className="all" id={allId} hidden={!expanded}>
@@ -522,6 +562,11 @@ export function IsoLanding() {
     e.preventDefault();
     setMenuOpen(false);
     const hash = href.slice(1);
+    if (PAGE_HASHES.has(hash)) {
+      history.pushState(null, '', href);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
     if (hash === 'coaches') setRole('coaches');
     history.replaceState(null, '', href);
     scrollToId(SECTION_ALIASES[hash] ?? hash);
@@ -586,7 +631,7 @@ export function IsoLanding() {
         aria-hidden={!menuOpen}
       >
         <div className="dtop">
-          <span className="eyebrow dk">Starting five</span>
+          <span className="eyebrow dk">The lineup</span>
           <button type="button" className="mbtn" onClick={() => setMenuOpen(false)}>
             <span>Close</span>
             <CloseIcon />
@@ -603,9 +648,29 @@ export function IsoLanding() {
             </li>
           ))}
         </ol>
-        <a className="dcta" href={WAITLIST_URL} target="_blank" rel="noopener noreferrer" tabIndex={menuOpen ? 0 : -1}>
-          Join the waitlist
-        </a>
+        <div className="dfoot">
+          <div className="dsocial">
+            <span className="eyebrow dk">Follow</span>
+            <ul>
+              {SOCIALS.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`ISO on ${s.label}`}
+                    tabIndex={menuOpen ? 0 : -1}
+                  >
+                    <SocialIcon label={s.label} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <a className="dcta" href={WAITLIST_URL} target="_blank" rel="noopener noreferrer" tabIndex={menuOpen ? 0 : -1}>
+            Join the waitlist
+          </a>
+        </div>
       </aside>
 
       {/* ---------- splash: scroll story ---------- */}
@@ -946,6 +1011,8 @@ export function IsoLanding() {
             </div>
           </div>
         </section>
+
+        <BuildYourCard />
 
         {/* ---------- safety ---------- */}
         <section id="safety" className="alt">

@@ -11,7 +11,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: '/#pathways', label: 'Pathways' },
   { href: '/#assist', label: 'The Assist' },
   { href: '/#about', label: 'About' },
-  { href: '/#questions', label: 'FAQ' },
+  { href: '/#faq', label: 'FAQ' },
 ];
 
 const SOCIALS = [
@@ -29,10 +29,10 @@ function TikTokIcon() {
   );
 }
 
-type Page = 'home' | 'about' | 'faq' | 'assist';
+type Page = 'home' | 'about' | 'assist';
 
 function pageForHash(hash: string): Page {
-  return hash === 'about' || hash === 'faq' || hash === 'assist' ? hash : 'home';
+  return hash === 'about' || hash === 'assist' ? hash : 'home';
 }
 
 /** Section anchor a home-page hash scrolls to; `#coaches` lands on How it works. */

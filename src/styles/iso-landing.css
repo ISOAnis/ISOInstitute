@@ -268,7 +268,7 @@ body:has(.iso-lp) {
   padding: 0;
   display: grid;
 }
-.iso-lp .drawer li a {
+.iso-lp .drawer ol li a {
   display: grid;
   grid-template-columns: 56px 1fr auto;
   align-items: center;
@@ -312,8 +312,43 @@ body:has(.iso-lp) {
   opacity: 1;
   transform: none;
 }
-.iso-lp .drawer li a:focus-visible {
+.iso-lp .drawer ol li a:focus-visible {
   outline: none;
+}
+.iso-lp .drawer .dfoot {
+  display: grid;
+  gap: 16px;
+}
+.iso-lp .drawer .dsocial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.iso-lp .drawer .dsocial ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+}
+.iso-lp .drawer .dsocial a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.iso-lp .drawer .dsocial a:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.iso-lp .drawer .dsocial a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 .iso-lp .dcta {
   display: block;
