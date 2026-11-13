@@ -10,6 +10,7 @@ import { initSplashStory } from '../components/landing/splashStory';
 import '../styles/iso-landing.css';
 import '../styles/coach-card.css';
 import { BuildYourCard } from '../components/landing/BuildYourCard';
+import { PathwayDeck } from '../components/landing/PathwayDeck';
 
 const WAITLIST_URL = 'https://tally.so/r/Y5Ee75';
 const DISCORD_URL = 'https://discord.gg/X3hvk4vZd';
@@ -105,14 +106,6 @@ const REVIEWS = [
   { quote: "Made me feel like I'm capable of doing the things everyone else is.", name: 'Ryan Zaghab' },
 ];
 
-const PATHWAYS = [
-  { name: 'Builder', field: 'Engineering & tech', live: true },
-  { name: 'Founder', field: 'Entrepreneurship & business' },
-  { name: 'Healer', field: 'Medicine & healthcare' },
-  { name: 'Reformer', field: 'Law & public policy' },
-  { name: 'Warrior', field: 'Health, fitness & athletics' },
-  { name: 'Seeker', field: 'Deen, purpose & character' },
-];
 
 const SAFETY = [
   { title: 'Public places only', body: 'Every ISO is at a café, gym or third space. Never a private address.' },
@@ -1162,15 +1155,7 @@ export function IsoLanding() {
             <div className="eyebrow">Six pathways</div>
             <h2>Find your path. Meet who&rsquo;s already on it.</h2>
             <p className="lede">We&rsquo;re starting with Builders in Denver. As each city fills up, more pathways open.</p>
-            <div className="paths">
-              {PATHWAYS.map((p) => (
-                <div className={`path${p.live ? ' live' : ''}`} key={p.name}>
-                  <span className="tag">{p.live ? 'Live in Denver soon' : 'Coming'}</span>
-                  <h3>{p.name}</h3>
-                  <p>{p.field}</p>
-                </div>
-              ))}
-            </div>
+            <PathwayDeck />
           </div>
         </section>
 

@@ -1,14 +1,42 @@
 import { memo, useEffect, useRef } from 'react';
-import { Activity, Dumbbell, Globe, Moon, Rocket, Settings, type LucideIcon } from 'lucide-react';
+import {
+  Activity,
+  Bell,
+  Dumbbell,
+  Globe,
+  MapPin,
+  Moon,
+  Rocket,
+  Settings,
+  Shirt,
+  Ticket,
+  TrendingUp,
+  Trophy,
+  type LucideIcon,
+} from 'lucide-react';
 import { initBuildCard, PATHWAYS } from './buildCard';
 
-const PERKS = [
-  { title: 'Players on your path find you', detail: 'on the map, by your card' },
-  { title: 'Followers get a ping', detail: 'every time you drop a pin' },
-  { title: 'Your Overall grows', detail: 'with every ISO you host' },
-  { title: 'Cohost your pathway\u2019s Invitational', detail: 'as you rank up' },
-  { title: 'Premium apparel unlocks', detail: 'for purchase as your Overall climbs' },
-  { title: 'A free player membership', detail: 'when you host consistently' },
+/** What the back of the card promises, grouped by when a coach gets it. */
+const PERK_GROUPS: Array<{ when: string; items: Array<{ Icon: LucideIcon; text: string }> }> = [
+  {
+    when: 'From day one',
+    items: [
+      { Icon: MapPin, text: 'Players on your path find you' },
+      { Icon: Bell, text: 'Followers get pinged on new pins' },
+      { Icon: TrendingUp, text: 'Your Overall grows with every ISO' },
+    ],
+  },
+  {
+    when: 'As you rank up',
+    items: [
+      { Icon: Trophy, text: 'Cohost your pathway\u2019s Invitational' },
+      { Icon: Shirt, text: 'Unlock premium ISO apparel to buy' },
+    ],
+  },
+  {
+    when: 'When you host consistently',
+    items: [{ Icon: Ticket, text: 'A free player membership' }],
+  },
 ];
 
 /** Same icons the About page uses for each pathway. */
@@ -172,14 +200,23 @@ export const BuildYourCard = memo(function BuildYourCard() {
                     <span className="bc-back-eyebrow">For ISO coaches</span>
                     <p className="bc-back-title">What comes with your card</p>
                   </div>
-                  <ul className="bc-back-list">
-                    {PERKS.map((perk) => (
-                      <li key={perk.title}>
-                        <b>{perk.title}</b>
-                        <span>{perk.detail}</span>
-                      </li>
+                  <div className="bc-back-groups">
+                    {PERK_GROUPS.map((group) => (
+                      <div className="bc-back-group" key={group.when}>
+                        <p className="bc-back-when">{group.when}</p>
+                        <ul>
+                          {group.items.map(({ Icon, text }) => (
+                            <li key={text}>
+                              <span className="bc-back-ic" aria-hidden="true">
+                                <Icon size={15} strokeWidth={2} />
+                              </span>
+                              <span>{text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                   <div className="bc-back-foot">
                     <span className="bc-back-path" id="bcBackPath">
                       Builder

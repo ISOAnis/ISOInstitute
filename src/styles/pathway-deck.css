@@ -1,0 +1,127 @@
+/* ---------- pathways: fanned 3D deck ---------- */
+.iso-lp .pd { margin-top: 36px; position: relative; overflow-x: clip; overflow-y: visible; padding-block: 10px; }
+.iso-lp .pd-stage {
+  position: relative;
+  height: 470px;
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  transform-style: preserve-3d;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  cursor: grab;
+}
+.iso-lp .pd-stage.dragging { cursor: grabbing; }
+.iso-lp .pd-stage:focus-visible { outline: 2px solid var(--gold); outline-offset: 8px; border-radius: 24px; }
+
+.iso-lp .pd-card {
+  --a: #c77ddb; --a2: rgba(199, 125, 219, 0.38); --g1: #4b1f5e; --g2: #24132c;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(300px, 72vw);
+  aspect-ratio: 300 / 400;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--fg);
+  background: linear-gradient(180deg, var(--g1) 0%, var(--g2) 62%, #17131a 100%);
+  border: 1px solid var(--a2);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 60px color-mix(in srgb, var(--a) 16%, transparent);
+  transition: transform 0.65s cubic-bezier(0.2, 0.75, 0.2, 1), opacity 0.45s ease, filter 0.45s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  cursor: pointer;
+}
+.iso-lp .pd-card.front { cursor: default; box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6), 0 0 80px color-mix(in srgb, var(--a) 26%, transparent); }
+.iso-lp .pd-stage.dragging .pd-card { transition: none; }
+.iso-lp .pd-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--a); }
+.iso-lp .pd-card[data-path="Founder"] { --a: #e8833a; --a2: rgba(232, 131, 58, 0.4); --g1: #4a2a14; --g2: #221810; }
+.iso-lp .pd-card[data-path="Healer"] { --a: #4d8ff0; --a2: rgba(77, 143, 240, 0.4); --g1: #182c4f; --g2: #111827; }
+.iso-lp .pd-card[data-path="Reformer"] { --a: #2ec4c4; --a2: rgba(46, 196, 196, 0.38); --g1: #143c40; --g2: #10201f; }
+.iso-lp .pd-card[data-path="Warrior"] { --a: #ef4b4b; --a2: rgba(239, 75, 75, 0.4); --g1: #4a1818; --g2: #221212; }
+.iso-lp .pd-card[data-path="Seeker"] { --a: #3fc77a; --a2: rgba(63, 199, 122, 0.38); --g1: #163d29; --g2: #111f18; }
+
+.iso-lp .pd-water {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translateX(-50%);
+  font-family: var(--display);
+  font-size: 120px;
+  line-height: 1;
+  color: var(--a);
+  opacity: 0.1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.iso-lp .pd-top { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.iso-lp .pd-icon {
+  width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+  color: var(--a);
+  background: color-mix(in srgb, var(--a) 16%, transparent);
+  border: 1px solid var(--a2);
+}
+.iso-lp .pd-tag {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(242, 238, 232, 0.55);
+  border: 1px solid rgba(242, 238, 232, 0.16);
+  border-radius: 999px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+.iso-lp .pd-tag.live { color: #16121a; background: var(--a); border-color: transparent; }
+.iso-lp .pd-body { position: relative; margin-top: auto; }
+.iso-lp .pd-num { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.22em; color: var(--a); font-variant-numeric: tabular-nums; }
+.iso-lp .pd-name { margin: 4px 0 0; font-family: var(--display); font-weight: 400; font-size: 60px; line-height: 0.92; text-transform: uppercase; }
+.iso-lp .pd-field { margin: 6px 0 0; font-size: 15px; font-weight: 600; color: rgba(242, 238, 232, 0.78); }
+.iso-lp .pd-foot { position: relative; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--a2); }
+.iso-lp .pd-label { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(242, 238, 232, 0.5); }
+.iso-lp .pd-who { margin: 5px 0 0; font-size: 14px; line-height: 1.4; color: rgba(242, 238, 232, 0.88); }
+
+.iso-lp .pd-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; }
+.iso-lp .pd-arrow {
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--fg); background: var(--panel); border: 1px solid var(--line);
+  cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.iso-lp .pd-arrow:hover { border-color: var(--gold); color: var(--gold); }
+.iso-lp .pd-arrow:focus-visible, .iso-lp .pd-tab:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.iso-lp .pd-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); }
+.iso-lp .pd-tab {
+  --a: #c77ddb;
+  font: 700 13px var(--body);
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.iso-lp .pd-tab[data-path="Founder"] { --a: #e8833a; }
+.iso-lp .pd-tab[data-path="Healer"] { --a: #4d8ff0; }
+.iso-lp .pd-tab[data-path="Reformer"] { --a: #2ec4c4; }
+.iso-lp .pd-tab[data-path="Warrior"] { --a: #ef4b4b; }
+.iso-lp .pd-tab[data-path="Seeker"] { --a: #3fc77a; }
+.iso-lp .pd-tab:hover { color: var(--fg); }
+.iso-lp .pd-tab[aria-selected="true"] { color: var(--fg); background: color-mix(in srgb, var(--a) 22%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--a) 55%, transparent); }
+.iso-lp .pd-count { display: none; font-size: 14px; font-weight: 700; color: var(--muted); min-width: 140px; text-align: center; }
+.iso-lp .pd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+
+@media (max-width: 760px) {
+  .iso-lp .pd-stage { height: 420px; perspective: 1000px; }
+  .iso-lp .pd-card { width: min(250px, 66vw); padding: 18px 18px 16px; }
+  .iso-lp .pd-name { font-size: 50px; }
+  .iso-lp .pd-water { font-size: 96px; }
+  .iso-lp .pd-tabs { display: none; }
+  .iso-lp .pd-count { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iso-lp .pd-card { transition: opacity 0.2s ease; }
+}
