@@ -10,6 +10,7 @@ import { initSplashStory } from '../components/landing/splashStory';
 import '../styles/iso-landing.css';
 import '../styles/coach-card.css';
 import { BuildYourCard } from '../components/landing/BuildYourCard';
+import { PathwayDeck } from '../components/landing/PathwayDeck';
 
 const WAITLIST_URL = 'https://tally.so/r/Y5Ee75';
 const DISCORD_URL = 'https://discord.gg/X3hvk4vZd';
@@ -46,8 +47,9 @@ const WALKS: Record<
       { t: 17.2, title: 'Your seat is locked in', body: 'The exact spot unlocks 24 hours before, only for confirmed players.' },
       { t: 21.4, title: 'Pull up and check in', body: 'Show the coach your four-digit code. No code, no seat.' },
       { t: 24.1, title: 'Ask what you came to ask', body: 'Guided questions keep it easy, and your notes save to My ISOs.' },
-      { t: 29.5, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
-      { t: 34.0, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
+      { t: 25.8, title: 'Record for safety', body: "Anyone can record an ISO. Everyone at the table sees it, and it's only used if you report." },
+      { t: 34.0, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
+      { t: 38.5, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
     ],
     shots: [
       { src: 's3-P1-Map.webp', alt: 'Map with coach pins around Denver', title: 'Find a coach', body: 'The map shows coaches on your path near you.' },
@@ -76,8 +78,9 @@ const WALKS: Record<
       { t: 8.7, title: 'Your ISO is live', body: 'Players on your path and your followers get a ping.' },
       { t: 12.9, title: 'Check players in', body: 'Each player shows a code when they pull up. No code, no seat.' },
       { t: 16.2, title: 'Run it with the ISO Guide', body: "A timed plan, prompts to steer the room and notes on who's there." },
-      { t: 21.3, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
-      { t: 29.9, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
+      { t: 17.8, title: 'Record for safety', body: 'Coaches can record too. The check-in list shows who is recording.' },
+      { t: 25.8, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
+      { t: 34.4, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
     ],
     shots: [
       { src: 's3-K13-CoachMap.webp', alt: 'Coach map of partner spots', title: 'Pick a spot', body: "Partner spots near you, with when they're quiet." },
@@ -105,20 +108,13 @@ const REVIEWS = [
   { quote: "Made me feel like I'm capable of doing the things everyone else is.", name: 'Ryan Zaghab' },
 ];
 
-const PATHWAYS = [
-  { name: 'Builder', field: 'Engineering & tech', live: true },
-  { name: 'Founder', field: 'Entrepreneurship & business' },
-  { name: 'Healer', field: 'Medicine & healthcare' },
-  { name: 'Reformer', field: 'Law & public policy' },
-  { name: 'Warrior', field: 'Health, fitness & athletics' },
-  { name: 'Seeker', field: 'Deen, purpose & character' },
-];
 
 const SAFETY = [
   { title: 'Public places only', body: 'Every ISO is at a café, gym or third space. Never a private address.' },
   { title: 'Always a small group', body: 'One coach and 2–4 players at the table.' },
   { title: 'Spot shared late', body: 'The exact location goes only to confirmed players, 24 hours before.' },
   { title: 'Check in with a code', body: 'Everyone checks in on arrival, and anyone can report a problem.' },
+  { title: 'Record for safety', body: 'Anyone can voice record an ISO. Everyone is told, it stays locked on your phone and only the safety team hears it, if you report.' },
 ];
 
 const FAQS = [
@@ -1162,15 +1158,7 @@ export function IsoLanding() {
             <div className="eyebrow">Six pathways</div>
             <h2>Find your path. Meet who&rsquo;s already on it.</h2>
             <p className="lede">We&rsquo;re starting with Builders in Denver. As each city fills up, more pathways open.</p>
-            <div className="paths">
-              {PATHWAYS.map((p) => (
-                <div className={`path${p.live ? ' live' : ''}`} key={p.name}>
-                  <span className="tag">{p.live ? 'Live in Denver soon' : 'Coming'}</span>
-                  <h3>{p.name}</h3>
-                  <p>{p.field}</p>
-                </div>
-              ))}
-            </div>
+            <PathwayDeck />
           </div>
         </section>
 

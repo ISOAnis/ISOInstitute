@@ -1378,7 +1378,7 @@ body:has(.iso-lp) {
 /* ---------- safety ---------- */
 .iso-lp .safe {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin-top: 44px;
 }
@@ -1387,6 +1387,7 @@ body:has(.iso-lp) {
 .iso-lp .safe p { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
 @media (max-width: 860px) {
   .iso-lp .safe { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 28px; }
+  .iso-lp .safe > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 
 /* ---------- FAQ ---------- */
