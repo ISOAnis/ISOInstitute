@@ -30,7 +30,7 @@ const PERK_GROUPS: Array<{ when: string; items: Array<{ Icon: LucideIcon; text: 
     when: 'As you rank up',
     items: [
       { Icon: Trophy, text: 'Cohost your pathway\u2019s Invitational' },
-      { Icon: Shirt, text: 'Unlock premium ISO apparel to buy' },
+      { Icon: Shirt, text: 'Earlier access to coach-only ISO drops' },
     ],
   },
   {
@@ -284,7 +284,7 @@ export const BuildYourCard = memo(function BuildYourCard() {
               </ul>
               <p>
                 Climb to Silver, Gold and Platinum to unlock more, like cohosting your pathway&rsquo;s Invitational and
-                premium ISO apparel.
+                earlier access to coach-only ISO drops.
               </p>
             </div>
             <div className="bc-ranks" role="group" aria-label="Preview your card at each rank">

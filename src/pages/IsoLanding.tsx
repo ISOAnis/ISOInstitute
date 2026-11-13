@@ -1084,7 +1084,7 @@ export function IsoLanding() {
               <ul className="ticks">
                 <li>
                   <div>
-                    Players unlock gear <span>and first access to Invitationals as they rank</span>
+                    Players get earlier access <span>to ISO drops and Invitationals as they rank</span>
                   </div>
                 </li>
                 <li>
