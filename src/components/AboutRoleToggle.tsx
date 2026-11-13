@@ -11,7 +11,7 @@ const AUDIENCE_CARDS: { label: string; title: string; body: string; highlights: 
     label: 'For Coaches',
     title: 'Sustained by humility',
     body: 'Been there. Giving back.',
-    highlights: ['ID-verified, real experience', 'Climb Bronze to Platinum', 'Gear at every rank up'],
+    highlights: ['ID-verified, real experience', 'Climb Bronze to Platinum', 'Coach-only ISO drops'],
   },
   {
     label: 'For Partner Businesses',
