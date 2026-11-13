@@ -19,7 +19,7 @@ interface Flow {
 
 const FLOWS: Record<ViewKey, Flow> = {
   players: {
-    video: 'v-player-full.mp4',
+    video: 'v-player-v4.mp4',
     poster: 's3-P1-Map.webp',
     label: 'A full ISO as a player: find a coach on the map, claim a seat, check in, ask questions, rate the ISO and rank up',
     note: 'Every step a player sees, from the map to ranking up.',
@@ -49,7 +49,7 @@ const FLOWS: Record<ViewKey, Flow> = {
     ],
   },
   coaches: {
-    video: 'v-coach-full.mp4',
+    video: 'v-coach-v4.mp4',
     poster: 's3-K13-CoachMap.webp',
     label: 'A full ISO as a coach: drop a pin, check players in, run the ISO Guide, review the ISO and rank up',
     note: 'Every step a coach sees, from dropping a pin to ranking up.',
