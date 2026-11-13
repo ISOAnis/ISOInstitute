@@ -35,7 +35,7 @@ const PERK_GROUPS: Array<{ when: string; items: Array<{ Icon: LucideIcon; text: 
   },
   {
     when: 'When you host consistently',
-    items: [{ Icon: Ticket, text: 'A free player membership' }],
+    items: [{ Icon: Ticket, text: 'A free player membership, with last call on open seats' }],
   },
 ];
 
