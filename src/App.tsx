@@ -1,60 +1,43 @@
 /**
- * =============================================================================
- * TEMPORARY SPLASH PAGE BRANCH
- * =============================================================================
- *
- * This branch (SplashPage) renders ONLY the EventSplashPage component.
- * The full site is being developed on the main branch.
- *
- * TO RESTORE THE FULL SITE:
- * 1. Switch to the main branch, OR
- * 2. Uncomment the FullApp component below and comment out the EventSplashPage import/render
- *
- * REMOVE THIS MODIFICATION AND DELETE src/pages/EventSplashPage.tsx
- * WHEN THE FULL SITE IS READY TO LAUNCH.
- * =============================================================================
+ * Routes are hash-based. The home page is the single-scroll ISO landing page
+ * (src/pages/IsoLanding.tsx); its sections use in-page anchors (#how, #first-iso,
+ * #pathways, #faq, #coaches). #about and #assist still open their own pages.
  */
 
 import { useState, useEffect } from 'react';
-import EventSplashPage from './pages/EventSplashPage';
+import IsoLanding from './pages/IsoLanding';
 import { About } from './components/About';
-import { FAQPage } from './components/FAQPage';
 import { AssistPage } from './components/AssistPage';
-import { homeSectionForHash } from './components/IsoNav';
 
 const WAITLIST_FORM_URL = 'https://tally.so/r/Y5Ee75';
 
-type SplashView = 'splash' | 'about' | 'faq' | 'assist';
+type View = 'home' | 'about' | 'assist';
 
-function getViewFromUrl(): SplashView {
+function getViewFromUrl(): View {
   if (window.location.hash === '#about') return 'about';
-  if (window.location.hash === '#faq') return 'faq';
   if (window.location.hash === '#assist') return 'assist';
-  return 'splash';
+  return 'home';
 }
 
-function setUrlForView(view: SplashView) {
-  const base = window.location.pathname + window.location.search;
-  const hash =
-    view === 'about'
-      ? '#about'
-      : view === 'faq'
-        ? '#faq'
-        : view === 'assist'
-          ? '#assist'
-          : '';
-  const nextUrl = `${base}${hash}`;
+function setUrl(hash: string) {
+  const nextUrl = window.location.pathname + window.location.search + hash;
   if (window.location.pathname + window.location.search + window.location.hash !== nextUrl) {
     window.history.pushState(null, '', nextUrl);
   }
 }
 
 export default function App() {
-  const [view, setView] = useState<SplashView>(getViewFromUrl);
+  const [view, setView] = useState<View>(getViewFromUrl);
 
-  const navigate = (next: SplashView) => {
+  const navigate = (next: View | 'faq') => {
+    if (next === 'faq') {
+      setUrl('#faq');
+      setView('home');
+      if (view === 'home') document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    setUrl(next === 'home' ? '' : `#${next}`);
     setView(next);
-    setUrlForView(next);
   };
 
   useEffect(() => {
@@ -64,18 +47,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const sectionId = view === 'splash' ? homeSectionForHash(window.location.hash.slice(1)) : null;
-    const section = sectionId ? document.getElementById(sectionId) : null;
-    if (section) section.scrollIntoView();
-    else window.scrollTo(0, 0);
-    document.title =
-      view === 'about'
-        ? 'About · ISO'
-        : view === 'faq'
-          ? 'FAQ · ISO'
-          : view === 'assist'
-            ? 'The Assist · ISO'
-            : 'ISO - In Search Of';
+    // The landing page scrolls itself to a section when the URL has a hash.
+    if (view !== 'home' || !window.location.hash) window.scrollTo(0, 0);
+    document.title = view === 'about' ? 'About · ISO' : view === 'assist' ? 'The Assist · ISO' : 'ISO · In Search Of';
   }, [view]);
 
   const openWaitlistForm = () => {
@@ -85,20 +59,9 @@ export default function App() {
   if (view === 'about') {
     return (
       <About
-        onBack={() => navigate('splash')}
+        onBack={() => navigate('home')}
         onWaitlistClick={openWaitlistForm}
         onNavigateToFAQ={() => navigate('faq')}
-        onNavigateToAssist={() => navigate('assist')}
-      />
-    );
-  }
-
-  if (view === 'faq') {
-    return (
-      <FAQPage
-        onBack={() => navigate('splash')}
-        onWaitlistClick={openWaitlistForm}
-        onNavigateToAbout={() => navigate('about')}
         onNavigateToAssist={() => navigate('assist')}
       />
     );
@@ -107,7 +70,7 @@ export default function App() {
   if (view === 'assist') {
     return (
       <AssistPage
-        onBack={() => navigate('splash')}
+        onBack={() => navigate('home')}
         onWaitlistClick={openWaitlistForm}
         onNavigateToAbout={() => navigate('about')}
         onNavigateToFAQ={() => navigate('faq')}
@@ -116,13 +79,5 @@ export default function App() {
     );
   }
 
-  return (
-    <EventSplashPage
-      onNavigateToAbout={() => navigate('about')}
-      onNavigateToFAQ={() => navigate('faq')}
-      onNavigateToAssist={() => navigate('assist')}
-    />
-  );
+  return <IsoLanding />;
 }
-
-/* Full site code preserved below — see git history / main branch */
