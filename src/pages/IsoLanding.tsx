@@ -47,8 +47,9 @@ const WALKS: Record<
       { t: 17.2, title: 'Your seat is locked in', body: 'The exact spot unlocks 24 hours before, only for confirmed players.' },
       { t: 21.4, title: 'Pull up and check in', body: 'Show the coach your four-digit code. No code, no seat.' },
       { t: 24.1, title: 'Ask what you came to ask', body: 'Guided questions keep it easy, and your notes save to My ISOs.' },
-      { t: 29.5, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
-      { t: 34.0, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
+      { t: 25.8, title: 'Record for safety', body: "Anyone can record an ISO. Everyone at the table sees it, and it's only used if you report." },
+      { t: 34.0, title: 'Rate the ISO', body: 'Stars and what stood out. Coaches only see an average.' },
+      { t: 38.5, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
     ],
     shots: [
       { src: 's3-P1-Map.webp', alt: 'Map with coach pins around Denver', title: 'Find a coach', body: 'The map shows coaches on your path near you.' },
@@ -77,8 +78,9 @@ const WALKS: Record<
       { t: 8.7, title: 'Your ISO is live', body: 'Players on your path and your followers get a ping.' },
       { t: 12.9, title: 'Check players in', body: 'Each player shows a code when they pull up. No code, no seat.' },
       { t: 16.2, title: 'Run it with the ISO Guide', body: "A timed plan, prompts to steer the room and notes on who's there." },
-      { t: 21.3, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
-      { t: 29.9, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
+      { t: 17.8, title: 'Record for safety', body: 'Coaches can record too. The check-in list shows who is recording.' },
+      { t: 25.8, title: 'Wrap up and review', body: 'Finish the ISO and tell us how it went. Players rate it too.' },
+      { t: 34.4, title: 'Rank up', body: 'Every ISO grows your Overall and unlocks more.' },
     ],
     shots: [
       { src: 's3-K13-CoachMap.webp', alt: 'Coach map of partner spots', title: 'Pick a spot', body: "Partner spots near you, with when they're quiet." },
