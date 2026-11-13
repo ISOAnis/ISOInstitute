@@ -120,7 +120,7 @@ const SAFETY = [
 const FAQS = [
   { q: 'Is ISO free?', a: "Yes, there's a free tier for players, so everyone has a way in. It comes with some limits, and coaches host for free. ISO is built for access, so the core experience is meant to stay that way." },
   { q: 'Why not just message people on LinkedIn?', a: "Cold messages to strangers mostly go unanswered, and the person who replies usually lives in another city. On ISO, the coach has already raised their hand to meet, they're on your path, and they're down the street. You show up and ask in person." },
-  { q: 'Why would a successful professional host for free?', a: 'Most people who made it remember someone who helped them. ISO makes giving back easy: coaches pick a spot they already go to, on their own schedule, and build a coach card and reputation in their city along the way. Coaches who run ISOs consistently also get a free player membership. It gets last call on open seats, so a coach never takes a spot from a player who needs it. Coaches who want first call can pay like any player.' },
+  { q: 'Why would a successful professional host for free?', a: 'Most people who made it remember someone who helped them. ISO makes giving back easy: coaches pick a spot they already go to, on their own schedule, and build a coach card and reputation in their city along the way. Active coaches also get last call: if a seat is still open 6 hours before an ISO, they get a ping and can take it for free. Players always get first call, and coaches who want it can pay like any player.' },
   { q: "Wait, isn't an ISO one-on-one?", a: "In basketball, yes. On ISO it's always a small group: one coach and 2–4 players. It's safer, it's lower pressure, and you learn from everyone else's questions too. That's how your growth compounds." },
   { q: 'Is the app out?', a: "Not yet. We're running ISOs by hand in Denver first to get the experience right. Join the waitlist to hear when ISOs open near you." },
   { q: 'Where is ISO available?', a: 'Denver, starting with the Builder pathway (engineering and tech). Join the waitlist and tell us your city and path so we know where to go next.' },
@@ -1100,8 +1100,8 @@ export function IsoLanding() {
                 </li>
                 <li>
                   <div>
-                    Coaches who host consistently{' '}
-                    <span>get a free player membership with last call on open seats, so players always get first call</span>
+                    Active coaches get last call{' '}
+                    <span>on any seat still open 6 hours before an ISO, free. Players always get first call</span>
                   </div>
                 </li>
               </ul>
