@@ -887,7 +887,7 @@ export function IsoLanding() {
             <p className="sp-ln sp-you" data-at=".02">You.</p>
             <p className="sp-ln sp-say" data-at=".034">A talented engineering student without access.</p>
             <p className="sp-ln sp-say dim" data-at=".047">
-              Competing with big-name schools and students who already have connections.
+              Competing against those with access and connections.
             </p>
             <p className="sp-ln sp-say dim" data-at=".06">No network to lean on.</p>
             <p className="sp-ln sp-say dim" data-at=".073">Your DMs go unanswered.</p>
@@ -937,9 +937,9 @@ export function IsoLanding() {
             <i />
           </div>
           <p className="sp-sr">
-            You. A talented engineering student without access, competing with big-name schools and students who already have connections. No network to lean on. Your DMs go unanswered. You&rsquo;re in search of guidance you didn&rsquo;t know you needed. Your problem isn&rsquo;t ability, it&rsquo;s proximity.
+            You. A talented engineering student without access, competing against those with access and connections. No network to lean on. Your DMs go unanswered. You&rsquo;re in search of guidance you didn&rsquo;t know you needed. Your problem isn&rsquo;t ability, it&rsquo;s proximity.
             Six degrees of separation: seven people, A to G, in a chain of introductions. ISO skips the chain and goes
-            straight from A to G. The world turns to Denver and the dot lands on your location in the ISO app map.
+            straight from A to G. The person you need splits in two and lands on New York and Denver on the globe, then the two come back together and land on your location in the ISO app map.
           </p>
         </div>
       </header>

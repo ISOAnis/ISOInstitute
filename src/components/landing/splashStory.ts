@@ -1,6 +1,7 @@
 /**
  * Scroll story for the landing splash: "You." → the six-degrees chain → ISO skips
- * the chain → the globe spins to Denver → the dot lands on the app map → coach card.
+ * the chain → the dot splits to New York and Denver on the globe → the two come back
+ * together as the globe fades → the dot lands on the app map → coach card.
  *
  * Everything is driven by scroll progress through `.sp-track` (1000vh tall) and drawn
  * on two canvases around the phone. The animation loop only runs while the track is
@@ -19,6 +20,13 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const ORANGE = '200,135,58';
 const INK = '242,238,232';
 const DENVER: [number, number] = [-104.99, 39.74];
+const NYC: [number, number] = [-74.01, 40.71];
+/** The globe settles on the point between the two cities. */
+const MID: [number, number] = [-89.5, 41.5];
+const CITIES = [
+  { name: 'Denver', ll: DENVER, coords: '39.74° N · 104.99° W', side: -1 },
+  { name: 'New York', ll: NYC, coords: '40.71° N · 74.01° W', side: 1 },
+] as const;
 /** The "you" ring on the map screenshot, as a fraction of the phone image. */
 const PIN = { x: 0.524, y: 0.465 };
 const LABELS = ['You', 'A friend', 'Their coworker', 'Her cousin', 'His old boss', 'A LinkedIn mutual', 'The person you need'];
@@ -101,7 +109,7 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
   let land: any = null;
   let borders: any = null;
   let states: any = null;
-  let colorado: any = null;
+  let homeStates: any[] = [];
   let disposed = false;
   const grat = geoGraticule10();
   Promise.all(
@@ -117,7 +125,7 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
       land = feature(world, world.objects.land);
       borders = mesh(world, world.objects.countries, (a: unknown, b: unknown) => a !== b);
       states = mesh(us, us.objects.states, (a: unknown, b: unknown) => a !== b);
-      colorado = (feature(us, us.objects.states) as any).features.find((f: any) => f.id === '08');
+      homeStates = (feature(us, us.objects.states) as any).features.filter((f: any) => f.id === '08' || f.id === '36');
       lastP = -1;
     })
     .catch((err) => console.warn('ISO splash: map data failed to load', err));
@@ -169,7 +177,7 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
     const gx = m ? W * 0.5 : W * 0.7;
     const gy = m ? bandTop + bh / 2 : H * 0.52;
     const R = m ? Math.min(W * 0.4, bh * 0.4) : Math.min(W * 0.25, H * 0.38);
-    const Z = ((m ? 1.55 : 1.15) * W) / R;
+    const Z = m ? 1.7 : 2;
     const ph = m ? Math.min(bh, 480) : Math.min(H * 0.8, 700);
     const pw = (ph * 540) / 1168;
     // Seven people, six equal links, one even zigzag
@@ -211,6 +219,21 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
     const t = eio(seg(p, 0.44, 0.56));
     return { x: lerp(F.x, L.gx, t), y: lerp(F.y, L.gy, t) };
   };
+  /** Sets the globe's projection for this point of the story; drawBack and the city orbs share it. */
+  const setProj = (p: number) => {
+    const c = globeCenter(p);
+    const g = seg(p, 0.44, 0.58);
+    const z = eio(seg(p, 0.6, 0.72));
+    const s = Math.max(1, L.R * eo(g) * lerp(1, L.Z, z));
+    const spin = eio(seg(p, 0.44, 0.62));
+    proj
+      .translate([c.x, c.y])
+      .scale(s)
+      .rotate([lerp(-MID[0] + 150, -MID[0], spin), lerp(-8, -MID[1], spin)]);
+    return { c, s, g };
+  };
+  /** Where the orbs meet again, just above the globe's center, before dropping onto the phone. */
+  const meetPoint = (p: number) => ({ x: L.gx, y: L.gy - (L.m ? 40 : 70) * eio(seg(p, 0.74, 0.8)) });
   const phonePos = (p: number) => {
     const rise = eio(seg(p, 0.74, 0.86));
     const cy = lerp(L.H + L.ph * 0.6, L.gy, rise);
@@ -224,18 +247,10 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
-    const g = seg(p, 0.44, 0.58);
-    if (g > 0 && land) {
-      const c = globeCenter(p);
-      const z = eio(seg(p, 0.6, 0.72));
-      const e = eio(seg(p, 0.74, 0.9));
-      const s = L.R * eo(g) * lerp(1, L.Z, z) * lerp(1, 3.2, e);
-      const spin = eio(seg(p, 0.44, 0.62));
-      proj
-        .translate([c.x, c.y])
-        .scale(s)
-        .rotate([lerp(-DENVER[0] + 150, -DENVER[0], spin), lerp(-8, -DENVER[1], spin)]);
-      const a = eo(g) * lerp(1, 0.3, e);
+    const { c, s, g } = setProj(p);
+    // the globe fades out as the phone rises, instead of zooming in
+    const a = eo(g) * (1 - eio(seg(p, 0.74, 0.86)));
+    if (g > 0 && a > 0 && land) {
       ctx.globalAlpha = a;
       if (s < Math.max(W, H) * 1.5) {
         const halo = ctx.createRadialGradient(c.x, c.y, s * 0.92, c.x, c.y, s * 1.22);
@@ -278,12 +293,12 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
         ctx.beginPath();
         path(states);
         ctx.stroke();
-        if (colorado) {
+        for (const f of homeStates) {
           ctx.fillStyle = `rgba(${ORANGE},.13)`;
           ctx.strokeStyle = `rgba(${ORANGE},.55)`;
           ctx.lineWidth = 1.2;
           ctx.beginPath();
-          path(colorado);
+          path(f);
           ctx.fill();
           ctx.stroke();
         }
@@ -388,9 +403,7 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
     else if (p < 0.42) pos = quad(A, arcCtrl(), F, eio(seg(p, 0.33, 0.42)));
     else if (p < 0.74) pos = globeCenter(p);
     else {
-      const lift = L.m ? 40 : 70;
-      const up = eio(seg(p, 0.74, 0.8));
-      const base = { x: L.gx, y: L.gy - lift * up };
+      const base = meetPoint(p);
       const ph = phonePos(p);
       const tgt = { x: ph.left + PIN.x * L.pw, y: ph.top + PIN.y * L.ph };
       const landT = eio(seg(p, 0.81, 0.9));
@@ -432,17 +445,35 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
     }
 
     const d = dotState(p);
-    const tag = seg(p, 0.58, 0.63) * (1 - seg(p, 0.72, 0.76));
-    if (tag > 0) {
-      ctx.globalAlpha = tag;
-      ctx.textAlign = 'left';
-      ctx.fillStyle = `rgba(${INK},.95)`;
-      ctx.font = `700 ${L.m ? 13 : 15}px ${BODY_FONT}`;
-      ctx.fillText('Denver', d.pos.x + 20, d.pos.y - 4);
-      ctx.fillStyle = `rgba(${INK},.55)`;
-      ctx.font = `500 ${L.m ? 11 : 12}px ${BODY_FONT}`;
-      ctx.fillText('39.74° N · 104.99° W', d.pos.x + 20, d.pos.y + 14);
-      ctx.globalAlpha = 1;
+    // "The person you need" splits in two: one orb lands on Denver, one on New York,
+    // then they come back together as the globe fades and the phone rises.
+    const split = eio(seg(p, 0.56, 0.64));
+    const merge = eio(seg(p, 0.72, 0.8));
+    let orbs: Pt[] = [d.pos];
+    if (split > 0 && merge < 1) {
+      setProj(p);
+      const meet = meetPoint(p);
+      orbs = CITIES.map((city) => {
+        const q = proj(city.ll as [number, number]) || [d.pos.x, d.pos.y];
+        const at = { x: lerp(d.pos.x, q[0], split), y: lerp(d.pos.y, q[1], split) };
+        return { x: lerp(at.x, meet.x, merge), y: lerp(at.y, meet.y, merge) };
+      });
+      const tag = seg(p, 0.6, 0.65) * (1 - seg(p, 0.7, 0.74));
+      if (tag > 0) {
+        ctx.globalAlpha = tag;
+        CITIES.forEach((city, i) => {
+          const o = orbs[i];
+          const dx = city.side * (L.m ? 16 : 20);
+          ctx.textAlign = city.side < 0 ? 'right' : 'left';
+          ctx.fillStyle = `rgba(${INK},.95)`;
+          ctx.font = `700 ${L.m ? 13 : 15}px ${BODY_FONT}`;
+          ctx.fillText(city.name, o.x + dx, o.y - 4);
+          ctx.fillStyle = `rgba(${INK},.55)`;
+          ctx.font = `500 ${L.m ? 10 : 12}px ${BODY_FONT}`;
+          ctx.fillText(city.coords, o.x + dx, o.y + 13);
+        });
+        ctx.globalAlpha = 1;
+      }
     }
 
     // ripple on landing
@@ -459,21 +490,21 @@ export function initSplashStory(root: HTMLElement, onQuietChange: (quiet: boolea
       }
     }
 
-    if (d.alpha > 0) {
+    if (d.alpha > 0) for (const o of orbs) {
       const pulse = reduce ? 1 : 1 + 0.18 * Math.sin(time / 420);
-      const gl = (L.m ? 30 : 40) * d.r * pulse;
+      const gl = (L.m ? 30 : 40) * d.r * pulse * (orbs.length > 1 ? 0.8 : 1);
       ctx.globalAlpha = d.alpha;
-      const g = ctx.createRadialGradient(d.pos.x, d.pos.y, 0, d.pos.x, d.pos.y, gl);
+      const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, gl);
       g.addColorStop(0, `rgba(${ORANGE},.75)`);
       g.addColorStop(0.25, `rgba(${ORANGE},.35)`);
       g.addColorStop(1, `rgba(${ORANGE},0)`);
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.arc(d.pos.x, d.pos.y, gl, 0, Math.PI * 2);
+      ctx.arc(o.x, o.y, gl, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#F6D9B4';
       ctx.beginPath();
-      ctx.arc(d.pos.x, d.pos.y, 5.5 * d.r, 0, Math.PI * 2);
+      ctx.arc(o.x, o.y, 5.5 * d.r, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1;
       if (p < 0.12) {
