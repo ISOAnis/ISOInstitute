@@ -918,7 +918,7 @@ export function IsoLanding() {
             <h1>
               Your city&rsquo;s best. ISO puts them <em>on the map.</em>
             </h1>
-            <p className="sp-sub">Engineering students: meet working engineers for small-group coffee chats in your city.</p>
+            <p className="sp-sub">Connecting engineering students with working engineers for small-group coffee chats in your city.</p>
             <div className="sp-ctas">
               <a className="btn" href={WAITLIST_URL} target="_blank" rel="noopener noreferrer">
                 Join the waitlist
