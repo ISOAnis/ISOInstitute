@@ -10,7 +10,7 @@ import { initSplashStory } from '../components/landing/splashStory';
 import '../styles/iso-landing.css';
 import '../styles/coach-card.css';
 import { BuildYourCard } from '../components/landing/BuildYourCard';
-import { PathwayDeck } from '../components/landing/PathwayDeck';
+import { PathwayFocus } from '../components/landing/PathwayFocus';
 
 const WAITLIST_URL = 'https://tally.so/r/Y5Ee75';
 const DISCORD_URL = 'https://discord.gg/X3hvk4vZd';
@@ -123,7 +123,7 @@ const FAQS = [
   { q: 'Why would a successful professional host for free?', a: 'Most people who made it remember someone who helped them. ISO makes giving back easy: coaches pick a spot they already go to, on their own schedule, and build a coach card and reputation in their city along the way. Active coaches also get last call: if a seat is still open 6 hours before an ISO, they get a ping and can take it for free. Players always get first call, and coaches who want it can pay like any player.' },
   { q: "Wait, isn't an ISO one-on-one?", a: "In basketball, yes. On ISO it's always a small group: one coach and 2–4 players. It's safer, it's lower pressure, and you learn from everyone else's questions too. That's how your growth compounds." },
   { q: 'Is the app out?', a: "Not yet. We're running ISOs by hand in Denver first to get the experience right. Join the waitlist to hear when ISOs open near you." },
-  { q: 'Where is ISO available?', a: 'Denver, starting with the Builder pathway (engineering and tech). Join the waitlist and tell us your city and path so we know where to go next.' },
+  { q: 'Where is ISO available?', a: 'New York and Denver, starting with the Builder pathway (engineering and tech). Join the waitlist and tell us your city and path so we know where to go next.' },
   { q: 'Can I become a coach?', a: "If you're doing big things in your field and want to pay it forward, DM us at @isoapp.co. We're looking for founding coaches." },
 ];
 
@@ -1157,10 +1157,10 @@ export function IsoLanding() {
         {/* ---------- pathways ---------- */}
         <section id="pathways">
           <div className="wrap">
-            <div className="eyebrow">Six pathways</div>
+            <div className="eyebrow">Starting with Builders</div>
             <h2>Find your path. Meet who&rsquo;s already on it.</h2>
-            <p className="lede">We&rsquo;re starting with Builders in Denver. As each city fills up, more pathways open.</p>
-            <PathwayDeck />
+            <p className="lede">ISO starts with one pathway, engineering and tech, in New York and Denver. More pathways open as each city fills up.</p>
+            <PathwayFocus />
           </div>
         </section>
 

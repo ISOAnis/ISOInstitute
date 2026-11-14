@@ -1,0 +1,47 @@
+/* ---------- pathways: Builder first, the rest coming soon ---------- */
+.iso-lp .pf { margin-top: 36px; display: grid; gap: 40px; }
+.iso-lp .pf-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 48px; align-items: center; }
+.iso-lp .pf-card.pd-card { position: relative; left: auto; top: auto; transform: none; cursor: default; }
+.iso-lp .pf-info { display: grid; gap: 26px; max-width: 520px; }
+.iso-lp .pf-block { display: grid; gap: 8px; }
+.iso-lp .pf-block p { margin: 0; font-size: 17px; line-height: 1.5; color: var(--fg); }
+.iso-lp .pf-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+}
+.iso-lp .pf-topics { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.iso-lp .pf-topics li {
+  font-size: 14px; font-weight: 700; color: #e9d3f0;
+  background: rgba(199, 125, 219, 0.14); border: 1px solid rgba(199, 125, 219, 0.4);
+  border-radius: 999px; padding: 7px 13px;
+}
+.iso-lp .pf-next { display: grid; gap: 14px; }
+.iso-lp .pf-coming { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.iso-lp .pf-coming li {
+  --a: #e8833a;
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  padding: 12px 14px; border-radius: 14px;
+  background: var(--panel); border: 1px solid var(--line);
+  opacity: 0.8;
+}
+.iso-lp .pf-coming li[data-path="Healer"] { --a: #4d8ff0; }
+.iso-lp .pf-coming li[data-path="Reformer"] { --a: #2ec4c4; }
+.iso-lp .pf-coming li[data-path="Warrior"] { --a: #ef4b4b; }
+.iso-lp .pf-coming li[data-path="Seeker"] { --a: #3fc77a; }
+.iso-lp .pf-ic {
+  flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+  color: var(--a); background: color-mix(in srgb, var(--a) 14%, transparent);
+}
+.iso-lp .pf-coming b { display: block; font-size: 14px; font-weight: 800; color: var(--fg); }
+.iso-lp .pf-coming small { display: block; font-size: 12px; color: var(--muted); line-height: 1.3; }
+
+@media (max-width: 900px) {
+  .iso-lp .pf-coming { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .iso-lp .pf-main { grid-template-columns: minmax(0, 1fr); gap: 28px; justify-items: center; }
+  .iso-lp .pf-info { justify-self: stretch; }
+}
+@media (max-width: 420px) {
+  .iso-lp .pf-coming li { padding: 10px; gap: 8px; }
+  .iso-lp .pf-ic { width: 28px; height: 28px; }
+}
