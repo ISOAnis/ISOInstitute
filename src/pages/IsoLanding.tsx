@@ -848,7 +848,7 @@ export function IsoLanding() {
         <div className="sp-stage">
           <canvas className="sp-back" aria-hidden="true" />
           <div className="sp-phone">
-            <img src={IMG + 's5-P-MapWide.webp'} alt="The ISO app map of New York City, showing coach pins around your location" />
+            <img src={IMG + 's3-P1-Map.webp'} alt="The ISO app map in Denver, showing coach pins around your location" />
           </div>
           <div className="sp-card" role="button" tabIndex={-1} aria-label="Flip Renat's coach card to see her path">
             <div className="sp-flip">
