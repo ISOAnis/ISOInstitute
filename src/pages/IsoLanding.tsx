@@ -36,9 +36,9 @@ const WALKS: Record<
   { video: string; poster: string; label: string; note: string; beats: Beat[]; shots: Shot[] }
 > = {
   players: {
-    video: 'v-player-v5.mp4',
+    video: 'v-player-v6.mp4',
     poster: 's5-P-Map.webp',
-    label: 'A full ISO as a player in New York: find a coach on the map, check their card, claim a seat, check in, ask questions and rank up',
+    label: 'A full ISO as a player in New York: find a coach on the map, check their card, claim a seat, ask questions, record for safety and rank up',
     note: 'Every step a player sees, from the map to ranking up.',
     beats: [
       { t: 0, title: 'Find a coach near you', body: 'Pins show working engineers hosting at coffee shops around New York.' },
@@ -48,7 +48,8 @@ const WALKS: Record<
       { t: 15.2, title: 'Your seat is locked in', body: 'The exact spot unlocks for confirmed players, with your check-in code.' },
       { t: 19.0, title: 'Meet the Huddle', body: 'A group chat with the coach and the other players before you pull up.' },
       { t: 22.8, title: 'Ask what you came to ask', body: 'Guided questions keep it easy, and your notes save to My ISOs.' },
-      { t: 26.6, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
+      { t: 26.6, title: 'Record for safety', body: "Anyone can record an ISO. Everyone at the table is told, it stays locked on your phone, and it's only used if you report." },
+      { t: 30.4, title: 'Level up', body: 'Every ISO counts toward your next rank.' },
     ],
     shots: [
       { src: 's5-P-Map.webp', alt: 'ISO map of New York with a coach preview for Sami A. in SoHo', title: 'Find a coach', body: 'Pins show coaches on your path around New York.' },
@@ -58,6 +59,7 @@ const WALKS: Record<
       { src: 's5-P-Seat.webp', alt: 'Seat confirmed with a four-digit check-in code', title: 'Seat confirmed', body: 'The exact spot unlocks for confirmed players only.' },
       { src: 's5-P-Huddle.webp', alt: 'The Huddle group chat with the coach', title: 'The Huddle', body: 'Chat with the coach and the table before you pull up.' },
       { src: 's5-P-Guide.webp', alt: 'Guided questions during an ISO', title: 'Ask what you came to ask', body: 'Guided questions so everyone at the table gets their answer.' },
+      { src: 's5-P-Record.webp', alt: 'Record this ISO sheet: everyone is told, locked on your phone, only for reports', title: 'Record for safety', body: 'Everyone is told, it stays on your phone and is only used if you report.' },
       { src: 's5-P-Rank.webp', alt: 'Rank up to Junior Varsity', title: 'Level up', body: "Five ISOs and you're off the bench." },
     ],
   },
